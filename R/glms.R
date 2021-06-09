@@ -172,7 +172,7 @@ vdtest.glm <- function(model,varformula,verbose=TRUE,...){
 
 #' @title Variable Selection in Normal Linear Models
 #' @description Performs variable selection in normal linear models.
-#' @param model an object of the class lm which is obtained from the fit of a normal linear model. The linear predictor of the model whose fit is stored in this lm object is the more complex candidate which should be considered by the variable selection procedure.
+#' @param model an object of the class lm which is obtained from the fit of a normal linear model. The linear predictor of the model whose fit is stored in this lm object is the more complex candidate which should be considered by the variable selection procedure.  The more simple model which should be considered by the variable selection procedure is that with just the Intercept, if there is.
 #' @param direction an (optional) character string indicating the mode of variable selection which should be used. The available options are: deleting variables ("backward")  and adding variables ("forward"). By default, \code{direction} is set to be "backward".
 #' @param level an (optional) numeric value in the interval (0,1) indicating the significance level chosen to perform the F tests. This is only appropiate if \code{criterion="p-value"}. By default, \code{level} is set to be 0.05.
 #' @param criterion an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted R-squared ("adjr2"), predicted R-squared ("predr2"), Mallows' CP ("cp") and \emph{p}-value of the F test ("p-value"). By default, \code{criterion} is set to be "bic".
@@ -189,7 +189,7 @@ vdtest.glm <- function(model,varformula,verbose=TRUE,...){
 #' fit1 <- lm(log(Ozone) ~ Solar.R*Temp*Wind, data=airquality)
 #' stepCriterion(fit1, direction="forward", criterion="adjr2")
 #' stepCriterion(fit1, direction="forward", criterion="bic")
-#' stepCriterion(fit1, direction="forward", criterion="p-value", level=0.01)
+#' stepCriterion(fit1, direction="forward", criterion="p-value", level=0.05)
 #'
 #' ## Example 2
 #' fit2 <- lm(mpg ~ log(hp)*log(wt)*qsec, data=mtcars)
@@ -250,7 +250,7 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","predr2","cp
     cat("\nInitial model:\n")
   }
   fit.x <- model
-  if(direction=="forward") fit.x <- eval(parse(text=paste("lm(",oldformula,",offset=offset,weights=weights,data=datas)")))
+  if(direction=="forward") fit.x <- lm(as.formula(oldformula),offset=offset,weights=weights,data=datas)
   if(verbose) cat(oldformula,"\n")
   out_ <- list(initial=oldformula,criterion=criterion)
   newformula <- oldformula
@@ -258,7 +258,7 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","predr2","cp
   inter <- ifelse(length(coef(model))>0,names(coef(model))[1]=="(Intercept)",FALSE)
   if(!inter & direction=="forward")
     stop("The forward variable selection and non-intercept models are not compatible!!",call.=FALSE)
-  names.col <- c("df"," BIC "," AIC ","adj.r-squared(^)","pred.r-squared(~)"," CP(&) "," Pr(F>)(*)")
+  names.col <- c("df"," BIC "," AIC ","adj.r2(^)","pred.r2(~)"," CP(&) "," Pr(F>)(*)")
   delta <- c(1,1,1,-1,-1,1,-1)
   id0 <-  c(" ","bic","aic","adjr2","predr2","cp","p-value")==criterion
   if(direction=="forward") delta[length(delta)] <- 1
@@ -276,7 +276,7 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","predr2","cp
       for(i in 1:length(names.effects)){
         if(all(apply(as.matrix(s[,-i]*s[,i]),2,sum) < sum(s[,i]))){
           formula0 <- constr.formula(fit.x,inter,term=names.effects[i],action="-")
-          fit0 <- eval(parse(text=paste("lm(",formula0,",offset=offset,weights=weights,data=datas)")))
+          fit0 <- lm(as.formula(formula0),offset=offset,weights=weights,data=datas)
           results[i+1,1] <- length(coef(fit.x)) - length(coef(fit0))
           results[i+1,2:(length(delta)-1)] <- lmstats(fit0)
           results[i+1,length(delta)] <- anova(fit.x,fit0,test="F")$Pr[2]
@@ -294,7 +294,7 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","predr2","cp
       for(i in 1:length(names.effects)){
         if(sum(apply(as.matrix(s2[,-i]),2,function(x) sum(s2[,i]*x)==sum(x)))==0){
           formula0 <- constr.formula(fit.x,inter,term=names.effects[i],action="+")
-          fit0 <- eval(parse(text=paste("lm(",formula0,",offset=offset,weights=weights,data=datas)")))
+          fit0 <- lm(as.formula(formula0),offset=offset,weights=weights,data=datas)
           results[i+1,1] <- length(coef(fit0)) - length(coef(fit.x))
           results[i+1,2:(length(delta)-1)] <- lmstats(fit0)
           results[i+1,length(delta)] <- anova(fit.x,fit0,test="F")$Pr[2]
@@ -316,7 +316,7 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","predr2","cp
     charac <- rownames(results)[2]
     rownames(results)[2] <- paste(charac,paste(replicate(max(long-nchar(charac),0)," "),collapse=""),collapse="")
     ids <- min(results[,2]*delta[id0])==(results[,2]*delta[id0])
-    if(verbose) cat("\nStep",count,": ",sale,"\n")
+    if(verbose) cat("\nStep",count,":",sale,"\n")
     indexes <- order(results[,2]*delta[id0],na.last=TRUE)
     if(sum(ids) > 1){
       nexto <- c(1:length(delta))[id0]
@@ -339,9 +339,9 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","predr2","cp
       newformula <- constr.formula(fit.x,inter,term=names.effects2[ids,2],action=names.effects2[ids,1])
       if(nrow(names.effects)==1 | (nrow(names.effects)==2 & !inter)){
         tol <- FALSE
-        if(verbose) cat("\nStep",count,": ",sale,"\n")
+        if(verbose) cat("\nStep",count,":",sale,"\n")
       }
-      fit.x <- eval(parse(text=paste("lm(",newformula,",offset=offset,weights=weights,data=datas)")))
+      fit.x <- lm(as.formula(newformula),offset=offset,weights=weights,data=datas)
     }else tol <- FALSE
   }
   if(verbose){
@@ -393,7 +393,7 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","predr2","cp
 #'
 #' # Example 3
 #' fit3 <- glm(cancer/exposed ~ dose, family=binomial, weights=exposed, data=bladder)
-#' envelope(fit3, type="deviance", col="red", pch=20,col.lab="blue",
+#' envelope(fit3, type="pearson", col="red", pch=20,col.lab="blue",
 #'          col.axis="blue",col.main="black",family="mono",cex=0.8)
 #'
 #' # Example 4
@@ -533,7 +533,7 @@ envelope.glm <- function(object, rep=100, conf=0.95, type=c("quantile","deviance
 #'
 #' # Example 2
 #' fit2 <- lm(mpg ~ log(hp) + log(wt), data=mtcars)
-#' envelope(fit2, type="internal", col="red", pch=20, col.lab="blue",
+#' envelope(fit2, type="external", col="red", pch=20, col.lab="blue",
 #'          col.axis="blue", col.main="black", family="mono", cex=0.8)
 #' @method envelope lm
 #' @export
@@ -863,7 +863,7 @@ anova2 <- function(object,...,test=c("wald","lrt","score","gradient"),verbose=TR
 
 #' @title Variable Selection in Generalized Linear Models
 #' @description Performs variable selection in generalized linear models.
-#' @param model an object of the class glm which is obtained from the fit of a generalized linear model. The linear predictor of the model whose fit is stored in this glm object is the more complex candidate which should be considered by the variable selection procedure.
+#' @param model an object of the class glm which is obtained from the fit of a generalized linear model. The linear predictor of the model whose fit is stored in this glm object is the more complex candidate which should be considered by the variable selection procedure.  The more simple model which should be considered by the variable selection procedure is that with just the Intercept, if there is.
 #' @param direction an (optional) character string indicating the mode of variable selection which should be used. The available options are: deleting variables ("backward")  and adding variables ("forward"). By default, \code{direction} is set to be "backward".
 #' @param level an (optional) numeric value in the interval (0,1) indicating the significance level chosen to perform the F tests. This is only appropiate if \code{criterion}="p-value". By default, \code{level} is set to be 0.05.
 #' @param test an (optional) character string indicating the statistical test which should be used to compare nested models. The available options are: Wald ("wald"), Rao's score ("score"), likelihood ratio ("lrt") and gradient ("gradient") tests. By default, \code{test} is set to be "wald".
@@ -951,7 +951,7 @@ stepCriterion.glm <- function(model, criterion=c("bic","aic","adjr2","p-value"),
     cat("\nInitial model:\n")
   }
   fit.x <- model
-  if(direction=="forward") fit.x <- eval(parse(text=paste("glm(",oldformula,", weights=model$prior.weights, offset=model$offset, family=model$family, data=datas)")))
+  if(direction=="forward") fit.x <- glm(as.formula(oldformula),weights=model$prior.weights,offset=model$offset,family=model$family,data=datas)
   cat(oldformula,"\n")
   out_ <- list(initial=oldformula,criterion=criterion)
   newformula <- oldformula
@@ -963,7 +963,7 @@ stepCriterion.glm <- function(model, criterion=c("bic","aic","adjr2","p-value"),
   }else quasi <- FALSE
   if(!inter & direction=="forward")
     stop("The forward variable selection and non-intercept models are not compatible!!",call.=FALSE)
-  names.col <- c("Df","AIC  ","BIC  ","Deviance(+)","p-value(*)")
+  names.col <- c("Df","AIC  ","BIC  ","adj.r2(^)","p-value(*)")
   delta <- c(1,1,1,-1,-1)
   id0 <-  c(" ","aic","bic","adjr2","p-value")==criterion
   if(!inter) delta <- c(1,1,1,1,-1)
@@ -980,8 +980,8 @@ stepCriterion.glm <- function(model, criterion=c("bic","aic","adjr2","p-value"),
       for(i in 1:max(num.effects)){
         if(all(apply(as.matrix(s[,-i]*s[,i]),2,sum) < sum(s[,i]))){
           formula0 <- constr.formula(fit.x,inter,term=names.effects[i],action="-")
-          fit0 <- try(eval(parse(text=paste("glm(",formula0,", weights=fit.x$prior.weights, offset=fit.x$offset, family=fit.x$family, data=datas)"))),silent=TRUE)
-          if(!is.list(fit0))	fit0 <- eval(parse(text=paste("glm(",formula0,", weights=fit.x$prior.weights, offset=fit.x$offset, family=fit.x$family, data=datas, mustart=fitted(fit.x))")))
+          fit0 <- try(glm(as.formula(formula0),weights=fit.x$prior.weights,offset=fit.x$offset,family=fit.x$family,data=datas),silent=TRUE)
+          if(!is.list(fit0))	fit0 <- glm(as.formula(formula0),weights=fit.x$prior.weights,offset=fit.x$offset,family=fit.x$family,data=datas,mustart=fitted(fit.x))
           results[i+1,1] <- fit0$df.residual - fit.x$df.residual
           results[i+1,2:4] <- glmstats(fit0)
           results[i+1,5] <- anova2(fit0,fit.x,test=test,verbose=FALSE)[1,3]
@@ -999,8 +999,8 @@ stepCriterion.glm <- function(model, criterion=c("bic","aic","adjr2","p-value"),
       for(i in 1:length(names.effects)){
         if(sum(apply(as.matrix(s2[,-i]),2,function(x) sum(s2[,i]*x)==sum(x)))==0){
           formula0 <- constr.formula(fit.x,inter,term=names.effects[i],action="+")
-          fit0 <- try(eval(parse(text=paste("glm(",formula0,", weights=fit.x$prior.weights, offset=fit.x$offset, family=fit.x$family, data=datas)"))),silent=TRUE)
-          if(!is.list(fit0)) fit0 <- eval(parse(text=paste("glm(",formula0,", weights=fit.x$prior.weights, offset=fit.x$offset, family=fit.x$family, data=datas, mustart=fitted(fit.x))")))
+          fit0 <- try(glm(as.formula(formula0),weights=fit.x$prior.weights,offset=fit.x$offset,family=fit.x$family,data=datas),silent=TRUE)
+          if(!is.list(fit0)) fit0 <- glm(as.formula(formula0),weights=fit.x$prior.weights,offset=fit.x$offset,family=fit.x$family,data=datas,mustart=fitted(fit.x))
           results[i+1,1] <- fit.x$df.residual - fit0$df.residual
           results[i+1,2:4] <- glmstats(fit0)
           results[i+1,5] <- anova2(fit.x,fit0,test=test,verbose=FALSE)[1,3]
@@ -1024,7 +1024,7 @@ stepCriterion.glm <- function(model, criterion=c("bic","aic","adjr2","p-value"),
 
     ids <- min(results[,2]*delta[id0])==(results[,2]*delta[id0])
     if(sum(ids)>1) ids <- min(results[,3])==(results[,3])
-    if(verbose) cat("\nStep",count,": ",sale,"\n")
+    if(verbose) cat("\nStep",count,":",sale,"\n")
     indexes <- sort(results[,2]*delta[id0],index=TRUE)$ix
     if(criterion=="p-value"){
       recicla <- results[names.effects3==names.effects3[ids],-c(1,2)]
@@ -1047,18 +1047,17 @@ stepCriterion.glm <- function(model, criterion=c("bic","aic","adjr2","p-value"),
       newformula <- constr.formula(fit.x,inter,term=names.effects2[ids,2],action=names.effects2[ids,1])
       if(nrow(names.effects)==1 | (nrow(names.effects)==2 & !inter)){
         tol <- FALSE
-        if(verbose) cat("\nStep",count,": ",sale,"\n")
+        if(verbose) cat("\nStep",count,":",sale,"\n")
       }
-      new <- paste("glm(",newformula,", weights=fit.x$prior.weights, offset=fit.x$offset, family=fit.x$family, data=datas)")
-      fit.x <- eval(parse(text=new))
+      fit.x <- glm(as.formula(newformula),weights=fit.x$prior.weights,offset=fit.x$offset,family=fit.x$family,data=datas)
     }else tol <- FALSE
   }
   if(verbose){
     cat("\n\nFinal model:\n")
     cat(newformula,"\n\n")
     cat("****************************************************************************\n")
-    if(inter) cat("\n(+) Adjusted R-squared based on the residual deviance")
-    else cat("\n(+) Deviance-based estimate of the dispersion parameter")
+    if(inter) cat("\n(^) Adjusted R-squared based on the residual deviance")
+    else cat("\n(^) Deviance-based estimate of the dispersion parameter")
     cat("\n(*) p-value of the",test2)
     if(criterion=="p-value" & direction=="backward") cat("\n ( effects are dropped when their p-values are higher than",level,")")
     if(criterion=="p-value" & direction=="forward")  cat("\n ( effects are included when their p-values are lower than",level,")")
@@ -1090,6 +1089,7 @@ stepCriterion.glm <- function(model, criterion=c("bic","aic","adjr2","p-value"),
 #' fit2 <- glm(mod2, family=binomial("logit"), data=burn1000)
 #' estequa(fit2)
 #'
+#' ## Example 3
 #' fit3 <- glm(cases ~ offset(log(population)) + city + age, family=poisson("log"), data=skincancer)
 #' estequa(fit3)
 estequa.glm <- function(model,...){
@@ -1209,5 +1209,95 @@ gvif.glm <- function(model,verbose=TRUE,...){
   rownames(results) <- vars
   colnames(results) <- c("GVIF", "df", "GVIF^(1/(2*df))")
   if(verbose) print(results)
+  return(invisible(results))
+}
+
+
+
+#' @title Confidence Intervals for Generalized Linear Models
+#' @description Computes confidence intervals based on Wald, likelihood-ratio, Rao's score or Terrell's gradient tests for a generalized linear model.
+#' @param model an object of the class glm which is obtained from the fit of a generalized linear model.
+#' @param test an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lrt") tests. By default, \code{test} is set to be "wald".
+#' @param digits an (optional) integer value indicating the number of decimal places to be used. By default, \code{digits} is set to be 4.
+#' @param level an (optional) value indicating the required confidence level. By default, \code{level} is set to be 0.95.
+#' @param verbose an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @details The approximate 100(\code{level})\% confidence interval for \eqn{\beta} based on the \code{test} test is the set of values of \eqn{\beta_0} for which the hypothesis \eqn{H_0}: \eqn{\beta=\beta_0} versus \eqn{H_1}: \eqn{\beta!=\beta_0} is not rejected at the approximate significance level of 100(1-\code{level})\%. The Wald, Rao's score and Terrell's gradient tests are performed using the expected Fisher information matrix.
+#' @return A matrix with so many rows as parameters in the linear predictor and two columns: "Lower limit" and "Upper limit".
+#' @references Buse A. (1982) The Likelihood Ratio, Wald, and Lagrange Multiplier Tests: An Expository Note. \emph{The American Statistician} 36, 153-157.
+#' @references Terrell G.R. (2002) The gradient statistic. \emph{Computing Science and Statistics} 34, 206 – 215.
+#' @export confint2
+#' @examples
+#' ## Example 1
+#' Auto <- ISLR::Auto
+#' fit1 <- glm(mpg ~ weight*horsepower, family=inverse.gaussian("log"), data=Auto)
+#' confint2(fit1)
+#'
+#' ## Example 2
+#' burn1000 <- aplore3::burn1000
+#' mod <- death ~ age + tbsa + inh_inj + age*inh_inj + tbsa*inh_inj
+#' fit2 <- glm(mod, family=binomial("logit"), data=burn1000)
+#' confint2(fit2)
+#'
+confint2 <- function(model, level=0.95, test=c("wald","lrt","score","gradient"), digits=4, verbose=TRUE){
+  test <- match.arg(test)
+  if(class(model)[1]!="glm")
+    stop("Only glm-type objects are supported!!",call.=FALSE)
+  alpha <- 1 - level
+  X <- model.matrix(model)
+  p <- ncol(X)
+  n <- nrow(X)
+  ee <- sqrt(diag(vcov(model)))
+  prefi <- "Approximate "
+  if(test=="lrt" | test=="score" | test=="gradient"){
+    results <- matrix(0,p,2)
+    phi <- summary(model)$dispersion
+    for(i in 1:p){
+      offset0 <- ifelse(is.null(model$offset),0,model$offset)
+      Xs <- X[,-i]
+      starts <- coef(model)[-i]
+      f1 <- function(beta0){
+        offsets <- offset0 + X[,i]*beta0
+        if(p > 1) fit0s <- glm(model$y ~ -1 + Xs, family=model$family, offset=offsets, weights=model$prior.weights)
+        if(p == 1) fit0s <- glm(model$y ~ -1, family=model$family, offset=offsets, weights=model$prior.weights)
+        if(test=="lrt") salida <- (fit0s$deviance - model$deviance)/phi - qchisq(1-alpha,1)
+        if(test=="score"){
+          ui <- (crossprod(X,resid(fit0s,type="pearson")*sqrt(fit0s$weights))/phi)[i]
+          Xw <- X*matrix(sqrt(fit0s$weights),n,p)
+          vi <- phi*solve(t(Xw)%*%Xw)[i,i]
+          salida <- ui^2*vi - qchisq(1-alpha,1)
+        }
+        if(test=="gradient"){
+          ui <- (crossprod(X,resid(fit0s,type="pearson")*sqrt(fit0s$weights))/phi)[i]
+          salida <- abs(ui*(coef(model)[i]-beta0)) - qchisq(1-alpha,1)
+        }
+        salida
+      }
+      betas <- coef(model)[i]
+      betai <- betas - 1.05*qnorm(1-alpha/2)*ee[i]
+      while(f1(betai) <= 0) betai <- betas + 1.05*(betai - betas)
+      results[i,1] <- uniroot(f1, lower=betai, upper=betas)$root
+      betai <- coef(model)[i]
+      betas <- betas + 1.05*qnorm(1-alpha/2)*ee[i]
+      while(f1(betas) <= 0) betas <- betai + 1.05*(betas - betai)
+      results[i,2] <- uniroot(f1, lower=betai, upper=betas)$root
+    }
+  }else{
+    if(model$family$family=="gaussian" & model$family$link=="identity"){
+      results <- cbind(coef(model) - qt(1-alpha/2,n-p)*ee,coef(model) + qt(1-alpha/2,n-p)*ee)
+      prefi <- "Exact "
+    }
+    else
+      results <- cbind(coef(model) - qnorm(1-alpha/2)*ee,coef(model) + qnorm(1-alpha/2)*ee)
+  }
+  rownames(results) <- colnames(X)
+  colnames(results) <- c("Lower limit","Upper limit")
+  if(verbose){
+    test <- switch(test,"lrt"="Likelihood-ratio test",
+                   "wald"="Wald test",
+                   "score"="Rao's score test",
+                   "gradient"="Gradient test")
+    cat("\n",prefi,round(100*(1-alpha),digits=1),"percent confidence intervals based on the",test,"\n")
+    print(round(results,digits=digits))
+  }
   return(invisible(results))
 }

@@ -14,7 +14,7 @@
 )
 }
 \arguments{
-\item{model}{an object of the class lm which is obtained from the fit of a normal linear model. The linear predictor of the model whose fit is stored in this lm object is the more complex candidate which should be considered by the variable selection procedure.}
+\item{model}{an object of the class lm which is obtained from the fit of a normal linear model. The linear predictor of the model whose fit is stored in this lm object is the more complex candidate which should be considered by the variable selection procedure.  The more simple model which should be considered by the variable selection procedure is that with just the Intercept, if there is.}
 
 \item{criterion}{an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted R-squared ("adjr2"), predicted R-squared ("predr2"), Mallows' CP ("cp") and \emph{p}-value of the F test ("p-value"). By default, \code{criterion} is set to be "bic".}
 
@@ -42,7 +42,7 @@ Performs variable selection in normal linear models.
 fit1 <- lm(log(Ozone) ~ Solar.R*Temp*Wind, data=airquality)
 stepCriterion(fit1, direction="forward", criterion="adjr2")
 stepCriterion(fit1, direction="forward", criterion="bic")
-stepCriterion(fit1, direction="forward", criterion="p-value", level=0.01)
+stepCriterion(fit1, direction="forward", criterion="p-value", level=0.05)
 
 ## Example 2
 fit2 <- lm(mpg ~ log(hp)*log(wt)*qsec, data=mtcars)

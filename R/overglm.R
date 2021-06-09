@@ -40,15 +40,19 @@
 #' @importFrom stats qqnorm quantile rbeta rbinom resid residuals rgamma rpois
 #' @importFrom utils setTxtProgressBar txtProgressBar
 #' @examples
+## Example 1
 #' fit1 <- overglm(tumors ~ group, family="nb3(log)", data=mammary)
 #' summary(fit1)
 #'
+## Example 2
 #' fit2 <- overglm(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 #' summary(fit2)
 #'
+## Example 3
 #' fit3 <- overglm(cbind(cells,200-cells) ~ tnf + ifn + tnf*ifn, family="bb(logit)", data=cellular)
 #' summary(fit3)
 #'
+## Example 4
 #' fit4 <- overglm(cbind(fetuses,litter-fetuses) ~ pht*tcpo, family="bb(logit)", data=ossification)
 #' summary(fit4)
 #'
@@ -253,15 +257,19 @@ confint.overglm <- function(object,parm,level=0.95,digits=4,verbose=TRUE,...){
 #' @method estequa overglm
 #' @export
 #' @examples
+#' ## Example 1
 #' fit1 <- overglm(tumors ~ group, family="nb3(log)", data=mammary)
 #' estequa(fit1)
 #'
+## Example 2
 #' fit2 <- overglm(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 #' estequa(fit2)
 #'
+## Example 3
 #' fit3 <- overglm(cbind(cells,200-cells) ~ tnf + ifn + tnf*ifn, family="bb(logit)", data=cellular)
 #' estequa(fit3)
 #'
+## Example 4
 #' fit4 <- overglm(cbind(fetuses,litter-fetuses) ~ pht*tcpo, family="bb(logit)", data=ossification)
 #' estequa(fit4)
 
@@ -592,10 +600,12 @@ fitted.overglm <- function(object,...) return(object$fitted.values)
 #' @method predict overglm
 #' @export
 #' @examples
+## Example 1
 #' fit1 <- overglm(tumors ~ group, family="nb3(log)", data=mammary)
 #' newdata <- data.frame(group=as.factor(c("control","retinoid")))
 #' predict(fit1,newdata=newdata,type="response",se.fit=TRUE)
 #'
+## Example 2
 #' fit2 <- overglm(cbind(cells,200-cells) ~ tnf + ifn + tnf*ifn, family="bb(logit)", data=cellular)
 #' newdata <- data.frame(tnf=c(0,100),ifn=c(100,0))
 #' predict(fit2,newdata=newdata,type="response",se.fit=TRUE)
@@ -638,13 +648,13 @@ predict.overglm <- function(object, ...,newdata, se.fit=FALSE, type=c("link","re
 #' @examples
 #' ## Example 1
 #' fit1 <- overglm(cbind(fetuses,litter-fetuses) ~ pht + tcpo, family="bb(logit)", data=ossification)
-#' residuals(fit1,type="quantile",col="red", pch=20,col.lab="blue",
-#'           col.axis="blue",col.main="black",family="mono",cex=0.8)
+#' residuals(fit1, type="quantile", col="red", pch=20, col.lab="blue",
+#'           col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
 #' ## Example 2
 #' fit2 <- overglm(infections ~ location + frequency, family="nb1(log)", data=swimmers)
-#' residuals(fit2,type="quantile",col="red", pch=20,col.lab="blue",
-#'           col.axis="blue",col.main="black",family="mono",cex=0.8)
+#' residuals(fit2, type="quantile", col="red", pch=20, col.lab="blue",
+#'           col.axis="blue", col.main="black", family="mono", cex=0.8)
 #' @method residuals overglm
 #' @export
 #' @references Dunn P.K. and Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics}, 5, 236-244.
@@ -842,13 +852,13 @@ BIC.overglm <- function(object,...,verbose=TRUE){
 #' @examples
 #' ## Example 1
 #' fit1 <- overglm(infections ~ frequency + location, family="nb1(log)", data=swimmers)
-#' envelope(fit1,rep=100,conf=0.95,type="quantile",col="red", pch=20,col.lab="blue",
-#'          col.axis="blue",col.main="black",family="mono",cex=0.8)
+#' envelope(fit1, rep=100, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
+#'          col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
 #' ## Example 2
 #' fit2 <- overglm(cbind(fetuses,litter-fetuses) ~ tcpo + pht, family="bb(logit)", data=ossification)
-#' envelope(fit2,rep=100,conf=0.95,type="quantile",col="red", pch=20,col.lab="blue",
-#'          col.axis="blue",col.main="black",family="mono",cex=0.8)
+#' envelope(fit2, rep=100, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
+#'          col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
 envelope.overglm <- function(object, rep=100, conf=0.95, type=c("quantile","response","standardized"), plot.it=TRUE, identify, ...){
   type <- match.arg(type)
@@ -924,7 +934,7 @@ envelope.overglm <- function(object, rep=100, conf=0.95, type=c("quantile","resp
 
 #' @title Variable selection in Negative Binomial and Beta-Binomial Regression Models
 #' @description Performs variable selection in negative binomial and beta-binomial regression models.
-#' @param model an object of the class overglm which is obtained from the fit of a negative binomial or beta-binomial model. The linear predictor of the model whose fit is stored in this overglm object is the more complex candidate which should be considered by the variable selection procedure.
+#' @param model an object of the class overglm which is obtained from the fit of a negative binomial or beta-binomial model. The linear predictor of the model whose fit is stored in this overglm object is the more complex candidate which should be considered by the variable selection procedure. The more simple model which should be considered by the variable selection procedure is that with just the Intercept, if there is.
 #' @param direction an (optional) character string indicating the mode of variable selection which should be used. The available options are: deleting variables ("backward")  and adding variables ("forward"). By default, \code{direction} is set to be "backward".
 #' @param test an (optional) character string indicating the statistical test which should be used to compare nested models. The available options are: Wald ("wald"), Rao's score ("score"), likelihood ratio ("lrt") and gradient ("gradient") tests. By default, \code{test} is set to be "wald".
 #' @param level an (optional) numeric value in the interval (0,1) indicating the significance level chosen to perform the statistical tests. This is only appropiate if \code{criterion="p-value"}. By default, \code{level} is set to be 0.05.
@@ -987,7 +997,7 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"),
   fit.x <- model
   oldformula2 <- oldformula
   oldformula <- paste(oldformula,"+ offset(model$offset)")
-  if(direction=="forward") fit.x <- eval(parse(text=paste("overglm(",oldformula,",weights=model$prior.weights,family=model$family,data=datas)")))
+  if(direction=="forward") fit.x <- overglm(as.formula(oldformula),weights=model$prior.weights,family=model$family,data=datas)
   cat(oldformula2,"\n")
   out_ <- list(initial=oldformula2,criterion=criterion)
   newformula2 <- oldformula2
@@ -1012,7 +1022,7 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"),
         if(all(apply(as.matrix(s[,-i]*s[,i]),2,sum) < sum(s[,i]))){
           formula0 <- constr.formula(fit.x,inter,term=names.effects[i],action="-")
           formula0 <- paste(formula0,"+ offset(model$offset)")
-          fit0 <- eval(parse(text=paste("overglm(",formula0,",weights=model$prior.weights,family=model$family,data=datas)")))
+          fit0 <- overglm(as.formula(formula0),weights=model$prior.weights,family=model$family,data=datas)
           results[i+1,1] <- length(coef(fit.x)) - length(coef(fit0))
           results[i+1,2] <- -2*fit0$logLik + log(nrow(fit0$y))*length(coef(fit0))
           results[i+1,3] <- -2*fit0$logLik + k*length(coef(fit0))
@@ -1032,7 +1042,7 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"),
         if(sum(apply(as.matrix(s2[,-i]),2,function(x) sum(s2[,i]*x)==sum(x)))==0){
           formula0 <- constr.formula(fit.x,inter,term=names.effects[i],action="+")
           formula0 <- paste(formula0,"+ offset(model$offset)")
-          fit0 <- eval(parse(text=paste("overglm(",formula0,",weights=model$prior.weights,family=model$family,data=datas)")))
+          fit0 <- overglm(as.formula(formula0),weights=model$prior.weights,family=model$family,data=datas)
           results[i+1,1] <- length(coef(fit0)) - length(coef(fit.x))
           results[i+1,2] <- -2*fit0$logLik + log(nrow(fit0$y))*length(coef(fit0))
           results[i+1,3] <- -2*fit0$logLik + k*length(coef(fit0))
@@ -1083,7 +1093,7 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"),
         tol <- FALSE
         if(verbose) cat("\nStep",count,": ",sale,"\n")
       }
-      fit.x <- eval(parse(text=paste("overglm(",newformula,",weights=model$prior.weights,family=model$family,data=datas)")))
+      fit.x <- overglm(as.formula(newformula),weights=model$prior.weights,family=model$family,data=datas)
     }else tol <- FALSE
   }
   if(verbose){

@@ -32,9 +32,8 @@ boxplot(infections ~ frequency, data=subset(swimmers,location=="non-beach"),
 boxplot(infections ~ frequency, data=subset(swimmers,location=="beach"), add=TRUE,
         at=c(1:2)+0.2, col="blue", boxwex=0.25, outline=FALSE, xaxt="n")
 axis(1, at=1:2, labels=levels(swimmers$frequency))
-legend(0.2, 6.7, legend=c("non-beach","beach"), title="Location",
-       col=c("yellow","blue"), bty="n", cex=0.9, title.adj=0.2,
-       y.intersp=0.1, x.intersp=0.3)
+legend(0.3, 6, legend=c("non-beach","beach"), title="Location",
+       fill=c("yellow","blue"), bty="n", cex=0.9)
 }
 \references{
 Hand D.J., Daly F., Lunn A.D., McConway K.J. and Ostrowsky E. (1994)

@@ -16,7 +16,7 @@ glmgee(
   corr,
   start,
   scale.fix = FALSE,
-  scale.value,
+  scale.value = 1,
   toler = 1e-07,
   maxit = 50,
   adjr2 = FALSE,
@@ -32,7 +32,7 @@ glmgee(
 
 \item{id}{a vector which identifies the clusters. The length of \code{id} should be the same as the number of observations.}
 
-\item{waves}{an (optional) a positive integer-valued variable that is used to identify the order and spacing of observations within groups. This argument is crucial when there are missing values and gaps in the data. By default, \code{waves} is equal to the integers from 1 to the size of each cluster.}
+\item{waves}{an (optional) a positive integer-valued variable that is used to identify the order and spacing of observations within clusters. This argument is crucial when there are missing values and gaps in the data. By default, \code{waves} is equal to the integers from 1 to the size of each cluster.}
 
 \item{data}{an (optional) \code{data frame} in which to look for variables involved in the \code{formula} expression, as well as the variables specified in the arguments \code{id} and \code{weights}. The data are assumed to be sorted by \code{id} and time.}
 
@@ -58,13 +58,13 @@ glmgee(
 }
 \value{
 an object of the class glmgee in which are stored the main results of the generalized estimating equation fitted to the data. Some of those results can be easily accessed using functions as, for example, \code{print()}, \code{summary()}, \code{model.matrix()}, \code{estequa()}, \code{coef()}, \code{vcov()}, \code{logLik()}, \code{fitted()}, \code{confint()} and \code{predict()}. In addition, the model fitted to the data
-can be assessed using functions as, for instance, \link{anova.glmgee}, \link{residuals.glmgee}, \link{dfbeta.glmgee} and \link{cooks.distance.glmgee}. The variable selection may be accomplished using \link{stepCriterion.glmgee} whereas the working–correlation–structure can be chosen by using criteria as \link{QIC}, \link{CIC}, \link{DEW} and \link{RJC}.
+can be assessed using functions as, for instance, \link{anova.glmgee}, \link{residuals.glmgee}, \link{dfbeta.glmgee} and \link{cooks.distance.glmgee}. The variable selection may be accomplished using \link{stepCriterion.glmgee} whereas the working–correlation–structure can be chosen by using criteria as \link{QIC}, \link{CIC}, \link{GHYC} and \link{RJC}.
 }
 \description{
 Produces an object of the class glmgee in which are stored the main results of the generalized estimating equation fitted to the data.
 }
 \details{
-If the value of \code{waves} for a cluster of size 4 is 2, 4, 5, 6 then it means that the data on times 1 and 3 are missing, which should be taken into account by \code{glmgee} to estimate the correlation matrix when its structure is assumed to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent" or "AR-1".  If in this scenario \code{waves} is not specified then \code{glmgee} assumes that the available data for this cluster were taken on point times 1, 2, 3 and 4.
+If the value of \code{waves} for a cluster of size 4 is 2, 4, 5, 6 then it means that the data on times 1 and 3 are missing, which should be taken into account by \code{glmgee} when the structure of the correlation matrix is assumed to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent" or "AR-1".  If in this scenario \code{waves} is not specified then \code{glmgee} assumes that the available data for this cluster were taken on point times 1, 2, 3 and 4.
 }
 \examples{
 ## Example 1

@@ -4,7 +4,7 @@
 #' @description The main objective of the analysis of these data is to assess the effect of the ozone pollution on the tree growth. As ozone pollution
 #' is common in urban areas, the impact of increased ozone concentrations on tree growth is of considerable interest. The
 #' response variable is tree size, where size is conventionally measured by the product of tree height and stem diameter squared.
-#' In a first group, a total of 54 trees were grown under a ozone-enriched atmosphere, that is, ozone exposure at 70 parts per billion,
+#' In a first group, a total of 54 trees were grown under an ozone-enriched atmosphere, that is, ozone exposure at 70 parts per billion,
 #' whereas in a second group, 25 were grown under a normal atmosphere. The size of each tree was observed 13 times across the time, that is,
 #' 152, 174, 201, 227, 258, 469, 496, 528, 556, 579, 613, 639 and 674 days since the beginning of the experiment. Hence,
 #' the objective is to compare the growth patterns of the trees under the two conditions. See Diggle et al. (2002, page 4).
@@ -23,13 +23,13 @@
 #' @keywords datasets
 #' @examples
 #' boxplot(size ~ days, data=subset(spruce,treat=="normal"), at=c(1:13)-0.2,
-#'         col="yellow", boxwex=0.25, outline=FALSE, xaxt="n")
+#'         col="yellow", boxwex=0.3, outline=FALSE, xaxt="n", xlim=c(0.9,13.1))
 #' boxplot(size ~ days, data=subset(spruce,treat=="ozone-enriched"), add=TRUE,
-#'         at=c(1:13)+0.2, col="blue", boxwex=0.25, outline=FALSE, xaxt="n")
+#'         at=c(1:13)+0.2, col="blue", boxwex=0.3, outline=FALSE, xaxt="n")
 #' axis(1, at=1:13, labels=unique(spruce$days))
-#' legend(-0.5, 1600, legend=c("normal","ozone-enriched"), title="Atmosphere",
-#'        col=c("yellow","blue"), bty="n", cex=0.75, title.adj=0.2,
-#'        y.intersp=0.1, x.intersp=0.3, pch=15)
+#' axis(2, at=seq(0,1500,250), labels=seq(0,1500,250))
+#' legend(0.5, 1500, legend=c("normal","ozone-enriched"), title="Atmosphere",
+#'        fill=c("yellow","blue"), bty="n")
 #' @references Diggle P.J., Heagarty P., Liang K.-Y. and Zeger S.L. (2002) \emph{Analysis of Longitudinal Data}. Oxford University Press, Oxford.
 #'
 "spruce"
@@ -57,8 +57,8 @@
 #' @examples
 #' barplot(100*cells/200 ~ ifn + tnf, beside=TRUE, data=cellular, col=terrain.colors(4),
 #'         xlab="Dose of TNF", ylab="% of cells with markers of differentiation")
-#' legend(0, 100, c("0","4","20","100"), col=terrain.colors(4), bty="n", cex=0.9,
-#'        title="Dose of IFN", y.intersp=0.1, x.intersp=0.3, title.adj=0.2, pch=15)
+#' legend(1, 90, c("0","4","20","100"), fill=terrain.colors(4), bty="n", cex=0.9,
+#'        title="Dose of IFN")
 #' @references Piegorsch W.W., Weinberg C.R. and Margolin B.H. (1988) Exploring
 #' simple independent action in multifactor tables of proportions. \emph{Biometrics} 44, 595-603.
 #'
@@ -98,8 +98,8 @@
 #' boxplot(100*fetuses/litter ~ pht, data=subset(ossification, tcpo=="100 mg/kg"),
 #'         add=TRUE, at=c(1:2)+0.2, col="blue", boxwex=0.25, outline=FALSE, xaxt="n")
 #' axis(1, at=1:2, labels=levels(ossification$pht))
-#' legend(0.2, 45, legend=c("0 mg/kg","100 mg/kg"), y.intersp=0.1, x.intersp=0.3, pch=15,
-#'        col=c("yellow","blue"), bty="n", cex=0.9, title="Dose of TCPO", title.adj=0.2)
+#' legend(0.25, 20, legend=c("0 mg/kg","100 mg/kg"), fill=c("yellow","blue"),
+#'        bty="n", cex=0.9, title="Dose of TCPO")
 #' @references Morel J.G. and Neerchal N.K. (1997) Clustered binary logistic regression in teratology data
 #' using a finite mixture distribution. \emph{Statistics in Medicine} 16, 2843-2853.
 #'
@@ -135,9 +135,8 @@
 #' boxplot(infections ~ frequency, data=subset(swimmers,location=="beach"), add=TRUE,
 #'         at=c(1:2)+0.2, col="blue", boxwex=0.25, outline=FALSE, xaxt="n")
 #' axis(1, at=1:2, labels=levels(swimmers$frequency))
-#' legend(0.2, 6.7, legend=c("non-beach","beach"), title="Location",
-#'        col=c("yellow","blue"), bty="n", cex=0.9, title.adj=0.2,
-#'        y.intersp=0.1, x.intersp=0.3)
+#' legend(0.3, 6, legend=c("non-beach","beach"), title="Location",
+#'        fill=c("yellow","blue"), bty="n", cex=0.9)
 #' @references Hand D.J., Daly F., Lunn A.D., McConway K.J. and Ostrowsky E. (1994)
 #' \emph{A Handbook of Small Data Sets}, Chapman and Hall, London.
 #'
@@ -199,9 +198,8 @@
 #'   plot(Biomass, Species,
 #'        col=apply(as.matrix(pH),1,function(x) switch(x,"low"="red","mid"="black","high"="blue")),
 #'        pch=apply(as.matrix(pH),1,function(x) switch(x,"low"=15,"mid"=16,"high"=17)))
-#'   legend(8.5, 50, legend=c("low","mid","high"), col=c("red","black","blue"),
-#'          pch=c(15,16,17), bty="n", cex=0.85, y.intersp=0.5, x.intersp=0.3,
-#'          title="Soil pH level", title.adj=0.2)
+#'   legend(8.5, 42, legend=c("low","mid","high"), col=c("red","black","blue"),
+#'          pch=c(15,16,17), bty="n", cex=0.95, title="Soil pH level")
 #' })
 #' @references Crawley M.J. (2007) \emph{The R Book}. John Wiley & Sons, Chichester.
 "richness"
@@ -236,9 +234,8 @@
 #'     plot(log(distance), log(rtime),
 #'          col=apply(as.matrix(cli),1,function(x) switch(x,"low"="red","high"="blue")),
 #'          pch=apply(as.matrix(cli),1,function(x) switch(x,"low"=15,"high"=16)))
-#'     legend(0.5, 5.5, legend=c("low","high"), title="Cumulative climb",
-#'            col=c("red","blue"), pch=c(15,16), bty="n", cex=0.75,
-#'            title.adj=0.4, y.intersp=0.5, x.intersp=0.3)
+#'     legend(0.7, 5.4, legend=c("low","high"), title="Cumulative climb",
+#'            col=c("red","blue"), pch=c(15,16), bty="n")
 #' })
 #' @source \url{http://users.stat.ufl.edu/~aa/glm/data/}
 #' @references Agresti A. (2015) \emph{Foundations of Linear and Generalized Linear Models}.
@@ -322,8 +319,7 @@
 #' @examples
 #' barplot(1000*cases/population ~ city + age, beside=TRUE, col=c("yellow","blue"), data=skincancer)
 #' legend(1, 11, legend=c("St.Paul","Ft.Worth"), title="City",
-#'        col=c("yellow","blue"), bty="n", cex=0.9, title.adj=0.2,
-#'        y.intersp=0.1, x.intersp=0.3, pch=15)
+#'        fill=c("yellow","blue"), bty="n", cex=0.9)
 
 #' @references Kleinbaum D., Kupper L., Nizam A. and Rosenberg E.S. (2013) \emph{Applied Regression Analysis and
 #' other Multivariable Methods, Fifth Edition}, Cengage Learning, Boston.
@@ -357,7 +353,7 @@
 #' oestrogen give transdermally for treatment of severe postnatal
 #' depression. Women with major depression were randomly assigned
 #' to either a placebo control group or estrogen patch group.
-#' Prior to the first treatment all women were assessed by
+#' Prior to the treatment all women were assessed by
 #' self-ratings of depressive symptoms on the Edinburgh
 #' Postnatal Depression Scale (EPDS). The data on EPDS were
 #' collected monthly for six months once the treatment began.
@@ -384,8 +380,8 @@
 #'  boxplot(dep ~ visit, data=subset(depression,group=="estrogen"), add=TRUE,
 #'          at=c(0:6)+0.2, col="blue", boxwex=0.25, outline=FALSE, xaxt="n")
 #'  axis(1, at=0:6, labels=c(-1,1:6))
-#'  legend(-1, 15, legend=c("placebo","estrogen"), col=c("yellow","blue"),
-#'         pch=15, bty="n", cex=0.9, title.adj=0.2, y.intersp=0.1, x.intersp=0.3)
+#'  legend(-1, 8, legend=c("placebo","estrogen"), fill=c("yellow","blue"),
+#'         bty="n", title="Group")
 #'
 #' @source \url{https://stats.idre.ucla.edu/spss/library/spss-librarypanel-data-analysis-using-gee/}
 #' @references Gregoire A.J.P., Kumar R., Everitt B., Henderson A.F. and Studd J.W.W. (1996) Transdermal oestrogen for treatment of severe postnatal depression,

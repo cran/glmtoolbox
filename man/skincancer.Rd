@@ -24,8 +24,7 @@ skin cancer for women stratified by age in Minneapolis
 \examples{
 barplot(1000*cases/population ~ city + age, beside=TRUE, col=c("yellow","blue"), data=skincancer)
 legend(1, 11, legend=c("St.Paul","Ft.Worth"), title="City",
-       col=c("yellow","blue"), bty="n", cex=0.9, title.adj=0.2,
-       y.intersp=0.1, x.intersp=0.3, pch=15)
+       fill=c("yellow","blue"), bty="n", cex=0.9)
 }
 \references{
 Kleinbaum D., Kupper L., Nizam A. and Rosenberg E.S. (2013) \emph{Applied Regression Analysis and

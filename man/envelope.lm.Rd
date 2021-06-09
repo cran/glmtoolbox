@@ -46,7 +46,7 @@ envelope(fit1, type="internal", col="red", pch=20, col.lab="blue",
 
 # Example 2
 fit2 <- lm(mpg ~ log(hp) + log(wt), data=mtcars)
-envelope(fit2, type="internal", col="red", pch=20, col.lab="blue",
+envelope(fit2, type="external", col="red", pch=20, col.lab="blue",
          col.axis="blue", col.main="black", family="mono", cex=0.8)
 }
 \references{

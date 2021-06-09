@@ -26,8 +26,8 @@ agents stimulate cell differentiation synergistically or independently.
 \examples{
 barplot(100*cells/200 ~ ifn + tnf, beside=TRUE, data=cellular, col=terrain.colors(4),
         xlab="Dose of TNF", ylab="\% of cells with markers of differentiation")
-legend(0, 100, c("0","4","20","100"), col=terrain.colors(4), bty="n", cex=0.9,
-       title="Dose of IFN", y.intersp=0.1, x.intersp=0.3, title.adj=0.2, pch=15)
+legend(1, 90, c("0","4","20","100"), fill=terrain.colors(4), bty="n", cex=0.9,
+       title="Dose of IFN")
 }
 \references{
 Piegorsch W.W., Weinberg C.R. and Margolin B.H. (1988) Exploring

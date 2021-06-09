@@ -25,7 +25,7 @@ These data arose from a study on the efficacy of
 oestrogen give transdermally for treatment of severe postnatal
 depression. Women with major depression were randomly assigned
 to either a placebo control group or estrogen patch group.
-Prior to the first treatment all women were assessed by
+Prior to the treatment all women were assessed by
 self-ratings of depressive symptoms on the Edinburgh
 Postnatal Depression Scale (EPDS). The data on EPDS were
 collected monthly for six months once the treatment began.
@@ -39,8 +39,8 @@ depression.
  boxplot(dep ~ visit, data=subset(depression,group=="estrogen"), add=TRUE,
          at=c(0:6)+0.2, col="blue", boxwex=0.25, outline=FALSE, xaxt="n")
  axis(1, at=0:6, labels=c(-1,1:6))
- legend(-1, 15, legend=c("placebo","estrogen"), col=c("yellow","blue"),
-        pch=15, bty="n", cex=0.9, title.adj=0.2, y.intersp=0.1, x.intersp=0.3)
+ legend(-1, 8, legend=c("placebo","estrogen"), fill=c("yellow","blue"),
+        bty="n", title="Group")
 
 }
 \references{

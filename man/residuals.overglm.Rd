@@ -32,13 +32,13 @@ Calculates residuals for a fitted negative binomial or beta-binomial model.
 \examples{
 ## Example 1
 fit1 <- overglm(cbind(fetuses,litter-fetuses) ~ pht + tcpo, family="bb(logit)", data=ossification)
-residuals(fit1,type="quantile",col="red", pch=20,col.lab="blue",
-          col.axis="blue",col.main="black",family="mono",cex=0.8)
+residuals(fit1, type="quantile", col="red", pch=20, col.lab="blue",
+          col.axis="blue", col.main="black", family="mono", cex=0.8)
 
 ## Example 2
 fit2 <- overglm(infections ~ location + frequency, family="nb1(log)", data=swimmers)
-residuals(fit2,type="quantile",col="red", pch=20,col.lab="blue",
-          col.axis="blue",col.main="black",family="mono",cex=0.8)
+residuals(fit2, type="quantile", col="red", pch=20, col.lab="blue",
+          col.axis="blue", col.main="black", family="mono", cex=0.8)
 }
 \references{
 Dunn P.K. and Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics}, 5, 236-244.

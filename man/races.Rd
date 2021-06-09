@@ -34,9 +34,8 @@ with(races2,{
     plot(log(distance), log(rtime),
          col=apply(as.matrix(cli),1,function(x) switch(x,"low"="red","high"="blue")),
          pch=apply(as.matrix(cli),1,function(x) switch(x,"low"=15,"high"=16)))
-    legend(0.5, 5.5, legend=c("low","high"), title="Cumulative climb",
-           col=c("red","blue"), pch=c(15,16), bty="n", cex=0.75,
-           title.adj=0.4, y.intersp=0.5, x.intersp=0.3)
+    legend(0.7, 5.4, legend=c("low","high"), title="Cumulative climb",
+           col=c("red","blue"), pch=c(15,16), bty="n")
 })
 }
 \references{

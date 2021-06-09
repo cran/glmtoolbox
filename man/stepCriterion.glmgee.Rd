@@ -15,7 +15,7 @@
 )
 }
 \arguments{
-\item{model}{an object of the class glmgee which is obtained from the fit of a generalized estimating equation. The linear predictor of the model whose fit is stored in this glmgee object is the more complex candidate which should be considered by the variable selection procedure.}
+\item{model}{an object of the class glmgee which is obtained from the fit of a generalized estimating equation. The linear predictor of the model whose fit is stored in this glmgee object is the more complex candidate which should be considered by the variable selection procedure. The more simple model which should be considered by the variable selection procedure is that with just the Intercept, if there is.}
 
 \item{criterion}{an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: QIC ("qic"), QICu ("qicu"), \emph{p}-value of a statistical test ("p-value") and adjusted deviance-based R-squared ("adjr2"). By default, \code{criterion} is set to be "p-value".}
 
@@ -45,13 +45,11 @@ Performs variable selection in generalized estimating equations using a chosen m
 mod <- size ~ poly(days,4)*treat
 fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruce, corstr="AR-1")
 stepCriterion(fit1, criterion="p-value", direction="forward")
-stepCriterion(fit1, criterion="p-value", direction="backward")
 
 ## Example 2
 mod <- depressd ~ visit*group
 fit2 <- glmgee(mod, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
-stepCriterion(fit2, criterion="qic", direction="forward")
-stepCriterion(fit2, criterion="qic", direction="backward")
+stepCriterion(fit2, criterion="adjr2", direction="forward")
 }
 \seealso{
 \link{stepCriterion.lm}, \link{stepCriterion.glm}, \link{stepCriterion.overglm}

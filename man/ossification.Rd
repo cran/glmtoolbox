@@ -34,8 +34,8 @@ boxplot(100*fetuses/litter ~ pht, data=subset(ossification, tcpo=="0 mg/kg"),
 boxplot(100*fetuses/litter ~ pht, data=subset(ossification, tcpo=="100 mg/kg"),
         add=TRUE, at=c(1:2)+0.2, col="blue", boxwex=0.25, outline=FALSE, xaxt="n")
 axis(1, at=1:2, labels=levels(ossification$pht))
-legend(0.2, 45, legend=c("0 mg/kg","100 mg/kg"), y.intersp=0.1, x.intersp=0.3, pch=15,
-       col=c("yellow","blue"), bty="n", cex=0.9, title="Dose of TCPO", title.adj=0.2)
+legend(0.25, 20, legend=c("0 mg/kg","100 mg/kg"), fill=c("yellow","blue"),
+       bty="n", cex=0.9, title="Dose of TCPO")
 }
 \references{
 Morel J.G. and Neerchal N.K. (1997) Clustered binary logistic regression in teratology data

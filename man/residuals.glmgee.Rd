@@ -7,7 +7,7 @@
 \method{residuals}{glmgee}(
   object,
   ...,
-  type = c("mahalanobis", "standardized", "response"),
+  type = c("mahalanobis", "pearson", "deviance"),
   plot.it = TRUE,
   identify
 )
@@ -17,7 +17,7 @@
 
 \item{...}{further arguments passed to or from other methods}
 
-\item{type}{an (optional) character string giving the type of residuals which should be returned. The available options are: (1) the difference between the observed response and the fitted mean ("response"); (2) the standardized difference between the observed response and the fitted mean ("standardized"); (3) the distance between the observed response vector and the fitted mean vector using a metric based on the product between the cluster size and fitted variance-covariance matrix ("mahalanobis"). By default, \code{type} is set to be "mahalanobis".}
+\item{type}{an (optional) character string giving the type of residuals which should be returned. The available options are: (1) "pearson"; (2) "deviance";  (3) the distance between the observed response vector and the fitted mean vector using a metric based on the product between the cluster size and fitted variance-covariance matrix ("mahalanobis"). By default, \code{type} is set to be "mahalanobis".}
 
 \item{plot.it}{an (optional) logical switch indicating if a plot of the residuals is required. By default, \code{plot.it} is set to be TRUE.}
 
@@ -32,6 +32,6 @@ Calculates residuals for a fitted generalized estimating equation.
 \examples{
 mod <- size ~ poly(days,4) + treat
 fit <- glmgee(mod, id=tree, family=Gamma("log"), data=spruce, corstr="AR-1")
-residuals(fit,type="mahalanobis",col="red", pch=20,col.lab="blue",
-          col.axis="blue",col.main="black",family="mono",cex=0.8)
+residuals(fit, type="mahalanobis", col="red", pch=20, col.lab="blue",
+          col.axis="blue", col.main="black", family="mono", cex=0.8)
 }

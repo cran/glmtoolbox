@@ -31,6 +31,7 @@ mod2 <- death ~ age + gender + race + tbsa + inh_inj + flame + age*inh_inj + tbs
 fit2 <- glm(mod2, family=binomial("logit"), data=burn1000)
 estequa(fit2)
 
+## Example 3
 fit3 <- glm(cases ~ offset(log(population)) + city + age, family=poisson("log"), data=skincancer)
 estequa(fit3)
 }

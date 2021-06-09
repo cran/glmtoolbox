@@ -55,7 +55,7 @@ envelope(fit2, type="deviance",col="red", pch=20,col.lab="blue",
 
 # Example 3
 fit3 <- glm(cancer/exposed ~ dose, family=binomial, weights=exposed, data=bladder)
-envelope(fit3, type="deviance", col="red", pch=20,col.lab="blue",
+envelope(fit3, type="pearson", col="red", pch=20,col.lab="blue",
          col.axis="blue",col.main="black",family="mono",cex=0.8)
 
 # Example 4

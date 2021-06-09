@@ -44,13 +44,13 @@ The simulated envelope is builded by simulating rep independent realizations of 
 \examples{
 ## Example 1
 fit1 <- overglm(infections ~ frequency + location, family="nb1(log)", data=swimmers)
-envelope(fit1,rep=100,conf=0.95,type="quantile",col="red", pch=20,col.lab="blue",
-         col.axis="blue",col.main="black",family="mono",cex=0.8)
+envelope(fit1, rep=100, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
+         col.axis="blue", col.main="black", family="mono", cex=0.8)
 
 ## Example 2
 fit2 <- overglm(cbind(fetuses,litter-fetuses) ~ tcpo + pht, family="bb(logit)", data=ossification)
-envelope(fit2,rep=100,conf=0.95,type="quantile",col="red", pch=20,col.lab="blue",
-         col.axis="blue",col.main="black",family="mono",cex=0.8)
+envelope(fit2, rep=100, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
+         col.axis="blue", col.main="black", family="mono", cex=0.8)
 
 }
 \references{

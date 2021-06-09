@@ -15,7 +15,7 @@
 )
 }
 \arguments{
-\item{model}{an object of the class overglm which is obtained from the fit of a negative binomial or beta-binomial model. The linear predictor of the model whose fit is stored in this overglm object is the more complex candidate which should be considered by the variable selection procedure.}
+\item{model}{an object of the class overglm which is obtained from the fit of a negative binomial or beta-binomial model. The linear predictor of the model whose fit is stored in this overglm object is the more complex candidate which should be considered by the variable selection procedure. The more simple model which should be considered by the variable selection procedure is that with just the Intercept, if there is.}
 
 \item{criterion}{an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic") and \emph{p}-value of the \code{test} test ("p-value"). By default, \code{criterion} is set to be "bic".}
 

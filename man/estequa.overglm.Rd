@@ -18,6 +18,7 @@ A vector with the value of the estimating equations evaluated at the parameter e
 Extracts estimating equations evaluated at the estimates of the parameters for a negative binomial or beta-binomial model fitted to the data.
 }
 \examples{
+## Example 1
 fit1 <- overglm(tumors ~ group, family="nb3(log)", data=mammary)
 estequa(fit1)
 

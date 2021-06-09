@@ -20,20 +20,20 @@ data(spruce)
 The main objective of the analysis of these data is to assess the effect of the ozone pollution on the tree growth. As ozone pollution
 is common in urban areas, the impact of increased ozone concentrations on tree growth is of considerable interest. The
 response variable is tree size, where size is conventionally measured by the product of tree height and stem diameter squared.
-In a first group, a total of 54 trees were grown under a ozone-enriched atmosphere, that is, ozone exposure at 70 parts per billion,
+In a first group, a total of 54 trees were grown under an ozone-enriched atmosphere, that is, ozone exposure at 70 parts per billion,
 whereas in a second group, 25 were grown under a normal atmosphere. The size of each tree was observed 13 times across the time, that is,
 152, 174, 201, 227, 258, 469, 496, 528, 556, 579, 613, 639 and 674 days since the beginning of the experiment. Hence,
 the objective is to compare the growth patterns of the trees under the two conditions. See Diggle et al. (2002, page 4).
 }
 \examples{
 boxplot(size ~ days, data=subset(spruce,treat=="normal"), at=c(1:13)-0.2,
-        col="yellow", boxwex=0.25, outline=FALSE, xaxt="n")
+        col="yellow", boxwex=0.3, outline=FALSE, xaxt="n", xlim=c(0.9,13.1))
 boxplot(size ~ days, data=subset(spruce,treat=="ozone-enriched"), add=TRUE,
-        at=c(1:13)+0.2, col="blue", boxwex=0.25, outline=FALSE, xaxt="n")
+        at=c(1:13)+0.2, col="blue", boxwex=0.3, outline=FALSE, xaxt="n")
 axis(1, at=1:13, labels=unique(spruce$days))
-legend(-0.5, 1600, legend=c("normal","ozone-enriched"), title="Atmosphere",
-       col=c("yellow","blue"), bty="n", cex=0.75, title.adj=0.2,
-       y.intersp=0.1, x.intersp=0.3, pch=15)
+axis(2, at=seq(0,1500,250), labels=seq(0,1500,250))
+legend(0.5, 1500, legend=c("normal","ozone-enriched"), title="Atmosphere",
+       fill=c("yellow","blue"), bty="n")
 }
 \references{
 Diggle P.J., Heagarty P., Liang K.-Y. and Zeger S.L. (2002) \emph{Analysis of Longitudinal Data}. Oxford University Press, Oxford.

@@ -19,7 +19,7 @@
 A matrix with three columns which contains the following:
 \itemize{
 \item \code{Chi:}{ The value of the statistic of the test.}
-\item \code{Df:}{ The number of degrees of freedom.}
+\item \code{df:}{ The number of degrees of freedom.}
 \item \code{Pr(>Chi):}{ The \emph{p}-value of the test computed using the Chi-square distribution.}
 }
 }

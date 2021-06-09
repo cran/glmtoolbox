@@ -22,7 +22,7 @@ A matrix with so many rows as clusters in the sample and so many columns as para
 Produces an approximation, better known as the \emph{one-step approximation}, of the effect of deleting each cluster in turn on the estimates of the parameters in the linear predictor of a generalized estimating equation. This function also can produce a plot of those effects for a subset of the parameters in the linear predictor.
 }
 \details{
-The \emph{one-step approximation} of the estimates of the parameters in the linear predictor of a GEE when the \emph{i}-th cluster is excluded from the dataset is given by the vector obtained as the result of the first iteration of the fitting algorithm of that GEE when it is performed using:  (1) a dataset in which the \emph{i}-th cluster is excluded; and (2) a starting value which is the solution of the same GEE but based on the dataset inluding all clusters.
+The \emph{one-step approximation} of the estimates of the parameters in the linear predictor of a GEE when the \emph{i}-th cluster is excluded from the dataset is given by the vector obtained as the result of the first iteration of the fitting algorithm of that GEE when it is performed using:  (1) a dataset in which the \emph{i}-th cluster is excluded; and (2) a starting value which is the solution to the same GEE but based on the dataset inluding all clusters.
 }
 \examples{
 mod <- size ~ poly(days,4) + treat
@@ -32,10 +32,11 @@ dfbs <- dfbeta(fit, coefs="treat" ,col="red", lty=1, lwd=1, col.lab="blue",
 
 # Calculation by hand of dfbeta for the tree labeled by "N1T01"
 idtree <- "N1T01"
-onestep <- glmgee(mod, id=tree, family=Gamma("log"), data=spruce,
-                 corstr="Exchangeable", start=coef(fit), subset=c(tree!=idtree), maxit=1)
+onestep <- glmgee(mod, id=tree, family=Gamma("log"), data=spruce, corstr="Exchangeable",
+                  start=coef(fit), subset=c(tree!=idtree), maxit=1)
 coef(fit)-coef(onestep)
 dfbs[rownames(dfbs)==idtree,]
+
 }
 \references{
 Pregibon D. (1981). Logistic regression diagnostics. \emph{The Annals of Statistics}, 9, 705-724.

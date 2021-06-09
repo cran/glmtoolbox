@@ -25,9 +25,8 @@ with(richness,{
   plot(Biomass, Species,
        col=apply(as.matrix(pH),1,function(x) switch(x,"low"="red","mid"="black","high"="blue")),
        pch=apply(as.matrix(pH),1,function(x) switch(x,"low"=15,"mid"=16,"high"=17)))
-  legend(8.5, 50, legend=c("low","mid","high"), col=c("red","black","blue"),
-         pch=c(15,16,17), bty="n", cex=0.85, y.intersp=0.5, x.intersp=0.3,
-         title="Soil pH level", title.adj=0.2)
+  legend(8.5, 42, legend=c("low","mid","high"), col=c("red","black","blue"),
+         pch=c(15,16,17), bty="n", cex=0.95, title="Soil pH level")
 })
 }
 \references{

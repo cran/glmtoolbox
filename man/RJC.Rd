@@ -4,13 +4,15 @@
 \alias{RJC}
 \title{Rotnitzky–Jewell's Criterion for Generalized Estimating Equations}
 \usage{
-RJC(...)
+RJC(..., verbose = TRUE)
 }
 \arguments{
 \item{...}{one or several objects of the class glmgee which are obtained from the fit of generalized estimating equations.}
+
+\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
 }
 \value{
-A matrix with the values of the RJC for each glmgee object provided in the input.
+A \code{data.frame} with the values of the RJC for each glmgee object in the input.
 }
 \description{
 Computes the Rotnitzky–Jewell's criterion (RJC) for one or more objects of the class glmgee.
@@ -18,8 +20,8 @@ Computes the Rotnitzky–Jewell's criterion (RJC) for one or more objects of the
 \examples{
 ## Example 1
 mod <- size ~ poly(days,4) + treat
-fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruce, corstr="AR-1")
-fit2 <- update(fit1, corstr="Exchangeable")
+fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruce, corstr="Exchangeable")
+fit2 <- update(fit1, corstr="AR-1")
 fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 fit4 <- update(fit1, corstr="Independence")
 RJC(fit1, fit2, fit3, fit4)
@@ -27,7 +29,7 @@ RJC(fit1, fit2, fit3, fit4)
 ## Example 2
 mod <- dep ~ visit + group
 fit1 <- glmgee(mod, id=subj, family=gaussian, corstr="Exchangeable", data=depression)
-fit2 <- update(fit1, corstr="Exchangeable")
+fit2 <- update(fit1, corstr="AR-1")
 fit3 <- update(fit1, corstr="Non-Stationary-M-dependent(2)")
 fit4 <- update(fit1, corstr="Independence")
 RJC(fit1, fit2, fit3, fit4)
@@ -35,7 +37,7 @@ RJC(fit1, fit2, fit3, fit4)
 ## Example 3
 mod <- depressd ~ visit + group
 fit1 <- glmgee(mod, id=subj, family=binomial, corstr="Exchangeable", data=depression)
-fit2 <- update(fit1, corstr="Exchangeable")
+fit2 <- update(fit1, corstr="AR-1")
 fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 fit4 <- update(fit1, corstr="Independence")
 RJC(fit1, fit2, fit3, fit4)
@@ -45,5 +47,5 @@ Hin L-Y, Carey V.J., Wang Y-G (2007) Criteria for Working–Correlation–Struct
 Assessment via Simulation. \emph{The American Statistician} 61, 360–364.
 }
 \seealso{
-\link{QIC}, \link{CIC}, \link{DEW}
+\link{QIC}, \link{CIC}, \link{GHYC}, \link{AGPC}, \link{SGPC}
 }
