@@ -7,7 +7,7 @@
 anova2(
   object,
   ...,
-  test = c("wald", "lrt", "score", "gradient"),
+  test = c("wald", "lr", "score", "gradient"),
   verbose = TRUE
 )
 }
@@ -16,7 +16,7 @@ anova2(
 
 \item{...}{another objects of the class glm which are obtained from the fit of generalized linear models.}
 
-\item{test}{an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lrt") tests. By default, \code{test} is set to be "wald".}
+\item{test}{an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lr") tests. By default, \code{test} is set to be "wald".}
 
 \item{verbose}{an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
 }
@@ -40,7 +40,7 @@ Auto <- ISLR::Auto
 fit1 <- glm(mpg ~ weight, family=inverse.gaussian("log"), data=Auto)
 fit2 <- update(fit1, . ~ . + horsepower)
 fit3 <- update(fit2, . ~ . + horsepower:weight)
-anova2(fit1, fit2, fit3, test="lrt")
+anova2(fit1, fit2, fit3, test="lr")
 anova2(fit1, fit2, fit3, test="score")
 anova2(fit1, fit2, fit3, test="wald")
 anova2(fit1, fit2, fit3, test="gradient")
@@ -50,14 +50,14 @@ burn1000 <- aplore3::burn1000
 mod <- death ~ age + tbsa + inh_inj
 fit1 <- glm(mod, family=binomial("logit"), data=burn1000)
 fit2 <- update(fit1, . ~ . + inh_inj + age*inh_inj + tbsa*inh_inj)
-anova2(fit1, fit2, test="lrt")
+anova2(fit1, fit2, test="lr")
 anova2(fit1, fit2, test="score")
 anova2(fit1, fit2, test="wald")
 anova2(fit1, fit2, test="gradient")
 
 ## Example 3
 fit <- glm(lesions ~ 1 + time, family=poisson("log"), data=aucuba)
-anova2(fit, test="lrt")
+anova2(fit, test="lr")
 anova2(fit, test="score")
 anova2(fit, test="wald")
 anova2(fit, test="gradient")

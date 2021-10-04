@@ -1,5 +1,83 @@
 #'
-#' @title Effect of ozone-enriched atmosphere on growth of sitka spruce
+#' @title Dental Clinical Trial
+#'
+#' @description These data arose from a dental clinical study. In
+#' this trial, subjects were generally healthy adult male and female
+#' volunteers, ages 18–55, with pre-existing plaque but without
+#' advanced periodontal disease. Prior to entry, subjects were
+#' screened for a minimum of 20 sound, natural teeth and a minimum
+#' mean plaque index of 2.0. Subjects with gross oral pathology or
+#' on antibiotic, antibacterial, or anti-inflammatory therapy were
+#' excluded from the study. One hundred nine volunteers were
+#' randomized in a double-blinded way to one of two new mouth
+#' rinses (A and B) or to a control mouth rinse. Plaque was scored
+#' at baseline, at 3 months, and at 6 months by the Turesky
+#' modification of the Quigley-Hein index, a continuous measure.
+#' Four subjects had missing plaque scores. The main objective
+#' of the analysis is to measure the effectiveness of the three
+#' mouth rinses in inhibiting the development of dental plaque.
+#'
+#' @docType data
+#'
+#' @usage data(rinse)
+#'
+#' @format A data frame with 315 rows and 7 variables:
+#' \describe{
+#'   \item{subject}{a character string giving the identifier of the volunteer.}
+#'   \item{gender}{a factor indicating the gender of the volunteer: "Female" and "Male".}
+#'   \item{age}{a numeric vector indicating the age of the volunteer.}
+#'   \item{rinse}{a factor indicating the type of rinse used by the volunteer: "Placebo", "A" and "B".}
+#'   \item{smoke}{a factor indicating if the volunteer smoke: "Yes" and "No".}
+#'   \item{time}{a numeric vector indicating the time (in months) since the treatment began.}
+#'   \item{score}{a numeric vector giving the subject's score of plaque.}
+#' }
+#' @keywords datasets
+#' @examples
+#' mod <- score ~ rinse + age + gender + smoke + time
+#' fit <- glmgee(mod, family=Gamma(log), id=subject, corstr="AR-1", data=rinse)
+#' summary(fit)
+#' @references Hadgu A. and Koch G. (1999) Application of generalized estimating equations to a dental randomized clinical trial. \emph{Journal
+#' of Biopharmaceutical Statistics} 9, 161-178.
+"rinse"
+
+#'
+#' @title Guidelines for Urinary Incontinence Discussion and Evaluation
+#'
+#' @description These data arose from a randomized controlled trial that
+#' assessed if provider adherence to a set of guidelines for treatment of
+#' patients with urinary incontinence (UI) affected patient outcomes. Data
+#' were collected on 137 elderly patients from 38 medical practices. The
+#' number of patients per practice ranged from 1 to 8 and the median was
+#' 4 patients. The interest of the present analysis is to determine what
+#' predicts whether or not a patient considers their UI a problem that
+#' interferes with him/her daily life.
+#'
+#' @docType data
+#'
+#' @usage data(GUIDE)
+#'
+#' @format A data frame with 137 rows and 7 variables:
+#' \describe{
+#'   \item{bothered}{a numeric vector giving the answer to the following: Do you consider this accidental loss of urine a problem that interferes with your day to day activities or bothers you in other ways? 1 for "Yes" and 0 for "No".}
+#'   \item{gender}{a factor giving the patient's gender: "Male" or "Female".}
+#'   \item{age}{a numeric vector giving the standardized age: (age in years - 76)/10.}
+#'   \item{dayacc}{a numeric vector giving the patient's report of the number of leaking accidents they experience in an average day (derived from number of accidents reported per week).}
+#'   \item{severe}{a factor giving the severity of the loss of urine: "1" if there is only some moisture; "2" if the patient wet the underwear; "3" if the urine trickled down the thigh; and "4" if the patient wet the floor.}
+#'   \item{toilet}{a numeric vector giving the patient's report on the number of times during the day he (or she) usually go to the toilet to urinate.}
+#'   \item{practice}{a character string giving the identifier of the medical practice.}
+#' }
+#' @keywords datasets
+#' @examples
+#' mod <- bothered ~ gender + age + dayacc + severe + toilet
+#' fit <- glmgee(mod, family=binomial(logit), id=practice, corstr="Exchangeable", data=GUIDE)
+#' summary(fit)
+#' @references Hammill B.G. and Preisser J.S. (2006) A SAS/IML software program for GEE and regression diagnostics. \emph{Computational Statistics & Data Analysis} 51, 1197-1212.
+#' @references Jung K.-M. (2008) Local Influence in Generalized Estimating Equations. \emph{Scandinavian Journal of Statistics} 35, 286-294.
+#' @source \url{http://www.bios.unc.edu/~preisser/personal/uidata/preqaq99.dat}
+"GUIDE"
+
+#'
+#' @title Effect of ozone-enriched atmosphere on growth of sitka spruces
 #'
 #' @description The main objective of the analysis of these data is to assess the effect of the ozone pollution on the tree growth. As ozone pollution
 #' is common in urban areas, the impact of increased ozone concentrations on tree growth is of considerable interest. The
@@ -11,7 +89,7 @@
 #'
 #' @docType data
 #'
-#' @usage data(spruce)
+#' @usage data(spruces)
 #'
 #' @format A data frame with 1027 rows and 4 variables:
 #' \describe{
@@ -22,17 +100,17 @@
 #' }
 #' @keywords datasets
 #' @examples
-#' boxplot(size ~ days, data=subset(spruce,treat=="normal"), at=c(1:13)-0.2,
+#' boxplot(size ~ days, data=subset(spruces,treat=="normal"), at=c(1:13)-0.2,
 #'         col="yellow", boxwex=0.3, outline=FALSE, xaxt="n", xlim=c(0.9,13.1))
-#' boxplot(size ~ days, data=subset(spruce,treat=="ozone-enriched"), add=TRUE,
+#' boxplot(size ~ days, data=subset(spruces,treat=="ozone-enriched"), add=TRUE,
 #'         at=c(1:13)+0.2, col="blue", boxwex=0.3, outline=FALSE, xaxt="n")
-#' axis(1, at=1:13, labels=unique(spruce$days))
+#' axis(1, at=1:13, labels=unique(spruces$days))
 #' axis(2, at=seq(0,1500,250), labels=seq(0,1500,250))
 #' legend(0.5, 1500, legend=c("normal","ozone-enriched"), title="Atmosphere",
 #'        fill=c("yellow","blue"), bty="n")
 #' @references Diggle P.J., Heagarty P., Liang K.-Y. and Zeger S.L. (2002) \emph{Analysis of Longitudinal Data}. Oxford University Press, Oxford.
-#'
-"spruce"
+#' @references Crainiceanu C.M., Ruppert D. and Wand M.P. (2005). Bayesian Analysis for Penalized Spline Regression Using WinBUGS. \emph{Journal of Statistical Software} 14(14).
+"spruces"
 
 #' @title Agents to stimulate cellular differentiation
 

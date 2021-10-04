@@ -14,10 +14,10 @@ glmgee(
   subset,
   corstr,
   corr,
-  start,
+  start = NULL,
   scale.fix = FALSE,
   scale.value = 1,
-  toler = 1e-07,
+  toler = 1e-05,
   maxit = 50,
   adjr2 = FALSE,
   ...
@@ -30,15 +30,15 @@ glmgee(
 
 \item{weights}{an (optional) vector of positive "prior weights" to be used in the fitting process. The length of \code{weights} should be the same as the number of observations.}
 
-\item{id}{a vector which identifies the clusters. The length of \code{id} should be the same as the number of observations.}
+\item{id}{a vector which identifies the subjects or clusters. The length of \code{id} should be the same as the number of observations.}
 
-\item{waves}{an (optional) a positive integer-valued variable that is used to identify the order and spacing of observations within clusters. This argument is crucial when there are missing values and gaps in the data. By default, \code{waves} is equal to the integers from 1 to the size of each cluster.}
+\item{waves}{an (optional) positive integer-valued variable that is used to identify the order and spacing of observations within clusters. This argument is crucial when there are missing values and gaps in the data. By default, \code{waves} is equal to the integers from 1 to the size of each cluster.}
 
-\item{data}{an (optional) \code{data frame} in which to look for variables involved in the \code{formula} expression, as well as the variables specified in the arguments \code{id} and \code{weights}. The data are assumed to be sorted by \code{id} and time.}
+\item{data}{a \code{data frame} in which to look for variables involved in the \code{formula} expression, as well as the variables specified in the arguments \code{id} and \code{weights}. The data are assumed to be sorted by \code{id} and time.}
 
 \item{subset}{an (optional) vector specifying a subset of observations to be used in the fitting process.}
 
-\item{corstr}{a character string specifying the (working) correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(m)", "Non-Stationary-M-dependent(m)", "AR-1", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. By default, \code{corstr} is set to be "Independence".}
+\item{corstr}{a character string specifying the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(m)", "Non-Stationary-M-dependent(m)", "AR-1", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. By default, \code{corstr} is set to be "Independence".}
 
 \item{corr}{an (optional) square matrix of the same dimension of the maximum cluster size containing the user specified correlation. This is only appropriate if \code{corstr} is specified to be "User-defined".}
 
@@ -46,41 +46,52 @@ glmgee(
 
 \item{scale.fix}{an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. By default, \code{scale.fix} is set to be FALSE.}
 
-\item{scale.value}{an (optional) numeric variable giving the value to which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. By default, \code{scale.value} is set to be 1.}
+\item{scale.value}{an (optional) numeric variable giving the value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. By default, \code{scale.value} is set to be 1.}
 
-\item{toler}{an (optional) positive value which represents the convergence tolerance. The convergence is reached when the maximum of the relative differences between the values of the parameters in the linear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. By default, \code{toler} is set to be 0.0000001.}
+\item{toler}{an (optional) positive value which represents the convergence tolerance. The convergence is reached when the maximum of the relative differences between the values of the parameters in the linear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. By default, \code{toler} is set to be 0.00001.}
 
 \item{maxit}{an (optional) integer value which represents the maximum number of iterations allowed for the fitting algorithm. By default, \code{maxit} is set to be 50.}
 
-\item{adjr2}{an (optional) logical variable. If TRUE, the adjusted deviance-based R-squared is calculated. By default, \code{adjr2} is set to be FALSE.}
+\item{adjr2}{an (optional) logical variable. If TRUE, the adjusted R-squared based on the deviance is computed. By default, \code{adjr2} is set to be FALSE.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
 \value{
-an object of the class glmgee in which are stored the main results of the generalized estimating equation fitted to the data. Some of those results can be easily accessed using functions as, for example, \code{print()}, \code{summary()}, \code{model.matrix()}, \code{estequa()}, \code{coef()}, \code{vcov()}, \code{logLik()}, \code{fitted()}, \code{confint()} and \code{predict()}. In addition, the model fitted to the data
-can be assessed using functions as, for instance, \link{anova.glmgee}, \link{residuals.glmgee}, \link{dfbeta.glmgee} and \link{cooks.distance.glmgee}. The variable selection may be accomplished using \link{stepCriterion.glmgee} whereas the working–correlation–structure can be chosen by using criteria as \link{QIC}, \link{CIC}, \link{GHYC} and \link{RJC}.
+an object of the class glmgee in which are stored the main results of a Generalized Estimating Equation fitted to the data. Some of those results can be easily accessed using functions as, for example, \code{print()}, \code{summary()}, \code{model.matrix()}, \code{estequa()}, \code{coef()}, \code{vcov()}, \code{fitted()}, \code{confint()} and \code{predict()}. In addition, the model fitted to the data
+can be assessed using functions as, for instance, \link{anova.glmgee}, \link{residuals.glmgee}, \link{leverage.glmgee}, \link{dfbeta.glmgee}, \link{cooks.distance.glmgee} and \link{localInfluence.glmgee}. The variable selection may be accomplished using \link{stepCriterion.glmgee} whereas the working–correlation–structure can be chosen by using criteria as \link{QIC}, \link{CIC}, \link{GHYC}, \link{RJC}, \link{AGPC} and \link{SGPC}.
 }
 \description{
-Produces an object of the class glmgee in which are stored the main results of the generalized estimating equation fitted to the data.
+Produces an object of the class \code{glmgee} in which the main results of a Generalized Estimating Equation fitted to the data are stored.
 }
 \details{
-If the value of \code{waves} for a cluster of size 4 is 2, 4, 5, 6 then it means that the data on times 1 and 3 are missing, which should be taken into account by \code{glmgee} when the structure of the correlation matrix is assumed to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent" or "AR-1".  If in this scenario \code{waves} is not specified then \code{glmgee} assumes that the available data for this cluster were taken on point times 1, 2, 3 and 4.
+If the maximum cluster size is 6 and for a cluster of size 4 \code{waves} is set to be 2, 4, 5, 6 then it means that the data on times 1 and 3 are missing, which should be taken into account by \code{glmgee} when the structure of the correlation matrix is assumed to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent" or "AR-1".  If in this scenario \code{waves} is not specified then \code{glmgee} assumes that the available data for this cluster were taken on point times 1, 2, 3 and 4.
 }
 \examples{
 ## Example 1
 mod1 <- size ~ poly(days,4) + treat
-fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-1", data=spruce)
+fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces)
 summary(fit1)
 
 ## Example 2
 mod2 <- depressd ~ visit + group
-fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="Exchangeable", data=depression)
+fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
 summary(fit2)
 
 ## Example 3
 mod3 <- dep ~ visit + group
-fit3 <- glmgee(mod3, id=subj, corstr="Non-Stationary-M-dependent(2)", data=depression)
+fit3 <- glmgee(mod3, id=subj, corstr="Exchangeable", data=depression)
 summary(fit3)
+
+## Example 4
+mod4 <- score ~ rinse + age + gender + smoke + time
+fit4 <- glmgee(mod4, family=Gamma(log), id=subject, corstr="Exchangeable", data=rinse)
+summary(fit4)
+
+## Example 5
+OME <- MASS::OME
+mod5 <- cbind(Correct, Trials-Correct) ~ Loud + Age + OME
+fit5 <- glmgee(mod5, family = binomial(cloglog), id = ID, corstr = "Exchangeable", data = OME)
+summary(fit5)
 }
 \references{
 Liang K.Y. and Zeger S.L. (1986) Longitudinal data analysis using generalized linear models.

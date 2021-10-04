@@ -4,19 +4,14 @@
 \alias{anova.overglm}
 \title{Comparison of nested Negative Binomial and Beta-Binomial Regression Models}
 \usage{
-\method{anova}{overglm}(
-  object,
-  ...,
-  test = c("wald", "lrt", "score", "gradient"),
-  verbose = TRUE
-)
+\method{anova}{overglm}(object, ..., test = c("wald", "lr", "score", "gradient"), verbose = TRUE)
 }
 \arguments{
 \item{object}{an object of the class overglm which is obtained from the fit of a negative binomial or beta-binomial model.}
 
 \item{...}{another objects of the class overglm which are obtained from the fit of negative binomial or beta-binomial models.}
 
-\item{test}{an (optional) character string indicating the required test. The available options are: Wald ("wald"), Rao's score ("score"), likelihood ratio ("lrt") and Terrell's gradient ("gradient") tests. By default, \code{test} is set to be "wald".}
+\item{test}{an (optional) character string indicating the required test. The available options are: Wald ("wald"), Rao's score ("score"), likelihood ratio ("lr") and Terrell's gradient ("gradient") tests. By default, \code{test} is set to be "wald".}
 
 \item{verbose}{an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
 }
@@ -41,7 +36,7 @@ fit2 <- update(fit1, . ~ . + ifn)
 fit3 <- update(fit2, . ~ . + tnf:ifn)
 anova(fit1, fit2, fit3, test="wald")
 anova(fit1, fit2, fit3, test="score")
-anova(fit1, fit2, fit3, test="lrt")
+anova(fit1, fit2, fit3, test="lr")
 anova(fit1, fit2, fit3, test="gradient")
 
 ## Example 2
@@ -51,7 +46,7 @@ fit3 <- update(fit2, . ~ . + age)
 fit4 <- update(fit3, . ~ . + gender)
 anova(fit1, fit2, fit3, fit4, test="wald")
 anova(fit1, fit2, fit3, fit4, test="score")
-anova(fit1, fit2, fit3, fit4, test="lrt")
+anova(fit1, fit2, fit3, fit4, test="lr")
 anova(fit1, fit2, fit3, fit4, test="gradient")
 }
 \references{

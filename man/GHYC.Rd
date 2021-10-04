@@ -20,7 +20,7 @@ Computes the Gosho-Hamada-Yoshimura's criterion (GHYC) for one or more objects o
 \examples{
 ## Example 1
 mod <- size ~ poly(days,4) + treat
-fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruce, corstr="Exchangeable")
+fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
 fit2 <- update(fit1, corstr="AR-1")
 fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 fit4 <- update(fit1, corstr="Independence")

@@ -4,14 +4,18 @@
 \alias{vcov.glmgee}
 \title{Estimate of the variance-covariance matrix in GEEs}
 \usage{
-\method{vcov}{glmgee}(object, ..., type = c("robust", "jackknife"))
+\method{vcov}{glmgee}(
+  object,
+  ...,
+  type = c("robust", "df-adjusted", "model", "bias-corrected", "jackknife")
+)
 }
 \arguments{
 \item{object}{An object of the class glmgee which is obtained from the fit of a generalized estimating equation.}
 
-\item{...}{further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the QIC (or the QICu), which by default is set to be 2.}
+\item{...}{further arguments passed to or from other methods.}
 
-\item{type}{an (optional) character string indicating the type of estimator which should be used. The available options are: robust estimator ("robust"), jackknife estimator computed from the one-step approximations of the ``leave-one-out'' estimates of the parameter vector ("jackknife"). By default, \code{type} is set to be "robust".}
+\item{type}{an (optional) character string indicating the type of estimator which should be used. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). By default, \code{type} is set to be "robust".}
 }
 \value{
 A \code{matrix} with the type-\code{type} estimate of the variance-covariance matrix.
@@ -22,23 +26,23 @@ Computes the type-\code{type} estimate of the variance-covariance matrix from an
 \examples{
 ## Example 1
 mod <- size ~ poly(days,4) + treat
-fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruce, corstr="Exchangeable")
+fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
 vcov(fit1)
-vcov(fit1,type="jackknife")
+vcov(fit1,type="bias-corrected")
 
 ## Example 2
 mod <- dep ~ visit + group
 fit2 <- glmgee(mod, id=subj, family=gaussian, corstr="AR-1", data=depression)
 vcov(fit2)
-vcov(fit2,type="jackknife")
+vcov(fit2,type="bias-corrected")
 
 ## Example 3
 mod <- depressd ~ visit + group
 fit3 <- glmgee(mod, id=subj, family=binomial, corstr="Stationary-M-dependent(3)", data=depression)
 vcov(fit3)
-vcov(fit3,type="jackknife")
+vcov(fit3,type="bias-corrected")
 
 }
 \references{
-Lipsitz S.R., Laird N.M. and Harrington D.P. (1990) Using the jackknife to estimate the variance of regression estimators from repeated measures studies. \emph{Communications in Statistics - Theory and Methods} 19, 821–845.
+Mancl, L.A. and DeRouen T.A. (2001) A Covariance Estimator for GEE with Improved Small-Sample Properties. \emph{Biometrics} 57, 126-134.
 }

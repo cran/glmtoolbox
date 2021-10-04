@@ -61,8 +61,8 @@
 #'
 #' Crowder M. (1978) Beta-binomial anova for proportions, \emph{Journal of the Royal Statistical Society Series C (Applied Statistics)} 27, 34-37.
 
-overglm <- function(formula,family,weights,data,subset,start,...){
-  if (missingArg(data)) data <- environment(formula)
+overglm <- function(formula,family,weights,data,subset,start=NULL,...){
+  if (missingArg(data)) data <- environment(eval(formula))
   mf <- match.call(expand.dots = FALSE)
   m <- match(c("formula", "weights", "data", "subset"), names(mf), 0L)
   mf <- mf[c(1L, m)]
@@ -176,7 +176,7 @@ overglm <- function(formula,family,weights,data,subset,start,...){
       c(coef(fits),log(l0/(1-l0)))
     }
   }
-  if(missingArg(start))
+  if(is.null(start))
     fit0 <- glm.fit(y=yres,x=X,offset=offset,weights=weights,family=familyf)
   else
     fit0 <- glm.fit(y=yres,x=X,offset=offset,weights=weights,family=familyf,start=start)
@@ -282,7 +282,7 @@ estequa.overglm <- function(model,...){
 #' @description Allows to compare nested negative binomial and beta-binomial regression models using Wald, score, gradient and likelihood ratio tests.
 #' @param object an object of the class overglm which is obtained from the fit of a negative binomial or beta-binomial model.
 #' @param ... another objects of the class overglm which are obtained from the fit of negative binomial or beta-binomial models.
-#' @param test an (optional) character string indicating the required test. The available options are: Wald ("wald"), Rao's score ("score"), likelihood ratio ("lrt") and Terrell's gradient ("gradient") tests. By default, \code{test} is set to be "wald".
+#' @param test an (optional) character string indicating the required test. The available options are: Wald ("wald"), Rao's score ("score"), likelihood ratio ("lr") and Terrell's gradient ("gradient") tests. By default, \code{test} is set to be "wald".
 #' @param verbose an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
 #' @return A matrix with three columns which contains the following:
 #' \itemize{
@@ -302,7 +302,7 @@ estequa.overglm <- function(model,...){
 #' fit3 <- update(fit2, . ~ . + tnf:ifn)
 #' anova(fit1, fit2, fit3, test="wald")
 #' anova(fit1, fit2, fit3, test="score")
-#' anova(fit1, fit2, fit3, test="lrt")
+#' anova(fit1, fit2, fit3, test="lr")
 #' anova(fit1, fit2, fit3, test="gradient")
 #'
 #' ## Example 2
@@ -312,9 +312,9 @@ estequa.overglm <- function(model,...){
 #' fit4 <- update(fit3, . ~ . + gender)
 #' anova(fit1, fit2, fit3, fit4, test="wald")
 #' anova(fit1, fit2, fit3, fit4, test="score")
-#' anova(fit1, fit2, fit3, fit4, test="lrt")
+#' anova(fit1, fit2, fit3, fit4, test="lr")
 #' anova(fit1, fit2, fit3, fit4, test="gradient")
-anova.overglm <- function(object,...,test=c("wald","lrt","score","gradient"),verbose=TRUE){
+anova.overglm <- function(object,...,test=c("wald","lr","score","gradient"),verbose=TRUE){
   test <- match.arg(test)
   x <- list(object,...)
   if(any(lapply(x,function(xx) class(xx)[1])!="overglm"))
@@ -332,7 +332,7 @@ anova.overglm <- function(object,...,test=c("wald","lrt","score","gradient"),ver
     nest <- vars0 %in% vars1
     ids <- is.na(match(vars1,vars0))
     if(test=="wald") sc <- crossprod(coef(x[[i]])[ids],solve(vcov(x[[i]])[ids,ids]))%*%coef(x[[i]])[ids]
-    if(test=="lrt") sc <- 2*(logLik(x[[i]])-logLik(x[[i-1]]))
+    if(test=="lr") sc <- 2*(logLik(x[[i]])-logLik(x[[i-1]]))
     if(test=="score" | test=="gradient"){
       envir <- environment(x[[i]]$escore)
       envir$weights <- x[[i]]$prior.weights
@@ -354,8 +354,8 @@ anova.overglm <- function(object,...,test=c("wald","lrt","score","gradient"),ver
       u0 <- x[[i]]$escore(theta0)[ids]
       if(test=="score"){
         v0 <- solve(jacobian(x[[i]]$escore,theta0))[ids,ids]
-        sc <- crossprod(u0,v0)%*%u0
-      }else sc <- abs(-crossprod(u0,coef(x[[i]])[ids]))
+        sc <- abs(crossprod(u0,v0)%*%u0)
+      }else sc <- abs(crossprod(u0,coef(x[[i]])[ids]))
     }
     df <- sum(ids)
     out_[i-1,] <- cbind(sc,df,1-pchisq(sc,df))
@@ -363,7 +363,7 @@ anova.overglm <- function(object,...,test=c("wald","lrt","score","gradient"),ver
   colnames(out_) <- c(" Chi  ", " Df", "  Pr(>Chi)")
   rownames(out_) <- paste(1:(hast-1),"vs",2:hast)
   if(verbose){
-    test <- switch(test,"lrt"="Likelihood-ratio test",
+    test <- switch(test,"lr"="Likelihood-ratio test",
                    "wald"="Wald test",
                    "score"="Rao's score test",
                    "gradient"="Gradient test")
@@ -722,10 +722,15 @@ residuals.overglm <- function(object, ...,type=c("quantile","standardized","resp
     if(is.null(nano$xlab)) nano$xlab <- "Fitted values"
     if(is.null(nano$ylab)) nano$ylab <- paste(type," - type residuals",sep="")
     if(is.null(nano$pch))  nano$pch  <- 20
+    if(is.null(nano$labels))  labels <- 1:length(res)
+    else{
+      labels <- nano$labels
+      nano$labels <- NULL
+    }
     do.call("plot",nano)
     abline(h=-3,lty=3)
     abline(h=+3,lty=3)
-    if(!missingArg(identify)) identify(object$fitted.values,res,n=max(1,floor(abs(identify))))
+    if(!missingArg(identify)) identify(object$fitted.values,res,n=max(1,floor(abs(identify))),labels=labels)
   }
   res <- as.matrix(res)
   colnames(res) <- "Residuals"
@@ -921,9 +926,14 @@ envelope.overglm <- function(object, rep=100, conf=0.95, type=c("quantile","resp
     if(is.null(nano$xlab)) nano$xlab <- "Expected quantiles"
     if(is.null(nano$ylab)) nano$ylab <- "Observed quantiles"
     if(is.null(nano$main)) nano$main <- paste0("Normal QQ plot with simulated envelope\n of ",type,"-type residuals")
+    if(is.null(nano$labels))  labels <- 1:length(rd)
+    else{
+      labels <- nano$labels
+      nano$labels <- NULL
+    }
     outm <- do.call("qqnorm",nano)
     if(!missingArg(identify)){
-      identify(outm$x,outm$y,labels=labels,n=max(1,floor(abs(identify))))
+      identify(outm$x,outm$y,labels=labels,n=max(1,floor(abs(identify))),labels=labels)
     }
   }
   out_ <- cbind(t(es),rd)
@@ -933,179 +943,335 @@ envelope.overglm <- function(object, rep=100, conf=0.95, type=c("quantile","resp
 
 
 #' @title Variable selection in Negative Binomial and Beta-Binomial Regression Models
-#' @description Performs variable selection in negative binomial and beta-binomial regression models.
-#' @param model an object of the class overglm which is obtained from the fit of a negative binomial or beta-binomial model. The linear predictor of the model whose fit is stored in this overglm object is the more complex candidate which should be considered by the variable selection procedure. The more simple model which should be considered by the variable selection procedure is that with just the Intercept, if there is.
-#' @param direction an (optional) character string indicating the mode of variable selection which should be used. The available options are: deleting variables ("backward")  and adding variables ("forward"). By default, \code{direction} is set to be "backward".
-#' @param test an (optional) character string indicating the statistical test which should be used to compare nested models. The available options are: Wald ("wald"), Rao's score ("score"), likelihood ratio ("lrt") and gradient ("gradient") tests. By default, \code{test} is set to be "wald".
-#' @param level an (optional) numeric value in the interval (0,1) indicating the significance level chosen to perform the statistical tests. This is only appropiate if \code{criterion="p-value"}. By default, \code{level} is set to be 0.05.
-#' @param criterion an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic") and \emph{p}-value of the \code{test} test ("p-value"). By default, \code{criterion} is set to be "bic".
+#' @description Performs variable selection in negative binomial and beta-binomial regression models using hybrid versions of forward stepwise and backward stepwise.
+#' @param model an object of the class overglm which is obtained from the fit of a negative binomial or beta-binomial regression model.
+#' @param direction an (optional) character string indicating the type of procedure which should be used. The available options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). By default, \code{direction} is set to be "forward".
+#' @param levels an (optional) two-dimensional vector of values in the interval \eqn{(0,1)} indicating the levels at which the variables should in and out from the model. This is only appropiate if \code{criterion}="p-value". By default, \code{levels} is set to be \code{c(0.05,0.05)}.
+#' @param test an (optional) character string indicating the statistical test which should be used to compare nested models. The available options are: Wald ("wald"), Rao's score ("score"), likelihood-ratio ("lr") and gradient ("gradient") tests. By default, \code{test} is set to be "wald".
+#' @param criterion an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), and \emph{p}-value of the \code{test} test ("p-value"). By default, \code{criterion} is set to be "bic".
 #' @param ...	further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC, which by default is set to be 2.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param trace an (optional) logical switch indicating if should the stepwise reports be printed. By default, \code{trace} is set to be TRUE.
+#' @param scope an (optional) list containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. By default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.
 #' @return A list which contains the following objects:
 #' \itemize{
-#' \item{\code{initial}:}{ an expression describing the linear predictor of the "initial" model.}
-#' \item{\code{final}:}{ an expression describing the linear predictor of the "final" model.}
-#' \item{\code{criterion}:}{ a character string describing the criterion chosen to compare the candidate models.}
+#' \item{\code{initial}:}{ a character string indicating the linear predictor of the "initial model".}
+#' \item{\code{direction}:}{ a character string indicating the type of procedure which was used.}
+#' \item{\code{criterion}:}{ a character string indicating the criterion used to compare the candidate models.}
+#' \item{\code{final}:}{ a character string indicating the linear predictor of the "final model".}
 #' }
 #' @seealso \link{stepCriterion.lm}, \link{stepCriterion.glm}, \link{stepCriterion.glmgee}
+#' @examples
+#' fit <- overglm(infections ~ frequency + location + age + gender, family="nb1(log)", data=swimmers)
+#' stepCriterion(fit,direction="forward",criterion="p-value",test="lr")
+#' stepCriterion(fit,direction="backward",criterion="p-value",test="lr")
+#' stepCriterion(fit,direction="forward",criterion="bic")
+#' stepCriterion(fit,direction="backward",criterion="bic")
 #' @method stepCriterion overglm
 #' @export
-stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"),
-                          direction=c("backward","forward"), test=c("wald","score","lrt","gradient"), level=0.05, verbose=TRUE, ...){
+#' @references James G., Witten D., Hastie T. and Tibshirani R. (2013, page 210) An Introduction to Statistical Learning with Applications in R, Springer, New York.
+stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), test=c("wald","score","lr","gradient"), direction=c("forward","backward"), levels=c(0.05,0.05), trace=TRUE, scope, ...){
   xxx <- list(...)
   if(is.null(xxx$k)) k <- 2 else k <- xxx$k
   criterion <- match.arg(criterion)
   direction <- match.arg(direction)
   test <- match.arg(test)
-
-  if(is.null(model$call$data)) datas <- na.omit(get_all_vars(eval(model$call$formula)))
-  else datas <- na.omit(get_all_vars(eval(model$call$formula),eval(model$call$data)))
-  out <- function(fitt,names.effets){
-    left <- lapply(as.list(strsplit(attr(fitt$terms,"term.labels"),":",fixed=TRUE)),function(x) paste(sort(x),collapse=":"))
-    right <- lapply(as.list(strsplit(names.effets,":",fixed=TRUE)),function(x) paste(sort(x),collapse=":"))
-    !(left %in% right)
-  }
-  constr.formula <- function(fitt,inter,term,action){
-    if(missingArg(term)) names.effects <- attr(fitt$terms,"term.labels")
-    else{if(action=="-") names.effects <- attr(fitt$terms,"term.labels")[attr(fitt$terms,"term.labels")!=term]
-    else names.effects <- c(attr(fitt$terms,"term.labels"),term)}
-    if(length(names.effects)>0)
-      paste(attr(fitt$terms,"variables")[2],ifelse(inter,"~ 1 +","~ 0 +"),paste(names.effects,collapse=" + "))
-    else paste(attr(fitt$terms,"variables")[2],ifelse(inter,"~ 1 ","~ 0 "))
-  }
-  tol <- TRUE
-  count <- 0
-  inter <- ifelse(length(coef(model))>0,rownames(coef(model))[1]=="(Intercept)",FALSE)
-  oldformula <- constr.formula(model,inter)
-  if(direction=="forward") oldformula <- constr.formula(model,inter,term=attr(model$terms,"term.labels"),action="-")
   if(test=="wald") test2 <- "Wald test"
   if(test=="score") test2 <- "Rao's score test"
-  if(test=="lrt") test2 <- "likelihood-ratio test"
+  if(test=="lr") test2 <- "likelihood-ratio test"
   if(test=="gradient") test2 <- "Gradient test"
 
-  ps <- ifelse(criterion=="p-value",FALSE,TRUE)
-  famili <- switch(model$family$family,"nb1"="Negative Binomial I",
-                   "nb2"="Negative Binomial II",
-                   "nb3"="Negative Binomial III",
-                   "bb"="Beta-Binomial")
-  if(verbose){
-    cat("\n               Family: ",famili,"\n")
-    cat("                 Link: ",model$family$link)
-    cat("\n****************************************************************************")
-    cat("\nInitial model:\n")
+  criters <- c("aic","bic","adjr2","p-value")
+  criters2 <- c("AIC","BIC","adj.R-squared","P(Chisq>)(*)")
+  sentido <- c(1,1,-1,1)
+  if(missingArg(scope)){
+    upper <- formula(eval(model$call$formula))
+    lower <- formula(eval(model$call$formula))
+    lower <- formula(paste(deparse(lower[[2]]),"~",attr(terms(lower),"intercept")))
+  }else{
+    lower <- scope$lower
+    upper <- scope$upper
   }
-  fit.x <- model
-  oldformula2 <- oldformula
-  oldformula <- paste(oldformula,"+ offset(model$offset)")
-  if(direction=="forward") fit.x <- overglm(as.formula(oldformula),weights=model$prior.weights,family=model$family,data=datas)
-  cat(oldformula2,"\n")
-  out_ <- list(initial=oldformula2,criterion=criterion)
-  newformula2 <- oldformula2
-  newformula <- oldformula
-  sale <- " "
-  inter <- ifelse(length(coef(model))>0,rownames(coef(model))[1]=="(Intercept)",FALSE)
-  if(!inter & direction=="forward")
-    stop("The forward variable selection and non-intercept models are not compatible!!",call.=FALSE)
-  names.col <- c("df"," BIC "," AIC "," Pr(Chisq>)(*)")
-  delta <- c(1,1,1,-1)
-  id0 <-  c(" ","bic","aic","p-value")==criterion
-  if(direction=="forward") delta[length(delta)] <- 1
-  long <- max(nchar(attr(model$terms,"term.labels")))+2
-  while(tol){
-    if(length(attr(fit.x$terms,"term.labels"))==0) names.effects <- "" else names.effects <- attr(fit.x$terms,"term.labels")
-    if(direction=="backward"){
-      results <- matrix(NA,length(names.effects)+1,length(delta))
-      if(criterion=="p-value") results[1,ncol(results)] <- -1
-      if(count == 0) results[1,2:(length(delta)-1)] <- c(-2*fit.x$logLik + log(nrow(fit.x$y))*length(coef(fit.x)),-2*fit.x$logLik + 2*length(coef(fit.x))) else results[1,2] <- 0
-      s <- attr(fit.x$terms,"factors")
-      for(i in 1:length(names.effects)){
-        if(all(apply(as.matrix(s[,-i]*s[,i]),2,sum) < sum(s[,i]))){
-          formula0 <- constr.formula(fit.x,inter,term=names.effects[i],action="-")
-          formula0 <- paste(formula0,"+ offset(model$offset)")
-          fit0 <- overglm(as.formula(formula0),weights=model$prior.weights,family=model$family,data=datas)
-          results[i+1,1] <- length(coef(fit.x)) - length(coef(fit0))
-          results[i+1,2] <- -2*fit0$logLik + log(nrow(fit0$y))*length(coef(fit0))
-          results[i+1,3] <- -2*fit0$logLik + k*length(coef(fit0))
-          results[i+1,4] <- anova(fit.x,fit0,test=test,verbose=FALSE)[1,3]
-        }
-      }
-      names.effects <- cbind("-",names.effects)
+  U <- attr(terms(upper),"term.labels")
+  fs <- attr(terms(upper),"factors")
+  long <- max(nchar(U)) + 2
+  nonename <- paste("<none>",paste(replicate(max(long-6,0)," "),collapse=""),collapse="")
+  cambio <- ""
+  paso <- 1
+  tol <- TRUE
+  if(trace){
+    cat("\n       Family: ",model$family$family,"\n")
+    cat("Link function: ",model$family$link,"\n")
+  }
+  if(direction=="forward"){
+    oldformula <- lower
+    if(trace){
+      cat("\nInitial model:\n")
+      cat(paste("~",as.character(oldformula)[length(oldformula)],sep=" "),"\n\n")
+      cat("\nStep",0,":\n")
     }
-    if(direction=="forward"){
-      outs <- out(model,names.effects)
-      s2 <- as.matrix(attr(model$terms,"factors")[,outs])
-      names.effects <- attr(model$terms,"term.labels")[outs]
-      results <- matrix(NA,length(names.effects)+1,length(delta))
-      if(criterion=="p-value") results[1,length(delta)] <- 1
-      if(count == 0) results[1,2:(length(delta)-1)] <- c(-2*fit.x$logLik + log(nrow(fit.x$y))*length(coef(fit.x)),-2*fit.x$logLik + 2*length(coef(fit.x))) else results[1,2] <- 0
-      for(i in 1:length(names.effects)){
-        if(sum(apply(as.matrix(s2[,-i]),2,function(x) sum(s2[,i]*x)==sum(x)))==0){
-          formula0 <- constr.formula(fit.x,inter,term=names.effects[i],action="+")
-          formula0 <- paste(formula0,"+ offset(model$offset)")
-          fit0 <- overglm(as.formula(formula0),weights=model$prior.weights,family=model$family,data=datas)
-          results[i+1,1] <- length(coef(fit0)) - length(coef(fit.x))
-          results[i+1,2] <- -2*fit0$logLik + log(nrow(fit0$y))*length(coef(fit0))
-          results[i+1,3] <- -2*fit0$logLik + k*length(coef(fit0))
-          results[i+1,4] <- anova(fit.x,fit0,test=test,verbose=FALSE)[1,3]
-        }
-      }
-      names.effects <- cbind("+",names.effects)
-    }
-    shows <- !is.na(results[,2])
-    results <- cbind(results[shows,1],results[shows,id0],results[shows,!id0])
-    colnames(results) <- c(names.col[1],names.col[id0],names.col[!id0])
-    results <- results[,-3]
-    if(count > 0){
-      if(criterion=="p-value") results[1,-c(1,2)] <- recicla
-      else results[1,-c(1,length(delta))] <- recicla
-    }
-    names.effects2 <- cbind(names.effects[shows[-1],1],names.effects[shows[-1],2])
-    names.effects3 <- c("<none>",paste(names.effects2[,1],names.effects2[,2]))
-    rownames(results) <- names.effects3
-    charac <- rownames(results)[2]
-    rownames(results)[2] <- paste(charac,paste(replicate(max(long-nchar(charac),0)," "),collapse=""),collapse="")
+    out_ <- list(initial=paste("~",as.character(oldformula)[length(oldformula)],sep=" "),direction=direction,criterion=criters2[criters==criterion])
+    while(tol){
+      oldformula <-  update(oldformula,paste(as.character(eval(model$call$formula))[2],"~ ."))
+      fit.x <- update(model,formula=oldformula,start=NULL)
+      S <- attr(terms(oldformula),"term.labels")
+      entran <- seq(1:length(U))[is.na(match(U,S))]
+      salen <- seq(1:length(U))[!is.na(match(U,S))]
+      mas <- TRUE
 
-    ids <- min(results[,2]*delta[id0])==(results[,2]*delta[id0])
-    if(verbose) cat("\nStep",count,": ",sale,"\n")
-    indexes <- order(results[,2]*delta[id0],na.last=TRUE)
-    if(sum(ids) > 1){
-      nexto <- c(1:length(delta))[id0]
-      nexto <- ifelse(nexto==length(delta),2,nexto+1)
-      indexes <- order(delta[nexto]*results[,3],na.last=TRUE)
+      fsalen <- matrix(NA,length(salen),5)
+      if(length(salen) > 0){
+        nombres <- matrix("",length(salen),1)
+        for(i in 1:length(salen)){
+          salida <- apply(as.matrix(fs[,salen[i]]*fs[,-c(entran,salen[i])]),2,sum)
+          if(all(salida < sum(fs[,salen[i]])) & U[salen[i]]!=cambio){
+            newformula <- update(oldformula, paste("~ . -",U[salen[i]]))
+            fit.0 <- update(model,formula=newformula,start=NULL)
+            fsalen[i,1] <- fit.0$df.residual - fit.x$df.residual
+            fsalen[i,5] <- anova(fit.0,fit.x,test=test,verbose=FALSE)[1,1]
+            fsalen[i,5] <- sqrt(9*fsalen[i,1]/2)*((fsalen[i,5]/fsalen[i,1])^(1/3) - 1 + 2/(9*fsalen[i,1]))
+            fsalen[i,2] <- AIC(fit.0,k=k)
+            fsalen[i,3] <- BIC(fit.0)
+            fsalen[i,4] <- 0
+            nombres[i] <- U[salen[i]]
+          }
+        }
+        rownames(fsalen) <- paste("-",nombres)
+        if(criterion=="p-value" & any(!is.na(fsalen))){
+          colnames(fsalen) <- c("df",criters2)
+          if(nrow(fsalen) > 1){
+            fsalen <- fsalen[order(fsalen[,5]),]
+            fsalen <- na.omit(fsalen)
+            attr(fsalen,"na.action")	<- attr(fsalen,"class") <- NULL
+          }
+          fsalen[,5] <- 1-pchisq((sqrt(2/(9*fsalen[,1]))*fsalen[,5] + 1 - 2/(9*fsalen[,1]))^3*fsalen[,1],fsalen[,1])
+          if(fsalen[1,5] > levels[2]){
+            fsalen <- rbind(fsalen,c(NA,AIC(fit.x,k=k),BIC(fit.x),NA,NA))
+            rownames(fsalen)[nrow(fsalen)] <- nonename
+            fsalen <- fsalen[,-4]
+            if(trace){
+              printCoefmat(fsalen,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=2:(ncol(fsalen)-2),
+                           signif.stars=FALSE,tst.ind=ncol(fsalen)-1,dig.tst=4,digits=5)
+              cat("\nStep",paso,":",rownames(fsalen)[1],"\n\n")
+            }
+            mas <- FALSE
+            oldformula <- update(oldformula, paste("~ .",rownames(fsalen)[1]))
+            paso <- paso + 1
+            cambio <- substring(rownames(fsalen)[1],3)
+          }
+        }
+      }
+
+      if(length(entran) > 0 & mas){
+        fentran <- matrix(NA,length(entran),5)
+        nombres <- matrix("",length(entran),1)
+        for(i in 1:length(entran)){
+          salida <- apply(as.matrix(fs[,-c(salen,entran[i])]),2,function(x) sum(fs[,entran[i]]*x)!=sum(x))
+          if(all(salida) & U[entran[i]]!=cambio){
+            newformula <- update(oldformula, paste("~ . +",U[entran[i]]))
+            fit.0 <- update(model,formula=newformula,adjr2=FALSE,start=NULL)
+            fentran[i,1] <- fit.x$df.residual - fit.0$df.residual
+            fentran[i,5] <- anova(fit.x,fit.0,test=test,verbose=FALSE)[1,1]
+            fentran[i,5] <- sqrt(9*fentran[i,1]/2)*((fentran[i,5]/fentran[i,1])^(1/3) - 1 + 2/(9*fentran[i,1]))
+            fentran[i,2] <- AIC(fit.0,k=k)
+            fentran[i,3] <- BIC(fit.0)
+            fentran[i,4] <- 0
+            nombres[i] <- U[entran[i]]
+          }
+        }
+        rownames(fentran) <- paste("+",nombres)
+        if(criterion=="p-value"){
+          colnames(fentran) <- c("df",criters2)
+          if(nrow(fentran) > 1){
+            fentran <- fentran[order(-fentran[,5]),]
+            fentran <- na.omit(fentran)
+            attr(fentran,"na.action")	<- attr(fentran,"class") <- NULL
+          }
+          fentran[,5] <- 1-pchisq((sqrt(2/(9*fentran[,1]))*fentran[,5] + 1 - 2/(9*fentran[,1]))^3*fentran[,1],fentran[,1])
+          fentran <- rbind(fentran,c(NA,AIC(fit.x,k=k),BIC(fit.x),NA,NA))
+          rownames(fentran)[nrow(fentran)] <- nonename
+          fentran <- fentran[,-4]
+          if(trace) printCoefmat(fentran,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=2:(ncol(fentran)-2),
+                                 signif.stars=FALSE,tst.ind=ncol(fentran)-1,dig.tst=4,digits=5)
+          if(fentran[1,ncol(fentran)] < levels[1]){
+            if(trace) cat("\nStep",paso,":",rownames(fentran)[1],"\n\n")
+            paso <- paso + 1
+            cambio <- substring(rownames(fentran)[1],3)
+            oldformula <- update(oldformula, paste("~ .",rownames(fentran)[1]))
+          }else tol <- FALSE
+        }
+      }
+      if(length(entran) > 0 & criterion!="p-value"){
+        if(any(!is.na(fsalen))) fentran <- rbind(fentran,fsalen)
+        fentran[,5] <- 1-pchisq((sqrt(2/(9*fentran[,1]))*fentran[,5] + 1 - 2/(9*fentran[,1]))^3*fentran[,1],fentran[,1])
+        fentran <- rbind(fentran,c(0,AIC(fit.x,k=k),BIC(fit.x),0,0))
+        rownames(fentran)[nrow(fentran)] <- nonename
+        ids <- criters == criterion
+        colnames(fentran) <- c("df",criters2)
+        fentran <- na.omit(fentran)
+        attr(fentran,"na.action")	<- attr(fentran,"class") <- NULL
+        fentran[nrow(fentran),c(1,5)] <- NA
+        fentran <- fentran[order(sentido[ids]*fentran[,c(FALSE,ids)]),]
+        if(rownames(fentran)[1]!=nonename){
+          fentran <- fentran[,-4]
+          if(trace){
+            printCoefmat(fentran,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=2:(ncol(fentran)-2),
+                         signif.stars=FALSE,tst.ind=ncol(fentran)-1,dig.tst=4,digits=5)
+            cat("\nStep",paso,":",rownames(fentran)[1],"\n\n")
+          }
+          paso <- paso + 1
+          cambio <- substring(rownames(fentran)[1],3)
+          oldformula <- update(oldformula, paste("~ .",rownames(fentran)[1]))
+        }else{
+          tol <- FALSE
+          fentran <- fentran[,-4]
+          if(trace) printCoefmat(fentran,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=2:(ncol(fentran)-2),
+                                 signif.stars=FALSE,tst.ind=ncol(fentran)-1,dig.tst=4,digits=5)
+        }
+      }
+      if(length(entran) == 0 & mas) tol <- FALSE
     }
-    ids <- c(1:length(indexes))==indexes[1]
+  }
+  if(direction=="backward"){
+    oldformula <- upper
+    if(trace){
+      cat("\nInitial model:\n")
+      cat(paste("~",as.character(oldformula)[length(oldformula)],sep=" "),"\n\n")
+      cat("\nStep",0,":\n")
+    }
+    out_ <- list(initial=paste("~",as.character(oldformula)[length(oldformula)],sep=" "),direction=direction,criterion=criters2[criters==criterion])
+    while(tol){
+      oldformula <-  update(oldformula,paste(as.character(eval(model$call$formula))[2],"~ ."))
+      fit.x <- update(model,formula=oldformula,start=NULL)
+      S <- attr(terms(oldformula),"term.labels")
+      entran <- seq(1:length(U))[is.na(match(U,S))]
+      salen <- seq(1:length(U))[!is.na(match(U,S))]
+      menos <- TRUE
+
+      fentran <- matrix(NA,length(entran),5)
+      if(length(entran) > 0){
+        nombres <- matrix("",length(entran),1)
+        for(i in 1:length(entran)){
+          salida <- apply(as.matrix(fs[,-c(salen,entran[i])]),2,function(x) sum(fs[,entran[i]]*x)!=sum(x))
+          if(all(salida) & U[entran[i]]!=cambio){
+            newformula <- update(oldformula, paste("~ . +",U[entran[i]]))
+            fit.0 <- update(model,formula=newformula,adjr2=FALSE,start=NULL)
+            fentran[i,1] <- fit.x$df.residual - fit.0$df.residual
+            fentran[i,5] <- anova(fit.x,fit.0,test=test,verbose=FALSE)[1,1]
+            fentran[i,5] <- sqrt(9*fentran[i,1]/2)*((fentran[i,5]/fentran[i,1])^(1/3) - 1 + 2/(9*fentran[i,1]))
+            fentran[i,2] <- AIC(fit.0,k=k)
+            fentran[i,3] <- BIC(fit.0)
+            fentran[i,4] <- 0
+            nombres[i] <- U[entran[i]]
+          }
+        }
+        rownames(fentran) <- paste("+",nombres)
+        if(criterion=="p-value" & any(!is.na(fentran))){
+          colnames(fentran) <- c("df",criters2)
+          if(nrow(fentran) > 1){
+            fentran <- fentran[order(-fentran[,5]),]
+            fentran <- na.omit(fentran)
+            attr(fentran,"na.action")	<- attr(fentran,"class") <- NULL
+          }
+          fentran[,5] <- 1-pchisq((sqrt(2/(9*fentran[,1]))*fentran[,5] + 1 - 2/(9*fentran[,1]))^3*fentran[,1],fentran[,1])
+          if(fentran[1,5] < levels[1]){
+            fentran <- rbind(fentran,c(NA,AIC(fit.x,k=k),BIC(fit.x),NA,NA))
+            rownames(fentran)[nrow(fentran)] <- nonename
+            fentran <- fentran[,-4]
+            if(trace){
+              printCoefmat(fentran,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=2:(ncol(fentran)-2),
+                           signif.stars=FALSE,tst.ind=ncol(fentran)-1,dig.tst=4,digits=5)
+              cat("\nStep",paso,":",rownames(fentran)[1],"\n\n")
+            }
+            menos <- FALSE
+            oldformula <- update(oldformula, paste("~ .",rownames(fentran)[1]))
+            paso <- paso + 1
+            cambio <- substring(rownames(fentran)[1],3)
+          }
+        }
+      }
+
+      if(length(salen) > 0 & menos){
+        fsalen <- matrix(NA,length(salen),5)
+        nombres <- matrix("",length(salen),1)
+        for(i in 1:length(salen)){
+          salida <- apply(as.matrix(fs[,salen[i]]*fs[,-c(entran,salen[i])]),2,sum)
+          if(all(salida < sum(fs[,salen[i]]))){
+            newformula <- update(oldformula, paste("~ . -",U[salen[i]]))
+            fit.0 <- update(model,formula=newformula,start=NULL)
+            fsalen[i,1] <- fit.0$df.residual - fit.x$df.residual
+            fsalen[i,5] <- anova(fit.0,fit.x,test=test,verbose=FALSE)[1,1]
+            fsalen[i,5] <- sqrt(9*fsalen[i,1]/2)*((fsalen[i,5]/fsalen[i,1])^(1/3) - 1 + 2/(9*fsalen[i,1]))
+            fsalen[i,2] <- AIC(fit.0,k=k)
+            fsalen[i,3] <- BIC(fit.0)
+            fsalen[i,4] <- 0
+            nombres[i] <- U[salen[i]]
+          }
+        }
+        rownames(fsalen) <- paste("-",nombres)
+        if(criterion=="p-value"){
+          colnames(fsalen) <- c("df",criters2)
+          if(nrow(fsalen) > 1){
+            fsalen <- fsalen[order(fsalen[,5]),]
+            fsalen <- na.omit(fsalen)
+            attr(fsalen,"na.action")	<- attr(fsalen,"class") <- NULL
+          }
+          fsalen[,5] <- 1-pchisq((sqrt(2/(9*fsalen[,1]))*fsalen[,5] + 1 - 2/(9*fsalen[,1]))^3*fsalen[,1],fsalen[,1])
+          fsalen <- rbind(fsalen,c(NA,AIC(fit.x,k=k),BIC(fit.x),NA,NA))
+          rownames(fsalen)[nrow(fsalen)] <- nonename
+          fsalen <- fsalen[,-4]
+          if(trace) printCoefmat(fsalen,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=2:(ncol(fsalen)-2),
+                                 signif.stars=FALSE,tst.ind=ncol(fsalen)-1,dig.tst=4,digits=5)
+          if(fsalen[1,ncol(fsalen)] > levels[2]){
+            if(trace) cat("\nStep",paso,":",rownames(fsalen)[1],"\n\n")
+            paso <- paso + 1
+            cambio <- substring(rownames(fsalen)[1],3)
+            oldformula <- update(oldformula, paste("~ .",rownames(fsalen)[1]))
+          }else tol <- FALSE
+        }
+      }
+      if(criterion!="p-value"){
+        if(any(!is.na(fentran))) fsalen <- rbind(fsalen,fentran)
+        fsalen[,5] <- 1-pchisq((sqrt(2/(9*fsalen[,1]))*fsalen[,5] + 1 - 2/(9*fsalen[,1]))^3*fsalen[,1],fsalen[,1])
+        fsalen <- rbind(fsalen,c(0,AIC(fit.x,k=k),BIC(fit.x),0,0))
+        rownames(fsalen)[nrow(fsalen)] <- nonename
+        ids <- criters == criterion
+        colnames(fsalen) <- c("df",criters2)
+        fsalen <- na.omit(fsalen)
+        attr(fsalen,"na.action")	<- attr(fsalen,"class") <- NULL
+        fsalen[nrow(fsalen),c(1,5)] <- NA
+        fsalen <- fsalen[order(sentido[ids]*fsalen[,c(FALSE,ids)]),]
+        if(rownames(fsalen)[1]!=nonename){
+          fsalen <- fsalen[,-4]
+          if(trace){
+            printCoefmat(fsalen,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=2:(ncol(fsalen)-2),
+                         signif.stars=FALSE,tst.ind=ncol(fsalen)-1,dig.tst=4,digits=5)
+            cat("\nStep",paso,":",rownames(fsalen)[1],"\n\n")
+          }
+          paso <- paso + 1
+          cambio <- substring(rownames(fsalen)[1],3)
+          oldformula <- update(oldformula, paste("~ .",rownames(fsalen)[1]))
+        }else{
+          tol <- FALSE
+          fsalen <- fsalen[,-4]
+          if(trace) printCoefmat(fsalen,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=2:(ncol(fsalen)-2),
+                                 signif.stars=FALSE,tst.ind=ncol(fsalen)-1,dig.tst=4,digits=5)
+        }
+      }
+      if(length(salen) == 0 & menos) tol <- FALSE
+    }
+  }
+  if(trace){
+    cat("\n\nFinal model:\n")
+    cat(paste("~",as.character(oldformula)[length(oldformula)],sep=" "),"\n\n")
+    cat("****************************************************************************")
+    cat("\n(*) p-values of the",test2)
     if(criterion=="p-value"){
-      recicla <- results[names.effects3==names.effects3[ids],-c(1,2)]
-      if(direction=="backward") ps <- ifelse(max(results[,2]) > level,TRUE,FALSE)
-      if(direction=="forward") ps <- ifelse(min(results[,2]) < level,TRUE,FALSE)
-      results[names.effects3=="<none>",2] <- NA
-    }else recicla <- results[names.effects3==names.effects3[ids],-c(1,length(delta))]
-    tst.ind <- c(2:4)[colnames(results)[-1]==names.col[4]]
-    if(verbose) printCoefmat(results[indexes,],cs.ind=1,tst.ind=tst.ind,dig.tst=5,na.print=" ",signif.stars=FALSE)
-    count <- count + 1
-
-    if(names.effects3[ids]!="<none>" & ps==TRUE){
-      ids <- ids[-1]
-      sale <- paste(names.effects2[ids,1],names.effects2[ids,2])
-      newformula2 <- constr.formula(fit.x,inter,term=names.effects2[ids,2],action=names.effects2[ids,1])
-      newformula <- paste(newformula2,"+ offset(model$offset)")
-      if(nrow(names.effects)==1 | (nrow(names.effects)==2 & !inter)){
-        tol <- FALSE
-        if(verbose) cat("\nStep",count,": ",sale,"\n")
-      }
-      fit.x <- overglm(as.formula(newformula),weights=model$prior.weights,family=model$family,data=datas)
-    }else tol <- FALSE
-  }
-  if(verbose){
-    cat("\nFinal model:\n")
-    cat(newformula2,"\n")
-    cat("****************************************************************************\n")
-    cat("(*) p-values of the",test2)
-    if(criterion=="p-value" & direction=="backward") cat(" ( effects are dropped when their p-values are higher than",level,")")
-    if(criterion=="p-value" & direction=="forward")  cat(" ( effects are included when their p-values are lower than",level,")")
+      cat("\n Effects are included when their p-values are lower than",levels[1])
+      cat("\n Effects are dropped when their p-values are higher than",levels[2])
+    }
     if(!is.null(xxx$k)) cat("The magnitude of the penalty in the AIC was set to be ",xxx$k)
     cat("\n")
   }
-  out_$final <- newformula2
+  out_$final <- paste("~",as.character(oldformula)[length(oldformula)],sep=" ")
   return(invisible(out_))
 }

@@ -7,7 +7,7 @@
 confint2(
   model,
   level = 0.95,
-  test = c("wald", "lrt", "score", "gradient"),
+  test = c("wald", "lr", "score", "gradient"),
   digits = 4,
   verbose = TRUE
 )
@@ -17,7 +17,7 @@ confint2(
 
 \item{level}{an (optional) value indicating the required confidence level. By default, \code{level} is set to be 0.95.}
 
-\item{test}{an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lrt") tests. By default, \code{test} is set to be "wald".}
+\item{test}{an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lr") tests. By default, \code{test} is set to be "wald".}
 
 \item{digits}{an (optional) integer value indicating the number of decimal places to be used. By default, \code{digits} is set to be 4.}
 

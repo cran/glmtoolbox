@@ -1,3 +1,21 @@
+#' @title Local Influence
+#' @description Computes measures of local influence for a fitted model object.
+#' @param object a fitted model object.
+#' @param ...	further arguments passed to or from other methods.
+#' @return An object with the measures of local influence.
+#' @export localInfluence
+localInfluence <- function(object,...) {
+  UseMethod("localInfluence")
+}#' @title Leverage
+#' @description Computes leverage measures for a fitted model object.
+#' @param object a fitted model object.
+#' @param ...	further arguments passed to or from other methods.
+#' @return An object with the values of the leverage measures.
+#' @export leverage
+leverage <- function(object,...) {
+  UseMethod("leverage")
+}
+
 #' @title Generalized Variance Inflaction Factor
 #' @description Computes the generalized variance inflaction factor (GVIF) for a fitted model object.
 #' @param model a fitted model object.
@@ -25,7 +43,7 @@ estequa <- function(model,...) {
 #' @param ...	further arguments passed to or from other methods.
 #' @return A list which includes the descriptions of the linear predictors of the initial and final models as well as the criterion used to compare the candidate models.
 #' @export stepCriterion
-stepCriterion <- function(model,...) {
+stepCriterion <- function(model,...){
   UseMethod("stepCriterion")
 }
 
@@ -88,8 +106,9 @@ vdtest <- function(model,...) {
 vdtest.lm <- function(model,varformula,verbose=TRUE,...){
   if(!missingArg(varformula)){
     if(is.null(model$call$data)) m <- get_all_vars(eval(varformula))
-    else m <- get_all_vars(eval(varformula),eval(model$varformula))
+    else m <- get_all_vars(eval(varformula),eval(model$call$data))
     Z <- model.matrix(varformula,m)
+    if(!is.null(model$call$subset)) Z <- Z[eval(model$call$subset,eval(model$call$data)),]
   }else Z <- model.matrix(model)
   if(colnames(Z)[1]=="(Intercept)") Z <- as.matrix(Z[,-1])
   n <- nrow(Z)
@@ -136,8 +155,9 @@ vdtest.glm <- function(model,varformula,verbose=TRUE,...){
     stop("Only gaussian, Gamma and inverse.gaussian families are supported!!",call.=FALSE)
   if(!missingArg(varformula)){
     if(is.null(model$call$data)) m <- get_all_vars(eval(varformula))
-    else m <- get_all_vars(eval(varformula),eval(model$varformula))
+    else m <- get_all_vars(eval(varformula),eval(model$call$data))
     Z <- model.matrix(varformula,m)
+    if(!is.null(model$call$subset)) Z <- Z[eval(model$call$subset,eval(model$call$data)),]
   }else Z <- model.matrix(model)
   if(colnames(Z)[1]=="(Intercept)") Z <- as.matrix(Z[,-1])
   n <- nrow(Z)
@@ -161,7 +181,7 @@ vdtest.glm <- function(model,varformula,verbose=TRUE,...){
   }
   Zstar <- cbind(1,Z)
   Zstar <- matrix(1,n,ncol(Zstar))*Zstar
-  Zstar2 <- (solve(t(Zstar)%*%Zstar))[-1,-1]
+  Zstar2 <- chol2inv(chol(t(Zstar)%*%Zstar))[-1,-1]
   sc = 0.5*(t(tau)%*%Z)%*%Zstar2%*%(t(Z)%*%tau)
   if(verbose){
     cat("\n             Score test for varying dispersion parameter\n\n")
@@ -171,193 +191,379 @@ vdtest.glm <- function(model,varformula,verbose=TRUE,...){
 }
 
 #' @title Variable Selection in Normal Linear Models
-#' @description Performs variable selection in normal linear models.
-#' @param model an object of the class lm which is obtained from the fit of a normal linear model. The linear predictor of the model whose fit is stored in this lm object is the more complex candidate which should be considered by the variable selection procedure.  The more simple model which should be considered by the variable selection procedure is that with just the Intercept, if there is.
-#' @param direction an (optional) character string indicating the mode of variable selection which should be used. The available options are: deleting variables ("backward")  and adding variables ("forward"). By default, \code{direction} is set to be "backward".
-#' @param level an (optional) numeric value in the interval (0,1) indicating the significance level chosen to perform the F tests. This is only appropiate if \code{criterion="p-value"}. By default, \code{level} is set to be 0.05.
-#' @param criterion an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted R-squared ("adjr2"), predicted R-squared ("predr2"), Mallows' CP ("cp") and \emph{p}-value of the F test ("p-value"). By default, \code{criterion} is set to be "bic".
-#' @param ...	further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC, which by default is set to be 2.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @description Performs variable selection in normal linear models using hybrid versions of forward stepwise and backward stepwise.
+#' @param model an object of the class lm which is obtained from the fit of a normal linear model.
+#' @param direction an (optional) character string indicating the type of procedure which should be used. The available options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). By default, \code{direction} is set to be "forward".
+#' @param levels an (optional) two-dimensional vector of values in the interval \eqn{(0,1)} indicating the levels at which the variables should in and out from the model. This is only appropiate if \code{criterion}="p-value". By default, \code{levels} is set to be \code{c(0.05,0.05)}.
+#' @param criterion an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted R-squared ("adjr2"), predicted R-squared ("prdr2"), Mallows' CP ("cp") and \emph{p}-value of the F test ("p-value"). By default, \code{criterion} is set to be "bic".
+#' @param ...	further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC/QICu, which by default is set to be 2.
+#' @param trace an (optional) logical switch indicating if should the stepwise reports be printed. By default, \code{trace} is set to be TRUE.
+#' @param scope an (optional) list, containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. By default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.
 #' @return A list which contains the following objects:
 #' \itemize{
-#' \item{\code{initial}:}{ an expression describing the linear predictor of the "initial" model.}
-#' \item{\code{final}:}{ an expression describing the linear predictor of the "final" model.}
-#' \item{\code{criterion}:}{ a character string describing the criterion chosen to compare the candidate models.}
+#' \item{\code{initial}:}{ a character string indicating the linear predictor of the "initial model".}
+#' \item{\code{direction}:}{ a character string indicating the type of procedure which was used.}
+#' \item{\code{criterion}:}{ a character string indicating the criterion used to compare the candidate models.}
+#' \item{\code{final}:}{ a character string indicating the linear predictor of the "final model".}
 #' }
+#' @seealso \link{stepCriterion.glm}, \link{stepCriterion.overglm}, \link{stepCriterion.glmgee}
 #' @examples
 #' ## Example 1
-#' fit1 <- lm(log(Ozone) ~ Solar.R*Temp*Wind, data=airquality)
-#' stepCriterion(fit1, direction="forward", criterion="adjr2")
-#' stepCriterion(fit1, direction="forward", criterion="bic")
-#' stepCriterion(fit1, direction="forward", criterion="p-value", level=0.05)
+#' fit1 <- lm(log(Ozone) ~ Solar.R + Temp + Wind, data=airquality)
+#' scope=list(lower=~1, upper=~Solar.R*Temp*Wind)
+#' stepCriterion(fit1, direction="forward", criterion="adjr2", scope=scope)
+#' stepCriterion(fit1, direction="forward", criterion="bic", scope=scope)
+#' stepCriterion(fit1, direction="forward", criterion="p-value", scope=scope)
 #'
 #' ## Example 2
-#' fit2 <- lm(mpg ~ log(hp)*log(wt)*qsec, data=mtcars)
-#' stepCriterion(fit2, direction="backward", criterion="bic")
-#' stepCriterion(fit2, direction="forward", criterion="cp")
-#' stepCriterion(fit2, direction="backward", criterion="p-value", level=0.05)
+#' fit2 <- lm(mpg ~ log(hp) + log(wt) + qsec, data=mtcars)
+#' scope=list(lower=~1, upper=~log(hp)*log(wt)*qsec)
+#' stepCriterion(fit2, direction="backward", criterion="bic", scope=scope)
+#' stepCriterion(fit2, direction="forward", criterion="cp", scope=scope)
+#' stepCriterion(fit2, direction="backward", criterion="prdr2", scope=scope)
+#'
+#' ## Example 3
+#' Credit <- ISLR::Credit
+#' fit3 <- lm(Balance ~ Cards + Age + Rating + Income + Student + Limit, data=Credit)
+#' stepCriterion(fit3, direction="forward", criterion="prdr2")
+#' stepCriterion(fit3, direction="forward", criterion="cp")
+#' stepCriterion(fit3, direction="forward", criterion="p-value")
+#'
 #' @seealso \link{stepCriterion.glm}, \link{stepCriterion.overglm}, \link{stepCriterion.glmgee}
 #' @method stepCriterion lm
 #' @export
-
-stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","predr2","cp","p-value"), direction=c("backward","forward"), level=0.05, verbose=TRUE, ...){
+#' @references James G., Witten D., Hastie T. and Tibshirani R. (2013, page 210) An Introduction to Statistical Learning with Applications in R, Springer, New York.
+#'
+stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp","p-value"), direction=c("forward","backward"), levels=c(0.05,0.05), trace=TRUE, scope, ...){
   xxx <- list(...)
   if(is.null(xxx$k)) k <- 2 else k <- xxx$k
   criterion <- match.arg(criterion)
   direction <- match.arg(direction)
-
-  if(is.null(model$call$data)) datas <- na.omit(get_all_vars(eval(model$call$formula)))
-  else datas <- na.omit(get_all_vars(eval(model$call$formula),eval(model$call$data)))
-  out <- function(fitt,names.effets){
-    left <- lapply(as.list(strsplit(attr(fitt$terms,"term.labels"),":",fixed=TRUE)),function(x) paste(sort(x),collapse=":"))
-    right <- lapply(as.list(strsplit(names.effets,":",fixed=TRUE)),function(x) paste(sort(x),collapse=":"))
-    !(left %in% right)
+  criters <- c("aic","bic","adjr2","prdr2","cp","p-value")
+  criters2 <- c("AIC","BIC","adj.R-squared","prd.R-squared","Mallows' CP","Pr(>F)(*)")
+  sentido <- c(1,1,-1,-1,1,1)
+  ids <- criters == criterion
+  if(missingArg(scope)){
+    upper <- formula(eval(model$call$formula))
+    lower <- formula(eval(model$call$formula))
+    lower <- formula(paste(deparse(lower[[2]]),"~",attr(terms(lower),"intercept")))
+  }else{
+    lower <- scope$lower
+    upper <- scope$upper
   }
-  constr.formula <- function(fitt,inter,term,action){
-    if(missingArg(term)) names.effects <- attr(fitt$terms,"term.labels")
-    else{if(action=="-") names.effects <- attr(fitt$terms,"term.labels")[attr(fitt$terms,"term.labels")!=term]
-    else names.effects <- c(attr(fitt$terms,"term.labels"),term)}
-    if(length(names.effects)>0)
-      paste(attr(fitt$terms,"variables")[2],ifelse(inter,"~ 1 +","~ 0 +"),paste(names.effects,collapse=" + "))
-    else paste(attr(fitt$terms,"variables")[2],ifelse(inter,"~ 1 ","~ 0 "))
+  formulae <- update(upper, paste(deparse(eval(model$call$formula)[[2]]),"~ ."))
+  model <- update(model,formula=formulae)
+  mf <- model$model
+  y <- mf[,attr(model$terms,"response")]
+  if(is.null(model$offset)) offset <- matrix(0,length(y),1)	else offset <- model$offset
+  if(is.null(model$weights)) weights <- matrix(1,length(y),1) else weights <- model$weights
+  n <- sum(weights > 0)
+  X <- model.matrix(upper,mf)
+  fit0 <- lm.fit(y=sqrt(weights)*(y-offset),x=X*matrix(sqrt(weights),nrow(X),ncol(X)))
+  sigma20 <- sum((y-offset-X%*%fit0$coefficients)^2*weights)/(n-ncol(X))
+  lmstats <- function(y,X,b,o,w,k){
+    p <- ncol(X)
+    sigma2 <- sum((y-o-X%*%b)^2*w)/(n-p)
+    mu0 <- sum((y-o)*w)/sum(w)
+    if(colnames(X)[1]=="(Intercept)") denom <- sum((y-o-mu0)^2*w)/(n-1)
+    else denom <- sum((y-o)^2*w)/n
+    adjr2 <- 1-sigma2/denom
+    aic <- n*log(2*pi*sigma2*(n-p)/n) + n + k*(p+1)
+    bic <- n*log(2*pi*sigma2*(n-p)/n) + n + log(n)*(p+1)
+    Xw <- X*matrix(sqrt(w),nrow(X),ncol(X))
+    salida <- svd(Xw)
+    h <- apply(salida$u^2,1,sum)
+    numer <- sum(((y-o-X%*%b)*sqrt(w)/(1-h))^2)
+    if(colnames(X)[1]=="(Intercept)") denom <- sum(((y-o-mu0)*sqrt(w)/(1-w/sum(w)))^2)
+    else denom <- sum((y-o)^2)
+    predr2 <- 1-numer/denom
+    cp <- (n-p)*(sigma2/sigma20-1) + p
+    return(c(aic,bic,adjr2,predr2,cp,sigma2))
   }
-  lmstats <- function(fitt){
-    X <- model.matrix(fitt)
-    nano <- summary(fitt)
-    sigma2 <- nano$sigma^2
-    if(length(X)!=0){
-      Xw <- X*matrix(sqrt(weights),nrow(X),ncol(X))
-      salida <- svd(Xw)
-      h <- apply(salida$u^2,1,sum)
-      press <- sum((resid(fitt)/(1-h))^2)
-    }else press <- sum(resid(fitt)^2)
-    salida <- c(round(AIC(fitt,k=k),digits=3),round(BIC(fitt),digits=3),nano$adj.r.squared,1-press/sigma20p,round(fitt$df.residual*(sigma2/sigma20-1) + ncol(X),digits=3))
-    salida
-  }
+  U <- unlist(lapply(strsplit(attr(terms(upper),"term.labels"),":"),function(x) paste(sort(x),collapse =":")))
+  fs <- attr(terms(upper),"factors")
+  long <- max(nchar(U)) + 2
+  nonename <- paste("<none>",paste(replicate(max(long-6,0)," "),collapse=""),collapse="")
+  cambio <- ""
+  paso <- 1
   tol <- TRUE
-  count <- 0
-  inter <- ifelse(length(coef(model))>0,names(coef(model))[1]=="(Intercept)",FALSE)
-  oldformula <- constr.formula(model,inter)
-  if(direction=="forward") oldformula <- constr.formula(model,inter,term=attr(model$terms,"term.labels"),action="-")
+  if(trace){
+    cat("\n       Family: gaussian\n")
+    cat("Link function: identity\n")
+  }
+  if(direction=="forward"){
+    oldformula <- lower
+    if(trace){
+      cat("\nInitial model:\n")
+      cat(paste("~",as.character(oldformula)[length(oldformula)],sep=" "),"\n\n")
+      cat("\nStep",0,":\n")
+    }
+    out_ <- list(initial=paste("~",as.character(oldformula)[length(oldformula)],sep=" "),direction=direction,criterion=criters2[criters==criterion])
+    while(tol){
+      X <- model.matrix(oldformula,mf)
+      fit.x <- lm.fit(y=sqrt(weights)*(y-offset),x=X*matrix(sqrt(weights),nrow(X),ncol(X)))
+      none <- c(NA,lmstats(y,X,fit.x$coefficients,offset,weights,k),NA)
+      S <- unlist(lapply(strsplit(attr(terms(oldformula),"term.labels"),":"),function(x) paste(sort(x),collapse =":")))
+      entran <- seq(1:length(U))[is.na(match(U,S))]
+      salen <- seq(1:length(U))[!is.na(match(U,S))]
+      mas <- TRUE
 
-  ps <- ifelse(criterion=="p-value",FALSE,TRUE)
-  if(is.null(model$offset)) offset <- matrix(0,length(model$residuals),1) else offset <- model$offset
-  if(is.null(model$weights)) weights <- matrix(1,length(model$residuals),1) else weights <- model$weights
-  if(verbose){
-    cat("\n               Family: gaussian\n")
-    cat("                 Link: identity")
-    cat("\n****************************************************************************")
-    cat("\nInitial model:\n")
+      fsalen <- matrix(NA,length(salen),7)
+      if(length(salen) > 0){
+        nombres <- matrix("",length(salen),1)
+        for(i in 1:length(salen)){
+          salida <- apply(as.matrix(fs[,salen[i]]*fs[,-c(entran,salen[i])]),2,sum)
+          if(all(salida < sum(fs[,salen[i]])) & U[salen[i]]!=cambio){
+            newformula <- update(oldformula, paste("~ . -",U[salen[i]]))
+            X <- model.matrix(newformula,mf)
+            fit.0 <- lm.fit(y=sqrt(weights)*(y-offset),x=X*matrix(sqrt(weights),nrow(X),ncol(X)))
+            fsalen[i,1] <- length(fit.x$coefficients) - length(fit.0$coefficients)
+            fsalen[i,2:7] <- lmstats(y,X,fit.0$coefficients,offset,weights,k)
+            fsalen[i,7] <- ((n-length(fit.0$coefficients))*fsalen[i,7] - (n-length(fit.x$coefficients))*none[7])/(fsalen[i,1]*none[7])
+            fsalen[i,7] <- (1 + fsalen[i,1] + n-length(fit.x$coefficients))*log(1 + fsalen[i,7]*fsalen[i,1]/(n-length(fit.x$coefficients)))
+            nombres[i] <- U[salen[i]]
+          }
+        }
+        rownames(fsalen) <- paste("-",nombres)
+        if(criterion=="p-value" & any(!is.na(fsalen))){
+          colnames(fsalen) <- c("df",criters2)
+          if(nrow(fsalen) > 1){
+            fsalen <- fsalen[order(fsalen[,7]),]
+            fsalen <- na.omit(fsalen)
+            attr(fsalen,"na.action")	<- attr(fsalen,"class") <- NULL
+          }
+          u <- fsalen[,1]; v <- n - length(fit.x$coefficients); x <- fsalen[,7]
+          fsalen[,7] <- 1 - pf((exp(fsalen[,7]/(1 + u + v)) - 1)*v/u,u,v)
+          if(fsalen[1,7] > levels[2]){
+            fsalen <- rbind(fsalen,none[-7])
+            rownames(fsalen)[nrow(fsalen)] <- nonename
+            if(trace){
+              printCoefmat(fsalen,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=c(2,3,6),
+                           signif.stars=FALSE,tst.ind=c(4,5),dig.tst=4,digits=5)
+              cat("\nStep",paso,":",rownames(fsalen)[1],"\n\n")
+            }
+            mas <- FALSE
+            oldformula <- update(oldformula, paste("~ .",rownames(fsalen)[1]))
+            paso <- paso + 1
+            cambio <- substring(rownames(fsalen)[1],3)
+          }
+        }
+      }
+      if(length(entran) > 0 & mas){
+        fentran <- matrix(NA,length(entran),7)
+        nombres <- matrix("",length(entran),1)
+        for(i in 1:length(entran)){
+          salida <- apply(as.matrix(fs[,-c(salen,entran[i])]),2,function(x) sum(fs[,entran[i]]*x)!=sum(x))
+          if(all(salida) & U[entran[i]]!=cambio){
+            newformula <- update(oldformula, paste("~ . +",U[entran[i]]))
+            X <- model.matrix(newformula,mf)
+            fit.0 <- lm.fit(y=sqrt(weights)*(y-offset),x=X*matrix(sqrt(weights),nrow(X),ncol(X)))
+            fentran[i,1] <- length(fit.0$coefficients) - length(fit.x$coefficients)
+            fentran[i,2:7] <- lmstats(y,X,fit.0$coefficients,offset,weights,k)
+            fentran[i,7] <- ((n-length(fit.x$coefficients))*none[7]-(n-length(fit.0$coefficients))*fentran[i,7])/(fentran[i,1]*fentran[i,7])
+            fentran[i,7] <- (1 + fentran[i,1] + n-length(fit.0$coefficients))*log(1 + fentran[i,7]*fentran[i,1]/(n-length(fit.0$coefficients)))
+            nombres[i] <- U[entran[i]]
+          }
+        }
+        rownames(fentran) <- paste("+",nombres)
+        if(criterion=="p-value"){
+          colnames(fentran) <- c("df",criters2)
+          if(nrow(fentran) > 1){
+            fentran <- fentran[order(-fentran[,7]),]
+            fentran <- na.omit(fentran)
+            attr(fentran,"na.action")	<- attr(fentran,"class") <- NULL
+          }
+          u <- fentran[,1]; v <- n - fentran[,1] - length(fit.x$coefficients); x <- fentran[,7]
+          fentran[,7] <- 1 - pf((exp(fentran[,7]/(1 + u + v)) - 1)*v/u,u,v)
+          fentran <- rbind(fentran,none[-7])
+          rownames(fentran)[nrow(fentran)] <- nonename
+          if(trace) printCoefmat(fentran,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=2:3,
+                                 signif.stars=FALSE,tst.ind=4:5,dig.tst=4,digits=5)
+          if(fentran[1,ncol(fentran)] < levels[1]){
+            if(trace) cat("\nStep",paso,":",rownames(fentran)[1],"\n\n")
+            paso <- paso + 1
+            cambio <- substring(rownames(fentran)[1],3)
+            oldformula <- update(oldformula, paste("~ .",rownames(fentran)[1]))
+          }else tol <- FALSE
+        }
+      }
+      if(length(entran) > 0 & criterion!="p-value"){
+        u <- fentran[,1]; v <- n - fentran[,1] - length(fit.x$coefficients); x <- fentran[,7]
+        fentran[,7] <- 1 - pf((exp(fentran[,7]/(1 + u + v)) - 1)*v/u,u,v)
+        if(any(!is.na(fsalen))){
+          u <- fsalen[,1]; v <- n - length(fit.x$coefficients); x <- fsalen[,7]
+          fsalen[,7] <- 1 - pf((exp(fsalen[,7]/(1 + u + v)) - 1)*v/u,u,v)
+          fentran <- rbind(fentran,fsalen)
+        }
+        fentran <- rbind(fentran,c(0,none[-c(1,7,8)],0))
+        rownames(fentran)[nrow(fentran)] <- nonename
+
+        colnames(fentran) <- c("df",criters2)
+        fentran <- na.omit(fentran)
+        attr(fentran,"na.action")	<- attr(fentran,"class") <- NULL
+        fentran[nrow(fentran),c(1,7)] <- NA
+        fentran <- fentran[order(sentido[ids]*fentran[,c(FALSE,ids)]),]
+        if(rownames(fentran)[1]!=nonename){
+          if(trace){
+            printCoefmat(fentran,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=c(2,3,6),
+                         signif.stars=FALSE,tst.ind=c(4,5),dig.tst=4,digits=5)
+            cat("\nStep",paso,":",rownames(fentran)[1],"\n\n")
+          }
+          paso <- paso + 1
+          cambio <- substring(rownames(fentran)[1],3)
+          oldformula <- update(oldformula, paste("~ .",rownames(fentran)[1]))
+        }else{
+          tol <- FALSE
+          if(trace) printCoefmat(fentran,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=c(2,3,6),
+                                 signif.stars=FALSE,tst.ind=c(4,5),dig.tst=4,digits=5)
+        }
+      }
+      if(length(entran) == 0 & mas) tol <- FALSE
+    }
   }
-  fit.x <- model
-  if(direction=="forward") fit.x <- lm(as.formula(oldformula),offset=offset,weights=weights,data=datas)
-  if(verbose) cat(oldformula,"\n")
-  out_ <- list(initial=oldformula,criterion=criterion)
-  newformula <- oldformula
-  sale <- " "
-  inter <- ifelse(length(coef(model))>0,names(coef(model))[1]=="(Intercept)",FALSE)
-  if(!inter & direction=="forward")
-    stop("The forward variable selection and non-intercept models are not compatible!!",call.=FALSE)
-  names.col <- c("df"," BIC "," AIC ","adj.r2(^)","pred.r2(~)"," CP(&) "," Pr(F>)(*)")
-  delta <- c(1,1,1,-1,-1,1,-1)
-  id0 <-  c(" ","bic","aic","adjr2","predr2","cp","p-value")==criterion
-  if(direction=="forward") delta[length(delta)] <- 1
-  long <- max(nchar(attr(model$terms,"term.labels")))+2
-  nano <- summary(model)
-  sigma20 <- nano$sigma^2
-  sigma20p <- nano$sigma^2*model$df.residual/(1 - nano$r.squared)
-  while(tol){
-    if(length(attr(fit.x$terms,"term.labels"))==0) names.effects <- "" else names.effects <- attr(fit.x$terms,"term.labels")
-    if(direction=="backward"){
-      results <- matrix(NA,length(names.effects)+1,length(delta))
-      if(criterion=="p-value") results[1,ncol(results)] <- -1
-      if(count == 0) results[1,2:(length(delta)-1)] <- lmstats(fit.x) else results[1,2] <- 0
-      s <- attr(fit.x$terms,"factors")
-      for(i in 1:length(names.effects)){
-        if(all(apply(as.matrix(s[,-i]*s[,i]),2,sum) < sum(s[,i]))){
-          formula0 <- constr.formula(fit.x,inter,term=names.effects[i],action="-")
-          fit0 <- lm(as.formula(formula0),offset=offset,weights=weights,data=datas)
-          results[i+1,1] <- length(coef(fit.x)) - length(coef(fit0))
-          results[i+1,2:(length(delta)-1)] <- lmstats(fit0)
-          results[i+1,length(delta)] <- anova(fit.x,fit0,test="F")$Pr[2]
+  if(direction=="backward"){
+    oldformula <- upper
+    if(trace){
+      cat("\nInitial model:\n")
+      cat(paste("~",as.character(oldformula)[length(oldformula)],sep=" "),"\n\n")
+      cat("\nStep",0,":\n")
+    }
+    out_ <- list(initial=paste("~",as.character(oldformula)[length(oldformula)],sep=" "),direction=direction,criterion=criters2[criters==criterion])
+    while(tol){
+      X <- model.matrix(oldformula,mf)
+      fit.x <- lm.fit(y=sqrt(weights)*(y-offset),x=X*matrix(sqrt(weights),nrow(X),ncol(X)))
+      none <- c(NA,lmstats(y,X,fit.x$coefficients,offset,weights,k),NA)
+      S <- unlist(lapply(strsplit(attr(terms(oldformula),"term.labels"),":"),function(x) paste(sort(x),collapse =":")))
+      entran <- seq(1:length(U))[is.na(match(U,S))]
+      salen <- seq(1:length(U))[!is.na(match(U,S))]
+      menos <- TRUE
+
+      fentran <- matrix(NA,length(entran),7)
+      if(length(entran) > 0){
+        nombres <- matrix("",length(entran),1)
+        for(i in 1:length(entran)){
+          salida <- apply(as.matrix(fs[,-c(salen,entran[i])]),2,function(x) sum(fs[,entran[i]]*x)!=sum(x))
+          if(all(salida) & U[entran[i]]!=cambio){
+            newformula <- update(oldformula, paste("~ . +",U[entran[i]]))
+            X <- model.matrix(newformula,mf)
+            fit.0 <- lm.fit(y=sqrt(weights)*(y-offset),x=X*matrix(sqrt(weights),nrow(X),ncol(X)))
+            fentran[i,1] <- length(fit.0$coefficients) - length(fit.x$coefficients)
+            fentran[i,2:7] <- lmstats(y,X,fit.0$coefficients,offset,weights,k)
+            fentran[i,7] <- ((n-length(fit.x$coefficients))*none[7]-(n-length(fit.0$coefficients))*fentran[i,7])/(fentran[i,1]*fentran[i,7])
+            fentran[i,7] <- (1 + fentran[i,1] + n-length(fit.0$coefficients))*log(1 + fentran[i,7]*fentran[i,1]/(n-length(fit.0$coefficients)))
+            nombres[i] <- U[entran[i]]
+          }
+        }
+        rownames(fentran) <- paste("+",nombres)
+        if(criterion=="p-value" & any(!is.na(fentran))){
+          colnames(fentran) <- c("df",criters2)
+          if(nrow(fentran) > 1){
+            fentran <- fentran[order(-fentran[,7]),]
+            fentran <- na.omit(fentran)
+            attr(fentran,"na.action")	<- attr(fentran,"class") <- NULL
+          }
+          u <- fentran[,1]; v <- n - fentran[,1] - length(fit.x$coefficients); x <- fentran[,7]
+          fentran[,7] <- 1 - pf((exp(fentran[,7]/(1 + u + v)) - 1)*v/u,u,v)
+          if(fentran[1,7] < levels[1]){
+            fentran <- rbind(fentran,none[-7])
+            rownames(fentran)[nrow(fentran)] <- nonename
+            if(trace){
+              printCoefmat(fentran,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=c(2,3,6),
+                           signif.stars=FALSE,tst.ind=c(4,5),dig.tst=4,digits=5)
+              cat("\nStep",paso,":",rownames(fentran)[1],"\n\n")
+            }
+            menos <- FALSE
+            oldformula <- update(oldformula, paste("~ .",rownames(fentran)[1]))
+            paso <- paso + 1
+            cambio <- substring(rownames(fentran)[1],3)
+          }
         }
       }
-      names.effects <- cbind("-",names.effects)
-    }
-    if(direction=="forward"){
-      outs <- out(model,names.effects)
-      s2 <- as.matrix(attr(model$terms,"factors")[,outs])
-      names.effects <- attr(model$terms,"term.labels")[outs]
-      results <- matrix(NA,length(names.effects)+1,length(delta))
-      if(criterion=="p-value") results[1,length(delta)] <- 1
-      if(count == 0) results[1,2:(length(delta)-1)] <- lmstats(fit.x) else results[1,2] <- 0
-      for(i in 1:length(names.effects)){
-        if(sum(apply(as.matrix(s2[,-i]),2,function(x) sum(s2[,i]*x)==sum(x)))==0){
-          formula0 <- constr.formula(fit.x,inter,term=names.effects[i],action="+")
-          fit0 <- lm(as.formula(formula0),offset=offset,weights=weights,data=datas)
-          results[i+1,1] <- length(coef(fit0)) - length(coef(fit.x))
-          results[i+1,2:(length(delta)-1)] <- lmstats(fit0)
-          results[i+1,length(delta)] <- anova(fit.x,fit0,test="F")$Pr[2]
+
+      if(length(salen) > 0 & menos){
+        fsalen <- matrix(NA,length(salen),7)
+        nombres <- matrix("",length(salen),1)
+        for(i in 1:length(salen)){
+          salida <- apply(as.matrix(fs[,salen[i]]*fs[,-c(entran,salen[i])]),2,sum)
+          if(all(salida < sum(fs[,salen[i]]))){
+            newformula <- update(oldformula, paste("~ . -",U[salen[i]]))
+            X <- model.matrix(newformula,mf)
+            fit.0 <- lm.fit(y=sqrt(weights)*(y-offset),x=X*matrix(sqrt(weights),nrow(X),ncol(X)))
+            fsalen[i,1] <- length(fit.x$coefficients) - length(fit.0$coefficients)
+            fsalen[i,2:7] <- lmstats(y,X,fit.0$coefficients,offset,weights,k)
+            fsalen[i,7] <- ((n-length(fit.0$coefficients))*fsalen[i,7] - (n-length(fit.x$coefficients))*none[7])/(fsalen[i,1]*none[7])
+            fsalen[i,7] <- (1 + fsalen[i,1] + n-length(fit.x$coefficients))*log(1 + fsalen[i,7]*fsalen[i,1]/(n-length(fit.x$coefficients)))
+            nombres[i] <- U[salen[i]]
+          }
+        }
+        rownames(fsalen) <- paste("-",nombres)
+        if(criterion=="p-value"){
+          colnames(fsalen) <- c("df",criters2)
+          if(nrow(fsalen) > 1){
+            fsalen <- fsalen[order(fsalen[,7]),]
+            fsalen <- na.omit(fsalen)
+            attr(fsalen,"na.action")	<- attr(fsalen,"class") <- NULL
+          }
+          u <- fsalen[,1]; v <- n - length(fit.x$coefficients); x <- fsalen[,7]
+          fsalen[,7] <- 1 - pf((exp(fsalen[,7]/(1 + u + v)) - 1)*v/u,u,v)
+          fsalen <- rbind(fsalen,none[-7])
+          rownames(fsalen)[nrow(fsalen)] <- nonename
+          if(trace) printCoefmat(fsalen,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=c(2,3,6),
+                                 signif.stars=FALSE,tst.ind=c(4,5),dig.tst=4,digits=5)
+          if(fsalen[1,ncol(fsalen)] > levels[2]){
+            if(trace) cat("\nStep",paso,":",rownames(fsalen)[1],"\n\n")
+            paso <- paso + 1
+            cambio <- substring(rownames(fsalen)[1],3)
+            oldformula <- update(oldformula, paste("~ .",rownames(fsalen)[1]))
+          }else tol <- FALSE
         }
       }
-      names.effects <- cbind("+",names.effects)
+      if(criterion!="p-value"){
+        u <- fsalen[,1]; v <- n - length(fit.x$coefficients); x <- fsalen[,7]
+        fsalen[,7] <- 1 - pf((exp(fsalen[,7]/(1 + u + v)) - 1)*v/u,u,v)
+        if(any(!is.na(fentran))){
+          u <- fentran[,1]; v <- n - fentran[,1] - length(fit.x$coefficients); x <- fentran[,7]
+          fentran[,7] <- 1 - pf((exp(fentran[,7]/(1 + u + v)) - 1)*v/u,u,v)
+          fentran <- rbind(fentran,fsalen)
+        }
+        fsalen <- rbind(fsalen,c(0,none[-c(1,7,8)],0))
+        rownames(fsalen)[nrow(fsalen)] <- nonename
+        colnames(fsalen) <- c("df",criters2)
+        fsalen <- na.omit(fsalen)
+        attr(fsalen,"na.action")	<- attr(fsalen,"class") <- NULL
+        fsalen[nrow(fsalen),c(1,7)] <- NA
+        fsalen <- fsalen[order(sentido[ids]*fsalen[,c(FALSE,ids)]),]
+        if(rownames(fsalen)[1]!=nonename){
+          if(trace){
+            printCoefmat(fsalen,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=c(2,3,6),
+                         signif.stars=FALSE,tst.ind=c(4,5),dig.tst=4,digits=5)
+            cat("\nStep",paso,":",rownames(fsalen)[1],"\n\n")
+          }
+          paso <- paso + 1
+          cambio <- substring(rownames(fsalen)[1],3)
+          oldformula <- update(oldformula, paste("~ .",rownames(fsalen)[1]))
+        }else{
+          tol <- FALSE
+          if(trace) printCoefmat(fsalen,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=c(2,3,6),
+                                 signif.stars=FALSE,tst.ind=c(4,5),dig.tst=4,digits=5)
+        }
+      }
+      if(length(salen) == 0 & menos) tol <- FALSE
     }
-    shows <- !is.na(results[,2])
-    results <- cbind(results[shows,1],results[shows,id0],results[shows,!id0])
-    colnames(results) <- c(names.col[1],names.col[id0],names.col[!id0])
-    results <- results[,-3]
-    if(count > 0){
-      if(criterion=="p-value") results[1,-c(1,2)] <- recicla
-      else results[1,-c(1,length(delta))] <- recicla
-    }
-    names.effects2 <- cbind(names.effects[shows[-1],1],names.effects[shows[-1],2])
-    names.effects3 <- c("<none>",paste(names.effects2[,1],names.effects2[,2]))
-    rownames(results) <- names.effects3
-    charac <- rownames(results)[2]
-    rownames(results)[2] <- paste(charac,paste(replicate(max(long-nchar(charac),0)," "),collapse=""),collapse="")
-    ids <- min(results[,2]*delta[id0])==(results[,2]*delta[id0])
-    if(verbose) cat("\nStep",count,":",sale,"\n")
-    indexes <- order(results[,2]*delta[id0],na.last=TRUE)
-    if(sum(ids) > 1){
-      nexto <- c(1:length(delta))[id0]
-      nexto <- ifelse(nexto==length(delta),2,nexto+1)
-      indexes <- order(delta[nexto]*results[,3],na.last=TRUE)
-    }
-    ids <- c(1:length(indexes))==indexes[1]
+  }
+  if(trace){
+    cat("\n\nFinal model:\n")
+    cat(paste("~",as.character(oldformula)[length(oldformula)],sep=" "),"\n\n")
+    cat("********************************************************************************************")
+    cat("\n (*) p-values of the F test")
     if(criterion=="p-value"){
-      recicla <- results[names.effects3==names.effects3[ids],-c(1,2)]
-      if(direction=="backward") ps <- ifelse(max(results[,2]) > level,TRUE,FALSE)
-      if(direction=="forward") ps <- ifelse(min(results[,2]) < level,TRUE,FALSE)
-      results[names.effects3=="<none>",2] <- NA
-    }else recicla <- results[names.effects3==names.effects3[ids],-c(1,length(delta))]
-    tst.ind <- c(2:7)[colnames(results)[-1]!=names.col[2] & colnames(results)[-1]!=names.col[3] & colnames(results)[-1]!=names.col[6]]
-    if(verbose) printCoefmat(results[indexes,],cs.ind=1,tst.ind=tst.ind,dig.tst=4,na.print=" ",signif.stars=FALSE)
-    count <- count + 1
-    if(names.effects3[ids]!="<none>" & ps==TRUE){
-      ids <- ids[-1]
-      sale <- paste(names.effects2[ids,1],names.effects2[ids,2])
-      newformula <- constr.formula(fit.x,inter,term=names.effects2[ids,2],action=names.effects2[ids,1])
-      if(nrow(names.effects)==1 | (nrow(names.effects)==2 & !inter)){
-        tol <- FALSE
-        if(verbose) cat("\nStep",count,":",sale,"\n")
-      }
-      fit.x <- lm(as.formula(newformula),offset=offset,weights=weights,data=datas)
-    }else tol <- FALSE
-  }
-  if(verbose){
-    cat("\nFinal model:\n")
-    cat(newformula,"\n")
-    cat("****************************************************************************\n")
-    cat("(^)  adjusted R-squared\n")
-    cat("(~)  predicted R-squared\n")
-    cat("(&)  Mallows' CP\n")
-    cat("(*)  p-value of the F test")
-    if(criterion=="p-value" & direction=="backward") cat(" ( effects are dropped when their p-values are higher than",level,")")
-    if(criterion=="p-value" & direction=="forward")  cat(" ( effects are included when their p-values are lower than",level,")")
-    if(!is.null(xxx$k)) cat("The magnitude of the penalty in the AIC was set to be ",xxx$k)
+      cat("\n Effects are included when their p-values are lower than",levels[1])
+      cat("\n Effects are dropped when their p-values are higher than",levels[2])
+    }
+    if(!is.null(xxx$k)) cat("The magnitude of the penalty in the AIC was set to be ",k)
     cat("\n")
   }
-  out_$final <- newformula
+  out_$final <- paste("~",as.character(oldformula)[length(oldformula)],sep=" ")
   return(invisible(out_))
 }
 
@@ -443,16 +649,16 @@ envelope.glm <- function(object, rep=100, conf=0.95, type=c("quantile","deviance
     fits <- try(glm.fit(x=X,y=resp,family=object$family,offset=offs,start=coef(object),weights=weights),silent=TRUE)
     if(is.list(fits)){
       if(fits$converged==TRUE){
-        phis <- summary((resp-fits$fitted.values)^2*weights/object$family$variance(fits$fitted.values))/fits$df.residual
+        phis <- sum((resp-fits$fitted.values)^2*weights/object$family$variance(fits$fitted.values))/fits$df.residual
         if(object$family$family=="binomial" | object$family$family=="poisson") phis <- 1
         if(type=="quantile")
           rs <- quantileres(object$family$family,resp,fits$fitted.values,phis/weights)
         if(type=="deviance"){
-          rs <- sqrt(object$family$dev.resids(resp,fits$fitted.values,weights)/sqrt(phis))
+          rs <- sqrt(object$family$dev.resids(resp,fits$fitted.values,weights)/phis)
           rs <- ifelse(resp >= fits$fitted.values,1,-1)*rs
         }
         if(type=="pearson")
-          rs <- (resp-fits$fitted.values)*sqrt(weights/object$family$variance(fits$fitted.values)*phis)
+          rs <- (resp-fits$fitted.values)*sqrt(weights/(object$family$variance(fits$fitted.values)*phis))
         if(standardized){
           Xw <- X*matrix(sqrt(fits$weights),n,p)
           salida <- svd(Xw)
@@ -469,10 +675,9 @@ envelope.glm <- function(object, rep=100, conf=0.95, type=c("quantile","deviance
   alpha <- 1 - max(0,min(1,abs(conf)))
   e <- as.matrix(e[,1:(i-1)])
   es <- apply(e,1,function(x) return(quantile(x,probs=c(alpha/2,0.5,1-alpha/2))))
-  rd <- if(type=="quantile")
+  if(type=="quantile")
     rd <- quantileres(object$family$family,object$y,mu,phi/object$prior.weights)
-  else
-    rd <- residuals(object,type=type)/sqrt(phi)
+  else rd <- residuals(object,type=type)/sqrt(phi)
   if(standardized){
     Xw <- X*matrix(sqrt(object$weights),n,p)
     salida <- svd(Xw)
@@ -501,9 +706,14 @@ envelope.glm <- function(object, rep=100, conf=0.95, type=c("quantile","deviance
     if(is.null(nano$xlab)) nano$xlab <- "Expected quantiles"
     if(is.null(nano$ylab)) nano$ylab <- "Observed quantiles"
     if(is.null(nano$main)) nano$main <- paste0("Normal QQ plot with simulated envelope\n of ",type,"-type residuals")
+    if(is.null(nano$labels))  labels <- 1:length(rd)
+    else{
+      labels <- nano$labels
+      nano$labels <- NULL
+    }
     outm <- do.call("qqnorm",nano)
     if(!missingArg(identify)){
-      identify(outm$x,outm$y,labels=labels,n=max(1,floor(abs(identify))))
+      identify(outm$x,outm$y,labels=labels,n=max(1,floor(abs(identify))),labels=labels)
     }
   }
   out_ <- cbind(t(es),rd)
@@ -594,9 +804,14 @@ envelope.lm <- function(object, rep=100, conf=0.95, type=c("external","internal"
     if(is.null(nano$xlab)) nano$xlab <- "Expected quantiles"
     if(is.null(nano$ylab)) nano$ylab <- "Observed quantiles"
     if(is.null(nano$main)) nano$main <- paste0("Normal QQ plot with simulated envelope\n of ",type,"lly studentized residuals")
+    if(is.null(nano$labels))  labels <- 1:length(td)
+    else{
+      labels <- nano$labels
+      nano$labels <- NULL
+    }
     outm <- do.call("qqnorm",nano)
     if(!missingArg(identify)){
-      identify(outm$x,outm$y,labels=labels,n=max(1,floor(abs(identify))))
+      identify(outm$x,outm$y,labels=labels,n=max(1,floor(abs(identify))),labels=labels)
     }
   }
   out_ <- cbind(t(es),td)
@@ -774,7 +989,7 @@ ROCc <- function(object,plot.it=TRUE,verbose=TRUE,...){
 #' @description Allows to compare nested generalized linear models using Wald, score, gradient, and likelihood ratio tests.
 #' @param object an object of the class glm which is obtained from the fit of a generalized linear model.
 #' @param ... another objects of the class glm which are obtained from the fit of generalized linear models.
-#' @param test an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lrt") tests. By default, \code{test} is set to be "wald".
+#' @param test an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lr") tests. By default, \code{test} is set to be "wald".
 #' @param verbose an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
 #' @details The Wald, Rao's score and Terrell's gradient tests are performed using the expected Fisher information matrix.
 #' @references Buse A. (1982) The Likelihood Ratio, Wald, and Lagrange Multiplier Tests: An Expository Note. \emph{The American Statistician} 36, 153-157.
@@ -785,7 +1000,7 @@ ROCc <- function(object,plot.it=TRUE,verbose=TRUE,...){
 #' fit1 <- glm(mpg ~ weight, family=inverse.gaussian("log"), data=Auto)
 #' fit2 <- update(fit1, . ~ . + horsepower)
 #' fit3 <- update(fit2, . ~ . + horsepower:weight)
-#' anova2(fit1, fit2, fit3, test="lrt")
+#' anova2(fit1, fit2, fit3, test="lr")
 #' anova2(fit1, fit2, fit3, test="score")
 #' anova2(fit1, fit2, fit3, test="wald")
 #' anova2(fit1, fit2, fit3, test="gradient")
@@ -795,14 +1010,14 @@ ROCc <- function(object,plot.it=TRUE,verbose=TRUE,...){
 #' mod <- death ~ age + tbsa + inh_inj
 #' fit1 <- glm(mod, family=binomial("logit"), data=burn1000)
 #' fit2 <- update(fit1, . ~ . + inh_inj + age*inh_inj + tbsa*inh_inj)
-#' anova2(fit1, fit2, test="lrt")
+#' anova2(fit1, fit2, test="lr")
 #' anova2(fit1, fit2, test="score")
 #' anova2(fit1, fit2, test="wald")
 #' anova2(fit1, fit2, test="gradient")
 #'
 #' ## Example 3
 #' fit <- glm(lesions ~ 1 + time, family=poisson("log"), data=aucuba)
-#' anova2(fit, test="lrt")
+#' anova2(fit, test="lr")
 #' anova2(fit, test="score")
 #' anova2(fit, test="wald")
 #' anova2(fit, test="gradient")
@@ -814,7 +1029,7 @@ ROCc <- function(object,plot.it=TRUE,verbose=TRUE,...){
 #' }
 #' @export anova2
 
-anova2 <- function(object,...,test=c("wald","lrt","score","gradient"),verbose=TRUE){
+anova2 <- function(object,...,test=c("wald","lr","score","gradient"),verbose=TRUE){
   test <- match.arg(test)
   x <- list(object,...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glm"))
@@ -834,22 +1049,22 @@ anova2 <- function(object,...,test=c("wald","lrt","score","gradient"),verbose=TR
     phi <- sum(resid(x[[i]],type="pearson")^2)/x[[i]]$df.residual
     if(x[[i]]$family$family=="poisson" | x[[i]]$family$family=="binomial") phi <- 1
     if(test=="wald") sc <- crossprod(coef(x[[i]])[ids],solve(vcov(x[[i]])[ids,ids]))%*%coef(x[[i]])[ids]
-    if(test=="lrt") sc <- (x[[i-1]]$deviance - x[[i]]$deviance)/phi
+    if(test=="lr") sc <- (x[[i-1]]$deviance - x[[i]]$deviance)/phi
     if(test=="score" | test=="gradient"){
       X <- model.matrix(x[[i]])
       u0 <- crossprod(X[,ids],resid(x[[i-1]],type="pearson")*sqrt(x[[i-1]]$weights))/phi
       if(test=="score"){
-        v0 <- solve(crossprod(X,X*matrix(x[[i-1]]$weights,nrow(X),ncol(X))))[ids,ids]
+        v0 <- phi*chol2inv(chol(crossprod(X,X*matrix(x[[i-1]]$weights,nrow(X),ncol(X)))))[ids,ids]
         sc <- crossprod(u0,v0)%*%u0
       }else sc <- abs(crossprod(u0,coef(x[[i]])[ids]))
     }
     df <- sum(ids)
     out_[i-1,] <- cbind(sc,df,1-pchisq(sc,df))
   }
-  colnames(out_) <- c(" Chi  ", " Df", "  Pr(>Chi)")
+  colnames(out_) <- c(" Chi  ", " df", " Pr(Chisq>)")
   rownames(out_) <- paste(1:(hast-1),"vs",2:hast)
   if(verbose){
-    test <- switch(test,"lrt"="Likelihood-ratio test",
+    test <- switch(test,"lr"="Likelihood-ratio test",
                    "wald"="Wald test",
                    "score"="Rao's score test",
                    "gradient"="Gradient test")
@@ -861,212 +1076,6 @@ anova2 <- function(object,...,test=c("wald","lrt","score","gradient"),verbose=TR
   return(invisible(out_))
 }
 
-#' @title Variable Selection in Generalized Linear Models
-#' @description Performs variable selection in generalized linear models.
-#' @param model an object of the class glm which is obtained from the fit of a generalized linear model. The linear predictor of the model whose fit is stored in this glm object is the more complex candidate which should be considered by the variable selection procedure.  The more simple model which should be considered by the variable selection procedure is that with just the Intercept, if there is.
-#' @param direction an (optional) character string indicating the mode of variable selection which should be used. The available options are: deleting variables ("backward")  and adding variables ("forward"). By default, \code{direction} is set to be "backward".
-#' @param level an (optional) numeric value in the interval (0,1) indicating the significance level chosen to perform the F tests. This is only appropiate if \code{criterion}="p-value". By default, \code{level} is set to be 0.05.
-#' @param test an (optional) character string indicating the statistical test which should be used to compare nested models. The available options are: Wald ("wald"), Rao's score ("score"), likelihood ratio ("lrt") and gradient ("gradient") tests. By default, \code{test} is set to be "wald".
-#' @param criterion an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted deviance-based R-squared ("adjr2"), and \emph{p}-value of the \code{test} test ("p-value"). By default, \code{criterion} is set to be "bic".
-#' @param ...	further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC, which by default is set to be 2.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @return A list which contains the following objects:
-#' \itemize{
-#' \item{\code{initial}:}{ an expression describing the linear predictor of the "initial" model.}
-#' \item{\code{final}:}{ an expression describing the linear predictor of the "final" model.}
-#' \item{\code{criterion}:}{ a character string describing the criterion chosen to compare the candidate models.}
-#' }
-#' @seealso \link{stepCriterion.lm}, \link{stepCriterion.overglm}, \link{stepCriterion.glmgee}
-#' @examples
-#' ## Example 1
-#' Auto <- ISLR::Auto
-#' mod <- mpg ~ cylinders + displacement + acceleration + origin + horsepower*weight
-#' fit1 <- glm(mod, family=inverse.gaussian("log"), data=Auto)
-#' stepCriterion(fit1, direction="forward", criterion="p-value", test="lrt")
-#' stepCriterion(fit1, direction="backward", criterion="adjr2")
-#'
-#' ## Example 2
-#' burn1000 <- aplore3::burn1000
-#' burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
-#' mod2 <- death ~ age + gender + race + tbsa + inh_inj + flame + age*inh_inj + tbsa*inh_inj
-#' fit2 <- glm(mod2, family=binomial("logit"), data=burn1000)
-#' stepCriterion(fit2, direction="backward", criterion="bic")
-#' stepCriterion(fit2, direction="forward", criterion="p-value", test="score")
-#'
-#' ## Example 3
-#' fit3 <- glm(cases ~ offset(log(population)) + city*age, family=poisson("log"), data=skincancer)
-#' stepCriterion(fit3, direction="backward", criterion="adjr2")
-#' stepCriterion(fit3, direction="forward", criterion="p-value", test="lrt")
-#' @method stepCriterion glm
-#' @export
-
-stepCriterion.glm <- function(model, criterion=c("bic","aic","adjr2","p-value"), test=c("wald","lrt","score","gradient"), direction=c("backward","forward"), level=0.05, verbose=TRUE, ...){
-  xxx <- list(...)
-  if(is.null(xxx$k)) k <- 2 else k <- xxx$k
-  criterion <- match.arg(criterion)
-  direction <- match.arg(direction)
-  test <- match.arg(test)
-  if(test=="wald") test2 <- "Wald test"
-  if(test=="score") test2 <- "Rao's score test"
-  if(test=="lrt") test2 <- "likelihood-ratio test"
-  if(test=="gradient") test2 <- "Gradient test"
-
-  if(is.null(model$call$data)) datas <- na.omit(get_all_vars(eval(model$call$formula)))
-  else datas <- na.omit(get_all_vars(eval(model$call$formula),eval(model$call$data)))
-  out <- function(fitt,names.effets){
-    left <- lapply(as.list(strsplit(attr(fitt$terms,"term.labels"),":",fixed=TRUE)),function(x) paste(sort(x),collapse=":"))
-    right <- lapply(as.list(strsplit(names.effets,":",fixed=TRUE)),function(x) paste(sort(x),collapse=":"))
-    !(left %in% right)
-  }
-  constr.formula <- function(fitt,inter,term,action){
-    if(missingArg(term)) names.effects <- attr(fitt$terms,"term.labels")
-    else{if(action=="-") names.effects <- attr(fitt$terms,"term.labels")[attr(fitt$terms,"term.labels")!=term]
-    else names.effects <- c(attr(fitt$terms,"term.labels"),term)}
-    if(length(names.effects)>0)
-      paste(attr(fitt$terms,"variables")[2],ifelse(inter,"~ 1 +","~ 0 +"),paste(names.effects,collapse=" + "))
-    else paste(attr(fitt$terms,"variables")[2],ifelse(inter,"~ 1 ","~ 0 "))
-  }
-  glmstats <- function(fitt){
-    if(inter) r2 <- 1 - (fitt$deviance/fitt$df.residual)/(fitt$null.deviance/fitt$df.null)
-    else r2 <- fitt$deviance/fitt$df.residual
-    if(quasi) return(c(0,0,r2))
-    else return(c(AIC(fitt,k=k),BIC(fitt),r2))
-  }
-  tol <- TRUE
-  count <- 0
-  inter <- ifelse(length(coef(model))>0,names(coef(model))[1]=="(Intercept)",FALSE)
-  oldformula <- constr.formula(model,inter)
-  if(direction=="forward") oldformula <- constr.formula(model,inter,term=attr(model$terms,"term.labels"),action="-")
-
-  ps <- ifelse(criterion=="p-value",FALSE,TRUE)
-  if(is.null(model$offset)) offset <- matrix(0,length(model$residuals),1) else offset <- model$offset
-  if(is.null(model$weights)) weights <- matrix(1,length(model$residuals),1) else weights <- model$weights
-  if(verbose){
-    cat("\n  Family: ",model$family$family,"\n")
-    cat("    Link: ",model$family$link,"\n")
-    if(model$family$family=="quasi"){
-      if(model$family$varfun!="constant") cat("Variance:  proportional to",model$family$varfun,"\n")
-      else cat("Variance: ",model$family$varfun,"\n")
-    }
-    cat("\nInitial model:\n")
-  }
-  fit.x <- model
-  if(direction=="forward") fit.x <- glm(as.formula(oldformula),weights=model$prior.weights,offset=model$offset,family=model$family,data=datas)
-  cat(oldformula,"\n")
-  out_ <- list(initial=oldformula,criterion=criterion)
-  newformula <- oldformula
-  sale <- " "
-  inter <- ifelse(length(coef(model))>0,names(coef(model))[1]=="(Intercept)",FALSE)
-  if(model$family$family=="quasi" | model$family$family=="quasibinomial" | model$family$family=="quasipoisson"){
-    quasi <- TRUE
-    if(criterion=="bic" | criterion=="aic") criterion <- "adjr2"
-  }else quasi <- FALSE
-  if(!inter & direction=="forward")
-    stop("The forward variable selection and non-intercept models are not compatible!!",call.=FALSE)
-  names.col <- c("Df","AIC  ","BIC  ","adj.r2(^)","p-value(*)")
-  delta <- c(1,1,1,-1,-1)
-  id0 <-  c(" ","aic","bic","adjr2","p-value")==criterion
-  if(!inter) delta <- c(1,1,1,1,-1)
-  if(direction=="forward") delta[5] <- 1
-  long <- max(nchar(attr(model$terms,"term.labels")))+2
-  while(tol){
-    if(length(attr(fit.x$terms,"term.labels"))==0) names.effects <- "" else names.effects <- attr(fit.x$terms,"term.labels")
-    if(length(attr(model.matrix(fit.x),"assign"))==0) num.effects <- 0 else num.effects <- attr(model.matrix(fit.x),"assign")
-    if(direction=="backward"){
-      results <- matrix(NA,max(num.effects)+1,5)
-      if(criterion=="p-value") results[1,ncol(results)] <- -1
-      if(count==0) results[1,2:(ncol(results)-1)] <- glmstats(fit.x) else results[1,2] <- 0
-      s <- attr(fit.x$terms,"factors")
-      for(i in 1:max(num.effects)){
-        if(all(apply(as.matrix(s[,-i]*s[,i]),2,sum) < sum(s[,i]))){
-          formula0 <- constr.formula(fit.x,inter,term=names.effects[i],action="-")
-          fit0 <- try(glm(as.formula(formula0),weights=fit.x$prior.weights,offset=fit.x$offset,family=fit.x$family,data=datas),silent=TRUE)
-          if(!is.list(fit0))	fit0 <- glm(as.formula(formula0),weights=fit.x$prior.weights,offset=fit.x$offset,family=fit.x$family,data=datas,mustart=fitted(fit.x))
-          results[i+1,1] <- fit0$df.residual - fit.x$df.residual
-          results[i+1,2:4] <- glmstats(fit0)
-          results[i+1,5] <- anova2(fit0,fit.x,test=test,verbose=FALSE)[1,3]
-        }
-      }
-      names.effects <- cbind("-",names.effects)
-    }
-    if(direction=="forward"){
-      outs <- out(model,names.effects)
-      s2 <- as.matrix(attr(model$terms,"factors")[,outs])
-      names.effects <- attr(model$terms,"term.labels")[outs]
-      results <- matrix(NA,length(names.effects)+1,5)
-      if(criterion=="p-value") results[1,ncol(results)] <- 1
-      if(count==0) results[1,2:(ncol(results)-1)] <- glmstats(fit.x) else results[1,2] <- 0
-      for(i in 1:length(names.effects)){
-        if(sum(apply(as.matrix(s2[,-i]),2,function(x) sum(s2[,i]*x)==sum(x)))==0){
-          formula0 <- constr.formula(fit.x,inter,term=names.effects[i],action="+")
-          fit0 <- try(glm(as.formula(formula0),weights=fit.x$prior.weights,offset=fit.x$offset,family=fit.x$family,data=datas),silent=TRUE)
-          if(!is.list(fit0)) fit0 <- glm(as.formula(formula0),weights=fit.x$prior.weights,offset=fit.x$offset,family=fit.x$family,data=datas,mustart=fitted(fit.x))
-          results[i+1,1] <- fit.x$df.residual - fit0$df.residual
-          results[i+1,2:4] <- glmstats(fit0)
-          results[i+1,5] <- anova2(fit.x,fit0,test=test,verbose=FALSE)[1,3]
-        }
-      }
-      names.effects <- cbind("+",names.effects)
-    }
-    shows <- !is.na(results[,2])
-    results <- cbind(results[shows,1],results[shows,id0],results[shows,!id0])
-    colnames(results) <- c(names.col[1],names.col[id0],names.col[!id0])
-    results <- results[,-3]
-    if(count > 0){
-      if(criterion=="p-value") results[1,-c(1,2)] <- recicla
-      else results[1,-c(1,5)] <- recicla
-    }
-    names.effects2 <- cbind(names.effects[shows[-1],1],names.effects[shows[-1],2])
-    names.effects3 <- c("<none>",paste(names.effects2[,1],names.effects2[,2]))
-    rownames(results) <- names.effects3
-    charac <- rownames(results)[2]
-    rownames(results)[2] <- paste(charac,paste(replicate(max(long-nchar(charac),0)," "),collapse=""),collapse="")
-
-    ids <- min(results[,2]*delta[id0])==(results[,2]*delta[id0])
-    if(sum(ids)>1) ids <- min(results[,3])==(results[,3])
-    if(verbose) cat("\nStep",count,":",sale,"\n")
-    indexes <- sort(results[,2]*delta[id0],index=TRUE)$ix
-    if(criterion=="p-value"){
-      recicla <- results[names.effects3==names.effects3[ids],-c(1,2)]
-      if(direction=="backward") ps <- ifelse(max(results[,2]) > level,TRUE,FALSE)
-      if(direction=="forward") ps <- ifelse(min(results[,2]) < level,TRUE,FALSE)
-      results[names.effects3=="<none>",2] <- NA
-    }else recicla <- results[names.effects3==names.effects3[ids],-c(1,ncol(results))]
-    results2 <- cbind(results[,1],NA,results[,-1])
-    colnames(results2) <- c(colnames(results)[1],"",colnames(results)[-1])
-    if(verbose){
-      if(quasi)
-        printCoefmat(results2[indexes,colnames(results2)!="AIC  " & colnames(results2)!="BIC  "],cs.ind=1,tst.ind=3,dig.tst=3,na.print=" ",signif.stars=FALSE)
-      else
-        printCoefmat(results2[indexes,],cs.ind=1,tst.ind=c(3:5),dig.tst=3,na.print=" ",signif.stars=FALSE)
-    }
-    count <- count + 1
-    if(names.effects3[ids]!="<none>" & ps==TRUE){
-      ids <- ids[-1]
-      sale <- paste(names.effects2[ids,1],names.effects2[ids,2])
-      newformula <- constr.formula(fit.x,inter,term=names.effects2[ids,2],action=names.effects2[ids,1])
-      if(nrow(names.effects)==1 | (nrow(names.effects)==2 & !inter)){
-        tol <- FALSE
-        if(verbose) cat("\nStep",count,":",sale,"\n")
-      }
-      fit.x <- glm(as.formula(newformula),weights=fit.x$prior.weights,offset=fit.x$offset,family=fit.x$family,data=datas)
-    }else tol <- FALSE
-  }
-  if(verbose){
-    cat("\n\nFinal model:\n")
-    cat(newformula,"\n\n")
-    cat("****************************************************************************\n")
-    if(inter) cat("\n(^) Adjusted R-squared based on the residual deviance")
-    else cat("\n(^) Deviance-based estimate of the dispersion parameter")
-    cat("\n(*) p-value of the",test2)
-    if(criterion=="p-value" & direction=="backward") cat("\n ( effects are dropped when their p-values are higher than",level,")")
-    if(criterion=="p-value" & direction=="forward")  cat("\n ( effects are included when their p-values are lower than",level,")")
-    if(!is.null(xxx$k)) cat("The magnitude of the penalty in the AIC was set to be ",xxx$k)
-    cat("\n")
-  }
-  out_$final <- newformula
-  return(invisible(out_))
-}
 
 #' @title Estimating Equations in Generalized Linear Models
 #' @description Extracts estimating equations evaluated at the parameter estimates and the observed data for a generalized linear model fitted to the data.
@@ -1217,7 +1226,7 @@ gvif.glm <- function(model,verbose=TRUE,...){
 #' @title Confidence Intervals for Generalized Linear Models
 #' @description Computes confidence intervals based on Wald, likelihood-ratio, Rao's score or Terrell's gradient tests for a generalized linear model.
 #' @param model an object of the class glm which is obtained from the fit of a generalized linear model.
-#' @param test an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lrt") tests. By default, \code{test} is set to be "wald".
+#' @param test an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lr") tests. By default, \code{test} is set to be "wald".
 #' @param digits an (optional) integer value indicating the number of decimal places to be used. By default, \code{digits} is set to be 4.
 #' @param level an (optional) value indicating the required confidence level. By default, \code{level} is set to be 0.95.
 #' @param verbose an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
@@ -1238,7 +1247,7 @@ gvif.glm <- function(model,verbose=TRUE,...){
 #' fit2 <- glm(mod, family=binomial("logit"), data=burn1000)
 #' confint2(fit2)
 #'
-confint2 <- function(model, level=0.95, test=c("wald","lrt","score","gradient"), digits=4, verbose=TRUE){
+confint2 <- function(model, level=0.95, test=c("wald","lr","score","gradient"), digits=4, verbose=TRUE){
   test <- match.arg(test)
   if(class(model)[1]!="glm")
     stop("Only glm-type objects are supported!!",call.=FALSE)
@@ -1247,8 +1256,8 @@ confint2 <- function(model, level=0.95, test=c("wald","lrt","score","gradient"),
   p <- ncol(X)
   n <- nrow(X)
   ee <- sqrt(diag(vcov(model)))
-  prefi <- "Approximate "
-  if(test=="lrt" | test=="score" | test=="gradient"){
+  prefi <- "Approximate"
+  if(test=="lr" | test=="score" | test=="gradient"){
     results <- matrix(0,p,2)
     phi <- summary(model)$dispersion
     for(i in 1:p){
@@ -1259,7 +1268,7 @@ confint2 <- function(model, level=0.95, test=c("wald","lrt","score","gradient"),
         offsets <- offset0 + X[,i]*beta0
         if(p > 1) fit0s <- glm(model$y ~ -1 + Xs, family=model$family, offset=offsets, weights=model$prior.weights)
         if(p == 1) fit0s <- glm(model$y ~ -1, family=model$family, offset=offsets, weights=model$prior.weights)
-        if(test=="lrt") salida <- (fit0s$deviance - model$deviance)/phi - qchisq(1-alpha,1)
+        if(test=="lr") salida <- (fit0s$deviance - model$deviance)/phi - qchisq(1-alpha,1)
         if(test=="score"){
           ui <- (crossprod(X,resid(fit0s,type="pearson")*sqrt(fit0s$weights))/phi)[i]
           Xw <- X*matrix(sqrt(fit0s$weights),n,p)
@@ -1284,7 +1293,7 @@ confint2 <- function(model, level=0.95, test=c("wald","lrt","score","gradient"),
   }else{
     if(model$family$family=="gaussian" & model$family$link=="identity"){
       results <- cbind(coef(model) - qt(1-alpha/2,n-p)*ee,coef(model) + qt(1-alpha/2,n-p)*ee)
-      prefi <- "Exact "
+      prefi <- "Exact"
     }
     else
       results <- cbind(coef(model) - qnorm(1-alpha/2)*ee,coef(model) + qnorm(1-alpha/2)*ee)
@@ -1292,7 +1301,7 @@ confint2 <- function(model, level=0.95, test=c("wald","lrt","score","gradient"),
   rownames(results) <- colnames(X)
   colnames(results) <- c("Lower limit","Upper limit")
   if(verbose){
-    test <- switch(test,"lrt"="Likelihood-ratio test",
+    test <- switch(test,"lr"="Likelihood-ratio test",
                    "wald"="Wald test",
                    "score"="Rao's score test",
                    "gradient"="Gradient test")
@@ -1300,4 +1309,551 @@ confint2 <- function(model, level=0.95, test=c("wald","lrt","score","gradient"),
     print(round(results,digits=digits))
   }
   return(invisible(results))
+}
+
+#' @title Residuals for Linear and Generalized Linear Models
+#' @description Computes residuals for a fitted linear or generalized linear model.
+#' @param object a object of the class lm or glm obtained from the fit of a linear or a generalized linear model.
+#' @param type an (optional) character string giving the type of residuals which should be returned. The available options for LMs are: (1) externally studentized ("external"); (2) internally studentized ("internal") (default). The available options for GLMs are: (1) "pearson"; (2) "deviance";  (3) "quantile" (default).
+#' @param standardized an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. By default, \code{standardized} is set to be FALSE.
+#' @param plot.it an (optional) logical switch indicating if a plot of the residuals is required. By default, \code{plot.it} is set to be TRUE.
+#' @param identify an (optional) integer value indicating the number of individuals to identify on the plot of residuals. This is only appropriate when \code{plot.it=TRUE}.
+#' @param ... further arguments passed to or from other methods
+#' @return A vector with the observed residuals type \code{type}.
+#' @examples
+#' # Example 1
+#' fit1 <- lm(Species ~ Biomass + pH + Biomass*pH, data=richness)
+#' residuals2(fit1, type="external", col="red", pch=20, col.lab="blue",
+#'            col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' # Example 2
+#' fit2 <- glm(infections ~ frequency + location, family=poisson, data=swimmers)
+#' residuals2(fit2, type="quantile", col="red", pch=20,col.lab="blue",
+#'            col.axis="blue",col.main="black",family="mono",cex=0.8)
+#' @export residuals2
+residuals2 <- function(object,type,standardized=FALSE,plot.it=TRUE,identify,...){
+  if(class(object)[1]!="glm" & class(object)[1]!="lm") stop("Only lm- and glm-type objects are supported!!",call.=FALSE)
+  if(class(object)[1]=="glm" & missingArg(type)) type <- "quantile"
+  if(class(object)[1]=="lm" & missingArg(type)) type <- "internal"
+  if(class(object)[1]=="glm" & type!="quantile" & type!="pearson" & type!="deviance")
+    stop("Only quantile-, pearson- and deviance-type residuals are supported for glm-type objects !!",call.=FALSE)
+  if(class(object)[1]=="lm" & type!="internal" & type!="external")
+    stop("Only internal-, and external-type residuals are supported for lm-type objects !!",call.=FALSE)
+  if(class(object)[1]=="glm"){
+    quantileres <- function(family,y,mu,phi){
+      resi <- switch(family,
+                     Gamma = pgamma(y,shape=1/phi,scale=mu*phi),
+                     inverse.gaussian = pnorm((y/mu-1)/sqrt(y*phi)) + exp(2/(mu*phi))*pnorm(-(y/mu+1)/sqrt(y*phi)),
+                     gaussian = pnorm((y-mu)/sqrt(phi)),
+                     poisson = ppois(y-1,lambda=mu) + dpois(y,lambda=mu)*runif(length(mu)),
+                     binomial = pbinom(y/phi-1,size=1/phi,prob=mu) + dbinom(y/phi,size=1/phi,prob=mu)*runif(length(mu)))
+      return(qnorm(ifelse(ifelse(resi<1e-16,1e-16,resi)>1-(1e-16),1-(1e-16),resi)))
+    }
+    phi <- summary(object)$dispersion
+    if(type=="quantile")
+      rd <- quantileres(object$family$family,object$y,object$fitted.values,phi/object$prior.weights)
+    else rd <- residuals(object,type=type)/sqrt(phi)
+    if(standardized){
+      X <- model.matrix(object)
+      Xw <- X*matrix(sqrt(object$weights),nrow(X),ncol(X))
+      salida <- svd(Xw)
+      h <- apply(salida$u^2,1,sum)
+      rd <- rd/sqrt(1-h)
+    }
+  }
+  if(class(object)[1]=="lm"){
+    X <- model.matrix(object)
+    if(is.null(object$weights)) weights <- rep(1,nrow(X)) else weights <- object$weights
+    Xw <- X*matrix(sqrt(weights),nrow(X),ncol(X))
+    salida <- svd(Xw)
+    h <- apply(salida$u^2,1,sum)
+    sigma2 <- summary(object)$sigma^2
+    rd <- residuals(object,type="response")/sqrt(sigma2*(1-h))
+    if(type=="external") rd <- rd*sqrt((nrow(X)-ncol(X)-1)/(nrow(X)-ncol(X)-rd^2))
+  }
+  if(plot.it){
+    nano <- list(...)
+    nano$x <- object$fitted.values
+    nano$y <- rd
+    if(is.null(nano$ylim)) nano$ylim <- c(min(-3.5,min(rd)),max(+3.5,max(rd)))
+    if(is.null(nano$xlab)) nano$xlab <- "Fitted values"
+    if(class(object)[1]=="lm") nano$ylab <- paste0(type,"lly studentized residual",sep="")
+    else if(is.null(nano$ylab)) nano$ylab <- paste(type," - type residual",sep="")
+    if(is.null(nano$pch))  nano$pch  <- 20
+    if(is.null(nano$labels))  labels <- 1:length(rd)
+    else{
+      labels <- nano$labels
+      nano$labels <- NULL
+    }
+    do.call("plot",nano)
+    abline(h=-3,lty=3)
+    abline(h=+3,lty=3)
+    if(!missingArg(identify)) identify(nano$x,nano$y,n=max(1,floor(abs(identify))),labels=labels)
+  }
+  rd <- as.matrix(rd)
+  colnames(rd) <- type
+  return(invisible(rd))
+}
+
+#' @title Variable Selection in Generalized Linear Models
+#' @description Performs variable selection in generalized linear models using hybrid versions of forward stepwise and backward stepwise.
+#' @param model an object of the class glm which is obtained from the fit of a generalized linear model.
+#' @param direction an (optional) character string indicating the type of procedure which should be used. The available options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). By default, \code{direction} is set to be "forward".
+#' @param levels an (optional) two-dimensional vector of values in the interval \eqn{(0,1)} indicating the levels at which the variables should in and out from the model. This is only appropiate if \code{criterion}="p-value". By default, \code{levels} is set to be \code{c(0.05,0.05)}.
+#' @param test an (optional) character string indicating the statistical test which should be used to compare nested models. The available options are: Wald ("wald"), Rao's score ("score"), likelihood-ratio ("lr") and gradient ("gradient") tests. By default, \code{test} is set to be "wald".
+#' @param criterion an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted deviance-based R-squared ("adjr2"), and \emph{p}-value of the \code{test} test ("p-value"). By default, \code{criterion} is set to be "bic".
+#' @param ...	further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC/QICu, which by default is set to be 2.
+#' @param trace an (optional) logical switch indicating if should the stepwise reports be printed. By default, \code{trace} is set to be TRUE.
+#' @param scope an (optional) list, containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. By default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.
+#' @return A list which contains the following objects:
+#' \itemize{
+#' \item{\code{initial}:}{ a character string indicating the linear predictor of the "initial model".}
+#' \item{\code{direction}:}{ a character string indicating the type of procedure which was used.}
+#' \item{\code{criterion}:}{ a character string indicating the criterion used to compare the candidate models.}
+#' \item{\code{final}:}{ a character string indicating the linear predictor of the "final model".}
+#' }
+#' @seealso \link{stepCriterion.lm}, \link{stepCriterion.overglm}, \link{stepCriterion.glmgee}
+#' @examples
+#' ## Example 1
+#' Auto <- ISLR::Auto
+#' Auto2 <- within(Auto, origin <- factor(origin))
+#' mod <- mpg ~ cylinders + displacement + acceleration + origin + horsepower*weight
+#' fit1 <- glm(mod, family=inverse.gaussian("log"), data=Auto2)
+#' stepCriterion(fit1, direction="forward", criterion="p-value", test="lr")
+#' stepCriterion(fit1, direction="backward", criterion="bic")
+#'
+#' ## Example 2
+#' burn1000 <- aplore3::burn1000
+#' burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
+#' upper <- ~ age + gender + race + tbsa + inh_inj + flame + age*inh_inj + tbsa*inh_inj
+#' lower <- ~ 1
+#' fit2 <- glm(death ~ age + gender + race + tbsa + inh_inj, family=binomial("logit"), data=burn1000)
+#' stepCriterion(fit2, direction="backward", criterion="bic", scope=list(lower=lower,upper=upper))
+#' stepCriterion(fit2, direction="forward", criterion="p-value", test="score")
+#'
+#' ## Example 3
+#' upper <- cases ~ city + age + city*age
+#' fit3 <- glm(upper, family=poisson("log"), offset=log(population), data=skincancer)
+#' stepCriterion(fit3, direction="backward", criterion="aic", scope=list(lower=~ 1,upper=upper))
+#' stepCriterion(fit3, direction="forward", criterion="p-value", test="lr")
+#' @method stepCriterion glm
+#' @export
+#' @references James G., Witten D., Hastie T. and Tibshirani R. (2013, page 210) An Introduction to Statistical Learning with Applications in R, Springer, New York.
+
+stepCriterion.glm <- function(model, criterion=c("bic","aic","adjr2","p-value","qicu"), test=c("wald","lr","score","gradient"), direction=c("forward","backward"), levels=c(0.05,0.05), trace=TRUE, scope, ...){
+  xxx <- list(...)
+  if(is.null(xxx$k)) k <- 2 else k <- xxx$k
+  criterion <- match.arg(criterion)
+  direction <- match.arg(direction)
+  test <- match.arg(test)
+  if(test=="wald") test2 <- "Wald test"
+  if(test=="score") test2 <- "Rao's score test"
+  if(test=="lr") test2 <- "likelihood-ratio test"
+  if(test=="gradient") test2 <- "Gradient test"
+
+  quasi <- FALSE
+  if(model$family$family %in% c("quasi","quasibinomial","quasipoisson")){
+    quasi <- TRUE
+    if(model$family$family=="quasi"){
+      familia <- switch(model$family$varfun,"constant"="gaussian","mu(1-mu)"="binomial",
+                        "mu"="poisson","mu^2"="Gamma","mu^3"="inverse.gaussian")
+    }else familia <- switch(model$family$family,"quasibinomial"="binomial","quasipoisson"="poisson")
+  }
+  if(quasi & criterion %in% c("aic","bic")) stop("The AIC and BIC are not supported for quasi-likelihood models!!",call.=FALSE)
+  if(!quasi & criterion=="qicu") stop("The QICu is not supported for likelihood-based models!!",call.=FALSE)
+  if(quasi & criterion=="qicu") criterion <- "aic"
+
+  quasilik <- function(familia,modelo){
+    mu <- modelo$fitted.values
+    y <- model$y
+    weights <- model$prior.weights
+    phi <- sum((y-mu)^2*weights/model$family$variance(mu))/modelo$df.residual
+    if(familia=="gaussian") qll <- sum(-weights*(y - mu)^2/2)
+    if(familia=="binomial") qll <- sum(weights*(y*log(mu) + (1-y)*log(1-mu)))
+    if(familia=="poisson") qll <- sum(weights*(y*log(mu) - mu))
+    if(familia=="Gamma") qll <- sum(-weights*(y/mu + log(mu)))
+    if(familia=="inverse.gaussian") qll <- sum(weights*(mu - y/2)/mu^2)
+    return(qll/phi)
+  }
+  tests <- function(fitred,fitcom,type){
+    phi <- sum((model$y-fitcom$fitted.values)^2*model$prior.weights/model$family$variance(fitcom$fitted.values))
+    phi <- phi/fitcom$df.residual
+    if(fitcom$family$family %in% c("poisson","binomial")) phi <- 1
+    if(type=="lr") sc <- (fitred$deviance - fitcom$deviance)/phi
+    cuales <- is.na(match(names(fitcom$coefficients),names(fitred$coefficients)))
+    if(type=="wald"){
+      vcovar <- phi*chol2inv(fitcom$R)
+      sc <- t(fitcom$coefficients[cuales])%*%chol2inv(chol(vcovar[cuales,cuales]))%*%fitcom$coefficients[cuales]
+    }
+    if(type=="score"){
+      X <- qr.X(fitcom$qr)/sqrt(fitcom$weights)
+      Xw <- X*matrix(sqrt(fitred$weights),nrow(X),ncol(X))
+      vcovar0 <- phi*chol2inv(chol(t(Xw)%*%Xw))
+      U0 <- t(Xw)%*%((model$y-fitred$fitted.values)*sqrt(model$prior.weights/model$family$variance(fitred$fitted.values)))/phi
+      sc <- t(U0[cuales])%*%vcovar0[cuales,cuales]%*%U0[cuales]
+    }
+    if(type=="gradient"){
+      X <- qr.X(fitcom$qr)/sqrt(fitcom$weights)
+      Xw <- X*matrix(sqrt(fitred$weights),nrow(X),ncol(X))
+      U0 <- t(Xw)%*%((model$y-fitred$fitted.values)*sqrt(model$prior.weights/model$family$variance(fitred$fitted.values)))/phi
+      sc <- abs(t(U0[cuales])%*%fitcom$coefficients[cuales])
+    }
+    return(sc)
+  }
+
+  criters <- c("aic","bic","adjr2","p-value")
+  criters2 <- c("AIC","BIC","adj.R-squared","P(Chisq>)(*)")
+  sentido <- c(1,1,-1,1)
+  if(names(coef(model))[1]!="(Intercept)") sentido[3] <- 1
+  pen <- attr(logLik(model),"df")-length(model$coefficients)
+  if(missingArg(scope)){
+    upper <- formula(eval(model$call$formula))
+    lower <- formula(eval(model$call$formula))
+    lower <- formula(paste(deparse(lower[[2]]),"~",attr(terms(lower),"intercept")))
+  }else{
+    lower <- scope$lower
+    upper <- scope$upper
+  }
+  if(is.null(model$call$data)) datas <- na.omit(get_all_vars(upper,environment(eval(model$call$formula))))
+  else datas <- na.omit(get_all_vars(upper,eval(model$call$data)))
+
+  U <- attr(terms(upper),"term.labels")
+  fs <- attr(terms(upper),"factors")
+  long <- max(nchar(U)) + 2
+  nonename <- paste("<none>",paste(replicate(max(long-6,0)," "),collapse=""),collapse="")
+  cambio <- ""
+  paso <- 1
+  tol <- TRUE
+  if(trace){
+    cat("\n       Family: ",model$family$family,"\n")
+    cat("Link function: ",model$family$link,"\n")
+  }
+  if(quasi){
+    if(model$family$varfun!="constant") cat("     Variance: proportional to",model$family$varfun,"\n")
+    else cat("     Variance: ",model$family$varfun,"\n")
+  }
+
+  if(direction=="forward"){
+    oldformula <- lower
+    if(trace){
+      cat("\nInitial model:\n")
+      cat(paste("~",as.character(oldformula)[length(oldformula)],sep=" "),"\n\n")
+      cat("\nStep",0,":\n")
+    }
+    out_ <- list(initial=paste("~",as.character(oldformula)[length(oldformula)],sep=" "),direction=direction,criterion=criters2[criters==criterion])
+    while(tol){
+      X <- model.matrix(oldformula,data=datas)
+      fit.x <- glm.fit(y=model$y,x=X,family=model$family,offset=model$offset,weights=model$prior.weights)
+      S <- attr(terms(oldformula),"term.labels")
+      entran <- seq(1:length(U))[is.na(match(U,S))]
+      salen <- seq(1:length(U))[!is.na(match(U,S))]
+      mas <- TRUE
+
+      fsalen <- matrix(NA,length(salen),5)
+      if(length(salen) > 0){
+        nombres <- matrix("",length(salen),1)
+        for(i in 1:length(salen)){
+          salida <- apply(as.matrix(fs[,salen[i]]*fs[,-c(entran,salen[i])]),2,sum)
+          if(all(salida < sum(fs[,salen[i]])) & U[salen[i]]!=cambio){
+            newformula <- update(oldformula, paste("~ . -",U[salen[i]]))
+            X <- model.matrix(newformula,data=datas)
+            fit.0 <- glm.fit(y=model$y,x=X,family=model$family,offset=model$offset,weights=model$prior.weights)
+            fsalen[i,1] <- fit.0$df.residual - fit.x$df.residual
+            fsalen[i,5] <- tests(fit.0,fit.x,type=test)
+            fsalen[i,5] <- sqrt(9*fsalen[i,1]/2)*((fsalen[i,5]/fsalen[i,1])^(1/3) - 1 + 2/(9*fsalen[i,1]))
+            fsalen[i,2] <- ifelse(quasi,-2*quasilik(familia,fit.0) + k*length(fit.0$coefficients),fit.0$aic + (k-2)*(length(fit.0$coefficients)+pen))
+            fsalen[i,3] <- fsalen[i,2] + (log(length(fit.0$y))-k)*(length(fit.0$coefficients)+pen)
+            fsalen[i,4] <- fit.0$deviance/fit.0$df.residual
+            if(names(coef(model))[1]=="(Intercept)") fsalen[i,4] <- 1 - fsalen[i,4]/(model$null.deviance/model$df.null)
+            nombres[i] <- U[salen[i]]
+          }
+        }
+        rownames(fsalen) <- paste("-",nombres)
+        if(criterion=="p-value" & any(!is.na(fsalen))){
+          colnames(fsalen) <- c("df",criters2)
+          if(nrow(fsalen) > 1){
+            fsalen <- fsalen[order(fsalen[,5]),]
+            fsalen <- na.omit(fsalen)
+            attr(fsalen,"na.action")	<- attr(fsalen,"class") <- NULL
+          }
+          fsalen[,5] <- 1-pchisq((sqrt(2/(9*fsalen[,1]))*fsalen[,5] + 1 - 2/(9*fsalen[,1]))^3*fsalen[,1],fsalen[,1])
+          if(fsalen[1,5] > levels[2]){
+            aic <- ifelse(quasi,-2*quasilik(familia,fit.x) + k*length(fit.x$coefficients),fit.x$aic + (k-2)*(length(fit.x$coefficients)+pen))
+            none <- c(aic,aic + (log(length(fit.x$y))-k)*(length(fit.x$coefficients)+pen),fit.x$deviance/fit.x$df.residual)
+            if(names(coef(model))[1]=="(Intercept)") none[3] <- 1 - none[3]/(model$null.deviance/model$df.null)
+            fsalen <- rbind(fsalen,c(NA,none,NA))
+            rownames(fsalen)[nrow(fsalen)] <- nonename
+            if(quasi){
+              fsalen <- fsalen[,-3]
+              colnames(fsalen)[2] <- "QICu"
+            }
+            if(trace){
+              printCoefmat(fsalen,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=2:(ncol(fsalen)-2),
+                           signif.stars=FALSE,tst.ind=ncol(fsalen)-1,dig.tst=4,digits=5)
+              cat("\nStep",paso,":",rownames(fsalen)[1],"\n\n")
+            }
+            mas <- FALSE
+            oldformula <- update(oldformula, paste("~ .",rownames(fsalen)[1]))
+            paso <- paso + 1
+            cambio <- substring(rownames(fsalen)[1],3)
+          }
+        }
+      }
+
+      if(length(entran) > 0 & mas){
+        fentran <- matrix(NA,length(entran),5)
+        nombres <- matrix("",length(entran),1)
+        for(i in 1:length(entran)){
+          salida <- apply(as.matrix(fs[,-c(salen,entran[i])]),2,function(x) sum(fs[,entran[i]]*x)!=sum(x))
+          if(all(salida) & U[entran[i]]!=cambio){
+            newformula <- update(oldformula, paste("~ . +",U[entran[i]]))
+            X <- model.matrix(newformula,data=datas)
+            fit.0 <- glm.fit(y=model$y,x=X,family=model$family,offset=model$offset,weights=model$prior.weights)
+            fentran[i,1] <- fit.x$df.residual - fit.0$df.residual
+            fentran[i,5] <- tests(fit.x,fit.0,type=test)
+            fentran[i,5] <- sqrt(9*fentran[i,1]/2)*((fentran[i,5]/fentran[i,1])^(1/3) - 1 + 2/(9*fentran[i,1]))
+            fentran[i,2] <- ifelse(quasi,-2*quasilik(familia,fit.0) + k*length(fit.0$coefficients),fit.0$aic + (k-2)*(length(fit.0$coefficients)+pen))
+            fentran[i,3] <- fentran[i,2] + (log(length(fit.0$y))-k)*(length(fit.0$coefficients)+pen)
+            fentran[i,4] <- fit.0$deviance/fit.0$df.residual
+            if(names(coef(model))[1]=="(Intercept)") fentran[i,4] <- 1 - fentran[i,4]/(model$null.deviance/model$df.null)
+            nombres[i] <- U[entran[i]]
+          }
+        }
+        rownames(fentran) <- paste("+",nombres)
+        if(criterion=="p-value"){
+          colnames(fentran) <- c("df",criters2)
+          if(nrow(fentran) > 1){
+            fentran <- fentran[order(-fentran[,5]),]
+            fentran <- na.omit(fentran)
+            attr(fentran,"na.action")	<- attr(fentran,"class") <- NULL
+          }
+          fentran[,5] <- 1-pchisq((sqrt(2/(9*fentran[,1]))*fentran[,5] + 1 - 2/(9*fentran[,1]))^3*fentran[,1],fentran[,1])
+          pen <- length(fit.x$coefficients) + attr(logLik(model),"df")-length(model$coefficients)
+          aic <- ifelse(quasi,-2*quasilik(familia,fit.x) + k*length(fit.x$coefficients),fit.x$aic + (k-2)*(length(fit.x$coefficients)+pen))
+          none <- c(aic,aic + (log(length(fit.x$y))-k)*(length(fit.x$coefficients)+pen),fit.x$deviance/fit.x$df.residual)
+          if(names(coef(model))[1]=="(Intercept)") none[3] <- 1 - none[3]/(model$null.deviance/model$df.null)
+          fentran <- rbind(fentran,c(NA,none,NA))
+          rownames(fentran)[nrow(fentran)] <- nonename
+          if(quasi){
+            fentran <- fentran[,-3]
+            colnames(fentran)[2] <- "QICu"
+          }
+          if(trace) printCoefmat(fentran,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=2:(ncol(fentran)-2),
+                                 signif.stars=FALSE,tst.ind=ncol(fentran)-1,dig.tst=4,digits=5)
+          if(fentran[1,ncol(fentran)] < levels[1]){
+            if(trace) cat("\nStep",paso,":",rownames(fentran)[1],"\n\n")
+            paso <- paso + 1
+            cambio <- substring(rownames(fentran)[1],3)
+            oldformula <- update(oldformula, paste("~ .",rownames(fentran)[1]))
+          }else tol <- FALSE
+        }
+      }
+      if(length(entran) > 0 & criterion!="p-value"){
+        if(any(!is.na(fsalen))) fentran <- rbind(fentran,fsalen)
+        fentran[,5] <- 1-pchisq((sqrt(2/(9*fentran[,1]))*fentran[,5] + 1 - 2/(9*fentran[,1]))^3*fentran[,1],fentran[,1])
+        aic <- ifelse(quasi,-2*quasilik(familia,fit.x) + k*length(fit.x$coefficients),fit.x$aic + (k-2)*(length(fit.x$coefficients)+pen))
+        none <- c(aic,aic + (log(length(fit.x$y))-k)*(length(fit.x$coefficients)+pen),fit.x$deviance/fit.x$df.residual)
+        if(names(coef(model))[1]=="(Intercept)") none[3] <- 1 - none[3]/(model$null.deviance/model$df.null)
+        fentran <- rbind(fentran,c(0,none,0))
+        rownames(fentran)[nrow(fentran)] <- nonename
+        ids <- criters == criterion
+        colnames(fentran) <- c("df",criters2)
+        fentran <- na.omit(fentran)
+        attr(fentran,"na.action")	<- attr(fentran,"class") <- NULL
+        fentran[nrow(fentran),c(1,5)] <- NA
+        fentran <- fentran[order(sentido[ids]*fentran[,c(FALSE,ids)]),]
+        if(rownames(fentran)[1]!=nonename){
+          if(quasi){
+            fentran <- fentran[,-3]
+            colnames(fentran)[2] <- "QICu"
+          }
+          if(trace){
+            printCoefmat(fentran,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=2:(ncol(fentran)-2),
+                         signif.stars=FALSE,tst.ind=ncol(fentran)-1,dig.tst=4,digits=5)
+            cat("\nStep",paso,":",rownames(fentran)[1],"\n\n")
+          }
+          paso <- paso + 1
+          cambio <- substring(rownames(fentran)[1],3)
+          oldformula <- update(oldformula, paste("~ .",rownames(fentran)[1]))
+        }else{
+          tol <- FALSE
+          if(quasi){
+            fentran <- fentran[,-3]
+            colnames(fentran)[2] <- "QICu"
+          }
+          if(trace) printCoefmat(fentran,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=2:(ncol(fentran)-2),
+                                 signif.stars=FALSE,tst.ind=ncol(fentran)-1,dig.tst=4,digits=5)
+        }
+      }
+      if(length(entran) == 0 & mas) tol <- FALSE
+    }
+  }
+  if(direction=="backward"){
+    oldformula <- upper
+    if(trace){
+      cat("\nInitial model:\n")
+      cat(paste("~",as.character(oldformula)[length(oldformula)],sep=" "),"\n\n")
+      cat("\nStep",0,":\n")
+    }
+    out_ <- list(initial=paste("~",as.character(oldformula)[length(oldformula)],sep=" "),direction=direction,criterion=criters2[criters==criterion])
+    while(tol){
+      X <- model.matrix(oldformula,data=datas)
+      fit.x <- glm.fit(y=model$y,x=X,family=model$family,offset=model$offset,weights=model$prior.weights)
+      S <- attr(terms(oldformula),"term.labels")
+      entran <- seq(1:length(U))[is.na(match(U,S))]
+      salen <- seq(1:length(U))[!is.na(match(U,S))]
+      menos <- TRUE
+
+      fentran <- matrix(NA,length(entran),5)
+      if(length(entran) > 0){
+        nombres <- matrix("",length(entran),1)
+        for(i in 1:length(entran)){
+          salida <- apply(as.matrix(fs[,-c(salen,entran[i])]),2,function(x) sum(fs[,entran[i]]*x)!=sum(x))
+          if(all(salida) & U[entran[i]]!=cambio){
+            newformula <- update(oldformula, paste("~ . +",U[entran[i]]))
+            X <- model.matrix(newformula,data=datas)
+            fit.0 <- glm.fit(y=model$y,x=X,family=model$family,offset=model$offset,weights=model$prior.weights)
+            fentran[i,1] <- fit.x$df.residual - fit.0$df.residual
+            fentran[i,5] <- tests(fit.x,fit.0,type=test)
+            fentran[i,5] <- sqrt(9*fentran[i,1]/2)*((fentran[i,5]/fentran[i,1])^(1/3) - 1 + 2/(9*fentran[i,1]))
+            fentran[i,2] <- ifelse(quasi,-2*quasilik(familia,fit.0) + k*length(fit.0$coefficients),fit.0$aic + (k-2)*(length(fit.0$coefficients)+pen))
+            fentran[i,3] <- fentran[i,2] + (log(length(fit.0$y))-k)*(length(fit.0$coefficients)+pen)
+            fentran[i,4] <- fit.0$deviance/fit.0$df.residual
+            if(names(coef(model))[1]=="(Intercept)") fentran[i,4] <- 1 - fentran[i,4]/(model$null.deviance/model$df.null)
+            nombres[i] <- U[entran[i]]
+          }
+        }
+        rownames(fentran) <- paste("+",nombres)
+        if(criterion=="p-value" & any(!is.na(fentran))){
+          colnames(fentran) <- c("df",criters2)
+          if(nrow(fentran) > 1){
+            fentran <- fentran[order(-fentran[,5]),]
+            fentran <- na.omit(fentran)
+            attr(fentran,"na.action")	<- attr(fentran,"class") <- NULL
+          }
+          fentran[,5] <- 1-pchisq((sqrt(2/(9*fentran[,1]))*fentran[,5] + 1 - 2/(9*fentran[,1]))^3*fentran[,1],fentran[,1])
+          if(fentran[1,5] < levels[1]){
+            aic <- ifelse(quasi,-2*quasilik(familia,fit.x) + k*length(fit.x$coefficients),fit.x$aic + (k-2)*(length(fit.x$coefficients)+pen))
+            none <- c(aic,aic + (log(length(fit.x$y))-k)*(length(fit.x$coefficients)+pen),fit.x$deviance/fit.x$df.residual)
+            if(names(coef(model))[1]=="(Intercept)") none[3] <- 1 - none[3]/(model$null.deviance/model$df.null)
+            fentran <- rbind(fentran,c(NA,none,NA))
+            rownames(fentran)[nrow(fentran)] <- nonename
+            if(quasi){
+              fentran <- fentran[,-3]
+              colnames(fentran)[2] <- "QICu"
+            }
+            if(trace){
+              printCoefmat(fentran,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=2:(ncol(fentran)-2),
+                           signif.stars=FALSE,tst.ind=ncol(fentran)-1,dig.tst=4,digits=5)
+              cat("\nStep",paso,":",rownames(fentran)[1],"\n\n")
+            }
+            menos <- FALSE
+            oldformula <- update(oldformula, paste("~ .",rownames(fentran)[1]))
+            paso <- paso + 1
+            cambio <- substring(rownames(fentran)[1],3)
+          }
+        }
+      }
+
+      if(length(salen) > 0 & menos){
+        fsalen <- matrix(NA,length(salen),5)
+        nombres <- matrix("",length(salen),1)
+        for(i in 1:length(salen)){
+          salida <- apply(as.matrix(fs[,salen[i]]*fs[,-c(entran,salen[i])]),2,sum)
+          if(all(salida < sum(fs[,salen[i]]))){
+            newformula <- update(oldformula, paste("~ . -",U[salen[i]]))
+            X <- model.matrix(newformula,data=datas)
+            fit.0 <- glm.fit(y=model$y,x=X,family=model$family,offset=model$offset,weights=model$prior.weights)
+            fsalen[i,1] <- fit.0$df.residual - fit.x$df.residual
+            fsalen[i,5] <- tests(fit.0,fit.x,type=test)
+            fsalen[i,5] <- sqrt(9*fsalen[i,1]/2)*((fsalen[i,5]/fsalen[i,1])^(1/3) - 1 + 2/(9*fsalen[i,1]))
+            fsalen[i,2] <- ifelse(quasi,-2*quasilik(familia,fit.0) + k*length(fit.0$coefficients),fit.0$aic + (k-2)*(length(fit.0$coefficients)+pen))
+            fsalen[i,3] <- fsalen[i,2] + (log(length(fit.0$y))-k)*(length(fit.0$coefficients)+pen)
+            fsalen[i,4] <- fit.0$deviance/fit.0$df.residual
+            if(names(coef(model))[1]=="(Intercept)") fsalen[i,4] <- 1 - fsalen[i,4]/(model$null.deviance/model$df.null)
+            nombres[i] <- U[salen[i]]
+          }
+        }
+        rownames(fsalen) <- paste("-",nombres)
+        if(criterion=="p-value"){
+          colnames(fsalen) <- c("df",criters2)
+          if(nrow(fsalen) > 1){
+            fsalen <- fsalen[order(fsalen[,5]),]
+            fsalen <- na.omit(fsalen)
+            attr(fsalen,"na.action")	<- attr(fsalen,"class") <- NULL
+          }
+          fsalen[,5] <- 1-pchisq((sqrt(2/(9*fsalen[,1]))*fsalen[,5] + 1 - 2/(9*fsalen[,1]))^3*fsalen[,1],fsalen[,1])
+          aic <- ifelse(quasi,-2*quasilik(familia,fit.x) + k*length(fit.x$coefficients),fit.x$aic + (k-2)*(length(fit.x$coefficients)+pen))
+          none <- c(aic,aic + (log(length(fit.x$y))-k)*(length(fit.x$coefficients)+pen),fit.x$deviance/fit.x$df.residual)
+          if(names(coef(model))[1]=="(Intercept)") none[3] <- 1 - none[3]/(model$null.deviance/model$df.null)
+          fsalen <- rbind(fsalen,c(NA,none,NA))
+          rownames(fsalen)[nrow(fsalen)] <- nonename
+          if(quasi){
+            fsalen <- fsalen[,-3]
+            colnames(fsalen)[2] <- "QICu"
+          }
+          if(trace) printCoefmat(fsalen,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=2:(ncol(fsalen)-2),
+                                 signif.stars=FALSE,tst.ind=ncol(fsalen)-1,dig.tst=4,digits=5)
+          if(fsalen[1,ncol(fsalen)] > levels[2]){
+            if(trace) cat("\nStep",paso,":",rownames(fsalen)[1],"\n\n")
+            paso <- paso + 1
+            cambio <- substring(rownames(fsalen)[1],3)
+            oldformula <- update(oldformula, paste("~ .",rownames(fsalen)[1]))
+          }else tol <- FALSE
+        }
+      }
+      if(criterion!="p-value"){
+        if(any(!is.na(fentran))) fsalen <- rbind(fsalen,fentran)
+        fsalen[,5] <- 1-pchisq((sqrt(2/(9*fsalen[,1]))*fsalen[,5] + 1 - 2/(9*fsalen[,1]))^3*fsalen[,1],fsalen[,1])
+        aic <- ifelse(quasi,-2*quasilik(familia,fit.x) + k*length(fit.x$coefficients),fit.x$aic + (k-2)*(length(fit.x$coefficients)+pen))
+        none <- c(aic,aic + (log(length(fit.x$y))-k)*(length(fit.x$coefficients)+pen),fit.x$deviance/fit.x$df.residual)
+        if(names(coef(model))[1]=="(Intercept)") none[3] <- 1 - none[3]/(model$null.deviance/model$df.null)
+        fsalen <- rbind(fsalen,c(0,none,0))
+        rownames(fsalen)[nrow(fsalen)] <- nonename
+        ids <- criters == criterion
+        colnames(fsalen) <- c("df",criters2)
+        fsalen <- na.omit(fsalen)
+        attr(fsalen,"na.action")	<- attr(fsalen,"class") <- NULL
+        fsalen[nrow(fsalen),c(1,5)] <- NA
+        fsalen <- fsalen[order(sentido[ids]*fsalen[,c(FALSE,ids)]),]
+        if(rownames(fsalen)[1]!=nonename){
+          if(quasi){
+            fsalen <- fsalen[,-3]
+            colnames(fsalen)[2] <- "QICu"
+          }
+          if(trace){
+            printCoefmat(fsalen,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=2:(ncol(fsalen)-2),
+                         signif.stars=FALSE,tst.ind=ncol(fsalen)-1,dig.tst=4,digits=5)
+            cat("\nStep",paso,":",rownames(fsalen)[1],"\n\n")
+          }
+          paso <- paso + 1
+          cambio <- substring(rownames(fsalen)[1],3)
+          oldformula <- update(oldformula, paste("~ .",rownames(fsalen)[1]))
+        }else{
+          tol <- FALSE
+          if(quasi){
+            fsalen <- fsalen[,-3]
+            colnames(fsalen)[2] <- "QICu"
+          }
+          if(trace) printCoefmat(fsalen,P.values=TRUE,has.Pvalue=TRUE,na.print="",cs.ind=2:(ncol(fsalen)-2),
+                                 signif.stars=FALSE,tst.ind=ncol(fsalen)-1,dig.tst=4,digits=5)
+        }
+      }
+      if(length(salen) == 0 & menos) tol <- FALSE
+    }
+  }
+  if(trace){
+    cat("\nFinal model:\n")
+    cat(paste("~",as.character(oldformula)[length(oldformula)],sep=" "),"\n\n")
+    cat("****************************************************************************")
+    cat("\n(*) p-values of the",test2)
+    if(criterion=="p-value"){
+      cat("\n Effects are included when their p-values are lower than",levels[1])
+      cat("\n Effects are dropped when their p-values are higher than",levels[2])
+    }
+    if(!is.null(xxx$k)) cat("The magnitude of the penalty in the AIC/QICu was set to be ",xxx$k)
+    cat("\n")
+  }
+  out_$final <- paste("~",as.character(oldformula)[length(oldformula)],sep=" ")
+  return(invisible(out_))
 }

@@ -6,60 +6,70 @@
 \usage{
 \method{stepCriterion}{glm}(
   model,
-  criterion = c("bic", "aic", "adjr2", "p-value"),
-  test = c("wald", "lrt", "score", "gradient"),
-  direction = c("backward", "forward"),
-  level = 0.05,
-  verbose = TRUE,
+  criterion = c("bic", "aic", "adjr2", "p-value", "qicu"),
+  test = c("wald", "lr", "score", "gradient"),
+  direction = c("forward", "backward"),
+  levels = c(0.05, 0.05),
+  trace = TRUE,
+  scope,
   ...
 )
 }
 \arguments{
-\item{model}{an object of the class glm which is obtained from the fit of a generalized linear model. The linear predictor of the model whose fit is stored in this glm object is the more complex candidate which should be considered by the variable selection procedure.  The more simple model which should be considered by the variable selection procedure is that with just the Intercept, if there is.}
+\item{model}{an object of the class glm which is obtained from the fit of a generalized linear model.}
 
 \item{criterion}{an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted deviance-based R-squared ("adjr2"), and \emph{p}-value of the \code{test} test ("p-value"). By default, \code{criterion} is set to be "bic".}
 
-\item{test}{an (optional) character string indicating the statistical test which should be used to compare nested models. The available options are: Wald ("wald"), Rao's score ("score"), likelihood ratio ("lrt") and gradient ("gradient") tests. By default, \code{test} is set to be "wald".}
+\item{test}{an (optional) character string indicating the statistical test which should be used to compare nested models. The available options are: Wald ("wald"), Rao's score ("score"), likelihood-ratio ("lr") and gradient ("gradient") tests. By default, \code{test} is set to be "wald".}
 
-\item{direction}{an (optional) character string indicating the mode of variable selection which should be used. The available options are: deleting variables ("backward")  and adding variables ("forward"). By default, \code{direction} is set to be "backward".}
+\item{direction}{an (optional) character string indicating the type of procedure which should be used. The available options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). By default, \code{direction} is set to be "forward".}
 
-\item{level}{an (optional) numeric value in the interval (0,1) indicating the significance level chosen to perform the F tests. This is only appropiate if \code{criterion}="p-value". By default, \code{level} is set to be 0.05.}
+\item{levels}{an (optional) two-dimensional vector of values in the interval \eqn{(0,1)} indicating the levels at which the variables should in and out from the model. This is only appropiate if \code{criterion}="p-value". By default, \code{levels} is set to be \code{c(0.05,0.05)}.}
 
-\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+\item{trace}{an (optional) logical switch indicating if should the stepwise reports be printed. By default, \code{trace} is set to be TRUE.}
 
-\item{...}{further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC, which by default is set to be 2.}
+\item{scope}{an (optional) list, containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. By default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.}
+
+\item{...}{further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC/QICu, which by default is set to be 2.}
 }
 \value{
 A list which contains the following objects:
 \itemize{
-\item{\code{initial}:}{ an expression describing the linear predictor of the "initial" model.}
-\item{\code{final}:}{ an expression describing the linear predictor of the "final" model.}
-\item{\code{criterion}:}{ a character string describing the criterion chosen to compare the candidate models.}
+\item{\code{initial}:}{ a character string indicating the linear predictor of the "initial model".}
+\item{\code{direction}:}{ a character string indicating the type of procedure which was used.}
+\item{\code{criterion}:}{ a character string indicating the criterion used to compare the candidate models.}
+\item{\code{final}:}{ a character string indicating the linear predictor of the "final model".}
 }
 }
 \description{
-Performs variable selection in generalized linear models.
+Performs variable selection in generalized linear models using hybrid versions of forward stepwise and backward stepwise.
 }
 \examples{
 ## Example 1
 Auto <- ISLR::Auto
+Auto2 <- within(Auto, origin <- factor(origin))
 mod <- mpg ~ cylinders + displacement + acceleration + origin + horsepower*weight
-fit1 <- glm(mod, family=inverse.gaussian("log"), data=Auto)
-stepCriterion(fit1, direction="forward", criterion="p-value", test="lrt")
-stepCriterion(fit1, direction="backward", criterion="adjr2")
+fit1 <- glm(mod, family=inverse.gaussian("log"), data=Auto2)
+stepCriterion(fit1, direction="forward", criterion="p-value", test="lr")
+stepCriterion(fit1, direction="backward", criterion="bic")
 
 ## Example 2
 burn1000 <- aplore3::burn1000
 burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
-mod2 <- death ~ age + gender + race + tbsa + inh_inj + flame + age*inh_inj + tbsa*inh_inj
-fit2 <- glm(mod2, family=binomial("logit"), data=burn1000)
-stepCriterion(fit2, direction="backward", criterion="bic")
+upper <- ~ age + gender + race + tbsa + inh_inj + flame + age*inh_inj + tbsa*inh_inj
+lower <- ~ 1
+fit2 <- glm(death ~ age + gender + race + tbsa + inh_inj, family=binomial("logit"), data=burn1000)
+stepCriterion(fit2, direction="backward", criterion="bic", scope=list(lower=lower,upper=upper))
 stepCriterion(fit2, direction="forward", criterion="p-value", test="score")
 
 ## Example 3
-fit3 <- glm(cases ~ offset(log(population)) + city*age, family=poisson("log"), data=skincancer)
-stepCriterion(fit3, direction="backward", criterion="adjr2")
-stepCriterion(fit3, direction="forward", criterion="p-value", test="lrt")
+upper <- cases ~ city + age + city*age
+fit3 <- glm(upper, family=poisson("log"), offset=log(population), data=skincancer)
+stepCriterion(fit3, direction="backward", criterion="aic", scope=list(lower=~ 1,upper=upper))
+stepCriterion(fit3, direction="forward", criterion="p-value", test="lr")
+}
+\references{
+James G., Witten D., Hastie T. and Tibshirani R. (2013, page 210) An Introduction to Statistical Learning with Applications in R, Springer, New York.
 }
 \seealso{
 \link{stepCriterion.lm}, \link{stepCriterion.overglm}, \link{stepCriterion.glmgee}

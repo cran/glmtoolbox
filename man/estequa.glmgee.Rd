@@ -19,6 +19,6 @@ Extracts estimating equations evaluated at the parameter estimates and the obser
 }
 \examples{
 mod <- size ~ poly(days,4) + treat
-fit <- glmgee(mod, id=tree, family=Gamma("log"), data=spruce, corstr="AR-1")
+fit <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
 estequa(fit)
 }

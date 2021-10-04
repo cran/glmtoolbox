@@ -4,16 +4,31 @@
 \alias{cooks.distance.glmgee}
 \title{Cook's Distance for Generalized Estimating Equations}
 \usage{
-\method{cooks.distance}{glmgee}(model, plot.it = TRUE, coefs, identify, ...)
+\method{cooks.distance}{glmgee}(
+  model,
+  method = c("Preisser-Qaqish", "full"),
+  level = c("clusters", "observations"),
+  plot.it = FALSE,
+  coefs,
+  identify,
+  varest = c("robust", "df-adjusted", "model", "bias-corrected"),
+  ...
+)
 }
 \arguments{
 \item{model}{an object of class glmgee obtained from the fit of a generalized estimating equation.}
 
-\item{plot.it}{an (optional) logical indicating if the plot of Cook's distance is required or just the data matrix in which that plot is based. By default, \code{plot.it} is set to be TRUE.}
+\item{method}{an (optional) character string indicating the method of calculation for the \emph{one-step approximation}. The options are: the \emph{one-step approximation} described by Preisser and Qaqish (1996) in which the working-correlation matrix is assumed to be known ("Preisser-Qaqish"); and the "authentic" \emph{one-step approximation} ("full"). By default, \code{method} is set to be "Preisser-Qaqish".}
+
+\item{level}{an (optional) character string indicating the level for which the Cook's distance is required. The options are: cluster-level ("clusters") and observation-level ("observations"). By default, \code{level} is set to be "clusters".}
+
+\item{plot.it}{an (optional) logical indicating if the plot of Cook's distance is required or just the data matrix in which that plot is based. By default, \code{plot.it} is set to be FALSE.}
 
 \item{coefs}{an (optional) character string which (partially) match with the names of some of the parameters in the linear predictor.}
 
 \item{identify}{an (optional) integer indicating the number of clusters to identify on the plot of Cook's distance. This is only appropriate if \code{plot.it=TRUE}.}
+
+\item{varest}{an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). By default, \code{varest} is set to be "robust".}
 
 \item{...}{further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example,  \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.}
 }
@@ -29,7 +44,7 @@ The Cook's distance consists of the \emph{distance} between two estimates of the
 \examples{
 ## Cook's distance for all parameters in the linear predictor
 mod <- size ~ poly(days,4) + treat
-fit <- glmgee(mod, id=tree, family=Gamma("log"), data=spruce, corstr="Exchangeable")
+fit <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
 cooks.distance(fit, col="red", lty=1, lwd=1, col.lab="blue", main="Cook's distance",
                col.axis="blue", col.main="black", family="mono", cex=0.8)
 

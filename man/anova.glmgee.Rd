@@ -4,7 +4,13 @@
 \alias{anova.glmgee}
 \title{Comparison of nested Generalized Estimating Equations}
 \usage{
-\method{anova}{glmgee}(object, ..., test = c("wald", "score"), verbose = TRUE)
+\method{anova}{glmgee}(
+  object,
+  ...,
+  test = c("wald", "score"),
+  verbose = TRUE,
+  varest = c("robust", "df-adjusted", "model", "bias-corrected")
+)
 }
 \arguments{
 \item{object}{an (object) of the class glmgee which is obtained from the fit of a generalized estimating equation.}
@@ -14,6 +20,8 @@
 \item{test}{an (optional) character string indicating the required test. The available options are: Wald ("wald") and generalized score ("score") tests. By default, \code{test} is set to be "wald".}
 
 \item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+
+\item{varest}{an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters in the Wald test. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). By default, \code{varest} is set to be "robust". See \link{vcov.glmgee}.}
 }
 \value{
 A matrix with three columns which contains the following:
@@ -29,7 +37,7 @@ Allows to compare nested generalized estimating equations using the Wald and gen
 \examples{
 ## Example 1
 mod <- size ~ poly(days,4)
-fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruce, corstr="AR-1")
+fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
 fit2 <- update(fit1, . ~ . + treat)
 fit3 <- update(fit2, . ~ . + poly(days,4):treat)
 anova(fit1,fit2,fit3,test="wald")

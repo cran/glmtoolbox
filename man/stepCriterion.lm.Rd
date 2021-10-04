@@ -6,50 +6,69 @@
 \usage{
 \method{stepCriterion}{lm}(
   model,
-  criterion = c("bic", "aic", "adjr2", "predr2", "cp", "p-value"),
-  direction = c("backward", "forward"),
-  level = 0.05,
-  verbose = TRUE,
+  criterion = c("bic", "aic", "adjr2", "prdr2", "cp", "p-value"),
+  direction = c("forward", "backward"),
+  levels = c(0.05, 0.05),
+  trace = TRUE,
+  scope,
   ...
 )
 }
 \arguments{
-\item{model}{an object of the class lm which is obtained from the fit of a normal linear model. The linear predictor of the model whose fit is stored in this lm object is the more complex candidate which should be considered by the variable selection procedure.  The more simple model which should be considered by the variable selection procedure is that with just the Intercept, if there is.}
+\item{model}{an object of the class lm which is obtained from the fit of a normal linear model.}
 
-\item{criterion}{an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted R-squared ("adjr2"), predicted R-squared ("predr2"), Mallows' CP ("cp") and \emph{p}-value of the F test ("p-value"). By default, \code{criterion} is set to be "bic".}
+\item{criterion}{an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted R-squared ("adjr2"), predicted R-squared ("prdr2"), Mallows' CP ("cp") and \emph{p}-value of the F test ("p-value"). By default, \code{criterion} is set to be "bic".}
 
-\item{direction}{an (optional) character string indicating the mode of variable selection which should be used. The available options are: deleting variables ("backward")  and adding variables ("forward"). By default, \code{direction} is set to be "backward".}
+\item{direction}{an (optional) character string indicating the type of procedure which should be used. The available options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). By default, \code{direction} is set to be "forward".}
 
-\item{level}{an (optional) numeric value in the interval (0,1) indicating the significance level chosen to perform the F tests. This is only appropiate if \code{criterion="p-value"}. By default, \code{level} is set to be 0.05.}
+\item{levels}{an (optional) two-dimensional vector of values in the interval \eqn{(0,1)} indicating the levels at which the variables should in and out from the model. This is only appropiate if \code{criterion}="p-value". By default, \code{levels} is set to be \code{c(0.05,0.05)}.}
 
-\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+\item{trace}{an (optional) logical switch indicating if should the stepwise reports be printed. By default, \code{trace} is set to be TRUE.}
 
-\item{...}{further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC, which by default is set to be 2.}
+\item{scope}{an (optional) list, containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. By default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.}
+
+\item{...}{further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC/QICu, which by default is set to be 2.}
 }
 \value{
 A list which contains the following objects:
 \itemize{
-\item{\code{initial}:}{ an expression describing the linear predictor of the "initial" model.}
-\item{\code{final}:}{ an expression describing the linear predictor of the "final" model.}
-\item{\code{criterion}:}{ a character string describing the criterion chosen to compare the candidate models.}
+\item{\code{initial}:}{ a character string indicating the linear predictor of the "initial model".}
+\item{\code{direction}:}{ a character string indicating the type of procedure which was used.}
+\item{\code{criterion}:}{ a character string indicating the criterion used to compare the candidate models.}
+\item{\code{final}:}{ a character string indicating the linear predictor of the "final model".}
 }
 }
 \description{
-Performs variable selection in normal linear models.
+Performs variable selection in normal linear models using hybrid versions of forward stepwise and backward stepwise.
 }
 \examples{
 ## Example 1
-fit1 <- lm(log(Ozone) ~ Solar.R*Temp*Wind, data=airquality)
-stepCriterion(fit1, direction="forward", criterion="adjr2")
-stepCriterion(fit1, direction="forward", criterion="bic")
-stepCriterion(fit1, direction="forward", criterion="p-value", level=0.05)
+fit1 <- lm(log(Ozone) ~ Solar.R + Temp + Wind, data=airquality)
+scope=list(lower=~1, upper=~Solar.R*Temp*Wind)
+stepCriterion(fit1, direction="forward", criterion="adjr2", scope=scope)
+stepCriterion(fit1, direction="forward", criterion="bic", scope=scope)
+stepCriterion(fit1, direction="forward", criterion="p-value", scope=scope)
 
 ## Example 2
-fit2 <- lm(mpg ~ log(hp)*log(wt)*qsec, data=mtcars)
-stepCriterion(fit2, direction="backward", criterion="bic")
-stepCriterion(fit2, direction="forward", criterion="cp")
-stepCriterion(fit2, direction="backward", criterion="p-value", level=0.05)
+fit2 <- lm(mpg ~ log(hp) + log(wt) + qsec, data=mtcars)
+scope=list(lower=~1, upper=~log(hp)*log(wt)*qsec)
+stepCriterion(fit2, direction="backward", criterion="bic", scope=scope)
+stepCriterion(fit2, direction="forward", criterion="cp", scope=scope)
+stepCriterion(fit2, direction="backward", criterion="prdr2", scope=scope)
+
+## Example 3
+Credit <- ISLR::Credit
+fit3 <- lm(Balance ~ Cards + Age + Rating + Income + Student + Limit, data=Credit)
+stepCriterion(fit3, direction="forward", criterion="prdr2")
+stepCriterion(fit3, direction="forward", criterion="cp")
+stepCriterion(fit3, direction="forward", criterion="p-value")
+
+}
+\references{
+James G., Witten D., Hastie T. and Tibshirani R. (2013, page 210) An Introduction to Statistical Learning with Applications in R, Springer, New York.
 }
 \seealso{
+\link{stepCriterion.glm}, \link{stepCriterion.overglm}, \link{stepCriterion.glmgee}
+
 \link{stepCriterion.glm}, \link{stepCriterion.overglm}, \link{stepCriterion.glmgee}
 }

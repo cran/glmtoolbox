@@ -2,54 +2,86 @@
 % Please edit documentation in R/geeglm.R
 \name{stepCriterion.glmgee}
 \alias{stepCriterion.glmgee}
-\title{Variable selection in Generalized Estimating Equations}
+\title{Variable selection in Generalized Estimating Equation}
 \usage{
 \method{stepCriterion}{glmgee}(
   model,
-  criterion = c("p-value", "qic", "qicu", "adjr2"),
-  direction = c("backward", "forward"),
+  criterion = c("p-value", "qic", "qicu", "adjr2", "agpc", "sgpc"),
   test = c("wald", "score"),
-  level = 0.05,
-  verbose = TRUE,
+  direction = c("forward", "backward"),
+  levels = c(0.05, 0.05),
+  trace = TRUE,
+  scope,
+  digits = 5,
+  varest = c("robust", "df-adjusted", "model", "bias-corrected"),
   ...
 )
 }
 \arguments{
-\item{model}{an object of the class glmgee which is obtained from the fit of a generalized estimating equation. The linear predictor of the model whose fit is stored in this glmgee object is the more complex candidate which should be considered by the variable selection procedure. The more simple model which should be considered by the variable selection procedure is that with just the Intercept, if there is.}
+\item{model}{an object of the class glmgee which is obtained from the fit of a generalized estimating equation.}
 
-\item{criterion}{an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: QIC ("qic"), QICu ("qicu"), \emph{p}-value of a statistical test ("p-value") and adjusted deviance-based R-squared ("adjr2"). By default, \code{criterion} is set to be "p-value".}
+\item{criterion}{an (optional) character string indicating the criterion which should be used to compare the candidate
+models. The available options are: QIC ("qic"), QICu ("qicu"), adjusted deviance-based R-squared ("adjr2"),
+Akaike-type penalized gaussian pseudo-likelihood criterion ("agpc"), Schwarz-type penalized gaussian pseudo-likelihood
+criterion ("sgpc") and \emph{p}-value of the \code{test} test ("p-value"). By default, \code{criterion} is set to be "p-value".}
 
-\item{direction}{an (optional) character string indicating the mode of variable selection which should be used. The available options are: deleting variables ("backward")  and adding variables ("forward"). By default, \code{direction} is set to be "backward".}
+\item{test}{an (optional) character string indicating the statistical test which should be used to compare nested
+models. The available options are: Wald ("wald") and generalized score ("score") tests. By default, \code{test} is
+set to be "wald".}
 
-\item{test}{an (optional) character string indicating the statistical test which should be used to compare nested models. The available options are: Wald ("wald") and generalized score ("score") tests. By default, \code{test} is set to be "wald".}
+\item{direction}{an (optional) character string indicating the type of procedure which should be used. The available
+options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). By default, \code{direction}
+is set to be "forward".}
 
-\item{level}{an (optional) numeric value in the interval (0,1) indicating the significance level chosen to perform the statistical tests. This is only appropiate if \code{criterion="p-value"}. By default, \code{level} is set to be 0.05.}
+\item{levels}{an (optional) two-dimensional vector of values in the interval \eqn{(0,1)} indicating the levels at which
+the variables should in and out from the model. This is only appropiate if \code{criterion}="p-value". By default,
+\code{levels} is set to be \code{c(0.05,0.05)}.}
 
-\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+\item{trace}{an (optional) logical switch indicating if should the stepwise reports be printed. By default,
+\code{trace} is set to be TRUE.}
 
-\item{...}{further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the QIC (or the QICu), which by default is set to be 2.}
+\item{scope}{an (optional) list, containing components \code{lower} and \code{upper}, both formula-type objects,
+indicating the range of models which should be examined in the stepwise search. By default, \code{lower} is a model
+with no predictors and \code{upper} is the linear predictor of the model in \code{model}.}
+
+\item{digits}{an (optional) integer indicating the number of digits which should be used to print the most of the
+criteria to compare the candidate models. By default, \code{digits} is set to be 5.}
+
+\item{varest}{an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters in the Wald-type test. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). By default, \code{varest} is set to be "robust".}
+
+\item{...}{further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the
+penalty in the AGPC, which by default is set to be 2.}
 }
 \value{
-A list with the following objects:
+A list which contains the following objects:
 \itemize{
-\item{\code{initial}:}{ an expression describing the linear predictor of the "initial" model.}
-\item{\code{final}:}{ an expression describing the linear predictor of the "final" model.}
-\item{\code{criterion}:}{ a character string describing the criterion chosen to compare the candidate models.}
+\item{\code{initial}:}{ a character string indicating the linear predictor of the "initial model".}
+\item{\code{direction}:}{ a character string indicating the type of procedure which was used.}
+\item{\code{criterion}:}{ a character string indicating the criterion used to compare the candidate models.}
+\item{\code{final}:}{ a character string indicating the linear predictor of the "final model".}
 }
 }
 \description{
-Performs variable selection in generalized estimating equations using a chosen model fit criterion.
+Performs variable selection in generalized estimating equations using hybrid versions of forward stepwise
+and backward stepwise.
 }
 \examples{
 ## Example 1
 mod <- size ~ poly(days,4)*treat
-fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruce, corstr="AR-1")
-stepCriterion(fit1, criterion="p-value", direction="forward")
+fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
+stepCriterion(fit1, criterion="p-value", direction="forward", scope=list(lower=~1,upper=mod))
 
 ## Example 2
 mod <- depressd ~ visit*group
 fit2 <- glmgee(mod, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
-stepCriterion(fit2, criterion="adjr2", direction="forward")
+stepCriterion(fit2, criterion="adjr2", direction="forward", scope=list(lower=~1,upper=mod))
+}
+\references{
+James G., Witten D., Hastie T. and Tibshirani R. (2013, page 210) An Introduction to Statistical Learning
+with Applications in R. Springer, New York.
+
+Jianwen X., Jiamao Z. and Liya F. (2019) Variable selection in generalized estimating equations via empirical
+likelihood and Gaussian pseudo-likelihood. Communications in Statistics - Simulation and Computation, 48:4.
 }
 \seealso{
 \link{stepCriterion.lm}, \link{stepCriterion.glm}, \link{stepCriterion.overglm}

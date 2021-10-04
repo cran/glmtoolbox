@@ -4,10 +4,21 @@
 \alias{dfbeta.glmgee}
 \title{Dfbeta for Generalized Estimating Equations}
 \usage{
-\method{dfbeta}{glmgee}(model, coefs, identify, ...)
+\method{dfbeta}{glmgee}(
+  model,
+  level = c("clusters", "observations"),
+  method = c("Preisser-Qaqish", "full"),
+  coefs,
+  identify,
+  ...
+)
 }
 \arguments{
 \item{model}{an object of class glmgee which is obtained from the fit of a generalized estimating equation.}
+
+\item{level}{an (optional) character string indicating the level for which the dfbeta statistic is required. The options are: cluster-level ("clusters") and observation-level ("observations"). By default, \code{level} is set to be "clusters".}
+
+\item{method}{an (optional) character string indicating the method of calculation for the \emph{one-step approximation}. The options are: the \emph{one-step approximation} described by Preisser and Qaqish (1996) in which the working-correlation matrix is assumed to be known ("Preisser-Qaqish"); and the "authentic" \emph{one-step approximation} ("full"). By default, \code{method} is set to be "Preisser-Qaqish".}
 
 \item{coefs}{an (optional) character string which (partially) match with the names of some parameters in the linear predictor.}
 
@@ -26,13 +37,13 @@ The \emph{one-step approximation} of the estimates of the parameters in the line
 }
 \examples{
 mod <- size ~ poly(days,4) + treat
-fit <- glmgee(mod, id=tree, family=Gamma("log"), data=spruce, corstr="Exchangeable")
+fit <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
 dfbs <- dfbeta(fit, coefs="treat" ,col="red", lty=1, lwd=1, col.lab="blue",
                col.axis="blue", col.main="black", family="mono", cex=0.8, main="Dfbeta")
 
 # Calculation by hand of dfbeta for the tree labeled by "N1T01"
 idtree <- "N1T01"
-onestep <- glmgee(mod, id=tree, family=Gamma("log"), data=spruce, corstr="Exchangeable",
+onestep <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable",
                   start=coef(fit), subset=c(tree!=idtree), maxit=1)
 coef(fit)-coef(onestep)
 dfbs[rownames(dfbs)==idtree,]

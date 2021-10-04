@@ -4,7 +4,7 @@
 \alias{overglm}
 \title{Negative Binomial and Beta-Binomial Regression Models}
 \usage{
-overglm(formula, family, weights, data, subset, start, ...)
+overglm(formula, family, weights, data, subset, start = NULL, ...)
 }
 \arguments{
 \item{formula}{a \code{formula} expression of the form \code{response ~ predictors}, which is a symbolic description of the linear predictor of the model to be fitted to the data.}

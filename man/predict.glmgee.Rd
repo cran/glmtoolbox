@@ -4,7 +4,14 @@
 \alias{predict.glmgee}
 \title{Predictions for Generalized Estimating Equations}
 \usage{
-\method{predict}{glmgee}(object, ..., newdata, se.fit = FALSE, type = c("link", "response"))
+\method{predict}{glmgee}(
+  object,
+  ...,
+  newdata,
+  se.fit = FALSE,
+  type = c("link", "response"),
+  varest = c("robust", "df-adjusted", "model", "bias-corrected")
+)
 }
 \arguments{
 \item{object}{an object of the class glmgee which is obtained from the fit of a generalized estimating equation.}
@@ -16,6 +23,8 @@
 \item{se.fit}{an (optional) logical switch indicating if standard errors are required. By default, \code{se.fit} is set to be FALSE.}
 
 \item{type}{an (optional) character string giving the type of prediction required. The default, "link", is on the scale of the linear predictors, and the alternative, "response", is on the scale of the response variable.}
+
+\item{varest}{an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). By default, \code{varest} is set to be "robust".}
 }
 \value{
 A matrix with so many rows as \code{newdata} and one column with the predictions. If \code{se.fit=}TRUE then a second column with estimates standard errors is included.
@@ -25,7 +34,7 @@ Produces predictions and optionally estimates standard errors of those predictio
 }
 \examples{
 mod <- size ~ poly(days,4) + treat
-fit <- glmgee(mod, id=tree, family=Gamma("log"), data=spruce, corstr="Stationary-M-dependent(2)")
+fit <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Stationary-M-dependent(2)")
 newdata <- data.frame(days=c(556,556),treat=as.factor(c("normal","ozone_enriched")))
 predict(fit,newdata=newdata,type="response",se.fit=TRUE)
 }
