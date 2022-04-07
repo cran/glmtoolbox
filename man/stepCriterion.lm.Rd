@@ -15,7 +15,7 @@
 )
 }
 \arguments{
-\item{model}{an object of the class lm which is obtained from the fit of a normal linear model.}
+\item{model}{an object of the class \emph{lm}.}
 
 \item{criterion}{an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted R-squared ("adjr2"), predicted R-squared ("prdr2"), Mallows' CP ("cp") and \emph{p}-value of the F test ("p-value"). By default, \code{criterion} is set to be "bic".}
 
@@ -25,38 +25,55 @@
 
 \item{trace}{an (optional) logical switch indicating if should the stepwise reports be printed. By default, \code{trace} is set to be TRUE.}
 
-\item{scope}{an (optional) list, containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. By default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.}
+\item{scope}{an (optional) list containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. By default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.}
 
 \item{...}{further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC/QICu, which by default is set to be 2.}
 }
 \value{
-A list which contains the following objects:
-\itemize{
-\item{\code{initial}:}{ a character string indicating the linear predictor of the "initial model".}
-\item{\code{direction}:}{ a character string indicating the type of procedure which was used.}
-\item{\code{criterion}:}{ a character string indicating the criterion used to compare the candidate models.}
-\item{\code{final}:}{ a character string indicating the linear predictor of the "final model".}
+a list list with components including
+\tabular{ll}{
+\code{initial} \tab  a character string indicating the linear predictor of the "initial model",\cr
+\tab \cr
+\code{direction} \tab  a character string indicating the type of procedure which was used,\cr
+\tab \cr
+\code{criterion} \tab a character string indicating the criterion used to compare the candidate models,\cr
+\tab \cr
+\code{final} \tab a character string indicating the linear predictor of the "final model",\cr
 }
 }
 \description{
-Performs variable selection in normal linear models using hybrid versions of forward stepwise and backward stepwise.
+Performs variable selection in normal linear models using a hybrid versions of forward stepwise and backward stepwise.
+}
+\details{
+The "hybrid forward stepwise"  algorithm starts with the simplest
+model (which may be specified at the argument \code{scope}, and by default,
+is a model whose parameters in the linear predictor, except the intercept,
+if any, are set to be 0), and then the candidate models are builded by
+hierarchically adding effects in the linear predictor, whose "relevance"
+and/or "importance" in the model fit is assessed by comparing nested models
+(that is, by comparing the models with and without the added effect) using a
+criterion previously specified. If an effect is added to the model then this strategy may
+also remove any effect which, according to the criterion previously specified, no
+longer provide an improvement in the model fit. That process remain until no more effects may be included or excluded.
+
+The "hybrid backward stepwise" algorithm works similarly.
 }
 \examples{
-## Example 1
+###### Example 1: New York air quality measurements
 fit1 <- lm(log(Ozone) ~ Solar.R + Temp + Wind, data=airquality)
 scope=list(lower=~1, upper=~Solar.R*Temp*Wind)
 stepCriterion(fit1, direction="forward", criterion="adjr2", scope=scope)
 stepCriterion(fit1, direction="forward", criterion="bic", scope=scope)
 stepCriterion(fit1, direction="forward", criterion="p-value", scope=scope)
 
-## Example 2
+###### Example 2: Fuel consumption of automobiles
 fit2 <- lm(mpg ~ log(hp) + log(wt) + qsec, data=mtcars)
 scope=list(lower=~1, upper=~log(hp)*log(wt)*qsec)
 stepCriterion(fit2, direction="backward", criterion="bic", scope=scope)
 stepCriterion(fit2, direction="forward", criterion="cp", scope=scope)
 stepCriterion(fit2, direction="backward", criterion="prdr2", scope=scope)
 
-## Example 3
+###### Example 3: Credit card balance
 Credit <- ISLR::Credit
 fit3 <- lm(Balance ~ Cards + Age + Rating + Income + Student + Limit, data=Credit)
 stepCriterion(fit3, direction="forward", criterion="prdr2")
@@ -65,7 +82,7 @@ stepCriterion(fit3, direction="forward", criterion="p-value")
 
 }
 \references{
-James G., Witten D., Hastie T. and Tibshirani R. (2013, page 210) An Introduction to Statistical Learning with Applications in R, Springer, New York.
+James, G. and Witten, D. and Hastie, T. and Tibshirani, R. (2013, page 210) An Introduction to Statistical Learning with Applications in R, Springer, New York.
 }
 \seealso{
 \link{stepCriterion.glm}, \link{stepCriterion.overglm}, \link{stepCriterion.glmgee}

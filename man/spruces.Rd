@@ -32,12 +32,12 @@ boxplot(size ~ days, data=subset(spruces,treat=="ozone-enriched"), add=TRUE,
         at=c(1:13)+0.2, col="blue", boxwex=0.3, outline=FALSE, xaxt="n")
 axis(1, at=1:13, labels=unique(spruces$days))
 axis(2, at=seq(0,1500,250), labels=seq(0,1500,250))
-legend(0.5, 1500, legend=c("normal","ozone-enriched"), title="Atmosphere",
-       fill=c("yellow","blue"), bty="n")
+legend(0.3, 1500, legend=c("normal","ozone-enriched"), fill=c("yellow","blue"),
+       bty="n", cex=0.7, x.intersp=0.2, y.intersp=1)
 }
 \references{
-Diggle P.J., Heagarty P., Liang K.-Y. and Zeger S.L. (2002) \emph{Analysis of Longitudinal Data}. Oxford University Press, Oxford.
+Diggle, P.J. and Heagarty, P. and Liang, K.-Y. and Zeger, S.L. (2002) \emph{Analysis of Longitudinal Data}. Oxford University Press, Oxford.
 
-Crainiceanu C.M., Ruppert D. and Wand M.P. (2005). Bayesian Analysis for Penalized Spline Regression Using WinBUGS. \emph{Journal of Statistical Software} 14(14).
+Crainiceanu, C.M. and Ruppert, D. and Wand, M.P. (2005). Bayesian Analysis for Penalized Spline Regression Using WinBUGS. \emph{Journal of Statistical Software} 14(14).
 }
 \keyword{datasets}

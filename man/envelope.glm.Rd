@@ -2,11 +2,11 @@
 % Please edit documentation in R/glms.R
 \name{envelope.glm}
 \alias{envelope.glm}
-\title{Normal QQ-plot with simulated envelope of model residuals}
+\title{Normal QQ-plot with simulated envelope of residuals in GLMs}
 \usage{
 \method{envelope}{glm}(
   object,
-  rep = 100,
+  rep = 25,
   conf = 0.95,
   type = c("quantile", "deviance", "pearson"),
   standardized = FALSE,
@@ -16,9 +16,9 @@
 )
 }
 \arguments{
-\item{object}{an object of the class glm which is obtained from the fit of a generalized linear model.}
+\item{object}{an object of the class \emph{glm}.}
 
-\item{rep}{an (optional) positive integer indicating the number of replicates which should be used to build the simulated envelope. By default, \code{rep} is set to be 100.}
+\item{rep}{an (optional) positive integer which allows to specify the number of replicates which should be used to build the simulated envelope. By default, \code{rep} is set to be 25.}
 
 \item{conf}{an (optional) value in the interval (0,1) indicating the confidence level which should be used to build the pointwise confidence intervals, which form the envelope. By default, \code{conf} is set to be 0.95.}
 
@@ -33,44 +33,74 @@
 \item{...}{further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example,  \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.}
 }
 \value{
-A matrix with \eqn{n} rows and four columns: the first three (Lower limit, Median, and Upper limit) describe the simulated envelope, that is, each row corresponds to the quantiles (1-\code{conf})/2, 0.5 and (1+\code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order statistic of the residuals type \code{type} for \eqn{i=1,2,...,n}; and the last one column (Residuals) contains the observed type \code{type} residuals.
+A matrix with the following four columns:
+\tabular{ll}{
+\code{Lower limit} \tab the quantile (1 - \code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
+                   \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
+\tab \cr
+\code{Median} \tab the quantile 0.5 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
+              \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
+\tab \cr
+\code{Upper limit} \tab the quantile (1 + \code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
+                   \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
+\tab \cr
+\code{Residuals} \tab the observed \code{type}-type residuals,\cr
+}
 }
 \description{
-Produces a normal QQ-plot with simulated envelope of residuals obtained from the fit of a generalized linear model.
+Produces a normal QQ-plot with simulated envelope of residuals
+for generalized linear models.
 }
 \details{
 The simulated envelope is builded by simulating \code{rep} independent realizations of the response variable for each
-individual, which is accomplished taking into account the following: (1) the model assumption about the distribution of the response variable; (2) the estimates of the parameters in the linear predictor; and (3) the estimate of the dispersion parameter. The interest model is re-fitted \code{rep} times, as each time the vector of observed responses is replaced by one of the simulated samples. The residuals type \emph{type} are computed and then ordered for each replicate, so that for each \eqn{i=1,2,...,n}, where \eqn{n} is the number of individuals in the sample, there is a random sample of size \code{rep} of the \eqn{i}-th order statistic of the residuals type \emph{type}. Therefore, the simulated envelope is composed of the quantiles (1-\code{conf})/2 and (1+\code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order statistic of the residuals type \emph{type} for \eqn{i=1,2,...,n}. Families \code{quasi()}, \code{quasipoisson} and \code{quasibinomial} are not supported.
+individual, which is accomplished taking into account the following: (1) the model assumption about the distribution of
+the response variable; (2) the estimates of the parameters in the linear predictor; and (3) the estimate of the
+dispersion parameter. The interest model is re-fitted \code{rep} times, as each time the vector of observed responses
+is replaced by one of the simulated samples. The \code{type}-type residuals are computed and then sorted for each
+replicate, so that for each \eqn{i=1,2,...,n}, where \eqn{n} is the number of individuals in the sample, there is a random
+sample of size \code{rep} of the \eqn{i}-th order statistic of the  \code{type}-type residuals. Therefore, the simulated
+envelope is composed of the quantiles (1 - \code{conf})/2 and (1 + \code{conf})/2 of the random sample of size \code{rep} of
+the \eqn{i}-th order statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n}.
 }
 \examples{
-# Example 1
-fit1 <- glm(infections ~ frequency + location, family=poisson, data=swimmers)
-envelope(fit1, type="quantile", col="red", pch=20,col.lab="blue",
+
+###### Example 1:
+burn1000 <- aplore3::burn1000
+burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
+fit1 <- glm(death ~ age*inh_inj + tbsa*inh_inj, family=binomial("logit"), data=burn1000)
+envelope(fit1, rep=50, conf=0.95, type="pearson", col="red", pch=20, col.lab="blue",
+         col.axis="blue", col.main="black", family="mono", cex=0.8)
+
+###### Example 2: Fuel consumption of automobiles
+Auto <- ISLR::Auto
+fit2 <- glm(mpg ~ horsepower*weight, family=inverse.gaussian("log"), data=Auto)
+envelope(fit2, rep=50, conf=0.95, type="pearson", col="red", pch=20, col.lab="blue",
+         col.axis="blue", col.main="black", family="mono", cex=0.8)
+
+###### Example 3: Skin cancer in women
+fit3 <- glm(cases ~ offset(log(population)) + city + age, family=poisson, data=skincancer)
+envelope(fit3, rep=100, conf=0.95, type="quantile", col="red", pch=20,col.lab="blue",
          col.axis="blue",col.main="black",family="mono",cex=0.8)
 
-# Example 2
-fit2 <- glm(cbind(cells,200-cells) ~ tnf + ifn + tnf*ifn, family=binomial, data=cellular)
-envelope(fit2, type="deviance",col="red", pch=20,col.lab="blue",
-         col.axis="blue",col.main="black",family="mono",cex=0.8)
+###### Example 4: Self diagnozed ear infections in swimmers
+fit4 <- glm(infections ~ frequency + location, family=poisson(log), data=swimmers)
+envelope(fit4, rep=100, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
+         col.axis="blue", col.main="black", family="mono", cex=0.8)
 
-# Example 3
-fit3 <- glm(cancer/exposed ~ dose, family=binomial, weights=exposed, data=bladder)
-envelope(fit3, type="pearson", col="red", pch=20,col.lab="blue",
-         col.axis="blue",col.main="black",family="mono",cex=0.8)
+###### Example 5: Agents to stimulate cellular differentiation
+fit5 <- glm(cbind(cells,200-cells) ~ tnf + ifn, family=binomial(logit), data=cellular)
+envelope(fit5, rep=100, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
+         col.axis="blue", col.main="black", family="mono", cex=0.8)
 
-# Example 4
-fit4 <- glm(cases ~ offset(log(population)) + city + age, family=poisson("log"), data=skincancer)
-envelope(fit4, type="quantile", col="red", pch=20,col.lab="blue",
-         col.axis="blue",col.main="black",family="mono",cex=0.8)
 }
 \references{
-Atkinson A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
+Atkinson, A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
 
-Davison A.C. and Gigli A. (1989) Deviance Residuals and Normal Scores Plots. \emph{Biometrika} 76, 211-221.
+Davison, A.C. and Gigli, A. (1989) Deviance Residuals and Normal Scores Plots. \emph{Biometrika} 76, 211-221.
 
-Dunn P.K. and Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics} 5, 236-244.
+Dunn, P.K. and Smyth, G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics} 5, 236-244.
 
-Pierce D.A. and Schafer D.W. (1986) Residuals in Generalized Linear Models. \emph{Journal of the American Statistical Association} 81, 977-986.
+Pierce, D.A. and Schafer, D.W. (1986) Residuals in Generalized Linear Models. \emph{Journal of the American Statistical Association} 81, 977-986.
 }
 \seealso{
 \link{envelope.lm}, \link{envelope.overglm}

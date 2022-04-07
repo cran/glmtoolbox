@@ -7,44 +7,44 @@
 RJC(..., verbose = TRUE)
 }
 \arguments{
-\item{...}{one or several objects of the class glmgee which are obtained from the fit of generalized estimating equations.}
+\item{...}{one or several objects of the class \emph{glmgee}.}
 
 \item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
 }
 \value{
-A \code{data.frame} with the values of the RJC for each glmgee object in the input.
+A \code{data.frame} with the values of the RJC for each \emph{glmgee} object in the input.
 }
 \description{
 Computes the Rotnitzky–Jewell's criterion (RJC) for one or more objects of the class glmgee.
 }
 \examples{
-## Example 1
-mod <- size ~ poly(days,4) + treat
-fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
+###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+mod1 <- size ~ poly(days,4) + treat
+fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces)
 fit2 <- update(fit1, corstr="AR-1")
 fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
-fit4 <- update(fit1, corstr="Independence")
+fit4 <- update(fit1, corstr="Exchangeable")
 RJC(fit1, fit2, fit3, fit4)
 
-## Example 2
-mod <- dep ~ visit + group
-fit1 <- glmgee(mod, id=subj, family=gaussian, corstr="Exchangeable", data=depression)
-fit2 <- update(fit1, corstr="AR-1")
-fit3 <- update(fit1, corstr="Non-Stationary-M-dependent(2)")
-fit4 <- update(fit1, corstr="Independence")
-RJC(fit1, fit2, fit3, fit4)
-
-## Example 3
-mod <- depressd ~ visit + group
-fit1 <- glmgee(mod, id=subj, family=binomial, corstr="Exchangeable", data=depression)
+###### Example 2: Treatment for severe postnatal depression
+mod2 <- depressd ~ visit + group
+fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), data=depression)
 fit2 <- update(fit1, corstr="AR-1")
 fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
-fit4 <- update(fit1, corstr="Independence")
+fit4 <- update(fit1, corstr="Exchangeable")
 RJC(fit1, fit2, fit3, fit4)
+
+###### Example 3: Treatment for severe postnatal depression (2)
+mod3 <- dep ~ visit*group
+fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), data=depression)
+fit2 <- update(fit1, corstr="AR-1")
+fit3 <- update(fit1, corstr="Exchangeable")
+RJC(fit1, fit2, fit3)
+
 }
 \references{
-Hin L-Y, Carey V.J., Wang Y-G (2007) Criteria for Working–Correlation–Structure Selection in GEE:
-Assessment via Simulation. \emph{The American Statistician} 61, 360–364.
+Hin, L.-Y. and Carey, V.J. and Wang, Y.-G. (2007) Criteria for Working–Correlation–Structure
+Selection in GEE: Assessment via Simulation. \emph{The American Statistician} 61, 360-364.
 }
 \seealso{
 \link{QIC}, \link{CIC}, \link{GHYC}, \link{AGPC}, \link{SGPC}

@@ -13,7 +13,7 @@
 )
 }
 \arguments{
-\item{object}{an (object) of the class glmgee which is obtained from the fit of a generalized estimating equation.}
+\item{object}{an object of the class \emph{glmgee}.}
 
 \item{...}{another objects of the class glmgee which are obtained from the fit of generalized estimating equations.}
 
@@ -35,7 +35,7 @@ A matrix with three columns which contains the following:
 Allows to compare nested generalized estimating equations using the Wald and generalized score tests.
 }
 \examples{
-## Example 1
+###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 mod <- size ~ poly(days,4)
 fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
 fit2 <- update(fit1, . ~ . + treat)
@@ -45,9 +45,9 @@ anova(fit3,test="wald")
 anova(fit1,fit2,fit3,test="score")
 anova(fit3,test="score")
 
-## Example 2
+###### Example 2: Treatment for severe postnatal depression
 mod2 <- depressd ~ group
-fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="Exchangeable", data=depression)
+fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
 fit2 <- update(fit1, . ~ . + visit)
 fit3 <- update(fit2, . ~ . + group:visit)
 anova(fit1,fit2,fit3,test="wald")
@@ -55,18 +55,23 @@ anova(fit3,test="wald")
 anova(fit1,fit2,fit3,test="score")
 anova(fit3,test="score")
 
-## Example 3
+###### Example 3: Treatment for severe postnatal depression (2)
 mod3 <- dep ~ group
 fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
 fit2 <- update(fit1, . ~ . + visit)
-fit3 <- update(fit2, . ~ . + group:visit)
+fit3 <- update(fit2, . ~ . + visit:group)
 anova(fit1,fit2,fit3,test="wald")
 anova(fit3,test="wald")
 anova(fit1,fit2,fit3,test="score")
 anova(fit3,test="score")
 }
 \references{
-Boos D. (1992) On Generalized Score Tests. \emph{American Statistician} 46, 327–33.
+Rotnitzky, A. and Jewell, P. (1990) Hypothesis Testing of Regression Parameters
+in Semiparametric Generalized Linear Models for Cluster Correlated Data. \emph{Biometrika} 77, 485-497.
 
-Rotnitzky A. and Jewell N.P. (1990). Hypothesis Testing of Regression Parameters in Semiparametric Generalized Linear Models for Cluster Correlated Data. \emph{Biometrika} 77, 485-497.
+Boos, D.D. (1992) On Generalized Score Tests. \emph{The American Statistician} 46, 327-333.
+
+Boos, D. (1992) On Generalized Score Tests. \emph{American Statistician} 46, 327–33.
+
+Rotnitzky, A. and Jewell, N.P. (1990). Hypothesis Testing of Regression Parameters in Semiparametric Generalized Linear Models for Cluster Correlated Data. \emph{Biometrika} 77, 485-497.
 }

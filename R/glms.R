@@ -6,7 +6,8 @@
 #' @export localInfluence
 localInfluence <- function(object,...) {
   UseMethod("localInfluence")
-}#' @title Leverage
+}
+#' @title Leverage
 #' @description Computes leverage measures for a fitted model object.
 #' @param object a fitted model object.
 #' @param ...	further arguments passed to or from other methods.
@@ -16,8 +17,8 @@ leverage <- function(object,...) {
   UseMethod("leverage")
 }
 
-#' @title Generalized Variance Inflaction Factor
-#' @description Computes the generalized variance inflaction factor (GVIF) for a fitted model object.
+#' @title Generalized Variance Inflation Factor
+#' @description Computes the generalized variance inflation factor (GVIF) for a fitted model object.
 #' @param model a fitted model object.
 #' @param ...	further arguments passed to or from other methods.
 #' @return An object with the values of the GVIF for all effects in the model.
@@ -29,11 +30,11 @@ gvif <- function(model,...) {
 
 #' @title Function to extract estimating equations
 #' @description Extracts estimating equations evaluated at the parameter estimates and the observed data for a fitted model object.
-#' @param model a fitted model object.
+#' @param object a fitted model object.
 #' @param ...	further arguments passed to or from other methods.
 #' @return A vector with the value of the estimating equations evaluated at the parameter estimates and the observed data.
 #' @export estequa
-estequa <- function(model,...) {
+estequa <- function(object,...) {
   UseMethod("estequa")
 }
 
@@ -69,39 +70,55 @@ vdtest <- function(model,...) {
 #'
 #' @title Test for Varying Dispersion Parameter in Normal Linear Models
 #' @description Performs Rao's score test for varying dispersion parameter in weighted and unweighted normal linear models.
-#' @param model an object of the class lm which is obtained from the fit of a weighted or unweighted normal linear model.
-#' @param varformula an (optional) \code{formula} expression of the form \code{~ predictors} describing only the potential explanatory variables for the dispersion. By default, the same explanatory variables are taken as in the model for the mean.
+#' @param model an object of the class \emph{lm}.
+#' @param varformula an (optional) \code{formula} expression of the form \code{~ z1 + z2 + ... + zq} indicating the potential explanatory variables for the dispersion parameter. By default, the same explanatory variables are taken as in the model for the mean.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
 #' @param ...	further arguments passed to or from other methods.
-#' @details If the object \code{model} corresponds to an unweighted normal linear model then this test assess the assumption of constant variance, which
-#' coincides with the (non-studentized) Breusch-Pagan test against heteroskedasticity.
-#' @return A list which includes the three main attributes of the test for varying dispersion parameter: statistic ("statistic"), degrees of freedom ("df") and \emph{p}-value ("p.value").
+#' @details From the heteroskedastic normal lineal model in which
+#' \eqn{\log(\sigma^2)=\gamma_0 + \gamma_1z_1 + \gamma_2z_2 + ...+ \gamma_qz_q}, where
+#' \eqn{\sigma^2} is the dispersion parameter of the distribution of the
+#' random errors, the Rao's score test (denoted here as \eqn{S}) to assess the
+#' hypothesis \eqn{H_0: \gamma=0} versus \eqn{H_1: \gamma\neq 0} is computed,
+#' where \eqn{\gamma=(\gamma_1,\ldots,\gamma_q)}. The corresponding \emph{p}-value is
+#' computed from the chi-squared distribution with \eqn{q} degrees of freedom,
+#' that is, \emph{p}-value = Prob\eqn{[\chi^2_{q} > S]}. If the object
+#' \code{model} corresponds to an unweighted normal linear model, then the
+#' test assess the assumption of constant variance, which coincides with the
+#' non-studentized Breusch-Pagan test against heteroskedasticity.
+#' @return a list list with components including
+#' \tabular{ll}{
+#' \code{statistic} \tab value of the Rao's score test (\eqn{S}),\cr
+#' \tab \cr
+#' \code{df}        \tab number of degrees of freedom (\eqn{q}),\cr
+#' \tab \cr
+#' \code{p.value}   \tab \emph{p}-value of the test,\cr
+#' }
 #' @method vdtest lm
 #' @export
 #' @examples
-#' ## Example 1
+#' ###### Example 1: Fuel consumption of automobiles
 #' fit1 <- lm(mpg ~ log(hp) + log(wt), data=mtcars)
 #' vdtest(fit1)
 #'
-#' ## Example 2
+#' ###### Example 2: Species richness in plots
 #' fit2 <- lm(Species ~ Biomass + pH, data=richness)
 #' vdtest(fit2)
 #'
+#' ### The test conclusions change when the outlying observations are excluded
 #' fit2a <- lm(Species ~ Biomass + pH, data=richness, subset=-c(1,3,18,20))
 #' vdtest(fit2a)
 #'
-#' ## Example 3
+#' ###### Example 3: Gas consumption in a home before and after insulation
 #' whiteside <- MASS::whiteside
 #' fit3 <- lm(Gas ~ Temp + Insul + Temp*Insul, data=whiteside)
 #' vdtest(fit3)
 #'
+#' ### The test conclusions change when the outlying observations are excluded
 #' fit3a <- lm(Gas ~ Temp + Insul + Temp*Insul, data=whiteside, subset=-c(8,9,36,46,55))
 #' vdtest(fit3a)
 #'
-#' @references Breusch T.S. and Pagan A.R. (1979) A simple test for heteroscedasticity and random coefficient variation. \emph{Econometrica} 47, 1287–1294.
-#'
-#' Cook R.D. and Weisberg S. (1983) Diagnostics for heteroscedasticity in regression. \emph{Biometrika} 70, 1–10.
-#'
+#' @references Breusch, T.S. and Pagan, A.R. (1979) A simple test for heteroscedasticity and random coefficient variation. \emph{Econometrica} 47, 1287–1294.
+#' @references Cook, R.D. and Weisberg, S. (1983) Diagnostics for heteroscedasticity in regression. \emph{Biometrika} 70, 1–10.
 #' @seealso \link{vdtest.glm}
 vdtest.lm <- function(model,varformula,verbose=TRUE,...){
   if(!missingArg(varformula)){
@@ -129,25 +146,50 @@ vdtest.lm <- function(model,varformula,verbose=TRUE,...){
 }
 
 #' @title Test for Varying Dispersion Parameter in Generalized Linear Models
-#' @description Performs Rao's score test for varying dispersion parameter in weighted and unweighted generalized linear models in which the response distribution is assumed to be gaussian, Gamma or inverse gaussian.
-#' @param model an object of the class glm which is obtained from the fit of a weighted or unweighted generalized linear model in which the response distribution is assumed to be gaussian, Gamma or inverse gaussian.
-#' @param varformula an (optional) \code{formula} expression of the form \code{~ predictors} describing only the potential explanatory variables for the dispersion. By default, the same explanatory variables are taken as in the model for the mean.
+#' @description Performs Rao's score test for varying dispersion parameter in
+#' weighted and unweighted generalized linear models in which the response
+#' distribution is assumed to be gaussian, Gamma or inverse gaussian.
+#' @param model an object of the class \emph{glm} where the distribution of the response
+#' variable is assumed to be \code{gaussian}, \code{Gamma} or \code{inverse.gaussian}.
+#' @param varformula an (optional) \code{formula} expression of the form \code{~ z1 + z2 + ... + zq} describing only the potential explanatory variables for the dispersion. By default, the same explanatory variables are taken as in the model for the mean.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
 #' @param ...	further arguments passed to or from other methods.
-#' @details The aim of this test is to assess the assumption of constant dispersion parameter in generalized linear models. If the object \code{model} corresponds to an unweighted generalized linear model then this test assess assumptions of constant variance and constant coefficient of variation on models in which the response distribution is assumed to be gaussian and Gamma, respectively.
-#' @return A list which includes the three main attributes of the test for varying dispersion parameter: statistic ("statistic"), degrees of freedom ("df") and \emph{p}-value ("p.value").
+#' @details From the generalized lineal model with varying dispersion in which
+#' \eqn{\log(\phi)=\gamma_0 + \gamma_1z_1 + \gamma_2z_2 + ... + \gamma_qz_q}, where
+#' \eqn{\phi} is the dispersion parameter of the distribution used to describe the
+#' response variable, the Rao's score test (denoted here as \eqn{S}) to assess the
+#' hypothesis \eqn{H_0: \gamma=0} versus \eqn{H_1: \gamma\neq 0} is computed,
+#' where \eqn{\gamma=(\gamma_1,\ldots,\gamma_q)}.  The corresponding \emph{p}-value is
+#' computed from the chi-squared distribution with \eqn{q} degrees of freedom,
+#' that is, \emph{p}-value = Prob\eqn{[\chi^2_{q} > S]}. If the object
+#' \code{model} corresponds to an unweighted generalized linear model then
+#' this test assess assumptions of constant variance and constant coefficient
+#' of variation on models in which the response distribution is assumed to be
+#' gaussian and Gamma, respectively.
+#' @return a list list with components including
+#' \tabular{ll}{
+#' \code{statistic} \tab value of the Rao's score test (\eqn{S}),\cr
+#' \tab \cr
+#' \code{df}        \tab number of degrees of freedom (\eqn{q}),\cr
+#' \tab \cr
+#' \code{p.value}   \tab \emph{p}-value of the test,\cr
+#' }
 #' @examples
-#' ## Example 1
+#' ###### Example 1: Fuel consumption of automobiles
 #' Auto <- ISLR::Auto
 #' fit1 <- glm(mpg ~ weight*horsepower, family=inverse.gaussian("log"), data=Auto)
 #' vdtest(fit1)
 #'
-#' ## Example 2
+#' ###### Example 2: Hill races in Scotland
 #' fit2 <- glm(rtime ~ log(distance) + log(cclimb), family=Gamma("log"), data=races)
 #' vdtest(fit2)
+#'
+#' ###### Example 3: Mammal brain and body weights
+#' fit3 <- glm(BrainWt ~ log(BodyWt), family=Gamma("log"), data=brains)
+#' vdtest(fit3)
 #' @method vdtest glm
 #' @export
-#' @references Wei BC., Shi JQ., Fung WK. and Hu YQ. (1998) Testing for Varying Dispersion in Exponential Family Nonlinear Models. \emph{Annals of the Institute of Statistical Mathematics} 50, 277–294.
+#' @references Wei, B.-C. and Shi, J.-Q. and Fung, W.-K. and Hu, Y.-Q. (1998) Testing for Varying Dispersion in Exponential Family Nonlinear Models. \emph{Annals of the Institute of Statistical Mathematics} 50, 277–294.
 #'
 #' @seealso \link{vdtest.lm}
 vdtest.glm <- function(model,varformula,verbose=TRUE,...){
@@ -191,38 +233,53 @@ vdtest.glm <- function(model,varformula,verbose=TRUE,...){
 }
 
 #' @title Variable Selection in Normal Linear Models
-#' @description Performs variable selection in normal linear models using hybrid versions of forward stepwise and backward stepwise.
-#' @param model an object of the class lm which is obtained from the fit of a normal linear model.
+#' @description Performs variable selection in normal linear models using a hybrid versions of forward stepwise and backward stepwise.
+#' @param model an object of the class \emph{lm}.
 #' @param direction an (optional) character string indicating the type of procedure which should be used. The available options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). By default, \code{direction} is set to be "forward".
 #' @param levels an (optional) two-dimensional vector of values in the interval \eqn{(0,1)} indicating the levels at which the variables should in and out from the model. This is only appropiate if \code{criterion}="p-value". By default, \code{levels} is set to be \code{c(0.05,0.05)}.
 #' @param criterion an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted R-squared ("adjr2"), predicted R-squared ("prdr2"), Mallows' CP ("cp") and \emph{p}-value of the F test ("p-value"). By default, \code{criterion} is set to be "bic".
 #' @param ...	further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC/QICu, which by default is set to be 2.
 #' @param trace an (optional) logical switch indicating if should the stepwise reports be printed. By default, \code{trace} is set to be TRUE.
-#' @param scope an (optional) list, containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. By default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.
-#' @return A list which contains the following objects:
-#' \itemize{
-#' \item{\code{initial}:}{ a character string indicating the linear predictor of the "initial model".}
-#' \item{\code{direction}:}{ a character string indicating the type of procedure which was used.}
-#' \item{\code{criterion}:}{ a character string indicating the criterion used to compare the candidate models.}
-#' \item{\code{final}:}{ a character string indicating the linear predictor of the "final model".}
+#' @param scope an (optional) list containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. By default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.
+#' @details The "hybrid forward stepwise"  algorithm starts with the simplest
+#' model (which may be specified at the argument \code{scope}, and by default,
+#' is a model whose parameters in the linear predictor, except the intercept,
+#' if any, are set to be 0), and then the candidate models are builded by
+#' hierarchically adding effects in the linear predictor, whose "relevance"
+#' and/or "importance" in the model fit is assessed by comparing nested models
+#' (that is, by comparing the models with and without the added effect) using a
+#' criterion previously specified. If an effect is added to the model then this strategy may
+#' also remove any effect which, according to the criterion previously specified, no
+#' longer provide an improvement in the model fit. That process remain until no more effects may be included or excluded.
+#'
+#' The "hybrid backward stepwise" algorithm works similarly.
+#' @return a list list with components including
+#' \tabular{ll}{
+#' \code{initial} \tab  a character string indicating the linear predictor of the "initial model",\cr
+#' \tab \cr
+#' \code{direction} \tab  a character string indicating the type of procedure which was used,\cr
+#' \tab \cr
+#' \code{criterion} \tab a character string indicating the criterion used to compare the candidate models,\cr
+#' \tab \cr
+#' \code{final} \tab a character string indicating the linear predictor of the "final model",\cr
 #' }
 #' @seealso \link{stepCriterion.glm}, \link{stepCriterion.overglm}, \link{stepCriterion.glmgee}
 #' @examples
-#' ## Example 1
+#' ###### Example 1: New York air quality measurements
 #' fit1 <- lm(log(Ozone) ~ Solar.R + Temp + Wind, data=airquality)
 #' scope=list(lower=~1, upper=~Solar.R*Temp*Wind)
 #' stepCriterion(fit1, direction="forward", criterion="adjr2", scope=scope)
 #' stepCriterion(fit1, direction="forward", criterion="bic", scope=scope)
 #' stepCriterion(fit1, direction="forward", criterion="p-value", scope=scope)
 #'
-#' ## Example 2
+#' ###### Example 2: Fuel consumption of automobiles
 #' fit2 <- lm(mpg ~ log(hp) + log(wt) + qsec, data=mtcars)
 #' scope=list(lower=~1, upper=~log(hp)*log(wt)*qsec)
 #' stepCriterion(fit2, direction="backward", criterion="bic", scope=scope)
 #' stepCriterion(fit2, direction="forward", criterion="cp", scope=scope)
 #' stepCriterion(fit2, direction="backward", criterion="prdr2", scope=scope)
 #'
-#' ## Example 3
+#' ###### Example 3: Credit card balance
 #' Credit <- ISLR::Credit
 #' fit3 <- lm(Balance ~ Cards + Age + Rating + Income + Student + Limit, data=Credit)
 #' stepCriterion(fit3, direction="forward", criterion="prdr2")
@@ -232,7 +289,7 @@ vdtest.glm <- function(model,varformula,verbose=TRUE,...){
 #' @seealso \link{stepCriterion.glm}, \link{stepCriterion.overglm}, \link{stepCriterion.glmgee}
 #' @method stepCriterion lm
 #' @export
-#' @references James G., Witten D., Hastie T. and Tibshirani R. (2013, page 210) An Introduction to Statistical Learning with Applications in R, Springer, New York.
+#' @references James, G. and Witten, D. and Hastie, T. and Tibshirani, R. (2013, page 210) An Introduction to Statistical Learning with Applications in R, Springer, New York.
 #'
 stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp","p-value"), direction=c("forward","backward"), levels=c(0.05,0.05), trace=TRUE, scope, ...){
   xxx <- list(...)
@@ -568,49 +625,86 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp"
 }
 
 
-#' @title Normal QQ-plot with simulated envelope of model residuals
-#' @description Produces a normal QQ-plot with simulated envelope of residuals obtained from the fit of a generalized linear model.
-#' @param object an object of the class glm which is obtained from the fit of a generalized linear model.
-#' @param rep an (optional) positive integer indicating the number of replicates which should be used to build the simulated envelope. By default, \code{rep} is set to be 100.
+#' @title Normal QQ-plot with simulated envelope of residuals in GLMs
+#' @description Produces a normal QQ-plot with simulated envelope of residuals
+#' for generalized linear models.
+#' @param object an object of the class \emph{glm}.
+#' @param rep an (optional) positive integer which allows to specify the number of replicates which should be used to build the simulated envelope. By default, \code{rep} is set to be 25.
 #' @param conf an (optional) value in the interval (0,1) indicating the confidence level which should be used to build the pointwise confidence intervals, which form the envelope. By default, \code{conf} is set to be 0.95.
 #' @param type a character string indicating the type of residuals which should be used. The available options are: randomized quantile ("quantile"), deviance ("deviance") and pearson ("pearson") residuals. By default, \code{type} is set to be "quantile".
 #' @param standardized an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. By default, \code{standardized} is set to be FALSE.
 #' @param plot.it an (optional) logical switch indicating if the normal QQ-plot with simulated envelope of residuals is required or just the data matrix in which it is based. By default, \code{plot.it} is set to be TRUE.
 #' @param identify an (optional) positive integer indicating the number of individuals to identify on the QQ-plot with simulated envelope of residuals. This is only appropriate if \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example,  \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
-#' @return A matrix with \eqn{n} rows and four columns: the first three (Lower limit, Median, and Upper limit) describe the simulated envelope, that is, each row corresponds to the quantiles (1-\code{conf})/2, 0.5 and (1+\code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order statistic of the residuals type \code{type} for \eqn{i=1,2,...,n}; and the last one column (Residuals) contains the observed type \code{type} residuals.
+#' @return A matrix with the following four columns:
+#' \tabular{ll}{
+#' \code{Lower limit} \tab the quantile (1 - \code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
+#'                    \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
+#' \tab \cr
+#' \code{Median} \tab the quantile 0.5 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
+#'               \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
+#' \tab \cr
+#' \code{Upper limit} \tab the quantile (1 + \code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
+#'                    \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
+#' \tab \cr
+#' \code{Residuals} \tab the observed \code{type}-type residuals,\cr
+#' }
 #' @details The simulated envelope is builded by simulating \code{rep} independent realizations of the response variable for each
-#' individual, which is accomplished taking into account the following: (1) the model assumption about the distribution of the response variable; (2) the estimates of the parameters in the linear predictor; and (3) the estimate of the dispersion parameter. The interest model is re-fitted \code{rep} times, as each time the vector of observed responses is replaced by one of the simulated samples. The residuals type \emph{type} are computed and then ordered for each replicate, so that for each \eqn{i=1,2,...,n}, where \eqn{n} is the number of individuals in the sample, there is a random sample of size \code{rep} of the \eqn{i}-th order statistic of the residuals type \emph{type}. Therefore, the simulated envelope is composed of the quantiles (1-\code{conf})/2 and (1+\code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order statistic of the residuals type \emph{type} for \eqn{i=1,2,...,n}. Families \code{quasi()}, \code{quasipoisson} and \code{quasibinomial} are not supported.
-#' @references Atkinson A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
-#' @references Davison A.C. and Gigli A. (1989) Deviance Residuals and Normal Scores Plots. \emph{Biometrika} 76, 211-221.
-#' @references Dunn P.K. and Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics} 5, 236-244.
-#' @references Pierce D.A. and Schafer D.W. (1986) Residuals in Generalized Linear Models. \emph{Journal of the American Statistical Association} 81, 977-986.
+#' individual, which is accomplished taking into account the following: (1) the model assumption about the distribution of
+#' the response variable; (2) the estimates of the parameters in the linear predictor; and (3) the estimate of the
+#' dispersion parameter. The interest model is re-fitted \code{rep} times, as each time the vector of observed responses
+#' is replaced by one of the simulated samples. The \code{type}-type residuals are computed and then sorted for each
+#' replicate, so that for each \eqn{i=1,2,...,n}, where \eqn{n} is the number of individuals in the sample, there is a random
+#' sample of size \code{rep} of the \eqn{i}-th order statistic of the  \code{type}-type residuals. Therefore, the simulated
+#' envelope is composed of the quantiles (1 - \code{conf})/2 and (1 + \code{conf})/2 of the random sample of size \code{rep} of
+#' the \eqn{i}-th order statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n}.
+#' @references Atkinson, A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
+#' @references Davison, A.C. and Gigli, A. (1989) Deviance Residuals and Normal Scores Plots. \emph{Biometrika} 76, 211-221.
+#' @references Dunn, P.K. and Smyth, G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics} 5, 236-244.
+#' @references Pierce, D.A. and Schafer, D.W. (1986) Residuals in Generalized Linear Models. \emph{Journal of the American Statistical Association} 81, 977-986.
 #' @seealso \link{envelope.lm}, \link{envelope.overglm}
 #' @examples
-#' # Example 1
-#' fit1 <- glm(infections ~ frequency + location, family=poisson, data=swimmers)
-#' envelope(fit1, type="quantile", col="red", pch=20,col.lab="blue",
+#'
+#' ###### Example 1:
+#' burn1000 <- aplore3::burn1000
+#' burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
+#' fit1 <- glm(death ~ age*inh_inj + tbsa*inh_inj, family=binomial("logit"), data=burn1000)
+#' envelope(fit1, rep=50, conf=0.95, type="pearson", col="red", pch=20, col.lab="blue",
+#'          col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 2: Fuel consumption of automobiles
+#' Auto <- ISLR::Auto
+#' fit2 <- glm(mpg ~ horsepower*weight, family=inverse.gaussian("log"), data=Auto)
+#' envelope(fit2, rep=50, conf=0.95, type="pearson", col="red", pch=20, col.lab="blue",
+#'          col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 3: Skin cancer in women
+#' fit3 <- glm(cases ~ offset(log(population)) + city + age, family=poisson, data=skincancer)
+#' envelope(fit3, rep=100, conf=0.95, type="quantile", col="red", pch=20,col.lab="blue",
 #'          col.axis="blue",col.main="black",family="mono",cex=0.8)
 #'
-#' # Example 2
-#' fit2 <- glm(cbind(cells,200-cells) ~ tnf + ifn + tnf*ifn, family=binomial, data=cellular)
-#' envelope(fit2, type="deviance",col="red", pch=20,col.lab="blue",
-#'          col.axis="blue",col.main="black",family="mono",cex=0.8)
+#' ###### Example 4: Self diagnozed ear infections in swimmers
+#' fit4 <- glm(infections ~ frequency + location, family=poisson(log), data=swimmers)
+#' envelope(fit4, rep=100, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
+#'          col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
-#' # Example 3
-#' fit3 <- glm(cancer/exposed ~ dose, family=binomial, weights=exposed, data=bladder)
-#' envelope(fit3, type="pearson", col="red", pch=20,col.lab="blue",
-#'          col.axis="blue",col.main="black",family="mono",cex=0.8)
+#' ###### Example 5: Agents to stimulate cellular differentiation
+#' fit5 <- glm(cbind(cells,200-cells) ~ tnf + ifn, family=binomial(logit), data=cellular)
+#' envelope(fit5, rep=100, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
+#'          col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
-#' # Example 4
-#' fit4 <- glm(cases ~ offset(log(population)) + city + age, family=poisson("log"), data=skincancer)
-#' envelope(fit4, type="quantile", col="red", pch=20,col.lab="blue",
-#'          col.axis="blue",col.main="black",family="mono",cex=0.8)
-#' @importFrom stats dbinom delete.response dpois glm
-#'             pbinom pgamma ppoints ppois qqplot rchisq
+#' @importFrom stats dbinom delete.response dpois glm AIC BIC logLik fitted quantile
+#'             pbinom pgamma ppoints ppois qqplot rchisq binomial poisson resid runif
+#'              rgamma rpois rbinom  qqnorm dnbinom residuals pnbinom
+#'             qnbinom qpois rbeta rnbinom .getXlevels lm optim
+#' @importFrom utils setTxtProgressBar txtProgressBar
+#' @importFrom numDeriv grad hessian
+#' @importFrom Rfast Digamma Lgamma
+#' @importFrom Formula Formula model.part
+#' @importFrom methods is
 #' @method envelope glm
 #' @export
-envelope.glm <- function(object, rep=100, conf=0.95, type=c("quantile","deviance","pearson"), standardized=FALSE, plot.it=TRUE, identify, ...){
+envelope.glm <- function(object, rep=25, conf=0.95, type=c("quantile","deviance","pearson"), standardized=FALSE, plot.it=TRUE, identify, ...){
   if(object$family$family=="quasi" | object$family$family=="quasipoisson" | object$family$family=="quasibinomial")
     stop("Quasi-likelihood models are not supported!!",call.=FALSE)
   if(any(object$prior.weights == 0)) stop("Only positive weights are supported!!",call.=FALSE)
@@ -721,30 +815,57 @@ envelope.glm <- function(object, rep=100, conf=0.95, type=c("quantile","deviance
   return(invisible(out_))
 }
 
-#' @title Normal QQ-plot with simulated envelope of model residuals
+#' @title Normal QQ-plot with simulated envelope of residuals for normal linear models
 #' @description Produces a normal QQ-plot with simulated envelope of residuals obtained from the fit of a normal linear model.
-#' @param object an object of the class lm which is obtained from the fit of a normal linear model.
+#' @param object an object of the class \emph{lm}.
 #' @param rep an (optional) positive integer indicating the number of replicates which should be used to build the simulated envelope. By default, \code{rep} is set to be 100.
 #' @param conf an (optional) value in the interval (0,1) indicating the confidence level which should be used to build the pointwise confidence intervals, which form the envelope. By default, \code{conf} is set to be 0.95.
 #' @param type a character string indicating the type of residuals which should be used. The available options are: internally Studentized ("internal") and externally Studentized ("external") residuals. See Cook and Weisberg (1982, pages 18-20).
 #' @param plot.it an (optional) logical switch indicating if the normal QQ-plot with simulated envelope of residuals is required or just the data matrix in which it is based. By default, \code{plot.it} is set to be TRUE.
 #' @param identify an (optional) positive integer value indicating the number of individuals to identify on the QQ-plot with simulated envelope of residuals. This is only appropriate if \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example, \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
-#' @return A matrix with \eqn{n} rows and four columns: the first three (Lower limit, Median, and Upper limit) describe the simulated envelope, that is, each row corresponds to the quantiles (1-\code{conf})/2, 0.5 and (1+\code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order statistic of the residuals type \code{type} for \eqn{i=1,2,...,n}; and the last one column (Residuals) contains the observed type \code{type} residuals.
-#' @details The simulated envelope is builded by simulating rep independent realizations of the response variable for each individual, which is accomplished taking into account the following: (1) the estimates of the parameters in the linear predictor; and (2) the estimate of the dispersion parameter. The interest model is re-fitted \code{rep} times, as each time the vector of observed responses is replaced by one of the simulated samples. The residuals type \code{type} are computed and then ordered for each replicate, so that for each \eqn{i=1,2,...,n}, where n is the number of individuals in the sample, there is a random sample of size \code{rep} of the \eqn{i}-th order statistic of the residuals type \code{type}. Therefore, the simulated envelope is composed of the quantiles (1-\code{conf})/2 and (1+\code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order statistic of the residuals type \code{type} for \eqn{i=1,2,...,n}.
-#' @references Atkinson A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
-#' @references Cook R.D. and Weisberg S. (1982) \emph{Residuals and Influence in Regression}. Chapman and Hall, New York.
+#' @return A matrix with the following four columns:
+#' \tabular{ll}{
+#' \code{Lower limit} \tab the quantile (1 - \code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
+#'                    \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
+#' \tab \cr
+#' \code{Median} \tab the quantile 0.5 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
+#'               \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
+#' \tab \cr
+#' \code{Upper limit} \tab the quantile (1 + \code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
+#'                    \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
+#' \tab \cr
+#' \code{Residuals} \tab the observed \code{type}-type residuals,\cr
+#' }
+#' @details The simulated envelope is builded by simulating \code{rep} independent realizations of the response variable for each
+#' individual, which is accomplished taking into account the following: (1) the model assumption about the distribution of
+#' the response variable; (2) the estimates of the parameters in the linear predictor; and (3) the estimate of the
+#' dispersion parameter. The interest model is re-fitted \code{rep} times, as each time the vector of observed responses
+#' is replaced by one of the simulated samples. The \code{type}-type residuals are computed and then sorted for each
+#' replicate, so that for each \eqn{i=1,2,...,n}, where \eqn{n} is the number of individuals in the sample, there is a random
+#' sample of size \code{rep} of the \eqn{i}-th order statistic of the  \code{type}-type residuals. Therefore, the simulated
+#' envelope is composed of the quantiles (1 - \code{conf})/2 and (1 + \code{conf})/2 of the random sample of size \code{rep} of
+#' the \eqn{i}-th order statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n}.
+#' @references Atkinson, A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
+#' @references Cook, R.D. and Weisberg, S. (1982) \emph{Residuals and Influence in Regression}. Chapman and Hall, New York.
 #' @seealso \link{envelope.glm}, \link{envelope.overglm}
 #' @examples
-#' # Example 1
-#' fit1 <- lm(Species ~ Biomass + pH + Biomass*pH, data=richness)
-#' envelope(fit1, type="internal", col="red", pch=20, col.lab="blue",
+#' ###### Example 1: Fuel consumption of automobiles
+#' fit1 <- lm(mpg ~ log(hp) + log(wt), data=mtcars)
+#' envelope(fit1, rep=100, conf=0.95, type="external", col="red", pch=20, col.lab="blue",
 #'          col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
-#' # Example 2
-#' fit2 <- lm(mpg ~ log(hp) + log(wt), data=mtcars)
-#' envelope(fit2, type="external", col="red", pch=20, col.lab="blue",
+#' ###### Example 2: Species richness in plots
+#' fit2 <- lm(Species ~ Biomass + pH + Biomass*pH, data=richness)
+#' envelope(fit2, rep=100, conf=0.95, type="internal", col="red", pch=20, col.lab="blue",
 #'          col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 3: Gas consumption in a home before and after insulation
+#' whiteside <- MASS::whiteside
+#' fit3 <- lm(Gas ~ Temp + Insul + Temp*Insul, data=whiteside)
+#' envelope(fit3, rep=100, conf=0.95, type="internal", col="red", pch=20, col.lab="blue",
+#'          col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
 #' @method envelope lm
 #' @export
 envelope.lm <- function(object, rep=100, conf=0.95, type=c("external","internal"), plot.it=TRUE, identify, ...){
@@ -818,36 +939,39 @@ envelope.lm <- function(object, rep=100, conf=0.95, type=c("external","internal"
   colnames(out_) <- c("Lower limit","Median","Upper limit","Residuals")
   return(invisible(out_))
 }
-
-
-
-#' @title The Hosmer-Lemeshow Goodness-of-Fit Test
+#'
+#'@title The Hosmer-Lemeshow Goodness-of-Fit Test
 #' @description Computes the Hosmer-Lemeshow goodness-of-fit test for a generalized linear model fitted to binary responses.
-#' @param model an object of the class glm which is obtained from the fit of a generalized linear model where the distribution for the response variable is assumed to be binomial.
+#' @param model an object of the class \emph{glm}, which is obtained from the fit of a generalized linear model where the distribution for the response variable is assumed to be binomial.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
 #' @param ... further arguments passed to or from other methods.
-#' @return A list which contains the following objects:
-#' \itemize{
-#' \item \code{hm:}{ A matrix with the values of Group, Size, Observed and Expected, which are required to compute the statistic of the test.}
-#' \item \code{statistic:}{ The value of the statistic of the test.}
-#' \item \code{df:}{ The number of degrees of freedom, given by the number of groups minus 2.}
-#' \item \code{p.value:}{ The \emph{p}-value of the test computed using the Chi-square distribution.}
+#' @return A matrix with the following four columns:
+#' \tabular{ll}{
+#' \code{hm} \tab a matrix with the values of Group, Size, Observed and Expected, which are required to compute the statistic of the test,\cr
+#' \tab \cr
+#' \code{statistic} \tab the value of the statistic of the test,\cr
+#' \tab \cr
+#' \code{df} \tab the number of degrees of freedom, given by the number of groups minus 2,\cr
+#' \tab \cr
+#' \code{p.value} \tab the \emph{p}-value of the test computed using the Chi-square distribution,\cr
 #' }
 #' @references Hosmer, D.W. and Lemeshow, S. (2000) \emph{Applied Logistic Regression. 2nd ed.} John Wiley & Sons, New York.
 #' @examples
-#' ## Example 1
-#' fit1 <-  glm(cancer/exposed ~ dose, weights=exposed, family=binomial("logit"), data=bladder)
+#'
+#' ###### Example 1: Patients with burn injuries
+#' burn1000 <- aplore3::burn1000
+#' burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
+#' fit1 <- glm(death ~ age*inh_inj + tbsa*inh_inj, family=binomial("logit"), data=burn1000)
 #' hltest(fit1)
 #'
-#' ## Example 2
-#' fit2 <-  glm(cancer/exposed ~ dose, weights=exposed, family=binomial("logit"), data=liver)
+#' ###### Example 2: Bladder cancer in mice
+#' fit2 <-  glm(cancer/exposed ~ dose, weights=exposed, family=binomial("cloglog"), data=bladder)
 #' hltest(fit2)
 #'
-#' ## Example 3
-#' burn1000 <- aplore3::burn1000
-#' mod <- death ~ age + tbsa + inh_inj + age*inh_inj + tbsa*inh_inj
-#' fit3 <- glm(mod, family=binomial("logit"), data=burn1000)
+#' ###### Example 3: Liver cancer in mice
+#' fit3 <-  glm(cancer/exposed ~ dose, weights=exposed, family=binomial("probit"), data=liver)
 #' hltest(fit3)
+#'
 #' @export hltest
 hltest <- function(model,verbose=TRUE,...){
   if(class(model)[1] != "glm") stop("Only glm-type objects are supported!!",call.=FALSE)
@@ -898,7 +1022,7 @@ hltest <- function(model,verbose=TRUE,...){
 #' @param plot.it an (optional) logical switch indicating if the plot of the ROC curve is required or just the data matrix in which it is based. By default, \code{plot.it} is set to be TRUE.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
 #' @param ... further arguments passed to or from other methods. For example, if \code{plot.it=TRUE} then \code{...} may to include graphical parameters as \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
-#' @references Hanley J.A. and McNeil B.J. (1982) The Meaning and Use of the Area under a Receiver Operating Characteristic (ROC) Curve. \emph{Radiology} 143, 29–36.
+#' @references Hanley, J.A. and McNeil, B.J. (1982) The Meaning and Use of the Area under a Receiver Operating Characteristic (ROC) Curve. \emph{Radiology} 143, 29–36.
 #' @return A list which contains the following objects:
 #' \itemize{
 #' \item{\code{roc:}}{ A matrix with the Cutoffs and the associated estimates of Sensitivity and Specificity.}
@@ -907,29 +1031,27 @@ hltest <- function(model,verbose=TRUE,...){
 #' \item{\code{ks:}}{ The value of the Kolmogorov-Smirnov statistic computed as the maximum value of |1-Sensitivity-Specificity|.}
 #' }
 #' @examples
+#' ###### Example: Patients with burn injuries
 #' burn1000 <- aplore3::burn1000
 #'
-#' ## splitting the sample
-#' ## 70% for the training sample and 30% for the validation sample
+#' ### splitting the sample: 70% for the training sample and 30% for the validation sample
 #' burn1000 <- within(burn1000, sampleof <- "validation")
 #' s <- sample(nrow(burn1000),nrow(burn1000)*0.7)
 #' burn1000$sampleof[s] <- "training"
 #'
-#' mod <- death ~ age + tbsa + inh_inj + age*inh_inj + tbsa*inh_inj
 #' training <- subset(burn1000,sampleof=="training")
-#' fit <- glm(mod, family=binomial("logit"), data=training)
+#' fit <- glm(death ~ age*inh_inj + tbsa*inh_inj, family=binomial("logit"), data=training)
 #'
-#' ## ROC curve for the training sample
-#' ROCc(fit, col="red", col.lab="blue", col.axis="black",
-#'      col.main="black", family="mono")
+#' ### ROC curve for the training sample
+#' ROCc(fit, col="red", col.lab="blue", col.axis="black", col.main="black", family="mono")
 #'
 #' validation <- subset(burn1000, sampleof=="validation")
 #' probs <- predict(fit, newdata=validation, type="response")
 #' responses <- with(validation, ifelse(death=="Dead",1,0))
 #'
-#' ## ROC curve for the validation sample
-#' ROCc(cbind(responses,probs), col="red", col.lab="blue",
-#'      col.axis="black", col.main="black", family="mono")
+#' ### ROC curve for the validation sample
+#' ROCc(cbind(responses,probs), col="red", col.lab="blue", col.axis="black",
+#'      col.main="black", family="mono")
 #' @export ROCc
 #' @importFrom stats aggregate sd
 #'
@@ -992,8 +1114,8 @@ ROCc <- function(object,plot.it=TRUE,verbose=TRUE,...){
 #' @param test an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lr") tests. By default, \code{test} is set to be "wald".
 #' @param verbose an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
 #' @details The Wald, Rao's score and Terrell's gradient tests are performed using the expected Fisher information matrix.
-#' @references Buse A. (1982) The Likelihood Ratio, Wald, and Lagrange Multiplier Tests: An Expository Note. \emph{The American Statistician} 36, 153-157.
-#' @references Terrell G.R. (2002) The gradient statistic. \emph{Computing Science and Statistics} 34, 206 – 215.
+#' @references Buse, A. (1982) The Likelihood Ratio, Wald, and Lagrange Multiplier Tests: An Expository Note. \emph{The American Statistician} 36, 153-157.
+#' @references Terrell, G.R. (2002) The gradient statistic. \emph{Computing Science and Statistics} 34, 206 – 215.
 #' @examples
 #' ## Example 1
 #' Auto <- ISLR::Auto
@@ -1079,7 +1201,7 @@ anova2 <- function(object,...,test=c("wald","lr","score","gradient"),verbose=TRU
 
 #' @title Estimating Equations in Generalized Linear Models
 #' @description Extracts estimating equations evaluated at the parameter estimates and the observed data for a generalized linear model fitted to the data.
-#' @param model an object of the class glm which is obtained from the fit of a generalized linear model.
+#' @param object an object of the class glm which is obtained from the fit of a generalized linear model.
 #' @param ... further arguments passed to or from other methods.
 #' @return A vector with the value of the estimating equations evaluated at the parameter estimates and the observed data.
 #' @method estequa glm
@@ -1101,40 +1223,47 @@ anova2 <- function(object,...,test=c("wald","lr","score","gradient"),verbose=TRU
 #' ## Example 3
 #' fit3 <- glm(cases ~ offset(log(population)) + city + age, family=poisson("log"), data=skincancer)
 #' estequa(fit3)
-estequa.glm <- function(model,...){
-  xx <- model.matrix(model)
+estequa.glm <- function(object,...){
+  xx <- model.matrix(object)
   n <- nrow(xx)
   p <- ncol(xx)
-  delta <- ifelse(model$family$mu.eta(model$linear.predictor)>=0,1,-1)
-  salida <- crossprod(xx,delta*resid(model,type="pearson")*sqrt(model$weights))
+  delta <- ifelse(object$family$mu.eta(object$linear.predictor)>=0,1,-1)
+  salida <- crossprod(xx,delta*resid(object,type="pearson")*sqrt(object$weights))
   colnames(salida) <- " "
-  rownames(salida) <- names(coef(model))
+  rownames(salida) <- names(coef(object))
   return(salida)
 }
-
-#' @title Generalized Variance Inflaction Factor
-#' @description Computes the generalized variance inflaction factor (GVIF) for a normal linear model.
-#' @param model an object of the class lm which is obtained from the fit of a normal linear model.
+#' @title Generalized Variance Inflation Factor
+#' @description Computes the generalized variance inflation factor (GVIF) for a weighted or unweighted normal linear model.
+#' @param model an object of the class \emph{lm}.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
 #' @param ...	further arguments passed to or from other methods.
-#' @return A matrix with so many rows as effects in the model and three columns: \emph{(1)} the values of GVIF; \emph{(2)} the number of degrees of freedom; and \emph{(3)} the values of GVIF^{1/(2*df)}.
-#' @return If the number of degrees of freedom is 1 then the GVIF reduces to the Variance Inflation Factor (VIF).
+#' @details If the number of degrees of freedom is 1 then the GVIF reduces to the Variance
+#' Inflation Factor (VIF).
+#' @return A matrix with so many rows as effects in the model and the following columns:
+#' \tabular{ll}{
+#' \code{GVIF}            \tab the values of GVIF,\cr
+#' \tab \cr
+#' \code{df}              \tab the number of degrees of freedom,\cr
+#' \tab \cr
+#' \code{GVIF^(1/(2*df))} \tab the values of GVIF\eqn{^{1/2 df}},\cr
+#' }
 #' @method gvif lm
 #' @export
 #' @examples
-#' ## Example 1
-#' fit1 <- lm(mpg ~ log(hp) + log(wt), data=mtcars)
+#' ###### Example 1: New York air quality measurements
+#' fit1 <- lm(log(Ozone) ~ Solar.R + Temp + Wind, data=airquality)
 #' gvif(fit1)
 #'
-#' ## Example 2
-#' fit2 <- lm(Species ~ Biomass + pH, data=richness)
+#' ###### Example 2: Fuel consumption of automobiles
+#' fit2 <- lm(mpg ~ log(hp) + log(wt) + qsec, data=mtcars)
 #' gvif(fit2)
 #'
-#' ## Example 3
-#' whiteside <- MASS::whiteside
-#' fit3 <- lm(Gas ~ Temp + Insul + Temp*Insul, data=whiteside)
+#' ###### Example 3: Credit card balance
+#' Credit <- ISLR::Credit
+#' fit3 <- lm(Balance ~ Cards + Age + Rating + Income + Student + Limit, data=Credit)
 #' gvif(fit3)
-#' @references Fox J. and Monette G. (1992) Generalized collinearity diagnostics, \emph{JASA} 87, 178–183.
+#' @references Fox, J. and Monette, G. (1992) Generalized collinearity diagnostics, \emph{JASA} 87, 178–183.
 #' @seealso \link{gvif.glm}
 gvif.lm <- function(model,verbose=TRUE,...){
   X <- model.matrix(model)
@@ -1155,43 +1284,53 @@ gvif.lm <- function(model,verbose=TRUE,...){
   for(i in 1:nn){
     rr2 <- as.matrix(cors[postos==i,postos==i])
     rr3 <- as.matrix(cors[postos!=i,postos!=i])
-    results[i,1] <- det(rr2)*det(rr3)/detx
+    results[i,1] <- round(det(rr2)*det(rr3)/detx,digits=4)
     results[i,2] <- ncol(rr2)
-    results[i,3] <- results[i,1]^(1/(2*ncol(rr2)))
+    results[i,3] <- round(results[i,1]^(1/(2*ncol(rr2))),digits=4)
   }
   rownames(results) <- vars
   colnames(results) <- c("GVIF", "df", "GVIF^(1/(2*df))")
   if(verbose) print(results)
   return(invisible(results))
 }
-
-
-#' @title Generalized Variance Inflaction Factor
-#' @description Computes the generalized variance inflaction factor (GVIF) for a generalized linear model.
-#' @param model an object of the class glm which is obtained from the fit of a generalized linear model.
+#'
+#' @title Generalized Variance Inflation Factor
+#' @description Computes the generalized variance inflation factor (GVIF) for a generalized linear model.
+#' @param model an object of the class \emph{glm}.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
 #' @param ...	further arguments passed to or from other methods.
-#' @return A matrix with so many rows as effects in the model and three columns: \emph{(1)} the values of GVIF; \emph{(2)} the number of degrees of freedom; and \emph{(3)} the values of GVIF^{1/(2*df)}.
-#' @return If the number of degrees of freedom is 1 then the GVIF reduces to the Variance Inflation Factor (VIF).
+#' @details If the number of degrees of freedom is 1 then the GVIF reduces to the Variance
+#' Inflation Factor (VIF).
+#' @return A matrix with so many rows as effects in the model and the following columns:
+#' \tabular{ll}{
+#' \code{GVIF} \tab the values of GVIF,\cr
+#' \tab \cr
+#' \code{df}\tab the number of degrees of freedom,\cr
+#' \tab \cr
+#' \code{GVIF^(1/(2*df))}\tab the values of GVIF\eqn{^{1/2 df}},\cr
+#' }
 #' @method gvif glm
 #' @export
 #' @examples
-#' ## Example 1
+#' ###### Example 1: Fuel consumption of automobiles
 #' Auto <- ISLR::Auto
-#' fit1 <- glm(mpg ~ weight*horsepower, family=inverse.gaussian("log"), data=Auto)
+#' Auto2 <- within(Auto, origin <- factor(origin))
+#' mod <- mpg ~ cylinders + displacement + acceleration + origin + horsepower*weight
+#' fit1 <- glm(mod, family=inverse.gaussian("log"), data=Auto2)
 #' gvif(fit1)
 #'
-#' ## Example 2
+#' ###### Example 2: Patients with burn injuries
 #' burn1000 <- aplore3::burn1000
-#' mod <- death ~ age + tbsa + inh_inj + age*inh_inj + tbsa*inh_inj
-#' fit2 <- glm(mod, family=binomial("logit"), data=burn1000)
+#' burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
+#' mod2 <- death ~ gender + race + flame + age*inh_inj + tbsa*inh_inj
+#' fit2 <- glm(mod2, family=binomial("logit"), data=burn1000)
 #' gvif(fit2)
 #'
-#' ## Example 3
+#' ###### Example 3: Hill races in Scotland
 #' fit3 <- glm(rtime ~ log(distance) + log(cclimb), family=Gamma("log"), data=races)
 #' gvif(fit3)
 #'
-#' @references Fox J. and Monette G. (1992) Generalized collinearity diagnostics, \emph{JASA} 87, 178–183.
+#' @references Fox, J. and Monette, G. (1992) Generalized collinearity diagnostics, \emph{JASA} 87, 178–183.
 #' @seealso \link{gvif.lm}
 gvif.glm <- function(model,verbose=TRUE,...){
   X <- model.matrix(model)
@@ -1211,9 +1350,9 @@ gvif.glm <- function(model,verbose=TRUE,...){
   for(i in 1:nn){
     rr2 <- as.matrix(cors[postos==i,postos==i])
     rr3 <- as.matrix(cors[postos!=i,postos!=i])
-    results[i,1] <- det(rr2)*det(rr3)/detx
+    results[i,1] <- round(det(rr2)*det(rr3)/detx,digits=4)
     results[i,2] <- ncol(rr2)
-    results[i,3] <- results[i,1]^(1/(2*ncol(rr2)))
+    results[i,3] <- round(results[i,1]^(1/(2*ncol(rr2))),digits=4)
   }
   rownames(results) <- vars
   colnames(results) <- c("GVIF", "df", "GVIF^(1/(2*df))")
@@ -1225,29 +1364,31 @@ gvif.glm <- function(model,verbose=TRUE,...){
 
 #' @title Confidence Intervals for Generalized Linear Models
 #' @description Computes confidence intervals based on Wald, likelihood-ratio, Rao's score or Terrell's gradient tests for a generalized linear model.
-#' @param model an object of the class glm which is obtained from the fit of a generalized linear model.
+#' @param model an object of the class \emph{glm}.
 #' @param test an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lr") tests. By default, \code{test} is set to be "wald".
-#' @param digits an (optional) integer value indicating the number of decimal places to be used. By default, \code{digits} is set to be 4.
+#' @param digits an (optional) integer value indicating the number of decimal places to be used. By default, \code{digits} is set to be 5.
 #' @param level an (optional) value indicating the required confidence level. By default, \code{level} is set to be 0.95.
 #' @param verbose an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
 #' @details The approximate 100(\code{level})\% confidence interval for \eqn{\beta} based on the \code{test} test is the set of values of \eqn{\beta_0} for which the hypothesis \eqn{H_0}: \eqn{\beta=\beta_0} versus \eqn{H_1}: \eqn{\beta!=\beta_0} is not rejected at the approximate significance level of 100(1-\code{level})\%. The Wald, Rao's score and Terrell's gradient tests are performed using the expected Fisher information matrix.
 #' @return A matrix with so many rows as parameters in the linear predictor and two columns: "Lower limit" and "Upper limit".
-#' @references Buse A. (1982) The Likelihood Ratio, Wald, and Lagrange Multiplier Tests: An Expository Note. \emph{The American Statistician} 36, 153-157.
-#' @references Terrell G.R. (2002) The gradient statistic. \emph{Computing Science and Statistics} 34, 206 – 215.
+#' @references Buse, A. (1982) The Likelihood Ratio, Wald, and Lagrange Multiplier Tests: An Expository Note. \emph{The American Statistician} 36, 153-157.
+#' @references Terrell, G.R. (2002) The gradient statistic. \emph{Computing Science and Statistics} 34, 206 – 215.
 #' @export confint2
 #' @examples
-#' ## Example 1
+#' ###### Example 1: Fuel consumption of automobiles
 #' Auto <- ISLR::Auto
 #' fit1 <- glm(mpg ~ weight*horsepower, family=inverse.gaussian("log"), data=Auto)
-#' confint2(fit1)
+#' confint2(fit1, test="lr")
+#' confint2(fit1, test="score")
 #'
-#' ## Example 2
+#' ###### Example 2: Patients with burn injuries
 #' burn1000 <- aplore3::burn1000
-#' mod <- death ~ age + tbsa + inh_inj + age*inh_inj + tbsa*inh_inj
-#' fit2 <- glm(mod, family=binomial("logit"), data=burn1000)
-#' confint2(fit2)
+#' burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
+#' fit2 <- glm(death ~ age*inh_inj + tbsa*inh_inj, family=binomial("logit"), data=burn1000)
+#' confint2(fit2, test="lr")
+#' confint2(fit2, test="gradient")
 #'
-confint2 <- function(model, level=0.95, test=c("wald","lr","score","gradient"), digits=4, verbose=TRUE){
+confint2 <- function(model, level=0.95, test=c("wald","lr","score","gradient"), digits=5, verbose=TRUE){
   test <- match.arg(test)
   if(class(model)[1]!="glm")
     stop("Only glm-type objects are supported!!",call.=FALSE)
@@ -1313,22 +1454,22 @@ confint2 <- function(model, level=0.95, test=c("wald","lr","score","gradient"), 
 
 #' @title Residuals for Linear and Generalized Linear Models
 #' @description Computes residuals for a fitted linear or generalized linear model.
-#' @param object a object of the class lm or glm obtained from the fit of a linear or a generalized linear model.
+#' @param object a object of the class \emph{lm} or \emph{glm}.
 #' @param type an (optional) character string giving the type of residuals which should be returned. The available options for LMs are: (1) externally studentized ("external"); (2) internally studentized ("internal") (default). The available options for GLMs are: (1) "pearson"; (2) "deviance";  (3) "quantile" (default).
 #' @param standardized an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. By default, \code{standardized} is set to be FALSE.
-#' @param plot.it an (optional) logical switch indicating if a plot of the residuals is required. By default, \code{plot.it} is set to be TRUE.
+#' @param plot.it an (optional) logical switch indicating if a plot of the residuals is required. By default, \code{plot.it} is set to be FALSE.
 #' @param identify an (optional) integer value indicating the number of individuals to identify on the plot of residuals. This is only appropriate when \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods
 #' @return A vector with the observed residuals type \code{type}.
 #' @examples
-#' # Example 1
-#' fit1 <- lm(Species ~ Biomass + pH + Biomass*pH, data=richness)
-#' residuals2(fit1, type="external", col="red", pch=20, col.lab="blue",
+#' ###### Example 1: Species richness in plots
+#' fit1 <- lm(Species ~ Biomass + pH, data=richness)
+#' residuals2(fit1, type="external", col="red", pch=20, col.lab="blue", plot.it=TRUE,
 #'            col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
-#' # Example 2
-#' fit2 <- glm(infections ~ frequency + location, family=poisson, data=swimmers)
-#' residuals2(fit2, type="quantile", col="red", pch=20,col.lab="blue",
+#' ###### Example 2: Lesions of Aucuba mosaic virus
+#' fit2 <- glm(lesions ~ time, family=poisson, data=aucuba)
+#' residuals2(fit2, type="quantile", col="red", pch=20, col.lab="blue", plot.it=TRUE,
 #'            col.axis="blue",col.main="black",family="mono",cex=0.8)
 #' @export residuals2
 residuals2 <- function(object,type,standardized=FALSE,plot.it=TRUE,identify,...){
@@ -1397,7 +1538,7 @@ residuals2 <- function(object,type,standardized=FALSE,plot.it=TRUE,identify,...)
 
 #' @title Variable Selection in Generalized Linear Models
 #' @description Performs variable selection in generalized linear models using hybrid versions of forward stepwise and backward stepwise.
-#' @param model an object of the class glm which is obtained from the fit of a generalized linear model.
+#' @param model an object of the class \emph{glm}.
 #' @param direction an (optional) character string indicating the type of procedure which should be used. The available options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). By default, \code{direction} is set to be "forward".
 #' @param levels an (optional) two-dimensional vector of values in the interval \eqn{(0,1)} indicating the levels at which the variables should in and out from the model. This is only appropiate if \code{criterion}="p-value". By default, \code{levels} is set to be \code{c(0.05,0.05)}.
 #' @param test an (optional) character string indicating the statistical test which should be used to compare nested models. The available options are: Wald ("wald"), Rao's score ("score"), likelihood-ratio ("lr") and gradient ("gradient") tests. By default, \code{test} is set to be "wald".
@@ -1405,16 +1546,31 @@ residuals2 <- function(object,type,standardized=FALSE,plot.it=TRUE,identify,...)
 #' @param ...	further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC/QICu, which by default is set to be 2.
 #' @param trace an (optional) logical switch indicating if should the stepwise reports be printed. By default, \code{trace} is set to be TRUE.
 #' @param scope an (optional) list, containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. By default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.
-#' @return A list which contains the following objects:
-#' \itemize{
-#' \item{\code{initial}:}{ a character string indicating the linear predictor of the "initial model".}
-#' \item{\code{direction}:}{ a character string indicating the type of procedure which was used.}
-#' \item{\code{criterion}:}{ a character string indicating the criterion used to compare the candidate models.}
-#' \item{\code{final}:}{ a character string indicating the linear predictor of the "final model".}
+#' @details The "hybrid forward stepwise"  algorithm starts with the simplest
+#' model (which may be specified at the argument \code{scope}, and by default,
+#' is a model whose parameters in the linear predictor, except the intercept,
+#' if any, are set to be 0), and then the candidate models are builded by
+#' hierarchically adding effects in the linear predictor, whose "relevance"
+#' and/or "importance" in the model fit is assessed by comparing nested models
+#' (that is, by comparing the models with and without the added effect) using a
+#' criterion previously specified. If an effect is added to the model then this strategy may
+#' also remove any effect which, according to the criterion previously specified, no
+#' longer provide an improvement in the model fit. That process remain until no more effects may be included or excluded.
+#'
+#' The "hybrid backward stepwise" algorithm works similarly.
+#' @return a list list with components including
+#' \tabular{ll}{
+#' \code{initial} \tab  a character string indicating the linear predictor of the "initial model",\cr
+#' \tab \cr
+#' \code{direction} \tab  a character string indicating the type of procedure which was used,\cr
+#' \tab \cr
+#' \code{criterion} \tab a character string indicating the criterion used to compare the candidate models,\cr
+#' \tab \cr
+#' \code{final} \tab a character string indicating the linear predictor of the "final model",\cr
 #' }
 #' @seealso \link{stepCriterion.lm}, \link{stepCriterion.overglm}, \link{stepCriterion.glmgee}
 #' @examples
-#' ## Example 1
+#' ###### Example 1: Fuel consumption of automobiles
 #' Auto <- ISLR::Auto
 #' Auto2 <- within(Auto, origin <- factor(origin))
 #' mod <- mpg ~ cylinders + displacement + acceleration + origin + horsepower*weight
@@ -1422,7 +1578,7 @@ residuals2 <- function(object,type,standardized=FALSE,plot.it=TRUE,identify,...)
 #' stepCriterion(fit1, direction="forward", criterion="p-value", test="lr")
 #' stepCriterion(fit1, direction="backward", criterion="bic")
 #'
-#' ## Example 2
+#' ###### Example 2: Patients with burn injuries
 #' burn1000 <- aplore3::burn1000
 #' burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
 #' upper <- ~ age + gender + race + tbsa + inh_inj + flame + age*inh_inj + tbsa*inh_inj
@@ -1431,14 +1587,14 @@ residuals2 <- function(object,type,standardized=FALSE,plot.it=TRUE,identify,...)
 #' stepCriterion(fit2, direction="backward", criterion="bic", scope=list(lower=lower,upper=upper))
 #' stepCriterion(fit2, direction="forward", criterion="p-value", test="score")
 #'
-#' ## Example 3
+#' ###### Example 3: Skin cancer in women
 #' upper <- cases ~ city + age + city*age
 #' fit3 <- glm(upper, family=poisson("log"), offset=log(population), data=skincancer)
 #' stepCriterion(fit3, direction="backward", criterion="aic", scope=list(lower=~ 1,upper=upper))
 #' stepCriterion(fit3, direction="forward", criterion="p-value", test="lr")
 #' @method stepCriterion glm
 #' @export
-#' @references James G., Witten D., Hastie T. and Tibshirani R. (2013, page 210) An Introduction to Statistical Learning with Applications in R, Springer, New York.
+#' @references James, G. and Witten, D. and Hastie, T. and Tibshirani, R. (2013, page 210) An Introduction to Statistical Learning with Applications in R, Springer, New York.
 
 stepCriterion.glm <- function(model, criterion=c("bic","aic","adjr2","p-value","qicu"), test=c("wald","lr","score","gradient"), direction=c("forward","backward"), levels=c(0.05,0.05), trace=TRUE, scope, ...){
   xxx <- list(...)
@@ -1855,5 +2011,107 @@ stepCriterion.glm <- function(model, criterion=c("bic","aic","adjr2","p-value","
     cat("\n")
   }
   out_$final <- paste("~",as.character(oldformula)[length(oldformula)],sep=" ")
+  return(invisible(out_))
+}
+#' @title Local Influence for Generalized Linear Models
+#' @description Computes some measures and, optionally, display	graphs of them to perform
+#' influence analysis based on the approaches described in Cook (1986).
+#' @param object an object of class \emph{glm}.
+#' @param type an (optional) character string indicating the type of approach to study the
+#' local influence. The options are: the absolute value of the elements of the eigenvector which corresponds to the maximum absolute eigenvalue ("local"); and the absolute value of the elements of the main diagonal ("total"). By default, \code{type} is set to be "total".
+#' @param perturbation an (optional) character string indicating the perturbation scheme
+#' to apply. The options are: case weight perturbation of observations ("case-weight"); perturbation of covariates ("covariate"); and perturbation of response ("response"). By default, \code{perturbation} is set to be "case-weight".
+#' @param plot.it an (optional) logical indicating if the plot of the measures of local
+#' influence is required or just the data matrix in which that plot is based. By default,
+#' \code{plot.it} is set to be FALSE.
+#' @param covariate an character string which (partially) match with the names of one of
+#' the parameters in the linear predictor. This is only appropriate if \code{perturbation="covariate"}.
+#' @param coefs	an (optional) character string which (partially) match with the names of
+#' some of the parameters in the linear predictor.
+#' @param identify an (optional) integer indicating the number of observations to identify
+#' on the plot of the measures of local influence. This is only appropriate if
+#' \code{plot.it=TRUE}.
+#' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE}
+#' then \code{...} may be used to include graphical parameters to customize the plot. For example, \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
+#' @return A matrix as many rows as observations in the sample and one column with the values of the measures of local influence.
+#' @method localInfluence glm
+#' @export
+#' @references Cook, D. (1986) Assessment of Local Influence. \emph{Journal of the Royal Statistical Society: Series B (Methodological)} 48, 133-155.
+#' @references Thomas, W. and Cook, D. (1989) Assessing Influence on Regression Coefficients in Generalized Linear Models. \emph{Biometrika} 76, 741-749.
+localInfluence.glm <- function(object,type=c("total","local"),perturbation=c("case-weight","response","covariate"),covariate,coefs,plot.it=FALSE,identify,...){
+  type <- match.arg(type)
+  perturbation <- match.arg(perturbation)
+  if(perturbation=="response" & object$family$family %in% c("binomial","poisson")) warning("response perturbation scheme is not appropiate for discrete response models!!",call.=FALSE)
+  beta <- object$coefficients
+  phi <- summary(object)$dispersion
+  X <- model.matrix(object)
+  p <- ncol(X)
+  n <- nrow(X)
+  y <- object$y
+  w <- object$prior.weights
+  if(is.null(object$offset)) eta <- X%*%beta
+  else eta <- X%*%beta + object$offset
+  mu <- object$family$linkinv(eta)
+  vmu <- object$family$variance(mu)
+  subst <- NULL
+  if(!missingArg(coefs)){
+    ids <- grepl(coefs,rownames(object$coefficients),ignore.case=TRUE)
+    if(sum(ids) > 0) subst <- rownames(object$coefficients)[ids]
+  }
+  if(perturbation=="covariate"){
+    if(missingArg(covariate)) stop("Under this perturbation scheme a covariate should be specified!!",call.=FALSE)
+    covar <- grep(covariate,names(coef(object)),ignore.case=TRUE)[1]
+    if(is.na(covar)) stop(paste("The covariate '",covariate,"' was not found!!",sep=""),call.=FALSE)
+    Xr <- matrix(0,n,p);Xr[,covar] <- rep(1,n)
+    br <- coef(object)[covar]
+  }
+  kp1 <- matrix(object$family$mu.eta(eta),n,1)
+  kp2 <- grad(object$family$mu.eta,eta)
+  vp <- grad(object$family$variance,mu)
+  vmu <- object$family$variance(mu)
+  Xw <- X*matrix(w*(vmu*((y - mu)*kp2 - kp1^2) - (y - mu)*kp1^2*vp)/vmu^2,n,p)
+  Qpp <- -t(X)%*%Xw
+  if(perturbation=="case-weight") Delta <- matrix(w*(y - mu)*kp1/vmu,n,p)*X
+  if(perturbation=="response") Delta <- matrix(kp1/sqrt(vmu/w),n,p)*X
+  if(perturbation=="covariate") Delta <- Xw*br + matrix(w*(y - mu)*kp1/vmu,n,p)*Xr
+
+  Qpp2 <- try(chol(Qpp),silent=TRUE)
+  if(is.matrix(Qpp2)) Qpp2 <- chol2inv(Qpp2) else Qpp2 <- solve(Qpp)
+  if(!is.null(subst)) Qpp2[-ids,-ids] <- Qpp2[-ids,-ids] - solve(Qpp[-ids,-ids])
+  li <- tcrossprod(Delta,t(Qpp2))
+  if(type=="local"){
+    tol <- 1
+    bnew <- matrix(rnorm(nrow(li)),nrow(li),1)
+    while(tol > 0.000001){
+      bold <- bnew
+      bnew <- tcrossprod(li,t(crossprod(Delta,bold)))
+      bnew <- bnew/sqrt(sum(bnew^2))
+      tol <- max(abs((bnew - bold)/bold))
+    }
+    out_ <- abs(bnew/sqrt(sum(bnew^2)))
+  }else out_ <- apply(li*Delta,1,sum)
+  out_ <- matrix(out_,nrow=length(out_))
+  rownames(out_) <- 1:n
+  colnames(out_) <- type
+  if(plot.it){
+    nano <- list(...)
+    nano$x <- 1:length(out_)
+    nano$y <- out_
+    if(is.null(nano$xlab)) nano$xlab <- "Observation Index"
+    if(is.null(nano$type)) nano$type <- "h"
+    if(is.null(nano$ylab)) nano$ylab <- ifelse(type=="local",expression(d[max]),expression(diag[i]))
+    if(is.null(nano$main) & perturbation=="covariate") nano$main <- names(coef(object))[covar]
+    if(is.null(nano$labels)) labels <- 1:n
+    else{
+      labels <- nano$labels
+      nano$labels <- NULL
+    }
+    do.call("plot",nano)
+    if(any(out_>0)) abline(h=3*mean(out_[out_>0]),lty=3)
+    if(any(out_<0)) abline(h=3*mean(out_[out_<0]),lty=3)
+    if(!missingArg(identify)) identify(nano$x,nano$y,n=max(1,floor(abs(identify))),labels=labels)
+  }
+  if(!is.null(subst))
+    message("The coefficients included in the measures of local influence are: ",paste(subst,sep=""),"\n")
   return(invisible(out_))
 }

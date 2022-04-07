@@ -8,18 +8,18 @@ confint2(
   model,
   level = 0.95,
   test = c("wald", "lr", "score", "gradient"),
-  digits = 4,
+  digits = 5,
   verbose = TRUE
 )
 }
 \arguments{
-\item{model}{an object of the class glm which is obtained from the fit of a generalized linear model.}
+\item{model}{an object of the class \emph{glm}.}
 
 \item{level}{an (optional) value indicating the required confidence level. By default, \code{level} is set to be 0.95.}
 
 \item{test}{an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lr") tests. By default, \code{test} is set to be "wald".}
 
-\item{digits}{an (optional) integer value indicating the number of decimal places to be used. By default, \code{digits} is set to be 4.}
+\item{digits}{an (optional) integer value indicating the number of decimal places to be used. By default, \code{digits} is set to be 5.}
 
 \item{verbose}{an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
 }
@@ -33,20 +33,22 @@ Computes confidence intervals based on Wald, likelihood-ratio, Rao's score or Te
 The approximate 100(\code{level})\% confidence interval for \eqn{\beta} based on the \code{test} test is the set of values of \eqn{\beta_0} for which the hypothesis \eqn{H_0}: \eqn{\beta=\beta_0} versus \eqn{H_1}: \eqn{\beta!=\beta_0} is not rejected at the approximate significance level of 100(1-\code{level})\%. The Wald, Rao's score and Terrell's gradient tests are performed using the expected Fisher information matrix.
 }
 \examples{
-## Example 1
+###### Example 1: Fuel consumption of automobiles
 Auto <- ISLR::Auto
 fit1 <- glm(mpg ~ weight*horsepower, family=inverse.gaussian("log"), data=Auto)
-confint2(fit1)
+confint2(fit1, test="lr")
+confint2(fit1, test="score")
 
-## Example 2
+###### Example 2: Patients with burn injuries
 burn1000 <- aplore3::burn1000
-mod <- death ~ age + tbsa + inh_inj + age*inh_inj + tbsa*inh_inj
-fit2 <- glm(mod, family=binomial("logit"), data=burn1000)
-confint2(fit2)
+burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
+fit2 <- glm(death ~ age*inh_inj + tbsa*inh_inj, family=binomial("logit"), data=burn1000)
+confint2(fit2, test="lr")
+confint2(fit2, test="gradient")
 
 }
 \references{
-Buse A. (1982) The Likelihood Ratio, Wald, and Lagrange Multiplier Tests: An Expository Note. \emph{The American Statistician} 36, 153-157.
+Buse, A. (1982) The Likelihood Ratio, Wald, and Lagrange Multiplier Tests: An Expository Note. \emph{The American Statistician} 36, 153-157.
 
-Terrell G.R. (2002) The gradient statistic. \emph{Computing Science and Statistics} 34, 206 – 215.
+Terrell, G.R. (2002) The gradient statistic. \emph{Computing Science and Statistics} 34, 206 – 215.
 }

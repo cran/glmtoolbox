@@ -14,7 +14,7 @@
 )
 }
 \arguments{
-\item{object}{an object of the class glmgee which is obtained from the fit of a generalized estimating equation.}
+\item{object}{an object of the class \emph{glmgee}.}
 
 \item{...}{further arguments passed to or from other methods.}
 
@@ -33,8 +33,22 @@ A matrix with so many rows as \code{newdata} and one column with the predictions
 Produces predictions and optionally estimates standard errors of those predictions from a fitted generalized estimating equation.
 }
 \examples{
-mod <- size ~ poly(days,4) + treat
-fit <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Stationary-M-dependent(2)")
-newdata <- data.frame(days=c(556,556),treat=as.factor(c("normal","ozone_enriched")))
-predict(fit,newdata=newdata,type="response",se.fit=TRUE)
+###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+mod1 <- size ~ poly(days,4) + treat
+fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
+newdata1 <- data.frame(days=c(556,556),treat=as.factor(c("normal","ozone-enriched")))
+predict(fit1,newdata=newdata1,type="response",se.fit=TRUE)
+
+###### Example 2: Treatment for severe postnatal depression
+mod2 <- depressd ~ visit + group
+fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+newdata2 <- data.frame(visit=c(6,6),group=as.factor(c("placebo","estrogen")))
+predict(fit2,newdata=newdata2,type="response",se.fit=TRUE)
+
+###### Example 3: Treatment for severe postnatal depression (2)
+mod3 <- dep ~ visit*group
+fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+newdata3 <- data.frame(visit=c(6,6),group=as.factor(c("placebo","estrogen")))
+predict(fit3,newdata=newdata3,type="response",se.fit=TRUE)
+
 }

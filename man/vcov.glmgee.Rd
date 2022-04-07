@@ -11,7 +11,7 @@
 )
 }
 \arguments{
-\item{object}{An object of the class glmgee which is obtained from the fit of a generalized estimating equation.}
+\item{object}{An object of the class \emph{glmgee}.}
 
 \item{...}{further arguments passed to or from other methods.}
 
@@ -24,25 +24,25 @@ A \code{matrix} with the type-\code{type} estimate of the variance-covariance ma
 Computes the type-\code{type} estimate of the variance-covariance matrix from an object of the class glmgee.
 }
 \examples{
-## Example 1
+###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 mod <- size ~ poly(days,4) + treat
 fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
 vcov(fit1)
 vcov(fit1,type="bias-corrected")
 
-## Example 2
-mod <- dep ~ visit + group
-fit2 <- glmgee(mod, id=subj, family=gaussian, corstr="AR-1", data=depression)
-vcov(fit2)
-vcov(fit2,type="bias-corrected")
-
-## Example 3
+###### Example 2: Treatment for severe postnatal depression
 mod <- depressd ~ visit + group
-fit3 <- glmgee(mod, id=subj, family=binomial, corstr="Stationary-M-dependent(3)", data=depression)
+fit3 <- glmgee(mod, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
 vcov(fit3)
 vcov(fit3,type="bias-corrected")
 
+###### Example 3: Treatment for severe postnatal depression (2)
+mod <- dep ~ visit*group
+fit2 <- glmgee(mod, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+vcov(fit2)
+vcov(fit2,type="bias-corrected")
+
 }
 \references{
-Mancl, L.A. and DeRouen T.A. (2001) A Covariance Estimator for GEE with Improved Small-Sample Properties. \emph{Biometrics} 57, 126-134.
+Mancl, L.A. and DeRouen, T.A. (2001) A Covariance Estimator for GEE with Improved Small-Sample Properties. \emph{Biometrics} 57, 126-134.
 }

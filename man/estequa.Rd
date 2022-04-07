@@ -4,10 +4,10 @@
 \alias{estequa}
 \title{Function to extract estimating equations}
 \usage{
-estequa(model, ...)
+estequa(object, ...)
 }
 \arguments{
-\item{model}{a fitted model object.}
+\item{object}{a fitted model object.}
 
 \item{...}{further arguments passed to or from other methods.}
 }

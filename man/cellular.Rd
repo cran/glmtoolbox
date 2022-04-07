@@ -26,14 +26,14 @@ agents stimulate cell differentiation synergistically or independently.
 \examples{
 barplot(100*cells/200 ~ ifn + tnf, beside=TRUE, data=cellular, col=terrain.colors(4),
         xlab="Dose of TNF", ylab="\% of cells with markers of differentiation")
-legend(1, 90, c("0","4","20","100"), fill=terrain.colors(4), bty="n", cex=0.9,
-       title="Dose of IFN")
+legend(-3, 97, c("0","4","20","100"), fill=terrain.colors(4), bty="n", cex=0.9,
+       title="Dose of IFN", x.intersp=0.2, y.intersp=1)
 }
 \references{
-Piegorsch W.W., Weinberg C.R. and Margolin B.H. (1988) Exploring
+Piegorsch, W.W. and Weinberg, C.R. and Margolin, B.H. (1988) Exploring
 simple independent action in multifactor tables of proportions. \emph{Biometrics} 44, 595-603.
 
-Vanegas L.H. and Rondon L.M. (2020) A data transformation to deal with
+Vanegas, L.H. and Rondon, L.M. (2020) A data transformation to deal with
 constant under/over-dispersion in binomial and poisson regression models. \emph{Journal
 of Statistical Computation and Simulation} 90, 1811-1833.
 }

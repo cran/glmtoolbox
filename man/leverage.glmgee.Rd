@@ -13,7 +13,7 @@
 )
 }
 \arguments{
-\item{object}{an object of class glmgee which is obtained from the fit of a generalized estimating equation.}
+\item{object}{an object of class \emph{glmgee}.}
 
 \item{level}{an (optional) character string indicating the level for which the leverage measures are required. The options are: cluster-level ("clusters") and observation-level ("observations"). By default, \code{level} is set to be "clusters".}
 
@@ -31,17 +31,15 @@ Computes and, optionally, displays a graph of the leverage measures at the clust
 }
 \examples{
 
-#Example 1
+###### Example 1: Tests of Auditory Perception in Children with OME
 OME <- MASS::OME
 mod <- cbind(Correct, Trials-Correct) ~ Loud + Age + OME
 fit1 <- glmgee(mod, family = binomial(cloglog), id = ID, corstr = "Exchangeable", data = OME)
 leverage(fit1,level="clusters",plot.it=TRUE)
 
-#Example 2
+###### Example 2: Guidelines for Urinary Incontinence Discussion and Evaluation
 mod <- bothered ~ gender + age + dayacc + severe + toilet
 fit2 <- glmgee(mod, family=binomial(logit), id=practice, corstr="Exchangeable", data=GUIDE)
-summary(fit2)
-par(mfrow=c(1,2))
 leverage(fit2,level="clusters",plot.it=TRUE)
 leverage(fit2,level="observations",plot.it=TRUE)
 
@@ -49,5 +47,5 @@ leverage(fit2,level="observations",plot.it=TRUE)
 \references{
 Preisser, J.S. and Qaqish, B.F. (1996). Deletion diagnostics for generalised estimating equations. \emph{Biometrika}, 83, 551-562.
 
-Hammill, B.G. and Preisser J.S. (2006). A SAS/IML software program for GEE and regression diagnostics. \emph{Computational Statistics & Data Analysis}, 51, 1197-1212.
+Hammill, B.G. and Preisser, J.S. (2006). A SAS/IML software program for GEE and regression diagnostics. \emph{Computational Statistics & Data Analysis}, 51, 1197-1212.
 }

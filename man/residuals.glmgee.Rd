@@ -13,7 +13,7 @@
 )
 }
 \arguments{
-\item{object}{a object of the class glmgee obtained from the fit of a generalized estimating equation.}
+\item{object}{a object of the class \emph{glmgee}.}
 
 \item{...}{further arguments passed to or from other methods}
 
@@ -30,8 +30,32 @@ A vector with the observed residuals type \code{type}.
 Calculates residuals for a fitted generalized estimating equation.
 }
 \examples{
-mod <- size ~ poly(days,4) + treat
-fit <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
-residuals(fit, type="mahalanobis", col="red", pch=20, col.lab="blue",
+
+###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+mod1 <- size ~ poly(days,4) + treat
+fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
+### Plot to assess the adequacy of the chosen variance function
+residuals(fit1, type="deviance", plot.it=TRUE, col="red", pch=20, col.lab="blue",
           col.axis="blue", col.main="black", family="mono", cex=0.8)
+### Plot to identify trees suspicious to be outliers
+residuals(fit1, type="mahalanobis", plot.it=TRUE, col="red", pch=20, col.lab="blue",
+          col.axis="blue", col.main="black", family="mono", cex=0.8)
+
+###### Example 2: Treatment for severe postnatal depression
+mod2 <- depressd ~ visit + group
+fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+### Plot to identify women suspicious to be outliers
+residuals(fit2, type="mahalanobis", plot.it=TRUE, col="red", pch=20, col.lab="blue",
+          col.axis="blue", col.main="black", family="mono", cex=0.8)
+
+###### Example 3: Treatment for severe postnatal depression (2)
+mod3 <- dep ~ visit*group
+fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+### Plot to assess the adequacy of the chosen variance function
+residuals(fit3, type="pearson", plot.it=TRUE, col="red", pch=20, col.lab="blue",
+          col.axis="blue", col.main="black", family="mono", cex=0.8)
+### Plot to identify women suspicious to be outliers
+residuals(fit3, type="mahalanobis", plot.it=TRUE, col="red", pch=20, col.lab="blue",
+          col.axis="blue", col.main="black", family="mono", cex=0.8)
+
 }

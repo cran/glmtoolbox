@@ -2,7 +2,7 @@
 % Please edit documentation in R/glms.R
 \name{gvif}
 \alias{gvif}
-\title{Generalized Variance Inflaction Factor}
+\title{Generalized Variance Inflation Factor}
 \usage{
 gvif(model, ...)
 }
@@ -15,5 +15,5 @@ gvif(model, ...)
 An object with the values of the GVIF for all effects in the model.
 }
 \description{
-Computes the generalized variance inflaction factor (GVIF) for a fitted model object.
+Computes the generalized variance inflation factor (GVIF) for a fitted model object.
 }

@@ -34,13 +34,13 @@ boxplot(100*fetuses/litter ~ pht, data=subset(ossification, tcpo=="0 mg/kg"),
 boxplot(100*fetuses/litter ~ pht, data=subset(ossification, tcpo=="100 mg/kg"),
         add=TRUE, at=c(1:2)+0.2, col="blue", boxwex=0.25, outline=FALSE, xaxt="n")
 axis(1, at=1:2, labels=levels(ossification$pht))
-legend(0.25, 20, legend=c("0 mg/kg","100 mg/kg"), fill=c("yellow","blue"),
-       bty="n", cex=0.9, title="Dose of TCPO")
+legend(0.1, 20, legend=c("0 mg/kg","100 mg/kg"), fill=c("yellow","blue"),
+       bty="n", cex=0.7, x.intersp=0.2, y.intersp=1)
 }
 \references{
-Morel J.G. and Neerchal N.K. (1997) Clustered binary logistic regression in teratology data
+Morel, J.G. and Neerchal, N.K. (1997) Clustered binary logistic regression in teratology data
 using a finite mixture distribution. \emph{Statistics in Medicine} 16, 2843-2853.
 
-Morel J.G. and Nagaraj N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc., Cary, North Carolina, USA.
+Morel, J.G. and Nagaraj, N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc., Cary, North Carolina, USA.
 }
 \keyword{datasets}

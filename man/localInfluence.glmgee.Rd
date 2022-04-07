@@ -7,8 +7,7 @@
 \method{localInfluence}{glmgee}(
   object,
   type = c("total", "local"),
-  perturbation = c("cw-clusters", "cw-observations", "response", "covariate"),
-  covariate,
+  perturbation = c("cw-clusters", "cw-observations", "response"),
   coefs,
   plot.it = FALSE,
   identify,
@@ -16,13 +15,11 @@
 )
 }
 \arguments{
-\item{object}{an object of class glmgee obtained from the fit of a generalized estimating equation.}
+\item{object}{an object of class \emph{glmgee}.}
 
 \item{type}{an (optional) character string indicating the type of approach to study the local influence. The options are: the absolute value of the elements of the eigenvector which corresponds to the maximum absolute eigenvalue ("local"); and the absolute value of the elements of the main diagonal ("total"). By default, \code{type} is set to be "total".}
 
-\item{perturbation}{an (optional) character string indicating the perturbation scheme to apply. The options are: case weight perturbation of clusters ("cw-clusters"); Case weight perturbation of observations ("cw-observations"); perturbation of covariates ("covariate"); and perturbation of response ("response"). By default, \code{perturbation} is set to be "cw-clusters".}
-
-\item{covariate}{an character string which (partially) match with the names of one of the parameters in the linear predictor. This is only appropriate if \code{perturbation="covariate"}.}
+\item{perturbation}{an (optional) character string indicating the perturbation scheme to apply. The options are: case weight perturbation of clusters ("cw-clusters"); Case weight perturbation of observations ("cw-observations"); and perturbation of response ("response"). By default, \code{perturbation} is set to be "cw-clusters".}
 
 \item{coefs}{an (optional) character string which (partially) match with the names of some of the parameters in the linear predictor.}
 
@@ -39,14 +36,24 @@ A matrix as many rows as clusters/observations in the sample and one column with
 Computes some measures and, optionally, display	graphs of them to perform influence analysis based on the approaches described in Cook (1986) and Jung (2008).
 }
 \examples{
-mod <- size ~ poly(days,4) + treat
-fit <- glmgee(mod, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces)
-summary(fit)
-localInfluence(fit,type="total",perturbation="cw-clusters",coefs="treat",plot.it=TRUE)
+###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+mod1 <- size ~ poly(days,4) + treat
+fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces)
+localInfluence(fit1,type="total",perturbation="cw-clusters",coefs="treat",plot.it=TRUE)
+
+###### Example 2: Treatment for severe postnatal depression
+mod2 <- depressd ~ visit + group
+fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+localInfluence(fit2,type="total",perturbation="cw-clusters",coefs="group",plot.it=TRUE)
+
+###### Example 3: Treatment for severe postnatal depression (2)
+mod3 <- dep ~ visit*group
+fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+localInfluence(fit3,type="total",perturbation="cw-clusters",coefs="visit:group",plot.it=TRUE)
 
 }
 \references{
-Cook D. (1986) Assessment of Local Influence. \emph{Journal of the Royal Statistical Society: Series B (Methodological)} 48, 133-155.
+Cook, D. (1986) Assessment of Local Influence. \emph{Journal of the Royal Statistical Society: Series B (Methodological)} 48, 133-155.
 
-Jung K.-M. (2008) Local Influence in Generalized Estimating Equations. \emph{Scandinavian Journal of Statistics} 35, 286-294.
+Jung, K.-M. (2008) Local Influence in Generalized Estimating Equations. \emph{Scandinavian Journal of Statistics} 35, 286-294.
 }

@@ -4,10 +4,10 @@
 \alias{estequa.glmgee}
 \title{Estimating Equations in Generalized Estimating Equations}
 \usage{
-\method{estequa}{glmgee}(model, ...)
+\method{estequa}{glmgee}(object, ...)
 }
 \arguments{
-\item{model}{an object of class glmgee which is obtained from the fit of a generalized estimating equation.}
+\item{object}{an object of class \emph{glmgee}.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
@@ -18,7 +18,40 @@ A vector with the value of the estimating equations evaluated at the parameter e
 Extracts estimating equations evaluated at the parameter estimates and the observed data for a generalized estimating equation fitted to the data.
 }
 \examples{
-mod <- size ~ poly(days,4) + treat
-fit <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
-estequa(fit)
+###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+mod1 <- size ~ poly(days,4) + treat
+fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces)
+estequa(fit1)
+
+###### Example 2: Treatment for severe postnatal depression
+mod2 <- depressd ~ visit + group
+fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+estequa(fit2)
+
+###### Example 3: Treatment for severe postnatal depression (2)
+mod3 <- dep ~ visit*group
+fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+estequa(fit3)
+
+###### Example 4: Dental Clinical Trial
+mod4 <- score/3.6 ~ rinse*time
+fit4 <- glmgee(mod4, family=binomial(log), id=subject, corstr="Exchangeable", data=rinse)
+estequa(fit4)
+
+###### Example 5: Shoulder Pain after Laparoscopic Cholecystectomy
+mod5 <- pain2 ~ treatment + age + time
+corstr <- "Stationary-M-dependent(2)"
+fit5 <- glmgee(mod5, family=binomial(logit), id=id, corstr=corstr, data=cholecystectomy)
+estequa(fit5)
+
+###### Example 6: Guidelines for Urinary Incontinence Discussion and Evaluation
+mod6 <- bothered ~ gender + age + dayacc + severe + toilet
+fit6 <- glmgee(mod6, family=binomial(logit), id=practice, corstr="Exchangeable", data=GUIDE)
+estequa(fit6)
+
+###### Example 7: Tests of Auditory Perception in Children with OME
+OME <- MASS::OME
+mod7 <- cbind(Correct, Trials-Correct) ~ Loud + Age + OME
+fit7 <- glmgee(mod7, family = binomial(cloglog), id = ID, corstr = "Exchangeable", data = OME)
+estequa(fit7)
 }

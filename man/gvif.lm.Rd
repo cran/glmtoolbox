@@ -2,41 +2,50 @@
 % Please edit documentation in R/glms.R
 \name{gvif.lm}
 \alias{gvif.lm}
-\title{Generalized Variance Inflaction Factor}
+\title{Generalized Variance Inflation Factor}
 \usage{
 \method{gvif}{lm}(model, verbose = TRUE, ...)
 }
 \arguments{
-\item{model}{an object of the class lm which is obtained from the fit of a normal linear model.}
+\item{model}{an object of the class \emph{lm}.}
 
 \item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
 \value{
-A matrix with so many rows as effects in the model and three columns: \emph{(1)} the values of GVIF; \emph{(2)} the number of degrees of freedom; and \emph{(3)} the values of GVIF^{1/(2*df)}.
-
-If the number of degrees of freedom is 1 then the GVIF reduces to the Variance Inflation Factor (VIF).
+A matrix with so many rows as effects in the model and the following columns:
+\tabular{ll}{
+\code{GVIF}            \tab the values of GVIF,\cr
+\tab \cr
+\code{df}              \tab the number of degrees of freedom,\cr
+\tab \cr
+\code{GVIF^(1/(2*df))} \tab the values of GVIF\eqn{^{1/2 df}},\cr
+}
 }
 \description{
-Computes the generalized variance inflaction factor (GVIF) for a normal linear model.
+Computes the generalized variance inflation factor (GVIF) for a weighted or unweighted normal linear model.
+}
+\details{
+If the number of degrees of freedom is 1 then the GVIF reduces to the Variance
+Inflation Factor (VIF).
 }
 \examples{
-## Example 1
-fit1 <- lm(mpg ~ log(hp) + log(wt), data=mtcars)
+###### Example 1: New York air quality measurements
+fit1 <- lm(log(Ozone) ~ Solar.R + Temp + Wind, data=airquality)
 gvif(fit1)
 
-## Example 2
-fit2 <- lm(Species ~ Biomass + pH, data=richness)
+###### Example 2: Fuel consumption of automobiles
+fit2 <- lm(mpg ~ log(hp) + log(wt) + qsec, data=mtcars)
 gvif(fit2)
 
-## Example 3
-whiteside <- MASS::whiteside
-fit3 <- lm(Gas ~ Temp + Insul + Temp*Insul, data=whiteside)
+###### Example 3: Credit card balance
+Credit <- ISLR::Credit
+fit3 <- lm(Balance ~ Cards + Age + Rating + Income + Student + Limit, data=Credit)
 gvif(fit3)
 }
 \references{
-Fox J. and Monette G. (1992) Generalized collinearity diagnostics, \emph{JASA} 87, 178–183.
+Fox, J. and Monette, G. (1992) Generalized collinearity diagnostics, \emph{JASA} 87, 178–183.
 }
 \seealso{
 \link{gvif.glm}

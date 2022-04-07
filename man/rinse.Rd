@@ -13,36 +13,35 @@ A data frame with 315 rows and 7 variables:
   \item{rinse}{a factor indicating the type of rinse used by the volunteer: "Placebo", "A" and "B".}
   \item{smoke}{a factor indicating if the volunteer smoke: "Yes" and "No".}
   \item{time}{a numeric vector indicating the time (in months) since the treatment began.}
-  \item{score}{a numeric vector giving the subject's score of plaque.}
+  \item{score}{a numeric vector giving the subject’s score of plaque.}
 }
 }
 \usage{
 data(rinse)
 }
 \description{
-These data arose from a dental clinical study. In
-this trial, subjects were generally healthy adult male and female
-volunteers, ages 18–55, with pre-existing plaque but without
-advanced periodontal disease. Prior to entry, subjects were
-screened for a minimum of 20 sound, natural teeth and a minimum
-mean plaque index of 2.0. Subjects with gross oral pathology or
-on antibiotic, antibacterial, or anti-inflammatory therapy were
-excluded from the study. One hundred nine volunteers were
-randomized in a double-blinded way to one of two new mouth
-rinses (A and B) or to a control mouth rinse. Plaque was scored
-at baseline, at 3 months, and at 6 months by the Turesky
-modification of the Quigley-Hein index, a continuous measure.
-Four subjects had missing plaque scores. The main objective
-of the analysis is to measure the effectiveness of the three
-mouth rinses in inhibiting the development of dental plaque.
+These data arose from a dental clinical study. In this trial, subjects were generally healthy adult
+male and female volunteers, ages 18–55, with pre-existing plaque but without advanced periodontal
+disease. Prior to entry, subjects were screened for a minimum of 20 sound, natural teeth and a minimum mean plaque index of 2.0. Subjects with gross oral pathology or on antibiotic, antibacterial,
+or anti-inflammatory therapy were excluded from the study. One hundred nine volunteers were randomized in a double-blinded way to one of two new mouth rinses (A and B) or to a control mouth
+rinse. Plaque was scored at baseline, at 3 months, and at 6 months by the Turesky modification of
+the Quigley-Hein index, a continuous measure. Four subjects had missing plaque scores. The main
+objective of the analysis is to measure the effectiveness of the three mouth rinses in inhibiting the
+development of dental plaque.
 }
 \examples{
-mod <- score ~ rinse + age + gender + smoke + time
-fit <- glmgee(mod, family=Gamma(log), id=subject, corstr="AR-1", data=rinse)
-summary(fit)
+boxplot(score ~ time, data=subset(rinse,rinse=="Placebo"), at=c(1:3)-0.2,
+ ylim=c(0,3.3), col="yellow", boxwex=0.15, outline=FALSE, xaxt="n", xlim=c(0.8,3.2))
+boxplot(score ~ time, data=subset(rinse,rinse=="A"), add=TRUE,
+        at=c(1:3), col="gray", boxwex=0.15, outline=FALSE, xaxt="n")
+boxplot(score ~ time, data=subset(rinse,rinse=="B"), add=TRUE,
+        at=c(1:3)+0.2, col="blue", boxwex=0.15, outline=FALSE, xaxt="n")
+axis(1, at=1:3, labels=unique(rinse$time))
+legend(0.7, 1, legend=c("Placebo","A","B"), fill=c("yellow","gray","blue"),
+       bty="n", cex=0.6)
 }
 \references{
-Hadgu A. and Koch G. (1999) Application of generalized estimating equations to a dental randomized clinical trial. \emph{Journal
-of Biopharmaceutical Statistics} 9, 161-178.
+Hadgu, A. and Koch, G. (1999) Application of generalized estimating equations
+to a dental randomized clinical trial. \emph{Journal of Biopharmaceutical Statistics} 9, 161-178.
 }
 \keyword{datasets}

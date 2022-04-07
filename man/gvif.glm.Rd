@@ -2,44 +2,56 @@
 % Please edit documentation in R/glms.R
 \name{gvif.glm}
 \alias{gvif.glm}
-\title{Generalized Variance Inflaction Factor}
+\title{Generalized Variance Inflation Factor}
 \usage{
 \method{gvif}{glm}(model, verbose = TRUE, ...)
 }
 \arguments{
-\item{model}{an object of the class glm which is obtained from the fit of a generalized linear model.}
+\item{model}{an object of the class \emph{glm}.}
 
 \item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
 \value{
-A matrix with so many rows as effects in the model and three columns: \emph{(1)} the values of GVIF; \emph{(2)} the number of degrees of freedom; and \emph{(3)} the values of GVIF^{1/(2*df)}.
-
-If the number of degrees of freedom is 1 then the GVIF reduces to the Variance Inflation Factor (VIF).
+A matrix with so many rows as effects in the model and the following columns:
+\tabular{ll}{
+\code{GVIF} \tab the values of GVIF,\cr
+\tab \cr
+\code{df}\tab the number of degrees of freedom,\cr
+\tab \cr
+\code{GVIF^(1/(2*df))}\tab the values of GVIF\eqn{^{1/2 df}},\cr
+}
 }
 \description{
-Computes the generalized variance inflaction factor (GVIF) for a generalized linear model.
+Computes the generalized variance inflation factor (GVIF) for a generalized linear model.
+}
+\details{
+If the number of degrees of freedom is 1 then the GVIF reduces to the Variance
+Inflation Factor (VIF).
 }
 \examples{
-## Example 1
+###### Example 1: Fuel consumption of automobiles
 Auto <- ISLR::Auto
-fit1 <- glm(mpg ~ weight*horsepower, family=inverse.gaussian("log"), data=Auto)
+Auto2 <- within(Auto, origin <- factor(origin))
+mod <- mpg ~ cylinders + displacement + acceleration + origin + horsepower*weight
+fit1 <- glm(mod, family=inverse.gaussian("log"), data=Auto2)
 gvif(fit1)
 
-## Example 2
+###### Example 2: Patients with burn injuries
 burn1000 <- aplore3::burn1000
-mod <- death ~ age + tbsa + inh_inj + age*inh_inj + tbsa*inh_inj
-fit2 <- glm(mod, family=binomial("logit"), data=burn1000)
+burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
+mod2 <- death ~ gender + race + flame + age*inh_inj + tbsa*inh_inj
+fit2 <- glm(mod2, family=binomial("logit"), data=burn1000)
 gvif(fit2)
 
-## Example 3
+###### Example 3: Hill races in Scotland
 fit3 <- glm(rtime ~ log(distance) + log(cclimb), family=Gamma("log"), data=races)
 gvif(fit3)
 
 }
 \references{
-Fox J. and Monette G. (1992) Generalized collinearity diagnostics, \emph{JASA} 87, 178–183.
+Fox, J. and Monette, G. (1992) Generalized collinearity diagnostics, \emph{JASA} 87, 178–183.
 }
 \seealso{
 \link{gvif.lm}

@@ -13,9 +13,6 @@ A data frame with 35 rows and 4 variables:
   \item{rtime}{a numeric vector giving the record time, in minutes, of the races.}
 }
 }
-\source{
-\url{http://users.stat.ufl.edu/~aa/glm/data/}
-}
 \usage{
 data(races)
 }
@@ -34,12 +31,12 @@ with(races2,{
     plot(log(distance), log(rtime),
          col=apply(as.matrix(cli),1,function(x) switch(x,"low"="red","high"="blue")),
          pch=apply(as.matrix(cli),1,function(x) switch(x,"low"=15,"high"=16)))
-    legend(0.7, 5.4, legend=c("low","high"), title="Cumulative climb",
-           col=c("red","blue"), pch=c(15,16), bty="n")
+    legend(0.7, 5.4, legend=c("low","high"), title="Cumulative climb", col=c("red","blue"),
+           pch=c(15,16), bty="n", x.intersp=0.2, y.intersp=1)
 })
 }
 \references{
-Agresti A. (2015) \emph{Foundations of Linear and Generalized Linear Models}.
+Agresti, A. (2015) \emph{Foundations of Linear and Generalized Linear Models}.
 John Wiley & Sons, New Jersey.
 }
 \keyword{datasets}

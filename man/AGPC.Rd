@@ -7,14 +7,14 @@
 AGPC(..., k = 2, verbose = TRUE)
 }
 \arguments{
-\item{...}{one or several objects of the class glmgee which are obtained from the fit of generalized estimating equations.}
+\item{...}{one or several objects of the class \emph{glmgee}.}
 
 \item{k}{an (optional) non-negative value giving the magnitude of the penalty. By default, \code{k} is set to be 2.}
 
 \item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
 }
 \value{
-A \code{data.frame} with the values of the gaussian pseudo-likelihood, the number of parameters in the linear predictor plus the number of parameters in the correlation matrix, and the value of AGPC for each glmgee object in the input.
+A \code{data.frame} with the values of the gaussian pseudo-likelihood, the number of parameters in the linear predictor plus the number of parameters in the correlation matrix, and the value of AGPC for each \emph{glmgee} object in the input.
 }
 \description{
 Computes the Akaike-type penalized Gaussian pseudo-likelihood criterion (AGPC) for one or more objects of the class glmgee.
@@ -23,38 +23,41 @@ Computes the Akaike-type penalized Gaussian pseudo-likelihood criterion (AGPC) f
 If \code{k} is set to be 0 then the AGPC reduces to the Gaussian pseudo-likelihood criterion (GPC), proposed by Carey and Wang (2011), which corresponds to the logarithm of the multivariate normal density function.
 }
 \examples{
-## Example 1
-mod <- size ~ poly(days,4) + treat
-fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
+###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+mod1 <- size ~ poly(days,4) + treat
+fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces)
 fit2 <- update(fit1, corstr="AR-1")
 fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
-fit4 <- update(fit1, corstr="Independence")
+fit4 <- update(fit1, corstr="Exchangeable")
 AGPC(fit1, fit2, fit3, fit4)
 
-## Example 2
-mod <- dep ~ visit + group
-fit1 <- glmgee(mod, id=subj, family=gaussian, corstr="Exchangeable", data=depression)
-fit2 <- update(fit1, corstr="AR-1")
-fit3 <- update(fit1, corstr="Non-Stationary-M-dependent(2)")
-fit4 <- update(fit1, corstr="Independence")
-AGPC(fit1, fit2, fit3, fit4)
-
-## Example 3
-mod <- depressd ~ visit + group
-fit1 <- glmgee(mod, id=subj, family=binomial, corstr="Exchangeable", data=depression)
+###### Example 2: Treatment for severe postnatal depression
+mod2 <- depressd ~ visit + group
+fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), data=depression)
 fit2 <- update(fit1, corstr="AR-1")
 fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
-fit4 <- update(fit1, corstr="Independence")
+fit4 <- update(fit1, corstr="Exchangeable")
 AGPC(fit1, fit2, fit3, fit4)
+
+###### Example 3: Treatment for severe postnatal depression (2)
+mod3 <- dep ~ visit*group
+fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), data=depression)
+fit2 <- update(fit1, corstr="AR-1")
+fit3 <- update(fit1, corstr="Exchangeable")
+AGPC(fit1, fit2, fit3)
+
 }
 \references{
-Carey V.J. and Wang Y.-G. (2011) Working covariance model selection for generalized estimating equations. \emph{Statistics in Medicine} 30, 3117–3124.
+Carey, V.J. and Wang, Y.-G. (2011) Working covariance model selection for
+generalized estimating equations. \emph{Statistics in Medicine} 30, 3117-3124.
 
-Zhu X. and Zhu Z. (2013) Comparison of criteria to select working correlation matrix in generalized estimating
-equations. \emph{Chinese Journal of Applied Probability and Statistics} 29, 515-530.
+Zhu, X. and Zhu, Z. (2013) Comparison of Criteria to Select Working Correlation
+Matrix in Generalized Estimating Equations. \emph{Chinese Journal of Applied Probability
+and Statistics} 29, 515-530.
 
-Fu L., Hao Y. and Wang Y.-G. (2018) Working correlation structure selection in generalized
-estimating equations. \emph{Computational Statistics} 33, 983-996.
+Fu, L. and Hao, Y. and Wang, Y.-G. (2018) Working correlation structure
+selection in generalized estimating equations. \emph{Computational Statistics} 33,
+983-996.
 }
 \seealso{
 \link{QIC}, \link{CIC}, \link{RJC}, \link{GHYC}, \link{SGPC}

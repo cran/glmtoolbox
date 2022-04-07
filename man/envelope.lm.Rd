@@ -2,7 +2,7 @@
 % Please edit documentation in R/glms.R
 \name{envelope.lm}
 \alias{envelope.lm}
-\title{Normal QQ-plot with simulated envelope of model residuals}
+\title{Normal QQ-plot with simulated envelope of residuals for normal linear models}
 \usage{
 \method{envelope}{lm}(
   object,
@@ -15,7 +15,7 @@
 )
 }
 \arguments{
-\item{object}{an object of the class lm which is obtained from the fit of a normal linear model.}
+\item{object}{an object of the class \emph{lm}.}
 
 \item{rep}{an (optional) positive integer indicating the number of replicates which should be used to build the simulated envelope. By default, \code{rep} is set to be 100.}
 
@@ -30,29 +30,56 @@
 \item{...}{further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example, \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.}
 }
 \value{
-A matrix with \eqn{n} rows and four columns: the first three (Lower limit, Median, and Upper limit) describe the simulated envelope, that is, each row corresponds to the quantiles (1-\code{conf})/2, 0.5 and (1+\code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order statistic of the residuals type \code{type} for \eqn{i=1,2,...,n}; and the last one column (Residuals) contains the observed type \code{type} residuals.
+A matrix with the following four columns:
+\tabular{ll}{
+\code{Lower limit} \tab the quantile (1 - \code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
+                   \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
+\tab \cr
+\code{Median} \tab the quantile 0.5 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
+              \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
+\tab \cr
+\code{Upper limit} \tab the quantile (1 + \code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
+                   \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
+\tab \cr
+\code{Residuals} \tab the observed \code{type}-type residuals,\cr
+}
 }
 \description{
 Produces a normal QQ-plot with simulated envelope of residuals obtained from the fit of a normal linear model.
 }
 \details{
-The simulated envelope is builded by simulating rep independent realizations of the response variable for each individual, which is accomplished taking into account the following: (1) the estimates of the parameters in the linear predictor; and (2) the estimate of the dispersion parameter. The interest model is re-fitted \code{rep} times, as each time the vector of observed responses is replaced by one of the simulated samples. The residuals type \code{type} are computed and then ordered for each replicate, so that for each \eqn{i=1,2,...,n}, where n is the number of individuals in the sample, there is a random sample of size \code{rep} of the \eqn{i}-th order statistic of the residuals type \code{type}. Therefore, the simulated envelope is composed of the quantiles (1-\code{conf})/2 and (1+\code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order statistic of the residuals type \code{type} for \eqn{i=1,2,...,n}.
+The simulated envelope is builded by simulating \code{rep} independent realizations of the response variable for each
+individual, which is accomplished taking into account the following: (1) the model assumption about the distribution of
+the response variable; (2) the estimates of the parameters in the linear predictor; and (3) the estimate of the
+dispersion parameter. The interest model is re-fitted \code{rep} times, as each time the vector of observed responses
+is replaced by one of the simulated samples. The \code{type}-type residuals are computed and then sorted for each
+replicate, so that for each \eqn{i=1,2,...,n}, where \eqn{n} is the number of individuals in the sample, there is a random
+sample of size \code{rep} of the \eqn{i}-th order statistic of the  \code{type}-type residuals. Therefore, the simulated
+envelope is composed of the quantiles (1 - \code{conf})/2 and (1 + \code{conf})/2 of the random sample of size \code{rep} of
+the \eqn{i}-th order statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n}.
 }
 \examples{
-# Example 1
-fit1 <- lm(Species ~ Biomass + pH + Biomass*pH, data=richness)
-envelope(fit1, type="internal", col="red", pch=20, col.lab="blue",
+###### Example 1: Fuel consumption of automobiles
+fit1 <- lm(mpg ~ log(hp) + log(wt), data=mtcars)
+envelope(fit1, rep=100, conf=0.95, type="external", col="red", pch=20, col.lab="blue",
          col.axis="blue", col.main="black", family="mono", cex=0.8)
 
-# Example 2
-fit2 <- lm(mpg ~ log(hp) + log(wt), data=mtcars)
-envelope(fit2, type="external", col="red", pch=20, col.lab="blue",
+###### Example 2: Species richness in plots
+fit2 <- lm(Species ~ Biomass + pH + Biomass*pH, data=richness)
+envelope(fit2, rep=100, conf=0.95, type="internal", col="red", pch=20, col.lab="blue",
          col.axis="blue", col.main="black", family="mono", cex=0.8)
+
+###### Example 3: Gas consumption in a home before and after insulation
+whiteside <- MASS::whiteside
+fit3 <- lm(Gas ~ Temp + Insul + Temp*Insul, data=whiteside)
+envelope(fit3, rep=100, conf=0.95, type="internal", col="red", pch=20, col.lab="blue",
+         col.axis="blue", col.main="black", family="mono", cex=0.8)
+
 }
 \references{
-Atkinson A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
+Atkinson, A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
 
-Cook R.D. and Weisberg S. (1982) \emph{Residuals and Influence in Regression}. Chapman and Hall, New York.
+Cook, R.D. and Weisberg, S. (1982) \emph{Residuals and Influence in Regression}. Chapman and Hall, New York.
 }
 \seealso{
 \link{envelope.glm}, \link{envelope.overglm}

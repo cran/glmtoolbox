@@ -2,7 +2,7 @@
 % Please edit documentation in R/geeglm.R
 \name{glmgee}
 \alias{glmgee}
-\title{Generalized Estimating Equations}
+\title{Fit Generalized Estimating Equations}
 \usage{
 glmgee(
   formula,
@@ -24,21 +24,22 @@ glmgee(
 )
 }
 \arguments{
-\item{formula}{a \code{formula} expression of the form \code{response ~ predictors}, which is a symbolic description of the linear predictor of the model to be fitted to the data.}
+\item{formula}{a \code{formula} expression of the form \code{response ~ x1 + x2 + ...}, which is a symbolic description of the linear predictor of the model to be fitted to the data.}
 
-\item{family}{a \code{family} object, that is, a list of functions and expressions for defining link and variance functions. Families supported are gaussian, binomial, poisson, Gamma, inverse gaussian and quasi. See the \link{glm} and \link{family} documentation. By default, \code{family} is set to be \code{gaussian("identity")}.}
+\item{family}{an (optional) \code{family} object, that is, a list of functions and expressions for defining link and variance functions. Families (and links) supported are the same supported by \link{glm} using its \link{family} argument, that is,
+\code{gaussian}, \code{binomial}, \code{poisson}, \code{Gamma}, \code{inverse.gaussian}, and \code{quasi}. The family \code{negative.binomial} in the library \pkg{MASS} are also available. By default, the argument \code{family} is set to be \code{gaussian("identity")}.}
 
-\item{weights}{an (optional) vector of positive "prior weights" to be used in the fitting process. The length of \code{weights} should be the same as the number of observations.}
+\item{weights}{an (optional) vector of positive "prior weights" to be used in the fitting process. The length of \code{weights} should be the same as the total number of observations.}
 
 \item{id}{a vector which identifies the subjects or clusters. The length of \code{id} should be the same as the number of observations.}
 
 \item{waves}{an (optional) positive integer-valued variable that is used to identify the order and spacing of observations within clusters. This argument is crucial when there are missing values and gaps in the data. By default, \code{waves} is equal to the integers from 1 to the size of each cluster.}
 
-\item{data}{a \code{data frame} in which to look for variables involved in the \code{formula} expression, as well as the variables specified in the arguments \code{id} and \code{weights}. The data are assumed to be sorted by \code{id} and time.}
+\item{data}{an (optional) \code{data frame} in which to look for variables involved in the \code{formula} expression, as well as for variables specified in the arguments \code{id} and \code{weights}. The data are assumed to be sorted by \code{id} and time.}
 
 \item{subset}{an (optional) vector specifying a subset of observations to be used in the fitting process.}
 
-\item{corstr}{a character string specifying the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(m)", "Non-Stationary-M-dependent(m)", "AR-1", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. By default, \code{corstr} is set to be "Independence".}
+\item{corstr}{an (optional) character string which allows to specify the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(\emph{m})", "Non-Stationary-M-dependent(\emph{m})", "AR-1", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. By default, \code{corstr} is set to be "Independence".}
 
 \item{corr}{an (optional) square matrix of the same dimension of the maximum cluster size containing the user specified correlation. This is only appropriate if \code{corstr} is specified to be "User-defined".}
 
@@ -46,9 +47,9 @@ glmgee(
 
 \item{scale.fix}{an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. By default, \code{scale.fix} is set to be FALSE.}
 
-\item{scale.value}{an (optional) numeric variable giving the value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. By default, \code{scale.value} is set to be 1.}
+\item{scale.value}{an (optional) numeric value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. By default, \code{scale.value} is set to be 1.}
 
-\item{toler}{an (optional) positive value which represents the convergence tolerance. The convergence is reached when the maximum of the relative differences between the values of the parameters in the linear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. By default, \code{toler} is set to be 0.00001.}
+\item{toler}{an (optional) positive value which represents the \emph{convergence tolerance}. The convergence is reached when the maximum of the absolute relative differences between the values of the parameters in the linear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. By default, \code{toler} is set to be 0.00001.}
 
 \item{maxit}{an (optional) integer value which represents the maximum number of iterations allowed for the fitting algorithm. By default, \code{maxit} is set to be 50.}
 
@@ -57,48 +58,135 @@ glmgee(
 \item{...}{further arguments passed to or from other methods.}
 }
 \value{
-an object of the class glmgee in which are stored the main results of a Generalized Estimating Equation fitted to the data. Some of those results can be easily accessed using functions as, for example, \code{print()}, \code{summary()}, \code{model.matrix()}, \code{estequa()}, \code{coef()}, \code{vcov()}, \code{fitted()}, \code{confint()} and \code{predict()}. In addition, the model fitted to the data
-can be assessed using functions as, for instance, \link{anova.glmgee}, \link{residuals.glmgee}, \link{leverage.glmgee}, \link{dfbeta.glmgee}, \link{cooks.distance.glmgee} and \link{localInfluence.glmgee}. The variable selection may be accomplished using \link{stepCriterion.glmgee} whereas the working–correlation–structure can be chosen by using criteria as \link{QIC}, \link{CIC}, \link{GHYC}, \link{RJC}, \link{AGPC} and \link{SGPC}.
+an object of class \emph{glmgee} in which the main results of the GEE model fitted to the data are stored, i.e., a
+list with components including
+\tabular{ll}{
+\code{coefficients} \tab a vector with the estimates of \eqn{\beta_1,\ldots,\beta_p},\cr
+\tab \cr
+\code{fitted.values}\tab a vector with the estimates of \eqn{\mu_{ij}} for \eqn{i=1,\ldots,n} and \eqn{j=1,\ldots,n_i},\cr
+\tab \cr
+\code{start}        \tab a vector with the starting values used,\cr
+\tab \cr
+\code{prior.weights}\tab a vector with the values of \eqn{\omega_{ij}} for \eqn{i=1,\ldots,n} and \eqn{j=1,\ldots,n_i},\cr
+\tab \cr
+\code{offset}       \tab a vector with the values of \eqn{z_{ij}} for \eqn{i=1,\ldots,n} and \eqn{j=1,\ldots,n_i},\cr
+\tab \cr
+\code{terms}        \tab an object containing the terms objects,\cr
+\tab \cr
+\code{loglik}       \tab the value of the quasi-log-likelihood function evaluated at the parameter\cr
+                    \tab estimates and the observed data,\cr
+\tab \cr
+\code{estfun}       \tab a vector with the estimating equations evaluated at the parameter\cr
+                    \tab estimates and the observed data,\cr
+\tab \cr
+\code{formula}      \tab the formula,\cr
+\tab \cr
+\code{levels}       \tab the levels of the categorical regressors,\cr
+\tab \cr
+\code{contrasts}    \tab an object containing the contrasts corresponding to levels,\cr
+\tab \cr
+\code{converged}    \tab a logical indicating successful convergence,\cr
+\tab \cr
+\code{model}        \tab the full model frame,\cr
+\tab \cr
+\code{y}            \tab a vector with the values of \eqn{y_{ij}} for \eqn{i=1,\ldots,n} and \eqn{j=1,\ldots,n_i},\cr
+\tab \cr
+\code{family}       \tab an object containing the \link{family} object used,\cr
+\tab \cr
+\code{linear.predictors} \tab a vector with the estimates of \eqn{g(\mu_{ij})} for \eqn{i=1,\ldots,n} and \eqn{j=1,\ldots,n_i},\cr
+\tab \cr
+\code{R}            \tab a matrix with the (robust) estimate of the variance-covariance,\cr
+\tab \cr
+\code{corr}         \tab a matrix with the estimate of the working-correlation,\cr
+\tab \cr
+\code{corstr}       \tab a character string specifying the working-correlation structure,\cr
+\tab \cr
+\code{id}           \tab a vector which identifies the subjects or clusters,\cr
+\tab \cr
+\code{sizes}        \tab a vector with the values of \eqn{n_i} for \eqn{i=1,\ldots,n},\cr
+\tab \cr
+\code{call}         \tab the original function call,\cr
+}
 }
 \description{
-Produces an object of the class \code{glmgee} in which the main results of a Generalized Estimating Equation fitted to the data are stored.
+Produces an object of the class \code{glmgee} in which the main results of a Generalized Estimating Equation (GEE) fitted to the data are stored.
 }
 \details{
-If the maximum cluster size is 6 and for a cluster of size 4 \code{waves} is set to be 2, 4, 5, 6 then it means that the data on times 1 and 3 are missing, which should be taken into account by \code{glmgee} when the structure of the correlation matrix is assumed to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent" or "AR-1".  If in this scenario \code{waves} is not specified then \code{glmgee} assumes that the available data for this cluster were taken on point times 1, 2, 3 and 4.
+The values of the multivariate response variable measured on \eqn{n} subjects or clusters,
+denoted by \eqn{y_{i}=(y_{i1},\ldots,y_{in_i})^{\top}} for \eqn{i=1,\ldots,n}, are assumed to be
+realizations of independent random vectors denoted by \eqn{Y_{i}=(Y_{i1},\ldots,Y_{in_i})^{\top}}
+for \eqn{i=1,\ldots,n}. The random variables associated to the \eqn{i}-th subject or
+cluster, \eqn{Y_{ij}} for \eqn{j=1,\ldots,n_i}, are assumed to satisfy
+\eqn{\mu_{ij}=} E\eqn{(Y_{ij})},Var\eqn{(Y_{ij})=\frac{\phi}{\omega_{ij}}}V\eqn{(\mu_{ij})}
+and Corr\eqn{(Y_{ij},Y_{ik})=r_{jk}(\rho)},
+where \eqn{\phi>0} is the dispersion parameter,
+V\eqn{(\mu_{ij})} is the variance function, \eqn{\omega_{ij}>0} is a known weight, and
+\eqn{\rho=(\rho_1,\ldots,\rho_q)^{\top}} is a parameter vector.
+In addition, \eqn{\mu_{ij}} is assumed to be dependent on the regressors vector \eqn{x_{ij}}
+by \eqn{g(\mu_{ij})=z_{ij} + x_{ij}^{\top}\beta}, where \eqn{g(\cdot)} is the link function,
+\eqn{z_{ij}} is a known \emph{offset} and \eqn{\beta=(\beta_1,\ldots,\beta_p)^{\top}} is
+a vector of regression parameters. The parameter estimates are obtained by iteratively
+solving the estimating equations described by Liang and Zeger (1986).
+
+If the maximum cluster size is 6 and for a cluster of size 4 the value of \code{waves} is set
+to be 2, 4, 5, 6, then it means that the data on times 1 and 3 are missing, which should be
+taken into account by \code{glmgee} when the structure of the correlation matrix is assumed
+to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent" or "AR-1".  If
+in this scenario \code{waves} is not specified then \code{glmgee} assumes that the available
+data for this cluster were taken on point times 1, 2, 3 and 4.
+
+A set of standard extractor functions for fitted model objects is available for objects of class  \emph{glmgee},
+including methods to the generic functions such as \code{print}, \code{summary},	\code{model.matrix}, \code{estequa},
+\code{coef}, \code{vcov}, \code{logLik}, \code{fitted}, \code{confint} and \code{predict}.
+In addition, the model may be assessed using functions such as \link{anova.glmgee},
+\link{residuals.glmgee}, \link{dfbeta.glmgee}, \link{cooks.distance.glmgee} and \link{localInfluence.glmgee}.
+The variable selection may be accomplished using the routine
+\link{stepCriterion.glmgee}.
 }
 \examples{
-## Example 1
+###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 mod1 <- size ~ poly(days,4) + treat
 fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces)
-summary(fit1)
+summary(fit1, corr.digits=2)
 
-## Example 2
+###### Example 2: Treatment for severe postnatal depression
 mod2 <- depressd ~ visit + group
 fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
-summary(fit2)
+summary(fit2, corr.digits=2)
 
-## Example 3
-mod3 <- dep ~ visit + group
-fit3 <- glmgee(mod3, id=subj, corstr="Exchangeable", data=depression)
-summary(fit3)
+###### Example 3: Treatment for severe postnatal depression (2)
+mod3 <- dep ~ visit*group
+fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+summary(fit3, corr.digits=2)
 
-## Example 4
-mod4 <- score ~ rinse + age + gender + smoke + time
-fit4 <- glmgee(mod4, family=Gamma(log), id=subject, corstr="Exchangeable", data=rinse)
-summary(fit4)
+###### Example 4: Dental Clinical Trial
+mod4 <- score/3.6 ~ rinse*time
+fit4 <- glmgee(mod4, family=binomial("log"), id=subject, corstr="Exchangeable", data=rinse)
+summary(fit4, corr.digits=2)
 
-## Example 5
+###### Example 5: Shoulder Pain after Laparoscopic Cholecystectomy
+mod5 <- pain2 ~ treatment + age + time
+corstr <- "Stationary-M-dependent(2)"
+fit5 <- glmgee(mod5, family=binomial("logit"), id=id, corstr=corstr, data=cholecystectomy)
+summary(fit5,varest="bias-corrected")
+
+###### Example 6: Guidelines for Urinary Incontinence Discussion and Evaluation
+mod6 <- bothered ~ gender + age + dayacc + severe + toilet
+fit6 <- glmgee(mod6, family=binomial("logit"), id=practice, corstr="Exchangeable", data=GUIDE)
+summary(fit6)
+
+###### Example 7: Tests of Auditory Perception in Children with OME
 OME <- MASS::OME
-mod5 <- cbind(Correct, Trials-Correct) ~ Loud + Age + OME
-fit5 <- glmgee(mod5, family = binomial(cloglog), id = ID, corstr = "Exchangeable", data = OME)
-summary(fit5)
+mod7 <- cbind(Correct, Trials-Correct) ~ Loud + Age + OME
+fit7 <- glmgee(mod7, family = binomial("cloglog"), id = ID, corstr = "Exchangeable", data = OME)
+summary(fit7, corr=FALSE)
 }
 \references{
-Liang K.Y. and Zeger S.L. (1986) Longitudinal data analysis using generalized linear models.
+Liang, K.Y. and Zeger, S.L. (1986) Longitudinal data analysis using generalized linear models.
 \emph{Biometrika} 73, 13-22.
 
-Zeger S.L. and Liang K.Y. (1986) Longitudinal data analysis for discrete and continuous outcomes.
+Zeger, S.L. and Liang, K.Y. (1986) Longitudinal data analysis for discrete and continuous outcomes.
 \emph{Biometrics} 42, 121-130.
 
-Hardin J.W. and Hilbe J.M. (2013). \emph{Generalized Estimating Equations}. Chapman & Hall, London.
+Hardin, J.W. and Hilbe, J.M. (2013). \emph{Generalized Estimating Equations}. Chapman & Hall, London.
 }

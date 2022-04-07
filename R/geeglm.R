@@ -1,78 +1,171 @@
-#' @title Generalized Estimating Equations
-#' @description Produces an object of the class \code{glmgee} in which the main results of a Generalized Estimating Equation fitted to the data are stored.
-#' @param formula a \code{formula} expression of the form \code{response ~ predictors}, which is a symbolic description of the linear predictor of the model to be fitted to the data.
-#' @param family a \code{family} object, that is, a list of functions and expressions for defining link and variance functions. Families supported are gaussian, binomial, poisson, Gamma, inverse gaussian and quasi. See the \link{glm} and \link{family} documentation. By default, \code{family} is set to be \code{gaussian("identity")}.
+#' @title Fit Generalized Estimating Equations
+#' @description Produces an object of the class \code{glmgee} in which the main results of a Generalized Estimating Equation (GEE) fitted to the data are stored.
+#' @param formula a \code{formula} expression of the form \code{response ~ x1 + x2 + ...}, which is a symbolic description of the linear predictor of the model to be fitted to the data.
+#' @param family an (optional) \code{family} object, that is, a list of functions and expressions for defining link and variance functions. Families (and links) supported are the same supported by \link{glm} using its \link{family} argument, that is,
+#' \code{gaussian}, \code{binomial}, \code{poisson}, \code{Gamma}, \code{inverse.gaussian}, and \code{quasi}. The family \code{negative.binomial} in the library \pkg{MASS} are also available. By default, the argument \code{family} is set to be \code{gaussian("identity")}.
 #' @param id a vector which identifies the subjects or clusters. The length of \code{id} should be the same as the number of observations.
-#' @param weights an (optional) vector of positive "prior weights" to be used in the fitting process. The length of \code{weights} should be the same as the number of observations.
-#' @param data a \code{data frame} in which to look for variables involved in the \code{formula} expression, as well as the variables specified in the arguments \code{id} and \code{weights}. The data are assumed to be sorted by \code{id} and time.
+#' @param weights an (optional) vector of positive "prior weights" to be used in the fitting process. The length of \code{weights} should be the same as the total number of observations.
+#' @param data an (optional) \code{data frame} in which to look for variables involved in the \code{formula} expression, as well as for variables specified in the arguments \code{id} and \code{weights}. The data are assumed to be sorted by \code{id} and time.
 #' @param subset an (optional) vector specifying a subset of observations to be used in the fitting process.
-#' @param corstr a character string specifying the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(m)", "Non-Stationary-M-dependent(m)", "AR-1", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. By default, \code{corstr} is set to be "Independence".
+#' @param corstr an (optional) character string which allows to specify the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(\emph{m})", "Non-Stationary-M-dependent(\emph{m})", "AR-1", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. By default, \code{corstr} is set to be "Independence".
 #' @param corr an (optional) square matrix of the same dimension of the maximum cluster size containing the user specified correlation. This is only appropriate if \code{corstr} is specified to be "User-defined".
 #' @param start an (optional) vector of starting values for the parameters in the linear predictor.
 #' @param maxit an (optional) integer value which represents the maximum number of iterations allowed for the fitting algorithm. By default, \code{maxit} is set to be 50.
-#' @param toler an (optional) positive value which represents the convergence tolerance. The convergence is reached when the maximum of the relative differences between the values of the parameters in the linear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. By default, \code{toler} is set to be 0.00001.
+#' @param toler an (optional) positive value which represents the \emph{convergence tolerance}. The convergence is reached when the maximum of the absolute relative differences between the values of the parameters in the linear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. By default, \code{toler} is set to be 0.00001.
 #' @param adjr2 an (optional) logical variable. If TRUE, the adjusted R-squared based on the deviance is computed. By default, \code{adjr2} is set to be FALSE.
 #' @param scale.fix an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. By default, \code{scale.fix} is set to be FALSE.
-#' @param scale.value an (optional) numeric variable giving the value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. By default, \code{scale.value} is set to be 1.
+#' @param scale.value an (optional) numeric value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. By default, \code{scale.value} is set to be 1.
 #' @param waves an (optional) positive integer-valued variable that is used to identify the order and spacing of observations within clusters. This argument is crucial when there are missing values and gaps in the data. By default, \code{waves} is equal to the integers from 1 to the size of each cluster.
 #' @param ...	further arguments passed to or from other methods.
-#' @details If the maximum cluster size is 6 and for a cluster of size 4 \code{waves} is set to be 2, 4, 5, 6 then it means that the data on times 1 and 3 are missing, which should be taken into account by \code{glmgee} when the structure of the correlation matrix is assumed to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent" or "AR-1".  If in this scenario \code{waves} is not specified then \code{glmgee} assumes that the available data for this cluster were taken on point times 1, 2, 3 and 4.
-#' @return an object of the class glmgee in which are stored the main results of a Generalized Estimating Equation fitted to the data. Some of those results can be easily accessed using functions as, for example, \code{print()}, \code{summary()}, \code{model.matrix()}, \code{estequa()}, \code{coef()}, \code{vcov()}, \code{fitted()}, \code{confint()} and \code{predict()}. In addition, the model fitted to the data
-#' can be assessed using functions as, for instance, \link{anova.glmgee}, \link{residuals.glmgee}, \link{leverage.glmgee}, \link{dfbeta.glmgee}, \link{cooks.distance.glmgee} and \link{localInfluence.glmgee}. The variable selection may be accomplished using \link{stepCriterion.glmgee} whereas the working–correlation–structure can be chosen by using criteria as \link{QIC}, \link{CIC}, \link{GHYC}, \link{RJC}, \link{AGPC} and \link{SGPC}.
+#' @details The values of the multivariate response variable measured on \eqn{n} subjects or clusters,
+#' denoted by \eqn{y_{i}=(y_{i1},\ldots,y_{in_i})^{\top}} for \eqn{i=1,\ldots,n}, are assumed to be
+#' realizations of independent random vectors denoted by \eqn{Y_{i}=(Y_{i1},\ldots,Y_{in_i})^{\top}}
+#' for \eqn{i=1,\ldots,n}. The random variables associated to the \eqn{i}-th subject or
+#' cluster, \eqn{Y_{ij}} for \eqn{j=1,\ldots,n_i}, are assumed to satisfy
+#' \eqn{\mu_{ij}=} E\eqn{(Y_{ij})},Var\eqn{(Y_{ij})=\frac{\phi}{\omega_{ij}}}V\eqn{(\mu_{ij})}
+#' and Corr\eqn{(Y_{ij},Y_{ik})=r_{jk}(\rho)},
+#' where \eqn{\phi>0} is the dispersion parameter,
+#' V\eqn{(\mu_{ij})} is the variance function, \eqn{\omega_{ij}>0} is a known weight, and
+#' \eqn{\rho=(\rho_1,\ldots,\rho_q)^{\top}} is a parameter vector.
+#' In addition, \eqn{\mu_{ij}} is assumed to be dependent on the regressors vector \eqn{x_{ij}}
+#' by \eqn{g(\mu_{ij})=z_{ij} + x_{ij}^{\top}\beta}, where \eqn{g(\cdot)} is the link function,
+#' \eqn{z_{ij}} is a known \emph{offset} and \eqn{\beta=(\beta_1,\ldots,\beta_p)^{\top}} is
+#' a vector of regression parameters. The parameter estimates are obtained by iteratively
+#' solving the estimating equations described by Liang and Zeger (1986).
+#'
+#' If the maximum cluster size is 6 and for a cluster of size 4 the value of \code{waves} is set
+#' to be 2, 4, 5, 6, then it means that the data on times 1 and 3 are missing, which should be
+#' taken into account by \code{glmgee} when the structure of the correlation matrix is assumed
+#' to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent" or "AR-1".  If
+#' in this scenario \code{waves} is not specified then \code{glmgee} assumes that the available
+#' data for this cluster were taken on point times 1, 2, 3 and 4.
+#'
+#' A set of standard extractor functions for fitted model objects is available for objects of class  \emph{glmgee},
+#' including methods to the generic functions such as \code{print}, \code{summary},	\code{model.matrix}, \code{estequa},
+#' \code{coef}, \code{vcov}, \code{logLik}, \code{fitted}, \code{confint} and \code{predict}.
+#' In addition, the model may be assessed using functions such as \link{anova.glmgee},
+#' \link{residuals.glmgee}, \link{dfbeta.glmgee}, \link{cooks.distance.glmgee} and \link{localInfluence.glmgee}.
+#' The variable selection may be accomplished using the routine
+#' \link{stepCriterion.glmgee}.
+#'
+#' @return an object of class \emph{glmgee} in which the main results of the GEE model fitted to the data are stored, i.e., a
+#' list with components including
+#' \tabular{ll}{
+#' \code{coefficients} \tab a vector with the estimates of \eqn{\beta_1,\ldots,\beta_p},\cr
+#' \tab \cr
+#' \code{fitted.values}\tab a vector with the estimates of \eqn{\mu_{ij}} for \eqn{i=1,\ldots,n} and \eqn{j=1,\ldots,n_i},\cr
+#' \tab \cr
+#' \code{start}        \tab a vector with the starting values used,\cr
+#' \tab \cr
+#' \code{prior.weights}\tab a vector with the values of \eqn{\omega_{ij}} for \eqn{i=1,\ldots,n} and \eqn{j=1,\ldots,n_i},\cr
+#' \tab \cr
+#' \code{offset}       \tab a vector with the values of \eqn{z_{ij}} for \eqn{i=1,\ldots,n} and \eqn{j=1,\ldots,n_i},\cr
+#' \tab \cr
+#' \code{terms}        \tab an object containing the terms objects,\cr
+#' \tab \cr
+#' \code{loglik}       \tab the value of the quasi-log-likelihood function evaluated at the parameter\cr
+#'                     \tab estimates and the observed data,\cr
+#' \tab \cr
+#' \code{estfun}       \tab a vector with the estimating equations evaluated at the parameter\cr
+#'                     \tab estimates and the observed data,\cr
+#' \tab \cr
+#' \code{formula}      \tab the formula,\cr
+#' \tab \cr
+#' \code{levels}       \tab the levels of the categorical regressors,\cr
+#' \tab \cr
+#' \code{contrasts}    \tab an object containing the contrasts corresponding to levels,\cr
+#' \tab \cr
+#' \code{converged}    \tab a logical indicating successful convergence,\cr
+#' \tab \cr
+#' \code{model}        \tab the full model frame,\cr
+#' \tab \cr
+#' \code{y}            \tab a vector with the values of \eqn{y_{ij}} for \eqn{i=1,\ldots,n} and \eqn{j=1,\ldots,n_i},\cr
+#' \tab \cr
+#' \code{family}       \tab an object containing the \link{family} object used,\cr
+#' \tab \cr
+#' \code{linear.predictors} \tab a vector with the estimates of \eqn{g(\mu_{ij})} for \eqn{i=1,\ldots,n} and \eqn{j=1,\ldots,n_i},\cr
+#' \tab \cr
+#' \code{R}            \tab a matrix with the (robust) estimate of the variance-covariance,\cr
+#' \tab \cr
+#' \code{corr}         \tab a matrix with the estimate of the working-correlation,\cr
+#' \tab \cr
+#' \code{corstr}       \tab a character string specifying the working-correlation structure,\cr
+#' \tab \cr
+#' \code{id}           \tab a vector which identifies the subjects or clusters,\cr
+#' \tab \cr
+#' \code{sizes}        \tab a vector with the values of \eqn{n_i} for \eqn{i=1,\ldots,n},\cr
+#' \tab \cr
+#' \code{call}         \tab the original function call,\cr
+#' }
+#'
 #' @export glmgee
 #' @importFrom splines bs ns
-#' @importFrom graphics abline par
+#' @importFrom graphics abline par lines
 #' @importFrom methods missingArg
-#' @importFrom stats as.formula coef gaussian get_all_vars rnorm update qt
+#' @importFrom stats as.formula coef gaussian get_all_vars rnorm update qt var
 #'             glm.fit model.extract model.frame model.matrix uniroot lm.fit
 #'             model.offset model.response model.weights pnorm cov2cor qchisq
 #'             printCoefmat pchisq vcov cooks.distance dfbeta qnorm anova na.omit
 #'             formula terms pf quasibinomial quasipoisson
 #' @examples
-#' ## Example 1
+#' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 #' mod1 <- size ~ poly(days,4) + treat
 #' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces)
-#' summary(fit1)
+#' summary(fit1, corr.digits=2)
 #'
-#' ## Example 2
+#' ###### Example 2: Treatment for severe postnatal depression
 #' mod2 <- depressd ~ visit + group
 #' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
-#' summary(fit2)
+#' summary(fit2, corr.digits=2)
 #'
-#' ## Example 3
-#' mod3 <- dep ~ visit + group
-#' fit3 <- glmgee(mod3, id=subj, corstr="Exchangeable", data=depression)
-#' summary(fit3)
+#' ###### Example 3: Treatment for severe postnatal depression (2)
+#' mod3 <- dep ~ visit*group
+#' fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+#' summary(fit3, corr.digits=2)
 #'
-#' ## Example 4
-#' mod4 <- score ~ rinse + age + gender + smoke + time
-#' fit4 <- glmgee(mod4, family=Gamma(log), id=subject, corstr="Exchangeable", data=rinse)
-#' summary(fit4)
+#' ###### Example 4: Dental Clinical Trial
+#' mod4 <- score/3.6 ~ rinse*time
+#' fit4 <- glmgee(mod4, family=binomial("log"), id=subject, corstr="Exchangeable", data=rinse)
+#' summary(fit4, corr.digits=2)
 #'
-#' ## Example 5
+#' ###### Example 5: Shoulder Pain after Laparoscopic Cholecystectomy
+#' mod5 <- pain2 ~ treatment + age + time
+#' corstr <- "Stationary-M-dependent(2)"
+#' fit5 <- glmgee(mod5, family=binomial("logit"), id=id, corstr=corstr, data=cholecystectomy)
+#' summary(fit5,varest="bias-corrected")
+#'
+#' ###### Example 6: Guidelines for Urinary Incontinence Discussion and Evaluation
+#' mod6 <- bothered ~ gender + age + dayacc + severe + toilet
+#' fit6 <- glmgee(mod6, family=binomial("logit"), id=practice, corstr="Exchangeable", data=GUIDE)
+#' summary(fit6)
+#'
+#' ###### Example 7: Tests of Auditory Perception in Children with OME
 #' OME <- MASS::OME
-#' mod5 <- cbind(Correct, Trials-Correct) ~ Loud + Age + OME
-#' fit5 <- glmgee(mod5, family = binomial(cloglog), id = ID, corstr = "Exchangeable", data = OME)
-#' summary(fit5)
-#' @references Liang K.Y. and Zeger S.L. (1986) Longitudinal data analysis using generalized linear models.
+#' mod7 <- cbind(Correct, Trials-Correct) ~ Loud + Age + OME
+#' fit7 <- glmgee(mod7, family = binomial("cloglog"), id = ID, corstr = "Exchangeable", data = OME)
+#' summary(fit7, corr=FALSE)
+#' @references Liang, K.Y. and Zeger, S.L. (1986) Longitudinal data analysis using generalized linear models.
 #' \emph{Biometrika} 73, 13-22.
-#' @references Zeger S.L. and Liang K.Y. (1986) Longitudinal data analysis for discrete and continuous outcomes.
+#' @references Zeger, S.L. and Liang, K.Y. (1986) Longitudinal data analysis for discrete and continuous outcomes.
 #' \emph{Biometrics} 42, 121-130.
-#' @references Hardin J.W. and Hilbe J.M. (2013). \emph{Generalized Estimating Equations}. Chapman & Hall, London.
-
+#' @references Hardin, J.W. and Hilbe, J.M. (2013). \emph{Generalized Estimating Equations}. Chapman & Hall, London.
+#'
 glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr,corr,start=NULL,scale.fix=FALSE,scale.value=1,toler=0.00001,maxit=50,adjr2=FALSE,...){
   if(missingArg(data)) data <- environment(eval(formula))
   if(missingArg(corstr)) corstr <- "Independence"
   mf <- match.call(expand.dots = FALSE)
   m <- match(c("formula", "weights", "waves", "data", "subset", "id"), names(mf), 0L)
   mf <- mf[c(1L, m)]
-  mf[[1L]] <- quote(stats::model.frame)
+  mf$drop.unused.levels <- TRUE
+  mf$na.action <- na.omit
+  mf[[1L]] <- as.name("model.frame")
   mf <- eval(mf, parent.frame())
   mt <- attr(mf, "terms")
   y <- as.matrix(model.response(mf, "any"))
   weights <- as.vector(model.weights(mf))
-  if(class(family)=="function") family <- family()
-  family2 <- family
+  if(is(family,"function")) family <- family()
+
+  if(family$family %in% c("quasi","quasibinomial","quasipoisson","gaussian","binomial","poisson","Gamma","inverse.gaussian")){
   if(family$family %in% c("quasi","quasibinomial","quasipoisson")){
     family$family <- switch(family$varfun,"constant"="gaussian","mu(1-mu)"="binomial",
                             "mu"="poisson","mu^2"="Gamma","mu^3"="inverse.gaussian")
@@ -86,6 +179,8 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
   }
   if(family$family=="binomial") family2 <- quasibinomial(link=family$link)
   if(family$family=="poisson") family2 <- quasipoisson(link=family$link)
+  }else family2 <- family
+
   if(ncol(y)==2 & family$family=="binomial"){
     weights <- as.matrix(y[,1]+y[,2])
     y <- as.matrix(y[,1]/weights)
@@ -199,19 +294,25 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
     etai <- tcrossprod(Xi,t(beta)) + D[,q+2]
     mui <- family$linkinv(etai)
     wi <- sqrt(family$variance(mui)/D[,q+3])
-    Vi <- t(R[D[,q+4],D[,q+4]]*matrix(wi,ni,ni))*matrix(wi,ni,ni)
     Xiw <- Xi*matrix(family$mu.eta(etai),nrow(Xi),p)
-    Vi2 <- try(chol(Vi),silent=TRUE)
-    if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)
+    Vi <- t(R[D[,q+4],D[,q+4]]*matrix(wi,ni,ni))*matrix(wi,ni,ni)
+    if(corstr=="Independence") Vi2 <- diag(1/wi[D[,q+4]]^2)
+    else{Vi2 <- try(chol(Vi),silent=TRUE)
+         if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)}
     Xiw2 <- crossprod(Vi2,Xiw)
     if(out) cbind(crossprod(Xiw2,(yi-mui)),crossprod(Xiw2,Xiw))
     else cbind(crossprod(Xiw2,(yi-mui)),crossprod(Xiw2,Xiw),crossprod(Xiw2,(tcrossprod(yi-mui))%*%Xiw2))
   }
   if(is.null(start)){
     beta_new <- try(glm.fit(y=y,x=X,family=family2,weights=weights,offset=offs),silent=TRUE)
-    if(beta_new$converged) beta_new <- beta_new$coefficients
-    else beta_new <- try(glm.fit(y=y,x=X,family=family,weights=weights,offset=offs)$coefficients,silent=TRUE)
+    if(is.list(beta_new)) beta_new <- beta_new$coefficients
+    else{
+         beta_new <- try(glm.fit(y=y,x=X,family=family,weights=weights,offset=offs),silent=TRUE)
+         if(is.list(beta_new)) beta_new <- beta_new$coefficients
+         else stop("cannot find valid starting values: please specify some!!",call.=FALSE)
+    }
   }else beta_new <- start
+  start <- beta_new
   tol <- 1
   niter <- 0
   if(missingArg(corr)) corr <- diag(maxsize)
@@ -270,7 +371,8 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
                  prior.weights=weights,y=y,formula=formula,call=match.call(),offset=offs,waves=waves,model=mf,data=data,score=score,ids=id2,
                  converged=ifelse(niter<maxit,TRUE,FALSE),estfun=estfun,R=vcovs,naive=I0,terms=mt,family=family,Rout=Rout,Rhat=Rhat,id=id,
                  phi=phi,CIC=CIC,RJC=RJC,logLik=logLik,corr=R,clusters=c(length(sizes),max(sizes),min(sizes)),corstr=corstr,
-                 deviance=sum(family$dev.resids(y,mu,weights)),df.residual=length(y)-length(beta_new))
+                 deviance=sum(family$dev.resids(y,mu,weights)),df.residual=length(y)-length(beta_new),levels=.getXlevels(attr(mf,"terms"),mf),
+                 contrasts=attr(X,"contrasts"),model=mf,start=start)
     class(out_) <- "glmgee"
     if(colnames(X)[1]=="(Intercept)" & adjr2==TRUE){
       p <- 1
@@ -300,29 +402,32 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
 }
 #' @method summary glmgee
 #' @export
-summary.glmgee <- function(object, ...,digits=4,varest=c("robust","df-adjusted","bias-corrected","model")){
+summary.glmgee <- function(object, ...,digits=5,corr.digits=3,varest=c("robust","df-adjusted","bias-corrected","model"),corr=TRUE){
   varest <- match.arg(varest)
   cat("\nSample size")
   cat("\n   Number of observations: ",sum(object$sizes))
-  cat("\n       Number of clusters: ",length(object$sizes))
-  cat("\n     Minimum cluster size: ",min(object$sizes))
-  cat("\n     Average cluster size: ",round(mean(object$sizes),digits=1))
-  cat("\n     Maximum cluster size: ",max(object$sizes))
-  cat("\n*************************************************************")
+  cat("\n       Number of clusters: ",length(object$sizes),"\n")
+  if(var(object$sizes) > 0){
+  out_ <- matrix(quantile(object$sizes,probs=c(0,0.25,0.5,0.75,1)),1,5)
+  rownames(out_)[1] <- "            Cluster sizes:";colnames(out_) <- c(" Min"," 25%"," 50%"," 75%"," Max")
+  print(out_,digits=1)
+  }else cat("             Cluster size: ",object$sizes[1],"\n")
+  cat("*************************************************************")
   cat("\nModel")
   cat("\n        Variance function: ",object$family$family)
   cat("\n            Link function: ",object$family$link)
   cat("\n    Correlation structure: ",ifelse(grepl("M-dependent",object$corstr),paste(object$corstr,"(",attr(object$corstr,"M"),")",sep=""),object$corstr))
   cat("\n*************************************************************\n")
   cat("Coefficients\n")
-  TAB	<- cbind(Estimate <- object$coefficients,
-               StdErr <- sqrt(diag(vcov(object,type=varest))),
-               tval <- Estimate/StdErr,
-               p.value <- 2*pnorm(-abs(tval)))
+  TAB	<- rbind(cbind(Estimate <- object$coefficients,
+                     StdErr <- sqrt(diag(vcov(object,type=varest))),
+                     tval <- Estimate/StdErr,
+                     p.value <- 2*pnorm(-abs(tval))),
+                     rep(NA,4),
+                     c(object$phi,NA,NA,NA))
   colnames(TAB) <- c("Estimate", "Std.Error", "z-value", "Pr(>|z|)")
-  rownames(TAB) <- rownames(object$coefficients)
-  printCoefmat(TAB, P.values=TRUE, signif.stars=FALSE, has.Pvalue=TRUE, digits=5, dig.tst=5, signif.legend=FALSE, tst.ind=c(1,2,3))
-  cat("\nDispersion ",round(object$phi,digits=5),"\n")
+  rownames(TAB) <- c(rownames(object$coefficients),"","Dispersion")
+  printCoefmat(TAB, P.values=TRUE, signif.stars=FALSE, has.Pvalue=TRUE, digits=digits, dig.tst=digits, signif.legend=FALSE, tst.ind=c(1,2,3), na.print="")
   cat("*************************************************************\n")
   cat("Goodness-of-fit statistics\n")
   cat("      -2*quasi-likelihood: ",round(-2*object$logLik,digits=3),"\n")
@@ -331,16 +436,18 @@ summary.glmgee <- function(object, ...,digits=4,varest=c("robust","df-adjusted",
   if(!is.null(object$null.deviance)){
     cat("       adjusted R-squared: ",round(1-(object$deviance/object$df.residual)/(object$null.deviance/object$df.null),digits=4),"\n")}
   cat("*************************************************************\n")
-  cat("Working correlation\n")
-  print(round(object$corr,digits=digits))
+  if(corr){
+    cat("Working correlation\n")
+    print(round(object$corr,digits=corr.digits))
+  }
   return(invisible(round(TAB,digits=digits)))
 }
 
 #' @method confint glmgee
 #' @export
-confint.glmgee <- function(object,parm,level=0.95,digits=4,verbose=TRUE,type=c("robust","df-adjusted","model","bias-corrected"),...){
-type <- match.arg(type)
-ee <- sqrt(diag(vcov(object,type=type)))
+confint.glmgee <- function(object,parm,level=0.95,digits=4,verbose=TRUE,varest=c("robust","df-adjusted","model","bias-corrected"),...){
+type <- match.arg(varest)
+ee <- sqrt(diag(vcov(object,type=varest)))
 results <- matrix(0,length(ee),2)
 results[,1] <- coef(object) - qnorm(1-level/2)*ee
 results[,2] <- coef(object) + qnorm(1-level/2)*ee
@@ -352,33 +459,72 @@ if(verbose){
 }
 return(invisible(results))
 }
-
-
 #' @title Dfbeta for Generalized Estimating Equations
-#' @description Produces an approximation, better known as the \emph{one-step approximation}, of the effect of deleting each cluster in turn on the estimates of the parameters in the linear predictor of a generalized estimating equation. This function also can produce a plot of those effects for a subset of the parameters in the linear predictor.
-#' @param model an object of class glmgee which is obtained from the fit of a generalized estimating equation.
+#' @description Produces an approximation, better known as the \emph{one-step approximation},
+#' of the effect on the parameter estimates of deleting each cluster/observation in turn. This function also can produce
+#' an index plot of the Dfbeta Statistic for some parameters via the argument \code{coefs}.
+#' @param model an object of class \emph{glmgee}.
 #' @param coefs	an (optional) character string which (partially) match with the names of some parameters in the linear predictor.
 #' @param method an (optional) character string indicating the method of calculation for the \emph{one-step approximation}. The options are: the \emph{one-step approximation} described by Preisser and Qaqish (1996) in which the working-correlation matrix is assumed to be known ("Preisser-Qaqish"); and the "authentic" \emph{one-step approximation} ("full"). By default, \code{method} is set to be "Preisser-Qaqish".
-#' @param level an (optional) character string indicating the level for which the dfbeta statistic is required. The options are: cluster-level ("clusters") and observation-level ("observations"). By default, \code{level} is set to be "clusters".
-#' @param identify an (optional) integer indicating the number of clusters to identify on the plot of dfbeta. This is only appropriate if \code{coefs} is specified.
+#' @param level an (optional) character string indicating the level for which the Dfbeta statistic is required. The options are: cluster-level ("clusters") and observation-level ("observations"). By default, \code{level} is set to be "clusters".
+#' @param identify an (optional) integer indicating the number of clusters/observations to identify on the plot of the Dfbeta statistic. This is only appropriate if \code{coefs} is specified.
 #' @param ... further arguments passed to or from other methods. If \code{coefs} is specified then \code{...} may be used to include graphical parameters to customize the plot. For example,  \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
-#' @return A matrix with so many rows as clusters in the sample and so many columns as parameters in the linear predictor. The \eqn{i}-th row of that matrix corresponds to the difference between the estimates of the parameters in the linear predictor using all clusters and the \emph{one-step approximation} of those estimates when the \emph{i}-th cluster is excluded from the dataset.
-#' @details The \emph{one-step approximation} of the estimates of the parameters in the linear predictor of a GEE when the \emph{i}-th cluster is excluded from the dataset is given by the vector obtained as the result of the first iteration of the fitting algorithm of that GEE when it is performed using:  (1) a dataset in which the \emph{i}-th cluster is excluded; and (2) a starting value which is the solution to the same GEE but based on the dataset inluding all clusters.
-#' @references Pregibon D. (1981). Logistic regression diagnostics. \emph{The Annals of Statistics}, 9, 705-724.
+#' @return A matrix with so many rows as clusters/observations in the sample and so many
+#' columns as parameters in the linear predictor. For clusters, the \eqn{i}-th row of that matrix corresponds to the
+#' difference between the estimates of the parameters in the linear predictor using all clustersand the \emph{one-step approximation} of those estimates when the \emph{i}-th cluster is excluded from the dataset.
+#' @details The \emph{one-step approximation} (with the \code{method} "full") of the estimates of the parameters in the linear
+#' predictor of a GEE when the \emph{i}-th cluster is excluded from the dataset is given by the
+#' vector obtained as the result of the first iteration of the fitting algorithm of that GEE
+#' when it is performed using:  (1) a dataset in which the \emph{i}-th cluster is excluded; and
+#' (2) a starting value which is the solution to the same GEE but based on the dataset inluding all clusters.
+#' @references Pregibon, D. (1981). Logistic regression diagnostics. \emph{The Annals of Statistics} 9, 705-724.
+#' @references Preisser, J.S. and Qaqish, B.F. (1996) Deletion diagnostics for generalised estimating equations.
+#' \emph{Biometrika} 83, 551–562.
+#' @references Hammill, B.G. and Preisser, J.S. (2006) A SAS/IML software program for GEE and regression diagnostics.
+#' \emph{Computational Statistics & Data Analysis} 51, 1197-1212.
 #' @method dfbeta glmgee
 #' @export
 #' @examples
-#' mod <- size ~ poly(days,4) + treat
-#' fit <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
-#' dfbs <- dfbeta(fit, coefs="treat" ,col="red", lty=1, lwd=1, col.lab="blue",
-#'                col.axis="blue", col.main="black", family="mono", cex=0.8, main="Dfbeta")
+#' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' mod1 <- size ~ poly(days,4) + treat
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces)
+#' dfbs1 <- dfbeta(fit1, method="full", coefs="treat", col="red", lty=1, lwd=1, col.lab="blue",
+#'          col.axis="blue", col.main="black", family="mono", cex=0.8, main="treat")
 #'
-#' # Calculation by hand of dfbeta for the tree labeled by "N1T01"
-#' idtree <- "N1T01"
-#' onestep <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable",
-#'                   start=coef(fit), subset=c(tree!=idtree), maxit=1)
-#' coef(fit)-coef(onestep)
-#' dfbs[rownames(dfbs)==idtree,]
+#' ### Calculation by hand of dfbeta for the tree labeled by "N1T01"
+#' onestep1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces,
+#'             start=coef(fit1), subset=c(tree!="N1T01"), maxit=1)
+#'
+#' coef(fit1)-coef(onestep1)
+#' dfbs1[rownames(dfbs1)=="N1T01",]
+#'
+#' ###### Example 2: Treatment for severe postnatal depression
+#' mod2 <- depressd ~ visit + group
+#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+#'
+#' dfbs2 <- dfbeta(fit2, method="full", coefs="group" ,col="red", lty=1, lwd=1, col.lab="blue",
+#'          col.axis="blue", col.main="black", family="mono", cex=0.8, main="group")
+#'
+#' ### Calculation by hand of dfbeta for the woman labeled by "18"
+#' onestep2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression,
+#'             start=coef(fit2), subset=c(subj!=18), maxit=1)
+#'
+#' coef(fit2)-coef(onestep2)
+#' dfbs2[rownames(dfbs2)==18,]
+#'
+#' ###### Example 3: Treatment for severe postnatal depression (2)
+#' mod3 <- dep ~ visit*group
+#' fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+#'
+#' dfbs3 <- dfbeta(fit3, method="full", coefs="visit:group" ,col="red", lty=1, lwd=1, col.lab="blue",
+#'          col.axis="blue", col.main="black", family="mono", cex=0.8, main="visit:group")
+#'
+#' ### Calculation by hand of dfbeta for the woman labeled by "18"
+#' onestep3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression,
+#'             start=coef(fit3), subset=c(subj!=18), maxit=1)
+#'
+#' coef(fit3)-coef(onestep3)
+#' dfbs3[rownames(dfbs3)==18,]
 #'
 dfbeta.glmgee <- function(model, level=c("clusters","observations"), method=c("Preisser-Qaqish","full"), coefs, identify,...){
   method <- match.arg(method)
@@ -410,14 +556,7 @@ dfbeta.glmgee <- function(model, level=c("clusters","observations"), method=c("P
           R <- matrix(alpha,envir$maxsize,envir$maxsize)
           diag(R) <- rep(1,envir$maxsize)
         }
-        if(model$corstr=="AR-1"){
-          refe <- matrix(1:envir$maxsize,envir$maxsize,envir$maxsize,byrow=TRUE) - matrix(1:envir$maxsize,envir$maxsize,envir$maxsize)
-          refe2 <- refe[datax[[i]][,envir$p+4],datax[[i]][,envir$p+4]]
-          alpha <- (model$corr[1,2]*(sum(envir$sizes-1)-p)*model$phi -
-                      sum(ifelse(refe2==1,1,0)*prs))/((sum(envir$sizes[-i]-1)-p)*phi)
-          R <- alpha^abs(refe)
-        }
-        if(model$corstr!="Exchangeable" & model$corstr!="AR-1"){
+        else{
           envir$sizes <- model$sizes[-i]
           envir$maxsize <- max(envir$sizes)
           datas2 <- datas
@@ -448,30 +587,31 @@ dfbeta.glmgee <- function(model, level=c("clusters","observations"), method=c("P
       Vi <- t(model$corr[D[,p+4],D[,p+4]]*matrix(wi,ni,ni))*matrix(wi,ni,ni)
       Xiw <- Xi*matrix(model$family$mu.eta(etai),nrow(Xi),p)
       if(level=="clusters" | ni==1){
-        Vi2 <- try(chol(Vi),silent=TRUE)
-        if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)
+        if(model$corstr=="Independence") Vi2 <- diag(1/wi[D[,p+4]]^2)
+        else{Vi2 <- try(chol(Vi),silent=TRUE)
+        if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)}
         Xiw2 <- crossprod(Vi2,Xiw)
         Hi <-  Xiw%*%model$naive%*%t(Xiw2)
         dfbetaCi <- model$naive%*%t(Xiw2)%*%solve(diag(ni)-Hi)%*%(yi-mui)
         return(dfbetaCi)
       }else{
-       dfbetaOij <- matrix(0,ni,p)
-       ri <- yi - mui
-       for(j in 1:ni){
+        dfbetaOij <- matrix(0,ni,p)
+        ri <- yi - mui
+        for(j in 1:ni){
           a <- Vi[j,-j]%*%solve(Vi[-j,-j])
           Dt <- Xiw[j,] - a%*%Xiw[-j,]
           rt <- ri[j] - a%*%ri[-j]
           vt <- Vi[j,j] - a%*%Vi[-j,j]
           ht <- (Dt%*%model$naive%*%t(Dt))/vt
           dfbetaOij[j,] <- as.numeric(rt/(vt*(1-ht)))*(Dt%*%model$naive)
-       }
-       return(dfbetaOij)
+        }
+        return(dfbetaOij)
       }
     }
     dfbetas <- 0;rowsn <- ""
     for(i in 1:length(model$arrangedata)){
-       dfbetas <- rbind(dfbetas,matrix(dfbetaCO(model$arrangedata[[i]]),ncol=p))
-       if(level=="observations") rowsn <- c(rowsn,paste(model$ids[i],"(",model$arrangedata[[i]][,p+4],")",sep=""))
+      dfbetas <- rbind(dfbetas,matrix(dfbetaCO(model$arrangedata[[i]]),ncol=p))
+      if(level=="observations") rowsn <- c(rowsn,paste(model$ids[i],"(",model$arrangedata[[i]][,p+4],")",sep=""))
     }
     dfbetas <- dfbetas[-1,]
   }
@@ -506,8 +646,11 @@ dfbeta.glmgee <- function(model, level=c("clusters","observations"), method=c("P
 }
 
 #' @title Cook's Distance for Generalized Estimating Equations
-#' @description Produces an approximation, better known as the \emph{one-step aproximation}, of the Cook's distance, which is aimed to measure the effect on the estimates of the parameters in the linear predictor of deleting each cluster in turn. This function also can produce a cluster-index plot of the Cook's distance for all parameters in the linear predictor or for some subset of them.
-#' @param model an object of class glmgee obtained from the fit of a generalized estimating equation.
+#' @description Produces an approximation, better known as the \emph{one-step aproximation},
+#' of the Cook's distance, which is aimed to measure the effect on the estimates of the parameters in the linear predictor
+#' of deleting each cluster/observation in turn. This function also can produce a cluster/observation-index plot of the
+#' Cook's distance for all parameters in the linear predictor or for some subset of them (via the argument \code{coefs}).
+#' @param model an object of class \emph{glmgee}.
 #' @param method an (optional) character string indicating the method of calculation for the \emph{one-step approximation}. The options are: the \emph{one-step approximation} described by Preisser and Qaqish (1996) in which the working-correlation matrix is assumed to be known ("Preisser-Qaqish"); and the "authentic" \emph{one-step approximation} ("full"). By default, \code{method} is set to be "Preisser-Qaqish".
 #' @param level an (optional) character string indicating the level for which the Cook's distance is required. The options are: cluster-level ("clusters") and observation-level ("observations"). By default, \code{level} is set to be "clusters".
 #' @param plot.it an (optional) logical indicating if the plot of Cook's distance is required or just the data matrix in which that plot is based. By default, \code{plot.it} is set to be FALSE.
@@ -515,21 +658,42 @@ dfbeta.glmgee <- function(model, level=c("clusters","observations"), method=c("P
 #' @param identify an (optional) integer indicating the number of clusters to identify on the plot of Cook's distance. This is only appropriate if \code{plot.it=TRUE}.
 #' @param varest an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). By default, \code{varest} is set to be "robust".
 #' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example,  \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
-#' @return A matrix as many rows as clusters in the sample and one column with the values of the Cook's distance.
-#' @details The Cook's distance consists of the \emph{distance} between two estimates of the parameters in the linear predictor using a metric based on the (estimate of the) variance-covariance matrix. The first one set of estimates is computed from a dataset including all clusters, and the second one is computed from a dataset in which the \emph{i}-th cluster is excluded. To avoid computational burden, the second set of estimates is replaced by its \emph{one-step approximation}. See the \link{dfbeta.glmgee} documentation.
+#' @return A matrix as many rows as clusters/observations in the sample and one column with the values of the Cook's distance.
+#' @details The Cook's distance consists of the \emph{distance} between two estimates of the
+#' parameters in the linear predictor using a metric based on the (estimate of the) variance-covariance matrix. For the cluster-level,
+#' the first one set of estimates is computed from a dataset including all clusters/observations, and the second one is computed from a dataset in which the \emph{i}-th cluster is excluded. To avoid computational burden, the second set of estimates is replaced by its \emph{one-step approximation}. See the \link{dfbeta.glmgee} documentation.
 #' @method cooks.distance glmgee
 #' @export
 #' @examples
-#' ## Cook's distance for all parameters in the linear predictor
-#' mod <- size ~ poly(days,4) + treat
-#' fit <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
-#' cooks.distance(fit, col="red", lty=1, lwd=1, col.lab="blue", main="Cook's distance",
-#'                col.axis="blue", col.main="black", family="mono", cex=0.8)
+#' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' mod1 <- size ~ poly(days,4) + treat
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
 #'
-#' ## Cook's distance for the parameter associated to the variable treat
-#' cooks.distance(fit, coef="treat", col="red", lty=1, lwd=1, col.lab="blue",
-#'                main="Cook's distance", col.axis="blue", col.main="black",
-#'                family="mono", cex=0.8)
+#' ### Cook's distance for all parameters in the linear predictor
+#' cooks.distance(fit1, method="full", plot.it=TRUE, col="red", lty=1, lwd=1, cex=0.8,
+#'                col.lab="blue", col.axis="blue", col.main="black", family="mono")
+#'
+#' ### Cook's distance for the parameter associated to the variable 'treat'
+#' cooks.distance(fit1, coef="treat", method="full", plot.it=TRUE, col="red", lty=1,
+#'                lwd=1, col.lab="blue", col.axis="blue", col.main="black", cex=0.8)
+#'
+#' ###### Example 2: Treatment for severe postnatal depression
+#' mod2 <- depressd ~ visit + group
+#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+#'
+#' ### Cook's distance for all parameters in the linear predictor
+#' cooks.distance(fit2, method="full", plot.it=TRUE, col="red", lty=1, lwd=1, cex=0.8,
+#'                col.lab="blue", col.axis="blue", col.main="black", family="mono")
+#'
+#' ### Cook's distance for the parameter associated to the variable 'group'
+#' cooks.distance(fit2, coef="group", method="full", plot.it=TRUE, col="red", lty=1,
+#'                lwd=1, col.lab="blue", col.axis="blue", col.main="black", cex=0.8)
+#'
+#' @references Pregibon, D. (1981). Logistic regression diagnostics. \emph{The Annals of Statistics} 9, 705-724.
+#' @references Preisser, J.S. and Qaqish, B.F. (1996) Deletion diagnostics for generalised estimating equations.
+#' \emph{Biometrika} 83, 551–562.
+#' @references Hammill, B.G. and Preisser, J.S. (2006) A SAS/IML software program for GEE and regression diagnostics.
+#' \emph{Computational Statistics & Data Analysis} 51, 1197-1212.
 cooks.distance.glmgee <- function(model, method=c("Preisser-Qaqish","full"), level=c("clusters","observations"), plot.it=FALSE, coefs, identify, varest=c("robust","df-adjusted","model","bias-corrected"),...){
   method <- match.arg(method)
   level <- match.arg(level)
@@ -577,7 +741,7 @@ cooks.distance.glmgee <- function(model, method=c("Preisser-Qaqish","full"), lev
 #' @export
 coef.glmgee <- function(object,...){
   out_ <- object$coefficients
-  colnames(out_) <- ""
+  colnames(out_) <- "Estimates"
   return(out_)
 }
 
@@ -585,11 +749,8 @@ coef.glmgee <- function(object,...){
 #' @method model.matrix glmgee
 #' @export
 model.matrix.glmgee <-	function(object,...){
-  if(is.null(object$call$data)) m <- get_all_vars(eval(object$call$formula))
-  else m <- get_all_vars(eval(object$call$formula),eval(object$call$data))
-  modelframe <- model.frame(object$call,m)
-  X <- model.matrix(modelframe,m)
-  return(X)
+  out_ <- model.matrix(object$terms, object$model, contrasts=object$contrasts)
+  return(out_)
 }
 
 #' @method logLik glmgee
@@ -621,17 +782,32 @@ print.glmgee <- function(x, ...){
 
 #' @title Predictions for Generalized Estimating Equations
 #' @description Produces predictions and optionally estimates standard errors of those predictions from a fitted generalized estimating equation.
-#' @param object an object of the class glmgee which is obtained from the fit of a generalized estimating equation.
+#' @param object an object of the class \emph{glmgee}.
 #' @param newdata	an (optional) \code{data frame} in which to look for variables with which to predict. If omitted, the fitted linear predictors are used.
 #' @param type an (optional) character string giving the type of prediction required. The default, "link", is on the scale of the linear predictors, and the alternative, "response", is on the scale of the response variable.
 #' @param se.fit	an (optional) logical switch indicating if standard errors are required. By default, \code{se.fit} is set to be FALSE.
 #' @param varest an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). By default, \code{varest} is set to be "robust".
 #' @param ... further arguments passed to or from other methods.
 #' @return A matrix with so many rows as \code{newdata} and one column with the predictions. If \code{se.fit=}TRUE then a second column with estimates standard errors is included.
-#' @examples mod <- size ~ poly(days,4) + treat
-#' fit <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Stationary-M-dependent(2)")
-#' newdata <- data.frame(days=c(556,556),treat=as.factor(c("normal","ozone_enriched")))
-#' predict(fit,newdata=newdata,type="response",se.fit=TRUE)
+#' @examples
+#' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' mod1 <- size ~ poly(days,4) + treat
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
+#' newdata1 <- data.frame(days=c(556,556),treat=as.factor(c("normal","ozone-enriched")))
+#' predict(fit1,newdata=newdata1,type="response",se.fit=TRUE)
+#'
+#' ###### Example 2: Treatment for severe postnatal depression
+#' mod2 <- depressd ~ visit + group
+#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+#' newdata2 <- data.frame(visit=c(6,6),group=as.factor(c("placebo","estrogen")))
+#' predict(fit2,newdata=newdata2,type="response",se.fit=TRUE)
+#'
+#' ###### Example 3: Treatment for severe postnatal depression (2)
+#' mod3 <- dep ~ visit*group
+#' fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+#' newdata3 <- data.frame(visit=c(6,6),group=as.factor(c("placebo","estrogen")))
+#' predict(fit3,newdata=newdata3,type="response",se.fit=TRUE)
+#'
 #' @method predict glmgee
 #' @export
 predict.glmgee <- function(object, ...,newdata, se.fit=FALSE, type=c("link","response"),varest=c("robust","df-adjusted","model","bias-corrected")){
@@ -643,8 +819,8 @@ predict.glmgee <- function(object, ...,newdata, se.fit=FALSE, type=c("link","res
   }
   else{
     newdata <- data.frame(newdata)
-    mf <- model.frame(delete.response(object$terms),newdata)
-    X <- model.matrix(delete.response(object$terms),mf)
+    mf <- model.frame(delete.response(object$terms),newdata,xlev=object$levels)
+    X <- model.matrix(delete.response(object$terms),mf,contrasts=object$contrasts)
     predicts <- tcrossprod(X,t(object$coefficients))
     offs <- model.offset(mf)
     if(!is.null(offs)) predicts <- predicts + offs
@@ -663,17 +839,41 @@ predict.glmgee <- function(object, ...,newdata, se.fit=FALSE, type=c("link","res
 
 #' @title Residuals for Generalized Estimating Equations
 #' @description Calculates residuals for a fitted generalized estimating equation.
-#' @param object a object of the class glmgee obtained from the fit of a generalized estimating equation.
+#' @param object a object of the class \emph{glmgee}.
 #' @param type an (optional) character string giving the type of residuals which should be returned. The available options are: (1) "pearson"; (2) "deviance";  (3) the distance between the observed response vector and the fitted mean vector using a metric based on the product between the cluster size and fitted variance-covariance matrix ("mahalanobis"). By default, \code{type} is set to be "mahalanobis".
 #' @param plot.it an (optional) logical switch indicating if a plot of the residuals is required. By default, \code{plot.it} is set to be FALSE.
 #' @param identify an (optional) integer value indicating the number of individuals/clusters to identify on the plot of residuals. This is only appropriate when \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods
 #' @return A vector with the observed residuals type \code{type}.
 #' @examples
-#' mod <- size ~ poly(days,4) + treat
-#' fit <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
-#' residuals(fit, type="mahalanobis", col="red", pch=20, col.lab="blue",
+#'
+#' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' mod1 <- size ~ poly(days,4) + treat
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
+#' ### Plot to assess the adequacy of the chosen variance function
+#' residuals(fit1, type="deviance", plot.it=TRUE, col="red", pch=20, col.lab="blue",
 #'           col.axis="blue", col.main="black", family="mono", cex=0.8)
+#' ### Plot to identify trees suspicious to be outliers
+#' residuals(fit1, type="mahalanobis", plot.it=TRUE, col="red", pch=20, col.lab="blue",
+#'           col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 2: Treatment for severe postnatal depression
+#' mod2 <- depressd ~ visit + group
+#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+#' ### Plot to identify women suspicious to be outliers
+#' residuals(fit2, type="mahalanobis", plot.it=TRUE, col="red", pch=20, col.lab="blue",
+#'           col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 3: Treatment for severe postnatal depression (2)
+#' mod3 <- dep ~ visit*group
+#' fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+#' ### Plot to assess the adequacy of the chosen variance function
+#' residuals(fit3, type="pearson", plot.it=TRUE, col="red", pch=20, col.lab="blue",
+#'           col.axis="blue", col.main="black", family="mono", cex=0.8)
+#' ### Plot to identify women suspicious to be outliers
+#' residuals(fit3, type="mahalanobis", plot.it=TRUE, col="red", pch=20, col.lab="blue",
+#'           col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
 #' @method residuals glmgee
 #' @export
 residuals.glmgee <- function(object,..., type=c("mahalanobis","pearson","deviance"), plot.it=FALSE, identify){
@@ -688,8 +888,9 @@ residuals.glmgee <- function(object,..., type=c("mahalanobis","pearson","devianc
     mui <- object$family$linkinv(etai)
     wi <- sqrt(object$family$variance(mui)/D[,p+3])
     Vi <- t(object$corr[D[,p+4],D[,p+4]]*matrix(wi,ni,ni))*matrix(wi,ni,ni)
-    uu <- try(chol(Vi),silent=TRUE)
-    if(is.matrix(uu)) Vi2 <- chol2inv(uu) else Vi2 <- solve(Vi)
+    if(object$corstr=="Independence") Vi2 <- diag(1/wi[D[,p+4]]^2)
+    else{Vi2 <- try(chol(Vi),silent=TRUE)
+    if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)}
     crossprod((yi-mui),Vi2%*%(yi-mui))/ni
   }
   res0 <- object$y-object$fitted.values
@@ -740,24 +941,57 @@ residuals.glmgee <- function(object,..., type=c("mahalanobis","pearson","devianc
 #'
 #' @title Estimating Equations in Generalized Estimating Equations
 #' @description Extracts estimating equations evaluated at the parameter estimates and the observed data for a generalized estimating equation fitted to the data.
-#' @param model an object of class glmgee which is obtained from the fit of a generalized estimating equation.
+#' @param object an object of class \emph{glmgee}.
 #' @param ... further arguments passed to or from other methods.
 #' @return A vector with the value of the estimating equations evaluated at the parameter estimates and the observed data.
-#' @method  estequa glmgee
+#' @method estequa glmgee
 #' @export
 #' @examples
-#' mod <- size ~ poly(days,4) + treat
-#' fit <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
-#' estequa(fit)
-estequa.glmgee <- function(model,...){
-  salida <- model$estfun
-  colnames(salida) <- " "
-  return(salida)
+#' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' mod1 <- size ~ poly(days,4) + treat
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces)
+#' estequa(fit1)
+#'
+#' ###### Example 2: Treatment for severe postnatal depression
+#' mod2 <- depressd ~ visit + group
+#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+#' estequa(fit2)
+#'
+#' ###### Example 3: Treatment for severe postnatal depression (2)
+#' mod3 <- dep ~ visit*group
+#' fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+#' estequa(fit3)
+#'
+#' ###### Example 4: Dental Clinical Trial
+#' mod4 <- score/3.6 ~ rinse*time
+#' fit4 <- glmgee(mod4, family=binomial(log), id=subject, corstr="Exchangeable", data=rinse)
+#' estequa(fit4)
+#'
+#' ###### Example 5: Shoulder Pain after Laparoscopic Cholecystectomy
+#' mod5 <- pain2 ~ treatment + age + time
+#' corstr <- "Stationary-M-dependent(2)"
+#' fit5 <- glmgee(mod5, family=binomial(logit), id=id, corstr=corstr, data=cholecystectomy)
+#' estequa(fit5)
+#'
+#' ###### Example 6: Guidelines for Urinary Incontinence Discussion and Evaluation
+#' mod6 <- bothered ~ gender + age + dayacc + severe + toilet
+#' fit6 <- glmgee(mod6, family=binomial(logit), id=practice, corstr="Exchangeable", data=GUIDE)
+#' estequa(fit6)
+#'
+#' ###### Example 7: Tests of Auditory Perception in Children with OME
+#' OME <- MASS::OME
+#' mod7 <- cbind(Correct, Trials-Correct) ~ Loud + Age + OME
+#' fit7 <- glmgee(mod7, family = binomial(cloglog), id = ID, corstr = "Exchangeable", data = OME)
+#' estequa(fit7)
+estequa.glmgee <- function(object,...){
+  out_ <- object$estfun
+  colnames(out_) <- " "
+  return(out_)
 }
 #'
 #' @title Comparison of nested Generalized Estimating Equations
 #' @description Allows to compare nested generalized estimating equations using the Wald and generalized score tests.
-#' @param object an (object) of the class glmgee which is obtained from the fit of a generalized estimating equation.
+#' @param object an object of the class \emph{glmgee}.
 #' @param ... another objects of the class glmgee which are obtained from the fit of generalized estimating equations.
 #' @param test an (optional) character string indicating the required test. The available options are: Wald ("wald") and generalized score ("score") tests. By default, \code{test} is set to be "wald".
 #' @param varest an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters in the Wald test. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). By default, \code{varest} is set to be "robust". See \link{vcov.glmgee}.
@@ -768,10 +1002,13 @@ estequa.glmgee <- function(model,...){
 #' \item \code{df:}{ The number of degrees of freedom.}
 #' \item \code{Pr(>Chi):}{ The \emph{p}-value of the test computed using the Chi-square distribution.}
 #' }
+#' @references Rotnitzky, A. and Jewell, P. (1990) Hypothesis Testing of Regression Parameters
+#' in Semiparametric Generalized Linear Models for Cluster Correlated Data. \emph{Biometrika} 77, 485-497.
+#' @references Boos, D.D. (1992) On Generalized Score Tests. \emph{The American Statistician} 46, 327-333.
 #' @method anova glmgee
 #' @export
 #' @examples
-#' ## Example 1
+#' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 #' mod <- size ~ poly(days,4)
 #' fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
 #' fit2 <- update(fit1, . ~ . + treat)
@@ -781,9 +1018,9 @@ estequa.glmgee <- function(model,...){
 #' anova(fit1,fit2,fit3,test="score")
 #' anova(fit3,test="score")
 #'
-#' ## Example 2
+#' ###### Example 2: Treatment for severe postnatal depression
 #' mod2 <- depressd ~ group
-#' fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="Exchangeable", data=depression)
+#' fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
 #' fit2 <- update(fit1, . ~ . + visit)
 #' fit3 <- update(fit2, . ~ . + group:visit)
 #' anova(fit1,fit2,fit3,test="wald")
@@ -791,17 +1028,17 @@ estequa.glmgee <- function(model,...){
 #' anova(fit1,fit2,fit3,test="score")
 #' anova(fit3,test="score")
 #'
-#' ## Example 3
+#' ###### Example 3: Treatment for severe postnatal depression (2)
 #' mod3 <- dep ~ group
 #' fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
 #' fit2 <- update(fit1, . ~ . + visit)
-#' fit3 <- update(fit2, . ~ . + group:visit)
+#' fit3 <- update(fit2, . ~ . + visit:group)
 #' anova(fit1,fit2,fit3,test="wald")
 #' anova(fit3,test="wald")
 #' anova(fit1,fit2,fit3,test="score")
 #' anova(fit3,test="score")
-#' @references Boos D. (1992) On Generalized Score Tests. \emph{American Statistician} 46, 327–33.
-#' @references Rotnitzky A. and Jewell N.P. (1990). Hypothesis Testing of Regression Parameters in Semiparametric Generalized Linear Models for Cluster Correlated Data. \emph{Biometrika} 77, 485-497.
+#' @references Boos, D. (1992) On Generalized Score Tests. \emph{American Statistician} 46, 327–33.
+#' @references Rotnitzky, A. and Jewell, N.P. (1990). Hypothesis Testing of Regression Parameters in Semiparametric Generalized Linear Models for Cluster Correlated Data. \emph{Biometrika} 77, 485-497.
 anova.glmgee <- function(object,...,test=c("wald","score"),verbose=TRUE,varest=c("robust","df-adjusted","model","bias-corrected")){
   test <- match.arg(test)
   varest <- match.arg(varest)
@@ -822,7 +1059,7 @@ anova.glmgee <- function(object,...,test=c("wald","score"),verbose=TRUE,varest=c
     ids <- is.na(match(vars1,vars0))
     if(test=="wald"){
       vcovsids <- chol(vcov(x[[i]],type=varest)[ids,ids])
-      if(is.matrix(vcovsids)) vcovsids <- chol2inv(vcovsids) else vcovsids <- solve(vcov(x[[i]])[ids,ids])
+      if(is.matrix(vcovsids)) vcovsids <- chol2inv(vcovsids) else vcovsids <- solve(vcov(x[[i]],type=varest)[ids,ids])
       sc <- crossprod(coef(x[[i]])[ids],vcovsids)%*%coef(x[[i]])[ids]
     }
     if(test=="score"){
@@ -859,41 +1096,41 @@ anova.glmgee <- function(object,...,test=c("wald","score"),verbose=TRUE,varest=c
 
 #' @title QIC for Generalized Estimating Equations
 #' @description Computes the quasi-likelihood under the independence model criterion (QIC) for one or more objects of the class glmgee.
-#' @param ...	one or several objects of the class glmgee which are obtained from the fit of generalized estimating equations.
+#' @param ...	one or several objects of the class \emph{glmgee}.
 #' @param k an (optional) non-negative value giving the magnitude of the penalty. By default, \code{k} is set to be 2.
 #' @param u an (optional) logical switch indicating if QIC should be replaced by QICu. By default, \code{u} is set to be FALSE.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @return A \code{data.frame} with the values of -2*quasi-likelihood, the number of parameters in the linear predictor, and the value of QIC (or QICu if \code{u}=TRUE) for each glmgee object in the input.
+#' @return A \code{data.frame} with the values of -2*quasi-likelihood, the number of parameters in the linear predictor, and the value of QIC (or QICu if \code{u}=TRUE) for each \emph{glmgee} object in the input.
 #' @seealso \link{CIC}, \link{GHYC}, \link{RJC}, \link{AGPC}, \link{SGPC}
 #' @export QIC
 #' @examples
-#' ## Example 1
-#' mod <- size ~ poly(days,4) + treat
-#' fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
+#' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' mod1 <- size ~ poly(days,4) + treat
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces)
 #' fit2 <- update(fit1, corstr="AR-1")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
-#' fit4 <- update(fit1, corstr="Independence")
+#' fit4 <- update(fit1, corstr="Exchangeable")
 #' QIC(fit1, fit2, fit3, fit4)
 #'
-#' ## Example 2
-#' mod <- dep ~ visit + group
-#' fit1 <- glmgee(mod, id=subj, family=gaussian, corstr="Exchangeable", data=depression)
-#' fit2 <- update(fit1, corstr="AR-1")
-#' fit3 <- update(fit1, corstr="Non-Stationary-M-dependent(2)")
-#' fit4 <- update(fit1, corstr="Independence")
-#' QIC(fit1, fit2, fit3, fit4)
-#'
-#' ## Example 3
-#' mod <- depressd ~ visit + group
-#' fit1 <- glmgee(mod, id=subj, family=binomial, corstr="Exchangeable", data=depression)
+#' ###### Example 2: Treatment for severe postnatal depression
+#' mod2 <- depressd ~ visit + group
+#' fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), data=depression)
 #' fit2 <- update(fit1, corstr="AR-1")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
-#' fit4 <- update(fit1, corstr="Independence")
+#' fit4 <- update(fit1, corstr="Exchangeable")
 #' QIC(fit1, fit2, fit3, fit4)
-#' @references Pan W. (2001) Akaike's information criterion in generalized estimating equations, \emph{Biometrics} 57, 120-125.
-#' @references Hin L-Y, Carey V.J., Wang Y-G (2007) Criteria for Working–Correlation–Structure Selection in GEE:
+#'
+#' ###### Example 3: Treatment for severe postnatal depression (2)
+#' mod3 <- dep ~ visit*group
+#' fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), data=depression)
+#' fit2 <- update(fit1, corstr="AR-1")
+#' fit3 <- update(fit1, corstr="Exchangeable")
+#' QIC(fit1, fit2, fit3)
+#'
+#' @references Pan, W. (2001) Akaike's information criterion in generalized estimating equations, \emph{Biometrics} 57, 120-125.
+#' @references Hin, L.-Y. and Carey, V.J. and Wang, Y.-G. (2007) Criteria for Working–Correlation–Structure Selection in GEE:
 #' Assessment via Simulation. \emph{The American Statistician} 61, 360–364.
-
+#'
 QIC <- function(...,k=2,u=FALSE,verbose=TRUE){
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -933,39 +1170,39 @@ QIC <- function(...,k=2,u=FALSE,verbose=TRUE){
 
 #' @title Correlation Information Criterion for Generalized Estimating Equations
 #' @description Computes the Correlation Information Criterion (CIC) for one or more objects of the class glmgee.
-#' @param ...	one or several objects of the class glmgee which are obtained from the fit of generalized estimating equations.
+#' @param ...	one or several objects of the class \emph{glmgee}.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @return A \code{data.frame} with the values of the CIC for each glmgee object in the input.
+#' @return A \code{data.frame} with the values of the CIC for each \emph{glmgee} object in the input.
 #' @export CIC
 #' @seealso \link{QIC}, \link{GHYC}, \link{RJC}, \link{AGPC}, \link{SGPC}
 #' @examples
-#' ## Example 1
-#' mod <- size ~ poly(days,4) + treat
-#' fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
+#' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' mod1 <- size ~ poly(days,4) + treat
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces)
 #' fit2 <- update(fit1, corstr="AR-1")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
-#' fit4 <- update(fit1, corstr="Independence")
+#' fit4 <- update(fit1, corstr="Exchangeable")
 #' CIC(fit1, fit2, fit3, fit4)
 #'
-#' ## Example 2
-#' mod <- dep ~ visit + group
-#' fit1 <- glmgee(mod, id=subj, family=gaussian, corstr="Exchangeable", data=depression)
-#' fit2 <- update(fit1, corstr="AR-1")
-#' fit3 <- update(fit1, corstr="Non-Stationary-M-dependent(2)")
-#' fit4 <- update(fit1, corstr="Independence")
-#' CIC(fit1, fit2, fit3, fit4)
-#'
-#' ## Example 3
-#' mod <- depressd ~ visit + group
-#' fit1 <- glmgee(mod, id=subj, family=binomial, corstr="Exchangeable", data=depression)
+#' ###### Example 2: Treatment for severe postnatal depression
+#' mod2 <- depressd ~ visit + group
+#' fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), data=depression)
 #' fit2 <- update(fit1, corstr="AR-1")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
-#' fit4 <- update(fit1, corstr="Independence")
+#' fit4 <- update(fit1, corstr="Exchangeable")
 #' CIC(fit1, fit2, fit3, fit4)
-#' @references Hin L.-Y. and Wang Y.-G. (2009) Working-Correlation-Structure Identification in Generalized Estimating Equations. \emph{Statistics in Medicine}, 28, 642-658.
-#' @references Hin L.-Y., Carey V.J., Wang Y.-G. (2007) Criteria for Working–Correlation–Structure Selection in GEE:
+#'
+#' ###### Example 3: Treatment for severe postnatal depression (2)
+#' mod3 <- dep ~ visit*group
+#' fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), data=depression)
+#' fit2 <- update(fit1, corstr="AR-1")
+#' fit3 <- update(fit1, corstr="Exchangeable")
+#' CIC(fit1, fit2, fit3)
+#'
+#' @references Hin, L.-Y. and Wang, Y.-G. (2009) Working-Correlation-Structure Identification in Generalized Estimating Equations. \emph{Statistics in Medicine}, 28, 642-658.
+#' @references Hin, L.-Y. and Carey, V.J. and Wang, Y.-G. (2007) Criteria for Working–Correlation–Structure Selection in GEE:
 #' Assessment via Simulation. \emph{The American Statistician} 61, 360–364.
-
+#'
 CIC <- function(...,verbose=TRUE){
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -1003,39 +1240,41 @@ CIC <- function(...,verbose=TRUE){
 
 #' @title Gosho-Hamada-Yoshimura's Criterion for Generalized Estimating Equations
 #' @description Computes the Gosho-Hamada-Yoshimura's criterion (GHYC) for one or more objects of the class glmgee.
-#' @param ...	one or several objects of the class glmgee which are obtained from the fit of generalized estimating equations.
+#' @param ...	one or several objects of the class \emph{glmgee}.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @return A \code{data.frame} with the values of the GHYC for each glmgee object in the input.
+#' @return A \code{data.frame} with the values of the GHYC for each \emph{glmgee} object in the input.
 #' @export GHYC
+#' @references Gosho, M. and Hamada, C. and Yoshimura, I. (2011) Criterion for the Selection
+#' of a Working Correlation Structure in the Generalized Estimating Equation Approach for
+#' Longitudinal Balanced Data. \emph{Communications in Statistics — Theory and Methods} 40,
+#' 3839-3856.
+#' @references Gosho, M. (2014) Criteria to Select a Working Correlation Structure in SAS.
+#' \emph{Journal of Statistical Software, Code Snippets} 57, 1548-7660.
 #' @seealso \link{QIC}, \link{CIC}, \link{RJC}, \link{AGPC}, \link{SGPC}
 #' @examples
-#' ## Example 1
-#' mod <- size ~ poly(days,4) + treat
-#' fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
+#' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' mod1 <- size ~ poly(days,4) + treat
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces)
 #' fit2 <- update(fit1, corstr="AR-1")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
-#' fit4 <- update(fit1, corstr="Independence")
+#' fit4 <- update(fit1, corstr="Exchangeable")
 #' GHYC(fit1, fit2, fit3, fit4)
 #'
-#' ## Example 2
-#' mod <- dep ~ visit + group
-#' fit1 <- glmgee(mod, id=subj, family=gaussian, corstr="Exchangeable", data=depression)
-#' fit2 <- update(fit1, corstr="AR-1")
-#' fit3 <- update(fit1, corstr="Non-Stationary-M-dependent(2)")
-#' fit4 <- update(fit1, corstr="Independence")
-#' GHYC(fit1, fit2, fit3, fit4)
-#'
-#' ## Example 3
-#' mod <- depressd ~ visit + group
-#' fit1 <- glmgee(mod, id=subj, family=binomial, corstr="Exchangeable", data=depression)
+#' ###### Example 2: Treatment for severe postnatal depression
+#' mod2 <- depressd ~ visit + group
+#' fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), data=depression)
 #' fit2 <- update(fit1, corstr="AR-1")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
-#' fit4 <- update(fit1, corstr="Independence")
+#' fit4 <- update(fit1, corstr="Exchangeable")
 #' GHYC(fit1, fit2, fit3, fit4)
-#' @references Gosho M., Hamada C., Yoshimura I. (2011) Criterion for the Selection of a Working Correlation Structure in the Generalized Estimating Equation Approach for Longitudinal Balanced
-#' Data. \emph{Communications in Statistics – Theory and Methods} 40, 3839–3856.
-#' @references Gosho M. (2014) Criteria to Select a Working Correlation Structure in SAS. \emph{Journal of Statistical Software, Code Snippets} 57.
-
+#'
+#' ###### Example 3: Treatment for severe postnatal depression (2)
+#' mod3 <- dep ~ visit*group
+#' fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), data=depression)
+#' fit2 <- update(fit1, corstr="AR-1")
+#' fit3 <- update(fit1, corstr="Exchangeable")
+#' GHYC(fit1, fit2, fit3)
+#'
 GHYC <- function(...,verbose=TRUE){
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -1100,38 +1339,37 @@ GHYC <- function(...,verbose=TRUE){
 
 #' @title Rotnitzky–Jewell's Criterion for Generalized Estimating Equations
 #' @description Computes the Rotnitzky–Jewell's criterion (RJC) for one or more objects of the class glmgee.
-#' @param ...	one or several objects of the class glmgee which are obtained from the fit of generalized estimating equations.
+#' @param ...	one or several objects of the class \emph{glmgee}.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @return A \code{data.frame} with the values of the RJC for each glmgee object in the input.
+#' @return A \code{data.frame} with the values of the RJC for each \emph{glmgee} object in the input.
 #' @export RJC
 #' @seealso \link{QIC}, \link{CIC}, \link{GHYC}, \link{AGPC}, \link{SGPC}
+#' @references Hin, L.-Y. and Carey, V.J. and Wang, Y.-G. (2007) Criteria for Working–Correlation–Structure
+#' Selection in GEE: Assessment via Simulation. \emph{The American Statistician} 61, 360-364.
 #' @examples
-#' ## Example 1
-#' mod <- size ~ poly(days,4) + treat
-#' fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
+#' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' mod1 <- size ~ poly(days,4) + treat
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces)
 #' fit2 <- update(fit1, corstr="AR-1")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
-#' fit4 <- update(fit1, corstr="Independence")
+#' fit4 <- update(fit1, corstr="Exchangeable")
 #' RJC(fit1, fit2, fit3, fit4)
 #'
-#' ## Example 2
-#' mod <- dep ~ visit + group
-#' fit1 <- glmgee(mod, id=subj, family=gaussian, corstr="Exchangeable", data=depression)
-#' fit2 <- update(fit1, corstr="AR-1")
-#' fit3 <- update(fit1, corstr="Non-Stationary-M-dependent(2)")
-#' fit4 <- update(fit1, corstr="Independence")
-#' RJC(fit1, fit2, fit3, fit4)
-#'
-#' ## Example 3
-#' mod <- depressd ~ visit + group
-#' fit1 <- glmgee(mod, id=subj, family=binomial, corstr="Exchangeable", data=depression)
+#' ###### Example 2: Treatment for severe postnatal depression
+#' mod2 <- depressd ~ visit + group
+#' fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), data=depression)
 #' fit2 <- update(fit1, corstr="AR-1")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
-#' fit4 <- update(fit1, corstr="Independence")
+#' fit4 <- update(fit1, corstr="Exchangeable")
 #' RJC(fit1, fit2, fit3, fit4)
-#' @references Hin L-Y, Carey V.J., Wang Y-G (2007) Criteria for Working–Correlation–Structure Selection in GEE:
-#' Assessment via Simulation. \emph{The American Statistician} 61, 360–364.
-
+#'
+#' ###### Example 3: Treatment for severe postnatal depression (2)
+#' mod3 <- dep ~ visit*group
+#' fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), data=depression)
+#' fit2 <- update(fit1, corstr="AR-1")
+#' fit3 <- update(fit1, corstr="Exchangeable")
+#' RJC(fit1, fit2, fit3)
+#'
 RJC <- function(...,verbose=TRUE){
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -1168,7 +1406,7 @@ RJC <- function(...,verbose=TRUE){
 }
 
 
-#' @title Variable selection in Generalized Estimating Equation
+#' @title Variable selection in Generalized Estimating Equations
 #' @description Performs variable selection in generalized estimating equations using hybrid versions of forward stepwise
 #' and backward stepwise.
 #' @param model an object of the class glmgee which is obtained from the fit of a generalized estimating equation.
@@ -1204,21 +1442,27 @@ RJC <- function(...,verbose=TRUE){
 #' }
 #' @seealso \link{stepCriterion.lm}, \link{stepCriterion.glm}, \link{stepCriterion.overglm}
 #' @examples
-#' ## Example 1
+#' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 #' mod <- size ~ poly(days,4)*treat
 #' fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
 #' stepCriterion(fit1, criterion="p-value", direction="forward", scope=list(lower=~1,upper=mod))
 #'
-#' ## Example 2
+#' ###### Example 2: Treatment for severe postnatal depression
 #' mod <- depressd ~ visit*group
 #' fit2 <- glmgee(mod, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
 #' stepCriterion(fit2, criterion="adjr2", direction="forward", scope=list(lower=~1,upper=mod))
+#'
+#' ###### Example 3: Treatment for severe postnatal depression (2)
+#' mod <- dep ~ visit*group
+#' fit2 <- glmgee(mod, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+#' stepCriterion(fit2, criterion="adjr2", direction="forward", scope=list(lower=~1,upper=mod))
+#'
 #' @method stepCriterion glmgee
 #' @export
-#' @references James G., Witten D., Hastie T. and Tibshirani R. (2013, page 210) An Introduction to Statistical Learning
-#' with Applications in R. Springer, New York.
-#' @references Jianwen X., Jiamao Z. and Liya F. (2019) Variable selection in generalized estimating equations via empirical
-#' likelihood and Gaussian pseudo-likelihood. Communications in Statistics - Simulation and Computation, 48:4.
+#' @references James, G. and Witten, D. and Hastie, T. and Tibshirani, R. (2013, page 210) \emph{An Introduction to Statistical Learning
+#' with Applications in R}. Springer, New York.
+#' @references Jianwen, X. and Jiamao, Z. and Liya, F. (2019) Variable selection in generalized estimating equations via empirical
+#' likelihood and Gaussian pseudo-likelihood. \emph{Communications in Statistics - Simulation and Computation} 48, 1239-1250.
 stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","adjr2","agpc","sgpc"), test=c("wald","score"), direction=c("forward","backward"), levels=c(0.05,0.05), trace=TRUE, scope, digits=5,varest=c("robust","df-adjusted","model","bias-corrected"),...){
   xxx <- list(...)
   if(is.null(xxx$k)) k <- 2 else k <- xxx$k
@@ -1530,43 +1774,45 @@ stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","adjr
 
 #' @title AGPC for Generalized Estimating Equations
 #' @description Computes the Akaike-type penalized Gaussian pseudo-likelihood criterion (AGPC) for one or more objects of the class glmgee.
-#' @param ...	one or several objects of the class glmgee which are obtained from the fit of generalized estimating equations.
+#' @param ...	one or several objects of the class \emph{glmgee}.
 #' @param k an (optional) non-negative value giving the magnitude of the penalty. By default, \code{k} is set to be 2.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @return A \code{data.frame} with the values of the gaussian pseudo-likelihood, the number of parameters in the linear predictor plus the number of parameters in the correlation matrix, and the value of AGPC for each glmgee object in the input.
+#' @return A \code{data.frame} with the values of the gaussian pseudo-likelihood, the number of parameters in the linear predictor plus the number of parameters in the correlation matrix, and the value of AGPC for each \emph{glmgee} object in the input.
 #' @details If \code{k} is set to be 0 then the AGPC reduces to the Gaussian pseudo-likelihood criterion (GPC), proposed by Carey and Wang (2011), which corresponds to the logarithm of the multivariate normal density function.
 #' @export AGPC
 #' @seealso \link{QIC}, \link{CIC}, \link{RJC}, \link{GHYC}, \link{SGPC}
+#' @references Carey, V.J. and Wang, Y.-G. (2011) Working covariance model selection for
+#' generalized estimating equations. \emph{Statistics in Medicine} 30, 3117-3124.
+#' @references Zhu, X. and Zhu, Z. (2013) Comparison of Criteria to Select Working Correlation
+#' Matrix in Generalized Estimating Equations. \emph{Chinese Journal of Applied Probability
+#' and Statistics} 29, 515-530.
+#' @references Fu, L. and Hao, Y. and Wang, Y.-G. (2018) Working correlation structure
+#' selection in generalized estimating equations. \emph{Computational Statistics} 33,
+#' 983-996.
 #' @examples
-#' ## Example 1
-#' mod <- size ~ poly(days,4) + treat
-#' fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
+#' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' mod1 <- size ~ poly(days,4) + treat
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces)
 #' fit2 <- update(fit1, corstr="AR-1")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
-#' fit4 <- update(fit1, corstr="Independence")
+#' fit4 <- update(fit1, corstr="Exchangeable")
 #' AGPC(fit1, fit2, fit3, fit4)
 #'
-#' ## Example 2
-#' mod <- dep ~ visit + group
-#' fit1 <- glmgee(mod, id=subj, family=gaussian, corstr="Exchangeable", data=depression)
-#' fit2 <- update(fit1, corstr="AR-1")
-#' fit3 <- update(fit1, corstr="Non-Stationary-M-dependent(2)")
-#' fit4 <- update(fit1, corstr="Independence")
-#' AGPC(fit1, fit2, fit3, fit4)
-#'
-#' ## Example 3
-#' mod <- depressd ~ visit + group
-#' fit1 <- glmgee(mod, id=subj, family=binomial, corstr="Exchangeable", data=depression)
+#' ###### Example 2: Treatment for severe postnatal depression
+#' mod2 <- depressd ~ visit + group
+#' fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), data=depression)
 #' fit2 <- update(fit1, corstr="AR-1")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
-#' fit4 <- update(fit1, corstr="Independence")
+#' fit4 <- update(fit1, corstr="Exchangeable")
 #' AGPC(fit1, fit2, fit3, fit4)
-#' @references Carey V.J. and Wang Y.-G. (2011) Working covariance model selection for generalized estimating equations. \emph{Statistics in Medicine} 30, 3117–3124.
-#' @references Zhu X. and Zhu Z. (2013) Comparison of criteria to select working correlation matrix in generalized estimating
-#' equations. \emph{Chinese Journal of Applied Probability and Statistics} 29, 515-530.
-#' @references Fu L., Hao Y. and Wang Y.-G. (2018) Working correlation structure selection in generalized
-#' estimating equations. \emph{Computational Statistics} 33, 983-996.
-
+#'
+#' ###### Example 3: Treatment for severe postnatal depression (2)
+#' mod3 <- dep ~ visit*group
+#' fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), data=depression)
+#' fit2 <- update(fit1, corstr="AR-1")
+#' fit3 <- update(fit1, corstr="Exchangeable")
+#' AGPC(fit1, fit2, fit3)
+#'
 AGPC <- function(...,k=2,verbose=TRUE){
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -1589,8 +1835,11 @@ AGPC <- function(...,k=2,verbose=TRUE){
       mui <- family$linkinv(etai)
       wi <- sqrt(family$variance(mui)/D[,p+3])
       Vi <- phi*t(model$corr[D[,p+4],D[,p+4]]*matrix(wi,ni,ni))*matrix(wi,ni,ni)
-      uu <- try(chol(Vi),silent=TRUE)
-      if(is.matrix(uu)) Vi2 <- chol2inv(uu) else Vi2 <- solve(Vi)
+      if(model$corstr=="Independence") Vi2 <- (1/phi)*diag(1/wi[D[,p+4]]^2)
+      else{
+        Vi2 <- try(chol(Vi),silent=TRUE)
+        if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)
+      }
       return(ni*log(2*pi) + t(yi - mui)%*%Vi2%*%(yi - mui) + log(det(Vi)))
     }
     resume <- Reduce('+',lapply(model$arrangedata,VSi))
@@ -1637,41 +1886,43 @@ AGPC <- function(...,k=2,verbose=TRUE){
 
 #' @title SGPC for Generalized Estimating Equations
 #' @description Computes the Schwarz-type penalized Gaussian pseudo-likelihood criterion (SGPC) for one or more objects of the class glmgee.
-#' @param ...	one or several objects of the class glmgee which are obtained from the fit of generalized estimating equations.
+#' @param ...	one or several objects of the class \emph{glmgee}.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @return A \code{data.frame} with the values of the gaussian pseudo-likelihood, the number of parameters in the linear predictor plus the number of parameters in the correlation matrix, and the value of SGPC for each glmgee object in the input.
+#' @return A \code{data.frame} with the values of the gaussian pseudo-likelihood, the number of parameters in the linear predictor plus the number of parameters in the correlation matrix, and the value of SGPC for each \emph{glmgee} object in the input.
 #' @export SGPC
 #' @seealso \link{QIC}, \link{CIC}, \link{RJC}, \link{GHYC}, \link{AGPC}
+#' @references Carey, V.J. and Wang, Y.-G. (2011) Working covariance model selection for
+#' generalized estimating equations. \emph{Statistics in Medicine} 30, 3117-3124.
+#' @references Zhu, X. and Zhu, Z. (2013) Comparison of Criteria to Select Working Correlation
+#' Matrix in Generalized Estimating Equations. \emph{Chinese Journal of Applied Probability
+#' and Statistics} 29, 515-530.
+#' @references Fu, L. and Hao, Y. and Wang, Y.-G. (2018) Working correlation structure
+#' selection in generalized estimating equations. \emph{Computational Statistics} 33,
+#' 983-996.
 #' @examples
-#' ## Example 1
-#' mod <- size ~ poly(days,4) + treat
-#' fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
+#' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' mod1 <- size ~ poly(days,4) + treat
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces)
 #' fit2 <- update(fit1, corstr="AR-1")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
-#' fit4 <- update(fit1, corstr="Independence")
+#' fit4 <- update(fit1, corstr="Exchangeable")
 #' SGPC(fit1, fit2, fit3, fit4)
 #'
-#' ## Example 2
-#' mod <- dep ~ visit + group
-#' fit1 <- glmgee(mod, id=subj, family=gaussian, corstr="Exchangeable", data=depression)
-#' fit2 <- update(fit1, corstr="AR-1")
-#' fit3 <- update(fit1, corstr="Non-Stationary-M-dependent(2)")
-#' fit4 <- update(fit1, corstr="Independence")
-#' SGPC(fit1, fit2, fit3, fit4)
-#'
-#' ## Example 3
-#' mod <- depressd ~ visit + group
-#' fit1 <- glmgee(mod, id=subj, family=binomial, corstr="Exchangeable", data=depression)
+#' ###### Example 2: Treatment for severe postnatal depression
+#' mod2 <- depressd ~ visit + group
+#' fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), data=depression)
 #' fit2 <- update(fit1, corstr="AR-1")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
-#' fit4 <- update(fit1, corstr="Independence")
+#' fit4 <- update(fit1, corstr="Exchangeable")
 #' SGPC(fit1, fit2, fit3, fit4)
-#' @references Carey V.J. and Wang Y.-G. (2011) Working covariance model selection for generalized estimating equations. \emph{Statistics in Medicine} 30, 3117–3124.
-#' @references Zhu X. and Zhu Z. (2013) Comparison of criteria to select working correlation matrix in generalized estimating
-#' equations. \emph{Chinese Journal of Applied Probability and Statistics} 29, 515-530.
-#' @references Fu L., Hao Y. and Wang Y.-G. (2018) Working correlation structure selection in generalized
-#' estimating equations. \emph{Computational Statistics} 33, 983-996.
-
+#'
+#' ###### Example 3: Treatment for severe postnatal depression (2)
+#' mod3 <- dep ~ visit*group
+#' fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), data=depression)
+#' fit2 <- update(fit1, corstr="AR-1")
+#' fit3 <- update(fit1, corstr="Exchangeable")
+#' SGPC(fit1, fit2, fit3)
+#'
 SGPC <- function(...,verbose=TRUE){
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -1694,8 +1945,9 @@ SGPC <- function(...,verbose=TRUE){
       mui <- family$linkinv(etai)
       wi <- sqrt(family$variance(mui)/D[,p+3])
       Vi <- phi*t(model$corr[D[,p+4],D[,p+4]]*matrix(wi,ni,ni))*matrix(wi,ni,ni)
-      uu <- try(chol(Vi),silent=TRUE)
-      if(is.matrix(uu)) Vi2 <- chol2inv(uu) else Vi2 <- solve(Vi)
+      if(model$corstr=="Independence") Vi2 <- (1/phi)*diag(1/wi[D[,p+4]]^2)
+      else{Vi2 <- try(chol(Vi),silent=TRUE)
+      if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)}
       return(ni*log(2*pi) + t(yi - mui)%*%Vi2%*%(yi - mui) + log(det(Vi)))
     }
     resume <- Reduce('+',lapply(model$arrangedata,VSi))
@@ -1742,32 +1994,32 @@ SGPC <- function(...,verbose=TRUE){
 
 #' @title Estimate of the variance-covariance matrix in GEEs
 #' @description Computes the type-\code{type} estimate of the variance-covariance matrix from an object of the class glmgee.
-#' @param object An object of the class glmgee which is obtained from the fit of a generalized estimating equation.
+#' @param object An object of the class \emph{glmgee}.
 #' @param type an (optional) character string indicating the type of estimator which should be used. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). By default, \code{type} is set to be "robust".
 #' @param ...	further arguments passed to or from other methods.
 #' @return A \code{matrix} with the type-\code{type} estimate of the variance-covariance matrix.
 #' @method vcov glmgee
 #' @export
 #' @examples
-#' ## Example 1
+#' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 #' mod <- size ~ poly(days,4) + treat
 #' fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
 #' vcov(fit1)
 #' vcov(fit1,type="bias-corrected")
 #'
-#' ## Example 2
-#' mod <- dep ~ visit + group
-#' fit2 <- glmgee(mod, id=subj, family=gaussian, corstr="AR-1", data=depression)
-#' vcov(fit2)
-#' vcov(fit2,type="bias-corrected")
-#'
-#' ## Example 3
+#' ###### Example 2: Treatment for severe postnatal depression
 #' mod <- depressd ~ visit + group
-#' fit3 <- glmgee(mod, id=subj, family=binomial, corstr="Stationary-M-dependent(3)", data=depression)
+#' fit3 <- glmgee(mod, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
 #' vcov(fit3)
 #' vcov(fit3,type="bias-corrected")
 #'
-#' @references Mancl, L.A. and DeRouen T.A. (2001) A Covariance Estimator for GEE with Improved Small-Sample Properties. \emph{Biometrics} 57, 126-134.
+#' ###### Example 3: Treatment for severe postnatal depression (2)
+#' mod <- dep ~ visit*group
+#' fit2 <- glmgee(mod, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+#' vcov(fit2)
+#' vcov(fit2,type="bias-corrected")
+#'
+#' @references Mancl, L.A. and DeRouen, T.A. (2001) A Covariance Estimator for GEE with Improved Small-Sample Properties. \emph{Biometrics} 57, 126-134.
 vcov.glmgee <- function(object,...,type=c("robust","df-adjusted","model","bias-corrected","jackknife")){
   type <- match.arg(type)
   if(type=="robust") out_ <- object$R
@@ -1783,29 +2035,27 @@ vcov.glmgee <- function(object,...,type=c("robust","df-adjusted","model","bias-c
 }
 #' @title Leverage for Generalized Estimating Equations
 #' @description Computes and, optionally, displays a graph of the leverage measures at the cluster- and observation-level.
-#' @param object an object of class glmgee which is obtained from the fit of a generalized estimating equation.
+#' @param object an object of class \emph{glmgee}.
 #' @param level an (optional) character string indicating the level for which the leverage measures are required. The options are: cluster-level ("clusters") and observation-level ("observations"). By default, \code{level} is set to be "clusters".
 #' @param plot.it an (optional) logical indicating if the plot of the measures of leverage are required or just the data matrix in which that plot is based. By default, \code{plot.it} is set to be FALSE.
 #' @param identify an (optional) integer indicating the number of (\code{level=``clusters''}) or observations (\code{level=``observations''}) to identify on the plot of the leverage measures. This is only appropriate if \code{plot.it} is specified to be \code{TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it} is specified to be \code{TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example,  \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
 #' @return A vector with the values of the leverage measures with so many rows as clusters (\code{level=``clusters''}) or observations (\code{level=``observations''}) in the sample.
 #' @references Preisser, J.S. and Qaqish, B.F. (1996). Deletion diagnostics for generalised estimating equations. \emph{Biometrika}, 83, 551-562.
-#' @references Hammill, B.G. and Preisser J.S. (2006). A SAS/IML software program for GEE and regression diagnostics. \emph{Computational Statistics & Data Analysis}, 51, 1197-1212.
+#' @references Hammill, B.G. and Preisser, J.S. (2006). A SAS/IML software program for GEE and regression diagnostics. \emph{Computational Statistics & Data Analysis}, 51, 1197-1212.
 #' @method leverage glmgee
 #' @export
 #' @examples
 #'
-#' #Example 1
+#' ###### Example 1: Tests of Auditory Perception in Children with OME
 #' OME <- MASS::OME
 #' mod <- cbind(Correct, Trials-Correct) ~ Loud + Age + OME
 #' fit1 <- glmgee(mod, family = binomial(cloglog), id = ID, corstr = "Exchangeable", data = OME)
 #' leverage(fit1,level="clusters",plot.it=TRUE)
 #'
-#' #Example 2
+#' ###### Example 2: Guidelines for Urinary Incontinence Discussion and Evaluation
 #' mod <- bothered ~ gender + age + dayacc + severe + toilet
 #' fit2 <- glmgee(mod, family=binomial(logit), id=practice, corstr="Exchangeable", data=GUIDE)
-#' summary(fit2)
-#' par(mfrow=c(1,2))
 #' leverage(fit2,level="clusters",plot.it=TRUE)
 #' leverage(fit2,level="observations",plot.it=TRUE)
 #'
@@ -1822,8 +2072,9 @@ leverage.glmgee <- function(object,level=c("clusters","observations"),plot.it=FA
     wi <- sqrt(object$family$variance(mui)/D[,p+3])
     Vi <- t(object$corr[D[,p+4],D[,p+4]]*matrix(wi,ni,ni))*matrix(wi,ni,ni)
     Xiw <- Xi*matrix(object$family$mu.eta(etai),nrow(Xi),p)
-    Vi2 <- try(chol(Vi),silent=TRUE)
-    if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)
+    if(object$corstr=="Independence") Vi2 <- diag(1/wi[D[,p+4]]^2)
+    else{Vi2 <- try(chol(Vi),silent=TRUE)
+         if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)}
     hi <- diag(Xiw%*%object$naive%*%t(Xiw)%*%Vi2)
     return(hi)
   }
@@ -1861,42 +2112,42 @@ leverage.glmgee <- function(object,level=c("clusters","observations"),plot.it=FA
 
 #' @title Local Influence for Generalized Estimating Equations
 #' @description Computes some measures and, optionally, display	graphs of them to perform influence analysis based on the approaches described in Cook (1986) and Jung (2008).
-#' @param object an object of class glmgee obtained from the fit of a generalized estimating equation.
+#' @param object an object of class \emph{glmgee}.
 #' @param type an (optional) character string indicating the type of approach to study the local influence. The options are: the absolute value of the elements of the eigenvector which corresponds to the maximum absolute eigenvalue ("local"); and the absolute value of the elements of the main diagonal ("total"). By default, \code{type} is set to be "total".
-#' @param perturbation an (optional) character string indicating the perturbation scheme to apply. The options are: case weight perturbation of clusters ("cw-clusters"); Case weight perturbation of observations ("cw-observations"); perturbation of covariates ("covariate"); and perturbation of response ("response"). By default, \code{perturbation} is set to be "cw-clusters".
+#' @param perturbation an (optional) character string indicating the perturbation scheme to apply. The options are: case weight perturbation of clusters ("cw-clusters"); Case weight perturbation of observations ("cw-observations"); and perturbation of response ("response"). By default, \code{perturbation} is set to be "cw-clusters".
 #' @param plot.it an (optional) logical indicating if the plot of the measures of local influence is required or just the data matrix in which that plot is based. By default, \code{plot.it} is set to be FALSE.
-#' @param covariate an character string which (partially) match with the names of one of the parameters in the linear predictor. This is only appropriate if \code{perturbation="covariate"}.
 #' @param coefs	an (optional) character string which (partially) match with the names of some of the parameters in the linear predictor.
 #' @param identify an (optional) integer indicating the number of clusters/observations to identify on the plot of the measures of local influence. This is only appropriate if \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example, \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
 #' @return A matrix as many rows as clusters/observations in the sample and one column with the values of the measures of local influence.
 #' @method localInfluence glmgee
 #' @export
-#' @references Cook D. (1986) Assessment of Local Influence. \emph{Journal of the Royal Statistical Society: Series B (Methodological)} 48, 133-155.
-#' @references Jung K.-M. (2008) Local Influence in Generalized Estimating Equations. \emph{Scandinavian Journal of Statistics} 35, 286-294.
+#' @references Cook, D. (1986) Assessment of Local Influence. \emph{Journal of the Royal Statistical Society: Series B (Methodological)} 48, 133-155.
+#' @references Jung, K.-M. (2008) Local Influence in Generalized Estimating Equations. \emph{Scandinavian Journal of Statistics} 35, 286-294.
 #' @examples
-#' mod <- size ~ poly(days,4) + treat
-#' fit <- glmgee(mod, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces)
-#' summary(fit)
-#' localInfluence(fit,type="total",perturbation="cw-clusters",coefs="treat",plot.it=TRUE)
+#' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' mod1 <- size ~ poly(days,4) + treat
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces)
+#' localInfluence(fit1,type="total",perturbation="cw-clusters",coefs="treat",plot.it=TRUE)
+#'
+#' ###### Example 2: Treatment for severe postnatal depression
+#' mod2 <- depressd ~ visit + group
+#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+#' localInfluence(fit2,type="total",perturbation="cw-clusters",coefs="group",plot.it=TRUE)
+#'
+#' ###### Example 3: Treatment for severe postnatal depression (2)
+#' mod3 <- dep ~ visit*group
+#' fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+#' localInfluence(fit3,type="total",perturbation="cw-clusters",coefs="visit:group",plot.it=TRUE)
 #'
 localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c("cw-clusters","cw-observations",
-                                                                                "response","covariate"),covariate,coefs,plot.it=FALSE,identify,...){
+                                                                                "response"),coefs,plot.it=FALSE,identify,...){
   type <- match.arg(type)
   perturbation <- match.arg(perturbation)
   subst <- NULL
   if(!missingArg(coefs)){
     ids <- grepl(coefs,rownames(object$coefficients),ignore.case=TRUE)
     if(sum(ids) > 0) subst <- rownames(object$coefficients)[ids]
-  }
-  if(perturbation=="covariate"){
-    covar <- grep(covariate,rownames(coef(object)),ignore.case=TRUE)[1]
-    if(is.na(covar)) stop(paste("The covariate '",covariate,"' was not found!!",sep=""),call.=FALSE)
-    bh <- coef(object)
-    oneh <- matrix(0,1,length(bh))
-    oneh[covar] <- 1
-    bh <- bh[covar]
-    xh <- matrix(model.matrix(object)[,covar],ncol=1)
   }
   Qbb <- function(D){
     beta <- object$coefficients
@@ -1908,25 +2159,22 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
     mui <- object$family$linkinv(etai)
     vmui <- object$family$variance(mui)
     wi <- sqrt(vmui/D[,p+3])
-    Vi <- object$phi*t(object$corr[D[,p+4],D[,p+4]]*matrix(wi,ni,ni))*matrix(wi,ni,ni)
+    #Vi <- object$phi*t(object$corr[D[,p+4],D[,p+4]]*matrix(wi,ni,ni))*matrix(wi,ni,ni)
+    Vi <- t(object$corr[D[,p+4],D[,p+4]]*matrix(wi,ni,ni))*matrix(wi,ni,ni)
     kpi <- as.vector(object$family$mu.eta(etai))
     kpii <- grad(object$family$mu.eta,etai)
     vpi <- grad(object$family$variance,mui)
     Xiw <- Xi*matrix(kpi,nrow(Xi),p)
-    Vi2 <- try(chol(Vi),silent=TRUE)
-    if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)
+    if(object$corstr=="Independence") Vi2 <- diag(1/wi[D[,p+4]]^2)
+    else{Vi2 <- try(chol(Vi),silent=TRUE)
+    if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)}
     zi <- Vi2%*%(yi-mui)
     a <- kpii - (1/2)*kpi^2*vpi/vmui
     b <- as.vector(-kpi*(1 + (1/2)*(yi-mui)*vpi/vmui))
     Qpp <- -t(Xi)%*%(diag(as.vector(a*zi),ni,ni) + diag(kpi,ni,ni)%*%Vi2%*%diag(b,ni,ni))%*%Xi
     if(perturbation=="cw-clusters") Delta <- matrix(apply(matrix(kpi*zi,ni,p)*Xi,2,sum),ncol=p,nrow=1)
     if(perturbation=="cw-observations") Delta <- matrix(kpi*zi,ni,p)*Xi
-    if(perturbation=="response") Delta <- matrix(diag(sqrt(diag(Vi)))%*%Vi2%*%diag(kpi),ni,p)*Xi
-    if(perturbation=="covariate"){
-      bb <- (kpi*zi)%*%oneh
-      aa <- matrix(1,ni,1)%*%(matrix(kpii*zi,nrow=1,ncol=ni) - matrix(kpi,nrow=1,ncol=ni)%*%(Vi2%*%diag(kpi)))%*%Xi
-      Delta <- bh*aa + bb
-    }
+    if(perturbation=="response") Delta <- diag(sqrt(diag(Vi)))%*%Vi2%*%diag(kpi)%*%Xi
     return(list(Qpp=Qpp,Delta=Delta))
   }
   p <- length(coef(object))
@@ -1937,7 +2185,7 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
     Delta <- rbind(Delta,resu$Delta)
     if(perturbation!="cw-clusters") rowsn <- c(rowsn,paste(object$ids[i],"(",object$arrangedata[[i]][,p+4],")",sep=""))
   }
-  Delta <- Delta[-1,]
+  Delta <- matrix(Delta[-1,],nrow(Delta)-1,ncol(Delta))
   Qpp2 <- try(chol(Qpp),silent=TRUE)
   if(is.matrix(Qpp2)) Qpp2 <- chol2inv(Qpp2) else Qpp2 <- solve(Qpp)
   if(!is.null(subst)) Qpp2[-ids,-ids] <- Qpp2[-ids,-ids] - solve(Qpp[-ids,-ids])
@@ -1951,7 +2199,7 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
       bnew <- bnew/sqrt(sum(bnew^2))
       tol <- max(abs((bnew - bold)/bold))
     }
-    out_ <- bnew/sqrt(sum(bnew^2))
+    out_ <- abs(bnew/sqrt(sum(bnew^2)))
   }else out_ <- apply(li*Delta,1,sum)
   if(perturbation=="cw-clusters") rowsn <- object$ids else rowsn <- rowsn[-1]
   out_ <- matrix(out_,nrow=length(out_))
@@ -1964,7 +2212,7 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
     if(is.null(nano$xlab)) nano$xlab <- ifelse(perturbation=="cw-clusters","Cluster Index","Observation Index")
     if(is.null(nano$type)) nano$type <- "h"
     if(is.null(nano$ylab)) nano$ylab <- ifelse(type=="local",expression(d[max]),ifelse(perturbation=="cw-clusters",expression(diag[i]),expression(diag[ij])))
-    if(is.null(nano$main) & perturbation=="covariate") nano$main <- rownames(coef(object))[covar]
+    if(is.null(nano$main)) nano$main <- ""
     if(is.null(nano$labels)) labels <- rowsn
     else{
       labels <- nano$labels
@@ -1973,7 +2221,7 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
     do.call("plot",nano)
     if(any(out_>0)) abline(h=3*mean(out_[out_>0]),lty=3)
     if(any(out_<0)) abline(h=3*mean(out_[out_<0]),lty=3)
-    if(!missingArg(identify)) identify(nano$x,nano$y,n=max(1,floor(abs(identify))),labels=rowsn)
+    if(!missingArg(identify)) identify(nano$x,nano$y,n=max(1,floor(abs(identify))),labels=labels)
   }
   if(!is.null(subst)){
     message("The coefficients included in the measures of local influence are: ",paste(subst,sep=""),"\n")

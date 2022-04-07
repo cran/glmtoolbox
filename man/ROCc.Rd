@@ -28,30 +28,28 @@ A list which contains the following objects:
 Computes the exact area under the ROC curve (AUROC), the Gini coefficient, and the Kolmogorov-Smirnov (KS) statistic for a binary classifier. Optionally, this function can plot the ROC curve, that is, the plot of the estimates of Sensitivity versus the estimates of 1-Specificity.
 }
 \examples{
+###### Example: Patients with burn injuries
 burn1000 <- aplore3::burn1000
 
-## splitting the sample
-## 70\% for the training sample and 30\% for the validation sample
+### splitting the sample: 70\% for the training sample and 30\% for the validation sample
 burn1000 <- within(burn1000, sampleof <- "validation")
 s <- sample(nrow(burn1000),nrow(burn1000)*0.7)
 burn1000$sampleof[s] <- "training"
 
-mod <- death ~ age + tbsa + inh_inj + age*inh_inj + tbsa*inh_inj
 training <- subset(burn1000,sampleof=="training")
-fit <- glm(mod, family=binomial("logit"), data=training)
+fit <- glm(death ~ age*inh_inj + tbsa*inh_inj, family=binomial("logit"), data=training)
 
-## ROC curve for the training sample
-ROCc(fit, col="red", col.lab="blue", col.axis="black",
-     col.main="black", family="mono")
+### ROC curve for the training sample
+ROCc(fit, col="red", col.lab="blue", col.axis="black", col.main="black", family="mono")
 
 validation <- subset(burn1000, sampleof=="validation")
 probs <- predict(fit, newdata=validation, type="response")
 responses <- with(validation, ifelse(death=="Dead",1,0))
 
-## ROC curve for the validation sample
-ROCc(cbind(responses,probs), col="red", col.lab="blue",
-     col.axis="black", col.main="black", family="mono")
+### ROC curve for the validation sample
+ROCc(cbind(responses,probs), col="red", col.lab="blue", col.axis="black",
+     col.main="black", family="mono")
 }
 \references{
-Hanley J.A. and McNeil B.J. (1982) The Meaning and Use of the Area under a Receiver Operating Characteristic (ROC) Curve. \emph{Radiology} 143, 29–36.
+Hanley, J.A. and McNeil, B.J. (1982) The Meaning and Use of the Area under a Receiver Operating Characteristic (ROC) Curve. \emph{Radiology} 143, 29–36.
 }

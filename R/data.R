@@ -1,21 +1,36 @@
 #'
+#' @title Mammal brain and body weights
+#'
+#' @description These data corresponds to the (average) body weight and the
+#' (average) brain weight for sixty-two species of mammals.
+#'
+#' @docType data
+#'
+#' @usage data(brains)
+#'
+#' @format A data frame with 62 rows and 3 variables:
+#' \describe{
+#'   \item{Specie}{a character string giving the species name.}
+#'   \item{BrainWt}{a numeric vector indicating the average brain weight, in grams.}
+#'   \item{BodyWt}{a numeric vector indicating the average body weight, in kilograms.}
+#' }
+#' @keywords datasets
+#' @examples with(brains, plot(log(BodyWt),log(BrainWt),pch=20,
+#'                xlab="log(Body Weight)",ylab="log(Brain Weight)"))
+#' @references Allison, T. and Cicchetti, D. (1976). Sleep in mammals: Ecology and constitutional correlates. \emph{Science} 194, 732-734.
+#' @references Weisberg, S. (2005). \emph{Applied Linear Regression}, 3rd edition. Wiley, New York.
+"brains"
+#'
 #' @title Dental Clinical Trial
 #'
-#' @description These data arose from a dental clinical study. In
-#' this trial, subjects were generally healthy adult male and female
-#' volunteers, ages 18–55, with pre-existing plaque but without
-#' advanced periodontal disease. Prior to entry, subjects were
-#' screened for a minimum of 20 sound, natural teeth and a minimum
-#' mean plaque index of 2.0. Subjects with gross oral pathology or
-#' on antibiotic, antibacterial, or anti-inflammatory therapy were
-#' excluded from the study. One hundred nine volunteers were
-#' randomized in a double-blinded way to one of two new mouth
-#' rinses (A and B) or to a control mouth rinse. Plaque was scored
-#' at baseline, at 3 months, and at 6 months by the Turesky
-#' modification of the Quigley-Hein index, a continuous measure.
-#' Four subjects had missing plaque scores. The main objective
-#' of the analysis is to measure the effectiveness of the three
-#' mouth rinses in inhibiting the development of dental plaque.
+#' @description These data arose from a dental clinical study. In this trial, subjects were generally healthy adult
+#' male and female volunteers, ages 18–55, with pre-existing plaque but without advanced periodontal
+#' disease. Prior to entry, subjects were screened for a minimum of 20 sound, natural teeth and a minimum mean plaque index of 2.0. Subjects with gross oral pathology or on antibiotic, antibacterial,
+#' or anti-inflammatory therapy were excluded from the study. One hundred nine volunteers were randomized in a double-blinded way to one of two new mouth rinses (A and B) or to a control mouth
+#' rinse. Plaque was scored at baseline, at 3 months, and at 6 months by the Turesky modification of
+#' the Quigley-Hein index, a continuous measure. Four subjects had missing plaque scores. The main
+#' objective of the analysis is to measure the effectiveness of the three mouth rinses in inhibiting the
+#' development of dental plaque.
 #'
 #' @docType data
 #'
@@ -29,17 +44,191 @@
 #'   \item{rinse}{a factor indicating the type of rinse used by the volunteer: "Placebo", "A" and "B".}
 #'   \item{smoke}{a factor indicating if the volunteer smoke: "Yes" and "No".}
 #'   \item{time}{a numeric vector indicating the time (in months) since the treatment began.}
-#'   \item{score}{a numeric vector giving the subject's score of plaque.}
+#'   \item{score}{a numeric vector giving the subject’s score of plaque.}
 #' }
 #' @keywords datasets
 #' @examples
-#' mod <- score ~ rinse + age + gender + smoke + time
-#' fit <- glmgee(mod, family=Gamma(log), id=subject, corstr="AR-1", data=rinse)
-#' summary(fit)
-#' @references Hadgu A. and Koch G. (1999) Application of generalized estimating equations to a dental randomized clinical trial. \emph{Journal
-#' of Biopharmaceutical Statistics} 9, 161-178.
+#' boxplot(score ~ time, data=subset(rinse,rinse=="Placebo"), at=c(1:3)-0.2,
+#'  ylim=c(0,3.3), col="yellow", boxwex=0.15, outline=FALSE, xaxt="n", xlim=c(0.8,3.2))
+#' boxplot(score ~ time, data=subset(rinse,rinse=="A"), add=TRUE,
+#'         at=c(1:3), col="gray", boxwex=0.15, outline=FALSE, xaxt="n")
+#' boxplot(score ~ time, data=subset(rinse,rinse=="B"), add=TRUE,
+#'         at=c(1:3)+0.2, col="blue", boxwex=0.15, outline=FALSE, xaxt="n")
+#' axis(1, at=1:3, labels=unique(rinse$time))
+#' legend(0.7, 1, legend=c("Placebo","A","B"), fill=c("yellow","gray","blue"),
+#'        bty="n", cex=0.6)
+#' @references Hadgu, A. and Koch, G. (1999) Application of generalized estimating equations
+#' to a dental randomized clinical trial. \emph{Journal of Biopharmaceutical Statistics} 9, 161-178.
 "rinse"
+#'
+#' @title Roots Produced by the Columnar Apple Cultivar Trajan.
+#'
+#' @description The data arose from a horticultural experiment to study the number of roots produced by 270
+#' micropropagated shoots of the columnar apple cultivar Trajan.
+#' During the rooting period, all shoots were maintained under identical conditions, but the shoots
+#' themselves were cultured on media containing different concentrations of the cytokinin
+#' 6-benzylaminopurine (BAP), in growth cabinets with an 8 or 16 hour photoperiod. The objective
+#' is to assess the effect of both the photoperiod and the concentration levels of BAP on the
+#' number of roots produced.
+#'
+#' @docType data
+#'
+#' @usage data(Trajan)
+#'
+#' @format A data frame with 270 rows and 4 variables:
+#' \describe{
+#'   \item{roots}{a numeric vector indicating the number of roots produced.}
+#'   \item{shoot}{a numeric vector indicating the number of micropropogated shoots.}
+#'   \item{photoperiod}{a factor indicating the photoperiod, in hours: 8 or 16.}
+#'   \item{bap}{a numeric vector indicating the concentrations of the cytokinin 6-benzylaminopurine: 2.2, 4.4, 8.8 or 17.6.}
+#' }
+#' @source \url{https://support.sas.com/rnd/app/stat/examples/GENMODZIP/sas.html}
+#' @keywords datasets
+#' @examples
+#' boxplot(roots ~ bap, data=subset(Trajan,photoperiod=="8"), at=c(1:4) - 0.15,
+#'     col="blue", boxwex=0.2, outline=FALSE, xaxt="n", xlim=c(0.7,4.3), ylim=c(-0.5,17))
+#' boxplot(roots ~ bap, data=subset(Trajan,photoperiod=="16"), add=TRUE, at=c(1:4) + 0.15,
+#'     col="yellow", boxwex=0.2, outline=FALSE, xaxt="n")
+#' axis(1, at=1:4, labels=levels(Trajan$bap))
+#' legend(0, 18, legend=c("8","16"), title="Photoperiod", bty="n", ncol=1,
+#'     fill=c("blue","yellow"), cex=0.6, x.intersp=0.2, y.intersp=1)
+#'
+#' @references Ridout, M. and Demétrio, C.G. and Hinde, J. (1998). Models for count data with many zeros. In
+#' \emph{Proceedings of the XIXth international biometric conference}, 179–192.
+#' @references Ridout, M. and Hinde, J. and Demétrio, C.G. (2001). A score test for testing a zero-inflated
+#' Poisson regression model against zero-inflated negative binomial alternatives. \emph{Biometrics},
+#' 57, 219-223.
+#' @references Garay, A.M. and Hashimoto, E.M. and Ortega, E.M.M. and Lachos, V. (2011). On estimation and
+#' influence diagnostics for zero-inflated negative binomial regression models. \emph{Computational
+#' Statistics & Data Analysis} 55, 1304-1318.
+"Trajan"
 
+#'
+#' @title Urinary Tract Infections in HIV-infected Men
+#'
+#' @description These data arose from a study conducted in the Department of
+#' Internal Medicine at the Utrecht University Hospital, the Netherlands, where
+#' 98 human immunodeficiency virus (HIV)-infected men were followed up to two
+#' years. Urinary cultures were obtained during the first visit and every six
+#' months thereafter. Also, cultures were obtained between regular scheduled
+#' visits when signs and symptoms of urinary tract infections (UTI) occurred,
+#' or when patients had fever of unknown origin. CD4+ cell counts were also
+#' measured. A CD4+ count is a blood test to determine how well the immune
+#' system is working in people who have been diagnosed with HIV. In general,
+#' a decreasing CD4+ count is an indication of the progression of HIV. See
+#' Hoepelman et al. (1992), van den Broek (1995), Morel and Nagaraj (2012, page 175).
+#'
+#' @docType data
+#'
+#' @usage data(uti)
+#'
+#' @format A data frame with 98 rows and 3 variables:
+#' \describe{
+#'   \item{episodes}{a numeric vector indicating the number of episodes, that is, the number of times each patient had urinary tract infections (UTI).}
+#'   \item{time}{a numeric vector indicating the time to follow up, in months.}
+#'   \item{cd4}{a numeric vector indicating the immune status of the patient as measured by the CD4+ cell counts.}
+#' }
+#' @keywords datasets
+#' @examples
+#' uti2 <- within(uti,cd4C <- cut(log(cd4),4,labels=c("Low","Mid-Low","Mid-High","High")))
+#' out <- aggregate(cbind(episodes,time) ~ cd4C, sum, data=uti2)
+#' barplot(12*episodes/time ~ cd4C, beside=TRUE, data=out, col="red",
+#'         xlab="CD4+ cell count", ylab="Number of UTIs per year")
+#'
+#' @references Hoepelman, A.I.M. and Van Buren, M. and Van den Broek, J., and Borleffs, J.C.C. (1992) Bacteriuria
+#' in men infected with HIV-1 is related to their immune status (CD4+ cell count). \emph{AIDS} 6, 179-184.
+#' @references Morel, J.G. and Nagaraj, N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc.,
+#' Cary, North Carolina, USA.
+#' @references van den Broek, J. (1995) A Score Test for Zero Inflation in a Poisson Distribution.
+#' \emph{Biometrics} 51, 738–743.
+"uti"
+#'
+#'
+#' @title Shoulder Pain after Laparoscopic Cholecystectomy
+#'
+#' @description Inflation of the abdomen during laparoscopic cholecystectomy
+#' (removal of the gallbladder) separates the liver from the diaphragm and
+#' places strain on the attachments that connect both. This strain is felt as
+#' referred pain in the shoulder. Suction to remove residual gas may reduce
+#' shoulder pain. There were 22 subjects randomized in the active group (with
+#' abdominal suction) and 19 subjects randomized in the control group (without
+#' abdominal suction). After laparoscopic surgery, patients were asked to rate
+#' their shoulder pain on a visual analog scale morning and afternoon for three
+#' days after the operation (a total of six different times). The scale was
+#' coded into five ordered categories where a pain score of 1 indicated "low pain"
+#' and a score of 5 reflected "high pain". See Jorgensen et al. (1995),
+#' Lumley (1996), Morel and Nagaraj (2012, page 319).
+#'
+#' @docType data
+#'
+#' @usage data(cholecystectomy)
+#'
+#' @format A data frame with 246 rows and 7 variables:
+#' \describe{
+#'   \item{id}{a numeric vector with the identifier of the patient.}
+#'   \item{treatment}{a factor indicating the treatment received by the patient: abdominal suction ("A") and placebo ("P").}
+#'   \item{gender}{a factor indicating the gender of the patient: female ("F") and male ("M").}
+#'   \item{age}{a numeric vector indicating the age of the patient, in years.}
+#'   \item{time}{a numeric vector indicating the occasion the patient was asked to rate their shoulder pain after the laparoscopic surgery: integers from 1 to 6.}
+#'   \item{pain}{a numeric vector indicating the shoulder pain rated by the patient on a scale coded into five ordered categories, where
+#'               1 indicated "low pain" and 5 reflected "high pain".}
+#'   \item{pain2}{a numeric vector indicating the shoulder pain rated by the patient and coded as 1 for the two first categories of
+#'                pain and 0 for other cases.}
+#' }
+#' @keywords datasets
+#' @examples
+#' out <- aggregate(pain2 ~ treatment + time, data=cholecystectomy, mean)
+#' barplot(100*pain2 ~ treatment + time, beside=TRUE, data=out, xlab="Time",
+#'         col=c("yellow","blue"), ylab="% of patients with \"low\" pain")
+#' legend(-1, 98, c("Placebo","Abdominal\n suction"), fill=c("yellow","blue"),
+#'        bty="n", cex=0.6, x.intersp=0.2, y.intersp=1)
+#'
+#' @references Jorgensen, J.O. and Gillies, R.B. and Hunt, D.R. and Caplehorn, J.R.M. and Lumley, T. (1995)
+#' A simple and effective way to reduce postoperative pain after laparoscopic cholecystectomy.
+#' \emph{Australian and New Zealand Journal of Surgery} 65, 466–469.
+#' @references Lumley, T. (1996) Generalized Estimating Equations for Ordinal Data: A Note on Working Correlation Structures.
+#' \emph{Biometrics} 52, 354–361.
+#' @references Morel, J.G. and Nagaraj, N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc.,
+#' Cary, North Carolina, USA.
+"cholecystectomy"
+#'
+#'
+#' @title Germination of Orobanche Seeds
+#'
+#' @description These data arose from a study of the germination of two species
+#' of Orobanche seeds (O. aegyptiaca 75 and O. aegyptiaca 73) grown on 1/125
+#' dilutions of two different root extract media (cucumber and bean) in a 2×2
+#' factorial layout with replicates. The data consist of the number of seeds
+#' and the number germinating for each replicate. Interest focusses on the
+#' possible differences in germination rates for the two types of seed and
+#' root extract and whether there is any interaction. See Crowder (1978),
+#' Hinde and Demetrio (1998).
+#'
+#' @docType data
+#'
+#' @usage data(orobanche)
+#'
+#' @format A data frame with 21 rows and 4 variables:
+#' \describe{
+#'   \item{specie}{a factor indicating the specie of Orobanche seed: O. aegyptiaca 75 ("Aegyptiaca 75") and O. aegyptiaca 73 ("Aegyptiaca 73").}
+#'   \item{extract}{a factor indicating the root extract: cucumber ("Cucumber") and bean ("Bean").}
+#'   \item{seeds}{a numeric vector indicating the total number of seeds.}
+#'   \item{germinated}{a numeric vector indicating the number of germinated seeds.}
+#' }
+#' @keywords datasets
+#' @examples
+#' out <- aggregate(cbind(germinated,seeds) ~ extract + specie, data=orobanche, sum)
+#' barplot(100*germinated/seeds ~ extract + specie, beside=TRUE, data=out, width=0.3,
+#'         col=c("yellow","blue"), xlab="Specie", ylab="% of germinated seeds")
+#' legend(0.3, 70, c("Bean","Cucumber"), fill=c("yellow","blue"), bty="n",
+#'        cex=0.6, x.intersp=0.2, y.intersp=1)
+#'
+#' @references Crowder, M.J. (1978) Beta-binomial anova for proportions. \emph{Journal of the Royal Statistical Society.
+#' Series C (Applied Statistics)} 27, 34-37.
+#' @references Hinde, J. and Demetrio, C.G.B. (1998) Overdispersion: Models and estimation. \emph{Computational Statistics
+#' & Data Analysis} 27, 151-170.
+"orobanche"
+#'
 #'
 #' @title Guidelines for Urinary Incontinence Discussion and Evaluation
 #'
@@ -71,8 +260,8 @@
 #' mod <- bothered ~ gender + age + dayacc + severe + toilet
 #' fit <- glmgee(mod, family=binomial(logit), id=practice, corstr="Exchangeable", data=GUIDE)
 #' summary(fit)
-#' @references Hammill B.G. and Preisser J.S. (2006) A SAS/IML software program for GEE and regression diagnostics. \emph{Computational Statistics & Data Analysis} 51, 1197-1212.
-#' @references Jung K.-M. (2008) Local Influence in Generalized Estimating Equations. \emph{Scandinavian Journal of Statistics} 35, 286-294.
+#' @references Hammill, B.G. and Preisser, J.S. (2006) A SAS/IML software program for GEE and regression diagnostics. \emph{Computational Statistics & Data Analysis} 51, 1197-1212.
+#' @references Jung, K.-M. (2008) Local Influence in Generalized Estimating Equations. \emph{Scandinavian Journal of Statistics} 35, 286-294.
 #' @source \url{http://www.bios.unc.edu/~preisser/personal/uidata/preqaq99.dat}
 "GUIDE"
 
@@ -106,10 +295,10 @@
 #'         at=c(1:13)+0.2, col="blue", boxwex=0.3, outline=FALSE, xaxt="n")
 #' axis(1, at=1:13, labels=unique(spruces$days))
 #' axis(2, at=seq(0,1500,250), labels=seq(0,1500,250))
-#' legend(0.5, 1500, legend=c("normal","ozone-enriched"), title="Atmosphere",
-#'        fill=c("yellow","blue"), bty="n")
-#' @references Diggle P.J., Heagarty P., Liang K.-Y. and Zeger S.L. (2002) \emph{Analysis of Longitudinal Data}. Oxford University Press, Oxford.
-#' @references Crainiceanu C.M., Ruppert D. and Wand M.P. (2005). Bayesian Analysis for Penalized Spline Regression Using WinBUGS. \emph{Journal of Statistical Software} 14(14).
+#' legend(0.3, 1500, legend=c("normal","ozone-enriched"), fill=c("yellow","blue"),
+#'        bty="n", cex=0.7, x.intersp=0.2, y.intersp=1)
+#' @references Diggle, P.J. and Heagarty, P. and Liang, K.-Y. and Zeger, S.L. (2002) \emph{Analysis of Longitudinal Data}. Oxford University Press, Oxford.
+#' @references Crainiceanu, C.M. and Ruppert, D. and Wand, M.P. (2005). Bayesian Analysis for Penalized Spline Regression Using WinBUGS. \emph{Journal of Statistical Software} 14(14).
 "spruces"
 
 #' @title Agents to stimulate cellular differentiation
@@ -135,12 +324,12 @@
 #' @examples
 #' barplot(100*cells/200 ~ ifn + tnf, beside=TRUE, data=cellular, col=terrain.colors(4),
 #'         xlab="Dose of TNF", ylab="% of cells with markers of differentiation")
-#' legend(1, 90, c("0","4","20","100"), fill=terrain.colors(4), bty="n", cex=0.9,
-#'        title="Dose of IFN")
-#' @references Piegorsch W.W., Weinberg C.R. and Margolin B.H. (1988) Exploring
+#' legend(-3, 97, c("0","4","20","100"), fill=terrain.colors(4), bty="n", cex=0.9,
+#'        title="Dose of IFN", x.intersp=0.2, y.intersp=1)
+#' @references Piegorsch, W.W. and Weinberg, C.R. and Margolin, B.H. (1988) Exploring
 #' simple independent action in multifactor tables of proportions. \emph{Biometrics} 44, 595-603.
 #'
-#' Vanegas L.H. and Rondon L.M. (2020) A data transformation to deal with
+#' Vanegas, L.H. and Rondon, L.M. (2020) A data transformation to deal with
 #' constant under/over-dispersion in binomial and poisson regression models. \emph{Journal
 #' of Statistical Computation and Simulation} 90, 1811-1833.
 "cellular"
@@ -176,12 +365,12 @@
 #' boxplot(100*fetuses/litter ~ pht, data=subset(ossification, tcpo=="100 mg/kg"),
 #'         add=TRUE, at=c(1:2)+0.2, col="blue", boxwex=0.25, outline=FALSE, xaxt="n")
 #' axis(1, at=1:2, labels=levels(ossification$pht))
-#' legend(0.25, 20, legend=c("0 mg/kg","100 mg/kg"), fill=c("yellow","blue"),
-#'        bty="n", cex=0.9, title="Dose of TCPO")
-#' @references Morel J.G. and Neerchal N.K. (1997) Clustered binary logistic regression in teratology data
+#' legend(0.1, 20, legend=c("0 mg/kg","100 mg/kg"), fill=c("yellow","blue"),
+#'        bty="n", cex=0.7, x.intersp=0.2, y.intersp=1)
+#' @references Morel, J.G. and Neerchal, N.K. (1997) Clustered binary logistic regression in teratology data
 #' using a finite mixture distribution. \emph{Statistics in Medicine} 16, 2843-2853.
 #'
-#' Morel J.G. and Nagaraj N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc., Cary, North Carolina, USA.
+#' Morel, J.G. and Nagaraj, N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc., Cary, North Carolina, USA.
 "ossification"
 
 #' @title Self diagnozed ear infections in swimmers
@@ -213,12 +402,12 @@
 #' boxplot(infections ~ frequency, data=subset(swimmers,location=="beach"), add=TRUE,
 #'         at=c(1:2)+0.2, col="blue", boxwex=0.25, outline=FALSE, xaxt="n")
 #' axis(1, at=1:2, labels=levels(swimmers$frequency))
-#' legend(0.3, 6, legend=c("non-beach","beach"), title="Location",
-#'        fill=c("yellow","blue"), bty="n", cex=0.9)
-#' @references Hand D.J., Daly F., Lunn A.D., McConway K.J. and Ostrowsky E. (1994)
+#' legend(0.2, 6.3, legend=c("non-beach","beach"), fill=c("yellow","blue"),
+#'         bty="n", cex=0.7, x.intersp=0.2, y.intersp=1)
+#' @references Hand, D.J. and Daly, F. and Lunn, A.D. and McConway, K.J. and Ostrowsky, E. (1994)
 #' \emph{A Handbook of Small Data Sets}, Chapman and Hall, London.
 #'
-#' Vanegas L.H. and Rondon L.M. (2020) A data transformation to deal with
+#' Vanegas, L.H. and Rondon, L.M. (2020) A data transformation to deal with
 #' constant under/over-dispersion in binomial and poisson regression models. \emph{Journal
 #' of Statistical Computation and Simulation} 90, 1811-1833.
 "swimmers"
@@ -248,10 +437,10 @@
 #' @examples
 #' boxplot(tumors ~ group, data=mammary, outline=FALSE, xlab="Group",
 #'         ylab="Number of tumors", col=c("yellow","blue"))
-#' @references Lawless J.F. (1987) Regression Methods for Poisson Process Data. \emph{Journal of the American
+#' @references Lawless, J.F. (1987) Regression Methods for Poisson Process Data. \emph{Journal of the American
 #' Statistical Association}, 82, 808-815.
 #'
-#' Morel J.G. and Nagaraj N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc., Cary, North Carolina, USA.
+#' Morel, J.G. and Nagaraj, N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc., Cary, North Carolina, USA.
 "mammary"
 
 #' @title Species richness
@@ -276,10 +465,10 @@
 #'   plot(Biomass, Species,
 #'        col=apply(as.matrix(pH),1,function(x) switch(x,"low"="red","mid"="black","high"="blue")),
 #'        pch=apply(as.matrix(pH),1,function(x) switch(x,"low"=15,"mid"=16,"high"=17)))
-#'   legend(8.5, 42, legend=c("low","mid","high"), col=c("red","black","blue"),
-#'          pch=c(15,16,17), bty="n", cex=0.95, title="Soil pH level")
+#'   legend(8.2, 43, legend=c("low","mid","high"), col=c("red","black","blue"),
+#'          pch=c(15,16,17), bty="n", cex=0.8, title="pH level")
 #' })
-#' @references Crawley M.J. (2007) \emph{The R Book}. John Wiley & Sons, Chichester.
+#' @references Crawley, M.J. (2007) \emph{The R Book}. John Wiley & Sons, Chichester.
 "richness"
 
 
@@ -312,11 +501,10 @@
 #'     plot(log(distance), log(rtime),
 #'          col=apply(as.matrix(cli),1,function(x) switch(x,"low"="red","high"="blue")),
 #'          pch=apply(as.matrix(cli),1,function(x) switch(x,"low"=15,"high"=16)))
-#'     legend(0.7, 5.4, legend=c("low","high"), title="Cumulative climb",
-#'            col=c("red","blue"), pch=c(15,16), bty="n")
+#'     legend(0.7, 5.4, legend=c("low","high"), title="Cumulative climb", col=c("red","blue"),
+#'            pch=c(15,16), bty="n", x.intersp=0.2, y.intersp=1)
 #' })
-#' @source \url{http://users.stat.ufl.edu/~aa/glm/data/}
-#' @references Agresti A. (2015) \emph{Foundations of Linear and Generalized Linear Models}.
+#' @references Agresti, A. (2015) \emph{Foundations of Linear and Generalized Linear Models}.
 #' John Wiley & Sons, New Jersey.
 "races"
 
@@ -344,11 +532,10 @@
 #' @examples
 #' barplot(100*cancer/exposed ~ dose, beside=TRUE, data=bladder, col="red",
 #'         xlab="Dose of 2-AAF", ylab="% of mice with bladder cancer")
-#' @references Zhang H. and Zelterman D. (1999) Binary Regression for Risks in Excess of
+#' @references Zhang, H. and Zelterman, D. (1999) Binary Regression for Risks in Excess of
 #' Subject-Specific Thresholds. \emph{Biometrics} 55, 1247-1251.
 "bladder"
-
-
+#'
 #' @title Liver cancer in mice
 #'
 #' @description Female mice were continuously fed dietary concentrations of
@@ -372,7 +559,7 @@
 #' @examples
 #' barplot(100*cancer/exposed ~ dose, beside=TRUE, data=liver, col="red",
 #'         xlab="Dose of 2-AAF", ylab="% of mice with liver cancer")
-#' @references Zhang H. and Zelterman D. (1999) Binary Regression for Risks in Excess of Subject-Specific Thresholds. \emph{Biometrics} 55, 1247-1251.
+#' @references Zhang, H. and Zelterman, D. (1999) Binary Regression for Risks in Excess of Subject-Specific Thresholds. \emph{Biometrics} 55, 1247-1251.
 "liver"
 
 
@@ -395,11 +582,12 @@
 #' }
 #' @keywords datasets
 #' @examples
-#' barplot(1000*cases/population ~ city + age, beside=TRUE, col=c("yellow","blue"), data=skincancer)
-#' legend(1, 11, legend=c("St.Paul","Ft.Worth"), title="City",
+#' barplot(1000*cases/population ~ city + age, beside=TRUE,
+#'         col=c("yellow","blue"), data=skincancer)
+#' legend(1.5, 8.5, legend=c("St.Paul","Ft.Worth"), title="City",
 #'        fill=c("yellow","blue"), bty="n", cex=0.9)
-
-#' @references Kleinbaum D., Kupper L., Nizam A. and Rosenberg E.S. (2013) \emph{Applied Regression Analysis and
+#'
+#' @references Kleinbaum, D. and Kupper, L. and Nizam, A. and Rosenberg, E.S. (2013) \emph{Applied Regression Analysis and
 #' other Multivariable Methods, Fifth Edition}, Cengage Learning, Boston.
 "skincancer"
 
@@ -422,7 +610,7 @@
 #' @examples
 #' barplot(lesions ~ time, col="red", data=aucuba)
 #'
-#' @references Snedecor G.W. and Cochran W.G. (1989) \emph{Statistical Methods, Eight Edition}, Iowa State University Press, Ames.
+#' @references Snedecor, G.W. and Cochran, W.G. (1989) \emph{Statistical Methods, Eight Edition}, Iowa State University Press, Ames.
 "aucuba"
 
 #' @title Treatment for severe postnatal depression
@@ -453,15 +641,15 @@
 #' @keywords datasets
 #' @examples
 #'  boxplot(dep ~ visit, data=subset(depression,group=="placebo"), at=c(0:6)-0.2,
-#'          col="yellow", boxwex=0.25, outline=FALSE, xaxt="n", ylab="EDPS",
+#'          col="yellow", boxwex=0.3, outline=FALSE, xaxt="n", ylab="EDPS",
 #'          xlab="Months since the treatment began", ylim=range(na.omit(depression$dep)))
 #'  boxplot(dep ~ visit, data=subset(depression,group=="estrogen"), add=TRUE,
-#'          at=c(0:6)+0.2, col="blue", boxwex=0.25, outline=FALSE, xaxt="n")
+#'          at=c(0:6)+0.2, col="blue", boxwex=0.3, outline=FALSE, xaxt="n")
 #'  axis(1, at=0:6, labels=c(-1,1:6))
-#'  legend(-1, 8, legend=c("placebo","estrogen"), fill=c("yellow","blue"),
-#'         bty="n", title="Group")
+#'  legend(5, 29, legend=c("placebo","estrogen"), fill=c("yellow","blue"),
+#'         bty="n", x.intersp=0.2, y.intersp=1)
 #'
-#' @source \url{https://stats.idre.ucla.edu/spss/library/spss-librarypanel-data-analysis-using-gee/}
-#' @references Gregoire A.J.P., Kumar R., Everitt B., Henderson A.F. and Studd J.W.W. (1996) Transdermal oestrogen for treatment of severe postnatal depression,
+#' @source \url{https://stats.oarc.ucla.edu/spss/library/spss-librarypanel-data-analysis-using-gee/}
+#' @references Gregoire, A.J.P. and Kumar, R. and Everitt, B. and Henderson, A.F. and Studd, J.W.W. (1996) Transdermal oestrogen for treatment of severe postnatal depression,
 #' \emph{The Lancet} 347, 930-933.
 "depression"

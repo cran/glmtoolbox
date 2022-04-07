@@ -7,35 +7,60 @@
 \method{vdtest}{glm}(model, varformula, verbose = TRUE, ...)
 }
 \arguments{
-\item{model}{an object of the class glm which is obtained from the fit of a weighted or unweighted generalized linear model in which the response distribution is assumed to be gaussian, Gamma or inverse gaussian.}
+\item{model}{an object of the class \emph{glm} where the distribution of the response
+variable is assumed to be \code{gaussian}, \code{Gamma} or \code{inverse.gaussian}.}
 
-\item{varformula}{an (optional) \code{formula} expression of the form \code{~ predictors} describing only the potential explanatory variables for the dispersion. By default, the same explanatory variables are taken as in the model for the mean.}
+\item{varformula}{an (optional) \code{formula} expression of the form \code{~ z1 + z2 + ... + zq} describing only the potential explanatory variables for the dispersion. By default, the same explanatory variables are taken as in the model for the mean.}
 
 \item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
 \value{
-A list which includes the three main attributes of the test for varying dispersion parameter: statistic ("statistic"), degrees of freedom ("df") and \emph{p}-value ("p.value").
+a list list with components including
+\tabular{ll}{
+\code{statistic} \tab value of the Rao's score test (\eqn{S}),\cr
+\tab \cr
+\code{df}        \tab number of degrees of freedom (\eqn{q}),\cr
+\tab \cr
+\code{p.value}   \tab \emph{p}-value of the test,\cr
+}
 }
 \description{
-Performs Rao's score test for varying dispersion parameter in weighted and unweighted generalized linear models in which the response distribution is assumed to be gaussian, Gamma or inverse gaussian.
+Performs Rao's score test for varying dispersion parameter in
+weighted and unweighted generalized linear models in which the response
+distribution is assumed to be gaussian, Gamma or inverse gaussian.
 }
 \details{
-The aim of this test is to assess the assumption of constant dispersion parameter in generalized linear models. If the object \code{model} corresponds to an unweighted generalized linear model then this test assess assumptions of constant variance and constant coefficient of variation on models in which the response distribution is assumed to be gaussian and Gamma, respectively.
+From the generalized lineal model with varying dispersion in which
+\eqn{\log(\phi)=\gamma_0 + \gamma_1z_1 + \gamma_2z_2 + ... + \gamma_qz_q}, where
+\eqn{\phi} is the dispersion parameter of the distribution used to describe the
+response variable, the Rao's score test (denoted here as \eqn{S}) to assess the
+hypothesis \eqn{H_0: \gamma=0} versus \eqn{H_1: \gamma\neq 0} is computed,
+where \eqn{\gamma=(\gamma_1,\ldots,\gamma_q)}.  The corresponding \emph{p}-value is
+computed from the chi-squared distribution with \eqn{q} degrees of freedom,
+that is, \emph{p}-value = Prob\eqn{[\chi^2_{q} > S]}. If the object
+\code{model} corresponds to an unweighted generalized linear model then
+this test assess assumptions of constant variance and constant coefficient
+of variation on models in which the response distribution is assumed to be
+gaussian and Gamma, respectively.
 }
 \examples{
-## Example 1
+###### Example 1: Fuel consumption of automobiles
 Auto <- ISLR::Auto
 fit1 <- glm(mpg ~ weight*horsepower, family=inverse.gaussian("log"), data=Auto)
 vdtest(fit1)
 
-## Example 2
+###### Example 2: Hill races in Scotland
 fit2 <- glm(rtime ~ log(distance) + log(cclimb), family=Gamma("log"), data=races)
 vdtest(fit2)
+
+###### Example 3: Mammal brain and body weights
+fit3 <- glm(BrainWt ~ log(BodyWt), family=Gamma("log"), data=brains)
+vdtest(fit3)
 }
 \references{
-Wei BC., Shi JQ., Fung WK. and Hu YQ. (1998) Testing for Varying Dispersion in Exponential Family Nonlinear Models. \emph{Annals of the Institute of Statistical Mathematics} 50, 277–294.
+Wei, B.-C. and Shi, J.-Q. and Fung, W.-K. and Hu, Y.-Q. (1998) Testing for Varying Dispersion in Exponential Family Nonlinear Models. \emph{Annals of the Institute of Statistical Mathematics} 50, 277–294.
 }
 \seealso{
 \link{vdtest.lm}

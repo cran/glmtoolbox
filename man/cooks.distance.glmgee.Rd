@@ -16,7 +16,7 @@
 )
 }
 \arguments{
-\item{model}{an object of class glmgee obtained from the fit of a generalized estimating equation.}
+\item{model}{an object of class \emph{glmgee}.}
 
 \item{method}{an (optional) character string indicating the method of calculation for the \emph{one-step approximation}. The options are: the \emph{one-step approximation} described by Preisser and Qaqish (1996) in which the working-correlation matrix is assumed to be known ("Preisser-Qaqish"); and the "authentic" \emph{one-step approximation} ("full"). By default, \code{method} is set to be "Preisser-Qaqish".}
 
@@ -33,23 +33,51 @@
 \item{...}{further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example,  \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.}
 }
 \value{
-A matrix as many rows as clusters in the sample and one column with the values of the Cook's distance.
+A matrix as many rows as clusters/observations in the sample and one column with the values of the Cook's distance.
 }
 \description{
-Produces an approximation, better known as the \emph{one-step aproximation}, of the Cook's distance, which is aimed to measure the effect on the estimates of the parameters in the linear predictor of deleting each cluster in turn. This function also can produce a cluster-index plot of the Cook's distance for all parameters in the linear predictor or for some subset of them.
+Produces an approximation, better known as the \emph{one-step aproximation},
+of the Cook's distance, which is aimed to measure the effect on the estimates of the parameters in the linear predictor
+of deleting each cluster/observation in turn. This function also can produce a cluster/observation-index plot of the
+Cook's distance for all parameters in the linear predictor or for some subset of them (via the argument \code{coefs}).
 }
 \details{
-The Cook's distance consists of the \emph{distance} between two estimates of the parameters in the linear predictor using a metric based on the (estimate of the) variance-covariance matrix. The first one set of estimates is computed from a dataset including all clusters, and the second one is computed from a dataset in which the \emph{i}-th cluster is excluded. To avoid computational burden, the second set of estimates is replaced by its \emph{one-step approximation}. See the \link{dfbeta.glmgee} documentation.
+The Cook's distance consists of the \emph{distance} between two estimates of the
+parameters in the linear predictor using a metric based on the (estimate of the) variance-covariance matrix. For the cluster-level,
+the first one set of estimates is computed from a dataset including all clusters/observations, and the second one is computed from a dataset in which the \emph{i}-th cluster is excluded. To avoid computational burden, the second set of estimates is replaced by its \emph{one-step approximation}. See the \link{dfbeta.glmgee} documentation.
 }
 \examples{
-## Cook's distance for all parameters in the linear predictor
-mod <- size ~ poly(days,4) + treat
-fit <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
-cooks.distance(fit, col="red", lty=1, lwd=1, col.lab="blue", main="Cook's distance",
-               col.axis="blue", col.main="black", family="mono", cex=0.8)
+###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+mod1 <- size ~ poly(days,4) + treat
+fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
 
-## Cook's distance for the parameter associated to the variable treat
-cooks.distance(fit, coef="treat", col="red", lty=1, lwd=1, col.lab="blue",
-               main="Cook's distance", col.axis="blue", col.main="black",
-               family="mono", cex=0.8)
+### Cook's distance for all parameters in the linear predictor
+cooks.distance(fit1, method="full", plot.it=TRUE, col="red", lty=1, lwd=1, cex=0.8,
+               col.lab="blue", col.axis="blue", col.main="black", family="mono")
+
+### Cook's distance for the parameter associated to the variable 'treat'
+cooks.distance(fit1, coef="treat", method="full", plot.it=TRUE, col="red", lty=1,
+               lwd=1, col.lab="blue", col.axis="blue", col.main="black", cex=0.8)
+
+###### Example 2: Treatment for severe postnatal depression
+mod2 <- depressd ~ visit + group
+fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+
+### Cook's distance for all parameters in the linear predictor
+cooks.distance(fit2, method="full", plot.it=TRUE, col="red", lty=1, lwd=1, cex=0.8,
+               col.lab="blue", col.axis="blue", col.main="black", family="mono")
+
+### Cook's distance for the parameter associated to the variable 'group'
+cooks.distance(fit2, coef="group", method="full", plot.it=TRUE, col="red", lty=1,
+               lwd=1, col.lab="blue", col.axis="blue", col.main="black", cex=0.8)
+
+}
+\references{
+Pregibon, D. (1981). Logistic regression diagnostics. \emph{The Annals of Statistics} 9, 705-724.
+
+Preisser, J.S. and Qaqish, B.F. (1996) Deletion diagnostics for generalised estimating equations.
+\emph{Biometrika} 83, 551–562.
+
+Hammill, B.G. and Preisser, J.S. (2006) A SAS/IML software program for GEE and regression diagnostics.
+\emph{Computational Statistics & Data Analysis} 51, 1197-1212.
 }

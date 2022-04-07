@@ -2,7 +2,7 @@
 % Please edit documentation in R/geeglm.R
 \name{stepCriterion.glmgee}
 \alias{stepCriterion.glmgee}
-\title{Variable selection in Generalized Estimating Equation}
+\title{Variable selection in Generalized Estimating Equations}
 \usage{
 \method{stepCriterion}{glmgee}(
   model,
@@ -66,22 +66,28 @@ Performs variable selection in generalized estimating equations using hybrid ver
 and backward stepwise.
 }
 \examples{
-## Example 1
+###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 mod <- size ~ poly(days,4)*treat
 fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
 stepCriterion(fit1, criterion="p-value", direction="forward", scope=list(lower=~1,upper=mod))
 
-## Example 2
+###### Example 2: Treatment for severe postnatal depression
 mod <- depressd ~ visit*group
 fit2 <- glmgee(mod, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
 stepCriterion(fit2, criterion="adjr2", direction="forward", scope=list(lower=~1,upper=mod))
+
+###### Example 3: Treatment for severe postnatal depression (2)
+mod <- dep ~ visit*group
+fit2 <- glmgee(mod, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+stepCriterion(fit2, criterion="adjr2", direction="forward", scope=list(lower=~1,upper=mod))
+
 }
 \references{
-James G., Witten D., Hastie T. and Tibshirani R. (2013, page 210) An Introduction to Statistical Learning
-with Applications in R. Springer, New York.
+James, G. and Witten, D. and Hastie, T. and Tibshirani, R. (2013, page 210) \emph{An Introduction to Statistical Learning
+with Applications in R}. Springer, New York.
 
-Jianwen X., Jiamao Z. and Liya F. (2019) Variable selection in generalized estimating equations via empirical
-likelihood and Gaussian pseudo-likelihood. Communications in Statistics - Simulation and Computation, 48:4.
+Jianwen, X. and Jiamao, Z. and Liya, F. (2019) Variable selection in generalized estimating equations via empirical
+likelihood and Gaussian pseudo-likelihood. \emph{Communications in Statistics - Simulation and Computation} 48, 1239-1250.
 }
 \seealso{
 \link{stepCriterion.lm}, \link{stepCriterion.glm}, \link{stepCriterion.overglm}

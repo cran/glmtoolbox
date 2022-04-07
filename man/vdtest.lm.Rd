@@ -7,49 +7,67 @@
 \method{vdtest}{lm}(model, varformula, verbose = TRUE, ...)
 }
 \arguments{
-\item{model}{an object of the class lm which is obtained from the fit of a weighted or unweighted normal linear model.}
+\item{model}{an object of the class \emph{lm}.}
 
-\item{varformula}{an (optional) \code{formula} expression of the form \code{~ predictors} describing only the potential explanatory variables for the dispersion. By default, the same explanatory variables are taken as in the model for the mean.}
+\item{varformula}{an (optional) \code{formula} expression of the form \code{~ z1 + z2 + ... + zq} indicating the potential explanatory variables for the dispersion parameter. By default, the same explanatory variables are taken as in the model for the mean.}
 
 \item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
 \value{
-A list which includes the three main attributes of the test for varying dispersion parameter: statistic ("statistic"), degrees of freedom ("df") and \emph{p}-value ("p.value").
+a list list with components including
+\tabular{ll}{
+\code{statistic} \tab value of the Rao's score test (\eqn{S}),\cr
+\tab \cr
+\code{df}        \tab number of degrees of freedom (\eqn{q}),\cr
+\tab \cr
+\code{p.value}   \tab \emph{p}-value of the test,\cr
+}
 }
 \description{
 Performs Rao's score test for varying dispersion parameter in weighted and unweighted normal linear models.
 }
 \details{
-If the object \code{model} corresponds to an unweighted normal linear model then this test assess the assumption of constant variance, which
-coincides with the (non-studentized) Breusch-Pagan test against heteroskedasticity.
+From the heteroskedastic normal lineal model in which
+\eqn{\log(\sigma^2)=\gamma_0 + \gamma_1z_1 + \gamma_2z_2 + ...+ \gamma_qz_q}, where
+\eqn{\sigma^2} is the dispersion parameter of the distribution of the
+random errors, the Rao's score test (denoted here as \eqn{S}) to assess the
+hypothesis \eqn{H_0: \gamma=0} versus \eqn{H_1: \gamma\neq 0} is computed,
+where \eqn{\gamma=(\gamma_1,\ldots,\gamma_q)}. The corresponding \emph{p}-value is
+computed from the chi-squared distribution with \eqn{q} degrees of freedom,
+that is, \emph{p}-value = Prob\eqn{[\chi^2_{q} > S]}. If the object
+\code{model} corresponds to an unweighted normal linear model, then the
+test assess the assumption of constant variance, which coincides with the
+non-studentized Breusch-Pagan test against heteroskedasticity.
 }
 \examples{
-## Example 1
+###### Example 1: Fuel consumption of automobiles
 fit1 <- lm(mpg ~ log(hp) + log(wt), data=mtcars)
 vdtest(fit1)
 
-## Example 2
+###### Example 2: Species richness in plots
 fit2 <- lm(Species ~ Biomass + pH, data=richness)
 vdtest(fit2)
 
+### The test conclusions change when the outlying observations are excluded
 fit2a <- lm(Species ~ Biomass + pH, data=richness, subset=-c(1,3,18,20))
 vdtest(fit2a)
 
-## Example 3
+###### Example 3: Gas consumption in a home before and after insulation
 whiteside <- MASS::whiteside
 fit3 <- lm(Gas ~ Temp + Insul + Temp*Insul, data=whiteside)
 vdtest(fit3)
 
+### The test conclusions change when the outlying observations are excluded
 fit3a <- lm(Gas ~ Temp + Insul + Temp*Insul, data=whiteside, subset=-c(8,9,36,46,55))
 vdtest(fit3a)
 
 }
 \references{
-Breusch T.S. and Pagan A.R. (1979) A simple test for heteroscedasticity and random coefficient variation. \emph{Econometrica} 47, 1287–1294.
+Breusch, T.S. and Pagan, A.R. (1979) A simple test for heteroscedasticity and random coefficient variation. \emph{Econometrica} 47, 1287–1294.
 
-Cook R.D. and Weisberg S. (1983) Diagnostics for heteroscedasticity in regression. \emph{Biometrika} 70, 1–10.
+Cook, R.D. and Weisberg, S. (1983) Diagnostics for heteroscedasticity in regression. \emph{Biometrika} 70, 1–10.
 }
 \seealso{
 \link{vdtest.glm}

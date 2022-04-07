@@ -16,7 +16,7 @@
 )
 }
 \arguments{
-\item{model}{an object of the class glm which is obtained from the fit of a generalized linear model.}
+\item{model}{an object of the class \emph{glm}.}
 
 \item{criterion}{an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted deviance-based R-squared ("adjr2"), and \emph{p}-value of the \code{test} test ("p-value"). By default, \code{criterion} is set to be "bic".}
 
@@ -33,19 +33,36 @@
 \item{...}{further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC/QICu, which by default is set to be 2.}
 }
 \value{
-A list which contains the following objects:
-\itemize{
-\item{\code{initial}:}{ a character string indicating the linear predictor of the "initial model".}
-\item{\code{direction}:}{ a character string indicating the type of procedure which was used.}
-\item{\code{criterion}:}{ a character string indicating the criterion used to compare the candidate models.}
-\item{\code{final}:}{ a character string indicating the linear predictor of the "final model".}
+a list list with components including
+\tabular{ll}{
+\code{initial} \tab  a character string indicating the linear predictor of the "initial model",\cr
+\tab \cr
+\code{direction} \tab  a character string indicating the type of procedure which was used,\cr
+\tab \cr
+\code{criterion} \tab a character string indicating the criterion used to compare the candidate models,\cr
+\tab \cr
+\code{final} \tab a character string indicating the linear predictor of the "final model",\cr
 }
 }
 \description{
 Performs variable selection in generalized linear models using hybrid versions of forward stepwise and backward stepwise.
 }
+\details{
+The "hybrid forward stepwise"  algorithm starts with the simplest
+model (which may be specified at the argument \code{scope}, and by default,
+is a model whose parameters in the linear predictor, except the intercept,
+if any, are set to be 0), and then the candidate models are builded by
+hierarchically adding effects in the linear predictor, whose "relevance"
+and/or "importance" in the model fit is assessed by comparing nested models
+(that is, by comparing the models with and without the added effect) using a
+criterion previously specified. If an effect is added to the model then this strategy may
+also remove any effect which, according to the criterion previously specified, no
+longer provide an improvement in the model fit. That process remain until no more effects may be included or excluded.
+
+The "hybrid backward stepwise" algorithm works similarly.
+}
 \examples{
-## Example 1
+###### Example 1: Fuel consumption of automobiles
 Auto <- ISLR::Auto
 Auto2 <- within(Auto, origin <- factor(origin))
 mod <- mpg ~ cylinders + displacement + acceleration + origin + horsepower*weight
@@ -53,7 +70,7 @@ fit1 <- glm(mod, family=inverse.gaussian("log"), data=Auto2)
 stepCriterion(fit1, direction="forward", criterion="p-value", test="lr")
 stepCriterion(fit1, direction="backward", criterion="bic")
 
-## Example 2
+###### Example 2: Patients with burn injuries
 burn1000 <- aplore3::burn1000
 burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
 upper <- ~ age + gender + race + tbsa + inh_inj + flame + age*inh_inj + tbsa*inh_inj
@@ -62,14 +79,14 @@ fit2 <- glm(death ~ age + gender + race + tbsa + inh_inj, family=binomial("logit
 stepCriterion(fit2, direction="backward", criterion="bic", scope=list(lower=lower,upper=upper))
 stepCriterion(fit2, direction="forward", criterion="p-value", test="score")
 
-## Example 3
+###### Example 3: Skin cancer in women
 upper <- cases ~ city + age + city*age
 fit3 <- glm(upper, family=poisson("log"), offset=log(population), data=skincancer)
 stepCriterion(fit3, direction="backward", criterion="aic", scope=list(lower=~ 1,upper=upper))
 stepCriterion(fit3, direction="forward", criterion="p-value", test="lr")
 }
 \references{
-James G., Witten D., Hastie T. and Tibshirani R. (2013, page 210) An Introduction to Statistical Learning with Applications in R, Springer, New York.
+James, G. and Witten, D. and Hastie, T. and Tibshirani, R. (2013, page 210) An Introduction to Statistical Learning with Applications in R, Springer, New York.
 }
 \seealso{
 \link{stepCriterion.lm}, \link{stepCriterion.overglm}, \link{stepCriterion.glmgee}

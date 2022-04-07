@@ -4,10 +4,10 @@
 \alias{estequa.glm}
 \title{Estimating Equations in Generalized Linear Models}
 \usage{
-\method{estequa}{glm}(model, ...)
+\method{estequa}{glm}(object, ...)
 }
 \arguments{
-\item{model}{an object of the class glm which is obtained from the fit of a generalized linear model.}
+\item{object}{an object of the class glm which is obtained from the fit of a generalized linear model.}
 
 \item{...}{further arguments passed to or from other methods.}
 }

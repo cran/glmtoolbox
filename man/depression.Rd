@@ -15,7 +15,7 @@ A data frame with 427 rows and 5 variables:
 }
 }
 \source{
-\url{https://stats.idre.ucla.edu/spss/library/spss-librarypanel-data-analysis-using-gee/}
+\url{https://stats.oarc.ucla.edu/spss/library/spss-librarypanel-data-analysis-using-gee/}
 }
 \usage{
 data(depression)
@@ -34,17 +34,17 @@ depression.
 }
 \examples{
  boxplot(dep ~ visit, data=subset(depression,group=="placebo"), at=c(0:6)-0.2,
-         col="yellow", boxwex=0.25, outline=FALSE, xaxt="n", ylab="EDPS",
+         col="yellow", boxwex=0.3, outline=FALSE, xaxt="n", ylab="EDPS",
          xlab="Months since the treatment began", ylim=range(na.omit(depression$dep)))
  boxplot(dep ~ visit, data=subset(depression,group=="estrogen"), add=TRUE,
-         at=c(0:6)+0.2, col="blue", boxwex=0.25, outline=FALSE, xaxt="n")
+         at=c(0:6)+0.2, col="blue", boxwex=0.3, outline=FALSE, xaxt="n")
  axis(1, at=0:6, labels=c(-1,1:6))
- legend(-1, 8, legend=c("placebo","estrogen"), fill=c("yellow","blue"),
-        bty="n", title="Group")
+ legend(5, 29, legend=c("placebo","estrogen"), fill=c("yellow","blue"),
+        bty="n", x.intersp=0.2, y.intersp=1)
 
 }
 \references{
-Gregoire A.J.P., Kumar R., Everitt B., Henderson A.F. and Studd J.W.W. (1996) Transdermal oestrogen for treatment of severe postnatal depression,
+Gregoire, A.J.P. and Kumar, R. and Everitt, B. and Henderson, A.F. and Studd, J.W.W. (1996) Transdermal oestrogen for treatment of severe postnatal depression,
 \emph{The Lancet} 347, 930-933.
 }
 \keyword{datasets}

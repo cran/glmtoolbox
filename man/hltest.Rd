@@ -7,38 +7,43 @@
 hltest(model, verbose = TRUE, ...)
 }
 \arguments{
-\item{model}{an object of the class glm which is obtained from the fit of a generalized linear model where the distribution for the response variable is assumed to be binomial.}
+\item{model}{an object of the class \emph{glm}, which is obtained from the fit of a generalized linear model where the distribution for the response variable is assumed to be binomial.}
 
 \item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
 \value{
-A list which contains the following objects:
-\itemize{
-\item \code{hm:}{ A matrix with the values of Group, Size, Observed and Expected, which are required to compute the statistic of the test.}
-\item \code{statistic:}{ The value of the statistic of the test.}
-\item \code{df:}{ The number of degrees of freedom, given by the number of groups minus 2.}
-\item \code{p.value:}{ The \emph{p}-value of the test computed using the Chi-square distribution.}
+A matrix with the following four columns:
+\tabular{ll}{
+\code{hm} \tab a matrix with the values of Group, Size, Observed and Expected, which are required to compute the statistic of the test,\cr
+\tab \cr
+\code{statistic} \tab the value of the statistic of the test,\cr
+\tab \cr
+\code{df} \tab the number of degrees of freedom, given by the number of groups minus 2,\cr
+\tab \cr
+\code{p.value} \tab the \emph{p}-value of the test computed using the Chi-square distribution,\cr
 }
 }
 \description{
 Computes the Hosmer-Lemeshow goodness-of-fit test for a generalized linear model fitted to binary responses.
 }
 \examples{
-## Example 1
-fit1 <-  glm(cancer/exposed ~ dose, weights=exposed, family=binomial("logit"), data=bladder)
+
+###### Example 1: Patients with burn injuries
+burn1000 <- aplore3::burn1000
+burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
+fit1 <- glm(death ~ age*inh_inj + tbsa*inh_inj, family=binomial("logit"), data=burn1000)
 hltest(fit1)
 
-## Example 2
-fit2 <-  glm(cancer/exposed ~ dose, weights=exposed, family=binomial("logit"), data=liver)
+###### Example 2: Bladder cancer in mice
+fit2 <-  glm(cancer/exposed ~ dose, weights=exposed, family=binomial("cloglog"), data=bladder)
 hltest(fit2)
 
-## Example 3
-burn1000 <- aplore3::burn1000
-mod <- death ~ age + tbsa + inh_inj + age*inh_inj + tbsa*inh_inj
-fit3 <- glm(mod, family=binomial("logit"), data=burn1000)
+###### Example 3: Liver cancer in mice
+fit3 <-  glm(cancer/exposed ~ dose, weights=exposed, family=binomial("probit"), data=liver)
 hltest(fit3)
+
 }
 \references{
 Hosmer, D.W. and Lemeshow, S. (2000) \emph{Applied Logistic Regression. 2nd ed.} John Wiley & Sons, New York.

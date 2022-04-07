@@ -24,6 +24,6 @@ barplot(lesions ~ time, col="red", data=aucuba)
 
 }
 \references{
-Snedecor G.W. and Cochran W.G. (1989) \emph{Statistical Methods, Eight Edition}, Iowa State University Press, Ames.
+Snedecor, G.W. and Cochran, W.G. (1989) \emph{Statistical Methods, Eight Edition}, Iowa State University Press, Ames.
 }
 \keyword{datasets}
