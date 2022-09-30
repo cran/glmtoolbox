@@ -39,6 +39,7 @@ is computed from a dataset including all individuals, and the second one is comp
 }
 \examples{
 ###### Example 1: Self diagnozed ear infections in swimmers
+data(swimmers)
 fit1 <- overglm(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 
 ### Cook's distance for all parameters in the linear predictor
@@ -62,6 +63,7 @@ cooks.distance(fit2, plot.it=TRUE, coef="fem", col="red", lty=1, lwd=1,
    col.lab="blue", col.axis="blue", col.main="black", family="mono", cex=0.8)
 
 ###### Example 3: Agents to stimulate cellular differentiation
+data(cellular)
 fit3 <- overglm(cbind(cells,200-cells) ~ tnf + ifn, family="bb(logit)", data=cellular)
 
 ### Cook's distance for all parameters in the linear predictor

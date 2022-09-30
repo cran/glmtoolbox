@@ -39,7 +39,7 @@ glmgee(
 
 \item{subset}{an (optional) vector specifying a subset of observations to be used in the fitting process.}
 
-\item{corstr}{an (optional) character string which allows to specify the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(\emph{m})", "Non-Stationary-M-dependent(\emph{m})", "AR-1", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. By default, \code{corstr} is set to be "Independence".}
+\item{corstr}{an (optional) character string which allows to specify the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(\emph{m})", "Non-Stationary-M-dependent(\emph{m})", "AR-M-dependent(\emph{m})", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. By default, \code{corstr} is set to be "Independence".}
 
 \item{corr}{an (optional) square matrix of the same dimension of the maximum cluster size containing the user specified correlation. This is only appropriate if \code{corstr} is specified to be "User-defined".}
 
@@ -131,8 +131,8 @@ solving the estimating equations described by Liang and Zeger (1986).
 If the maximum cluster size is 6 and for a cluster of size 4 the value of \code{waves} is set
 to be 2, 4, 5, 6, then it means that the data on times 1 and 3 are missing, which should be
 taken into account by \code{glmgee} when the structure of the correlation matrix is assumed
-to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent" or "AR-1".  If
-in this scenario \code{waves} is not specified then \code{glmgee} assumes that the available
+to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent" or "AR-M-dependent".
+If in this scenario \code{waves} is not specified then \code{glmgee} assumes that the available
 data for this cluster were taken on point times 1, 2, 3 and 4.
 
 A set of standard extractor functions for fitted model objects is available for objects of class  \emph{glmgee},
@@ -145,32 +145,38 @@ The variable selection may be accomplished using the routine
 }
 \examples{
 ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+data(spruces)
 mod1 <- size ~ poly(days,4) + treat
-fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces)
+fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-M-dependent", data=spruces)
 summary(fit1, corr.digits=2)
 
 ###### Example 2: Treatment for severe postnatal depression
+data(depression)
 mod2 <- depressd ~ visit + group
-fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
 summary(fit2, corr.digits=2)
 
 ###### Example 3: Treatment for severe postnatal depression (2)
+data(depression)
 mod3 <- dep ~ visit*group
-fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-M-dependent", data=depression)
 summary(fit3, corr.digits=2)
 
 ###### Example 4: Dental Clinical Trial
+data(rinse)
 mod4 <- score/3.6 ~ rinse*time
 fit4 <- glmgee(mod4, family=binomial("log"), id=subject, corstr="Exchangeable", data=rinse)
 summary(fit4, corr.digits=2)
 
 ###### Example 5: Shoulder Pain after Laparoscopic Cholecystectomy
+data(cholecystectomy)
 mod5 <- pain2 ~ treatment + age + time
 corstr <- "Stationary-M-dependent(2)"
 fit5 <- glmgee(mod5, family=binomial("logit"), id=id, corstr=corstr, data=cholecystectomy)
 summary(fit5,varest="bias-corrected")
 
 ###### Example 6: Guidelines for Urinary Incontinence Discussion and Evaluation
+data(GUIDE)
 mod6 <- bothered ~ gender + age + dayacc + severe + toilet
 fit6 <- glmgee(mod6, family=binomial("logit"), id=practice, corstr="Exchangeable", data=GUIDE)
 summary(fit6)

@@ -63,6 +63,7 @@ significance tests.
 }
 \examples{
 ###### Example 1: Self diagnozed ear infections in swimmers
+data(swimmers)
 fit1 <- overglm(infections ~ age + gender + frequency + location, family="nb1(log)", data=swimmers)
 
 stepCriterion(fit1, criterion="p-value", direction="forward", test="lr")
@@ -78,6 +79,7 @@ stepCriterion(fit2, criterion="p-value", direction="forward", test="lr")
 stepCriterion(fit2, criterion="bic", direction="backward", test="score")
 
 ###### Example 3: Agents to stimulate cellular differentiation
+data(cellular)
 fit3 <- overglm(cbind(cells,200-cells) ~ tnf + ifn + tnf*ifn, family="bb(logit)", data=cellular)
 
 stepCriterion(fit3, criterion="p-value", direction="backward", test="lr")

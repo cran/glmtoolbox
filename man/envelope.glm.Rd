@@ -78,16 +78,19 @@ envelope(fit2, rep=50, conf=0.95, type="pearson", col="red", pch=20, col.lab="bl
          col.axis="blue", col.main="black", family="mono", cex=0.8)
 
 ###### Example 3: Skin cancer in women
+data(skincancer)
 fit3 <- glm(cases ~ offset(log(population)) + city + age, family=poisson, data=skincancer)
 envelope(fit3, rep=100, conf=0.95, type="quantile", col="red", pch=20,col.lab="blue",
          col.axis="blue",col.main="black",family="mono",cex=0.8)
 
 ###### Example 4: Self diagnozed ear infections in swimmers
+data(swimmers)
 fit4 <- glm(infections ~ frequency + location, family=poisson(log), data=swimmers)
 envelope(fit4, rep=100, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
          col.axis="blue", col.main="black", family="mono", cex=0.8)
 
 ###### Example 5: Agents to stimulate cellular differentiation
+data(cellular)
 fit5 <- glm(cbind(cells,200-cells) ~ tnf + ifn, family=binomial(logit), data=cellular)
 envelope(fit5, rep=100, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
          col.axis="blue", col.main="black", family="mono", cex=0.8)

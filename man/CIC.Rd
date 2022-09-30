@@ -19,17 +19,19 @@ Computes the Correlation Information Criterion (CIC) for one or more objects of 
 }
 \examples{
 ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+data(spruces)
 mod1 <- size ~ poly(days,4) + treat
 fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces)
-fit2 <- update(fit1, corstr="AR-1")
+fit2 <- update(fit1, corstr="AR-M-dependent")
 fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 fit4 <- update(fit1, corstr="Exchangeable")
 CIC(fit1, fit2, fit3, fit4)
 
 ###### Example 2: Treatment for severe postnatal depression
+data(depression)
 mod2 <- depressd ~ visit + group
 fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), data=depression)
-fit2 <- update(fit1, corstr="AR-1")
+fit2 <- update(fit1, corstr="AR-M-dependent")
 fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 fit4 <- update(fit1, corstr="Exchangeable")
 CIC(fit1, fit2, fit3, fit4)
@@ -37,7 +39,7 @@ CIC(fit1, fit2, fit3, fit4)
 ###### Example 3: Treatment for severe postnatal depression (2)
 mod3 <- dep ~ visit*group
 fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), data=depression)
-fit2 <- update(fit1, corstr="AR-1")
+fit2 <- update(fit1, corstr="AR-M-dependent")
 fit3 <- update(fit1, corstr="Exchangeable")
 CIC(fit1, fit2, fit3)
 

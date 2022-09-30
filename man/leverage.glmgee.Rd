@@ -38,6 +38,7 @@ fit1 <- glmgee(mod, family = binomial(cloglog), id = ID, corstr = "Exchangeable"
 leverage(fit1,level="clusters",plot.it=TRUE)
 
 ###### Example 2: Guidelines for Urinary Incontinence Discussion and Evaluation
+data(GUIDE)
 mod <- bothered ~ gender + age + dayacc + severe + toilet
 fit2 <- glmgee(mod, family=binomial(logit), id=practice, corstr="Exchangeable", data=GUIDE)
 leverage(fit2,level="clusters",plot.it=TRUE)

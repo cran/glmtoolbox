@@ -30,6 +30,7 @@ objective of the analysis is to measure the effectiveness of the three mouth rin
 development of dental plaque.
 }
 \examples{
+data(rinse)
 boxplot(score ~ time, data=subset(rinse,rinse=="Placebo"), at=c(1:3)-0.2,
  ylim=c(0,3.3), col="yellow", boxwex=0.15, outline=FALSE, xaxt="n", xlim=c(0.8,3.2))
 boxplot(score ~ time, data=subset(rinse,rinse=="A"), add=TRUE,

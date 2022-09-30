@@ -7,7 +7,7 @@
 #' @param weights an (optional) vector of positive "prior weights" to be used in the fitting process. The length of \code{weights} should be the same as the total number of observations.
 #' @param data an (optional) \code{data frame} in which to look for variables involved in the \code{formula} expression, as well as for variables specified in the arguments \code{id} and \code{weights}. The data are assumed to be sorted by \code{id} and time.
 #' @param subset an (optional) vector specifying a subset of observations to be used in the fitting process.
-#' @param corstr an (optional) character string which allows to specify the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(\emph{m})", "Non-Stationary-M-dependent(\emph{m})", "AR-1", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. By default, \code{corstr} is set to be "Independence".
+#' @param corstr an (optional) character string which allows to specify the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(\emph{m})", "Non-Stationary-M-dependent(\emph{m})", "AR-M-dependent(\emph{m})", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. By default, \code{corstr} is set to be "Independence".
 #' @param corr an (optional) square matrix of the same dimension of the maximum cluster size containing the user specified correlation. This is only appropriate if \code{corstr} is specified to be "User-defined".
 #' @param start an (optional) vector of starting values for the parameters in the linear predictor.
 #' @param maxit an (optional) integer value which represents the maximum number of iterations allowed for the fitting algorithm. By default, \code{maxit} is set to be 50.
@@ -36,8 +36,8 @@
 #' If the maximum cluster size is 6 and for a cluster of size 4 the value of \code{waves} is set
 #' to be 2, 4, 5, 6, then it means that the data on times 1 and 3 are missing, which should be
 #' taken into account by \code{glmgee} when the structure of the correlation matrix is assumed
-#' to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent" or "AR-1".  If
-#' in this scenario \code{waves} is not specified then \code{glmgee} assumes that the available
+#' to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent" or "AR-M-dependent".
+#' If in this scenario \code{waves} is not specified then \code{glmgee} assumes that the available
 #' data for this cluster were taken on point times 1, 2, 3 and 4.
 #'
 #' A set of standard extractor functions for fitted model objects is available for objects of class  \emph{glmgee},
@@ -103,38 +103,44 @@
 #' @importFrom graphics abline par lines
 #' @importFrom methods missingArg
 #' @importFrom stats as.formula coef gaussian get_all_vars rnorm update qt var
-#'             glm.fit model.extract model.frame model.matrix uniroot lm.fit
+#'             glm.fit model.extract model.frame model.matrix uniroot lm.fit lm.wfit
 #'             model.offset model.response model.weights pnorm cov2cor qchisq
 #'             printCoefmat pchisq vcov cooks.distance dfbeta qnorm anova na.omit
-#'             formula terms pf quasibinomial quasipoisson
+#'             formula terms pf quasibinomial quasipoisson toeplitz
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' data(spruces)
 #' mod1 <- size ~ poly(days,4) + treat
-#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces)
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-M-dependent", data=spruces)
 #' summary(fit1, corr.digits=2)
 #'
 #' ###### Example 2: Treatment for severe postnatal depression
+#' data(depression)
 #' mod2 <- depressd ~ visit + group
-#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
 #' summary(fit2, corr.digits=2)
 #'
 #' ###### Example 3: Treatment for severe postnatal depression (2)
+#' data(depression)
 #' mod3 <- dep ~ visit*group
-#' fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+#' fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-M-dependent", data=depression)
 #' summary(fit3, corr.digits=2)
 #'
 #' ###### Example 4: Dental Clinical Trial
+#' data(rinse)
 #' mod4 <- score/3.6 ~ rinse*time
 #' fit4 <- glmgee(mod4, family=binomial("log"), id=subject, corstr="Exchangeable", data=rinse)
 #' summary(fit4, corr.digits=2)
 #'
 #' ###### Example 5: Shoulder Pain after Laparoscopic Cholecystectomy
+#' data(cholecystectomy)
 #' mod5 <- pain2 ~ treatment + age + time
 #' corstr <- "Stationary-M-dependent(2)"
 #' fit5 <- glmgee(mod5, family=binomial("logit"), id=id, corstr=corstr, data=cholecystectomy)
 #' summary(fit5,varest="bias-corrected")
 #'
 #' ###### Example 6: Guidelines for Urinary Incontinence Discussion and Evaluation
+#' data(GUIDE)
 #' mod6 <- bothered ~ gender + age + dayacc + severe + toilet
 #' fit6 <- glmgee(mod6, family=binomial("logit"), id=practice, corstr="Exchangeable", data=GUIDE)
 #' summary(fit6)
@@ -165,21 +171,24 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
   weights <- as.vector(model.weights(mf))
   if(is(family,"function")) family <- family()
 
-  if(family$family %in% c("quasi","quasibinomial","quasipoisson","gaussian","binomial","poisson","Gamma","inverse.gaussian")){
   if(family$family %in% c("quasi","quasibinomial","quasipoisson")){
-    family$family <- switch(family$varfun,"constant"="gaussian","mu(1-mu)"="binomial",
-                            "mu"="poisson","mu^2"="Gamma","mu^3"="inverse.gaussian")
+    if(family$family=="quasi"){
+      family$family <- switch(family$varfun,"constant"="gaussian","mu(1-mu)"="binomial",
+                              "mu"="poisson","mu^2"="Gamma","mu^3"="inverse.gaussian")
+    }
+    else{
+      family$family <- switch(family$family,"quasibinomial"="binomial","quasipoisson"="poisson")
+    }
     family <- do.call(family$family,list(link=family$link))
+    family2 <- family
   }
   else{
-    varfun <- switch(family$family,"gaussian"="constant","binomial"="mu(1-mu)","quasibinomial"="mu(1-mu)",
-                     "poisson"="mu","quasipoisson"="mu","Gamma"="mu^2","inverse.gaussian"="mu^3")
-    family$family <- gsub("quasi","",family$family)
-    family2 <- do.call("quasi",list(variance=varfun,link=family$link))
+    if(family$family %in% c("gaussian","binomial","poisson","Gamma","inverse.gaussian")){
+       varfun <- switch(family$family,"gaussian"="constant","binomial"="mu(1-mu)",
+                       "poisson"="mu","Gamma"="mu^2","inverse.gaussian"="mu^3")
+       family2 <- do.call("quasi",list(variance=varfun,link=family$link))
+    }else family2 <- family
   }
-  if(family$family=="binomial") family2 <- quasibinomial(link=family$link)
-  if(family$family=="poisson") family2 <- quasipoisson(link=family$link)
-  }else family2 <- family
 
   if(ncol(y)==2 & family$family=="binomial"){
     weights <- as.matrix(y[,1]+y[,2])
@@ -197,7 +206,7 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
   waves <- as.vector(model.extract(mf,waves))
   if(!is.null(waves)) if(any(waves!=floor(waves)) | any(waves<=0)) stop("Only positive integers are allowed in waves!!",call.=FALSE)
   id <- model.extract(mf,id)
-  if(is.null(id)) id <- matrix(1,n,1)
+  if(is.null(id)) id <- matrix(1:n,n,1)
   id2 <- as.matrix(unique(id))
   nclus <- length(id2)
   sizes <- matrix(0,nclus,1)
@@ -225,17 +234,17 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
   }
   temp <- strsplit(gsub("[[:space:]]","",corstr),"[()]")[[1]]
   args <- c("Independence","Unstructured","Stationary-M-dependent",
-            "Non-Stationary-M-dependent","AR-1","Exchangeable","User-defined")
+            "Non-Stationary-M-dependent","AR-M-dependent","Exchangeable","User-defined")
   temp2 <- grep(tolower(temp[1]),tolower(args))
   if(length(temp)>0){
     corstr <- args[temp2[1]]
-    if(corstr=="Stationary-M-dependent" | corstr=="Non-Stationary-M-dependent"){
+    if(corstr=="Stationary-M-dependent" | corstr=="Non-Stationary-M-dependent" | corstr=="AR-M-dependent"){
       M <- min(max(1,floor(abs(as.numeric(temp[2])))),maxsize-1)
       if(is.na(M)) M <- 1
       attr(corstr,"M") <- M
     }
   }else stop("Correlation structure should be one of Independence, Unstructured, Stationary-M-dependent,
- 		            Non-Stationary-M-dependent, AR-1, Exchangeable and User-defined!!",call.=FALSE)
+ 		            Non-Stationary-M-dependent, AR-M-dependent, Exchangeable and User-defined!!",call.=FALSE)
   Rout <- function(resume,corstr){
     if(corstr=="Unstructured"){
       R <- resume[1:maxsize,1:maxsize]/(resume[1:maxsize,-c(1:maxsize)]-p)
@@ -268,14 +277,21 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
         }
       }
     }
-    if(corstr=="AR-1"){
-      inds <- cbind(1:(maxsize-1),2:maxsize)
-      inds2 <- cbind(inds[,1],maxsize+inds[,2])
-      alpha <- sum(resume[inds])/(sum(resume[inds2])-p)
-      alpha <- alpha/phi
-      is <- rep(1:maxsize,maxsize)
-      m1 <- matrix(is,ncol=maxsize,nrow=maxsize)
-      R <- alpha^abs(m1 - t(m1))
+    if(corstr=="AR-M-dependent"){
+      alphas <- matrix(0,M,1)
+      R <- matrix(0,maxsize,maxsize)
+      for(i in 1:M){
+        inds <- cbind(1:(maxsize-i),(1+i):maxsize)
+        inds2 <- cbind(inds[,1],maxsize+inds[,2])
+        alphas[i] <- sum(resume[inds])/(sum(resume[inds2])-p)
+      }
+      alphas <- alphas/phi
+      alphasf <- function(x) if(x==0) return(1) else return(alphas[x])
+      phises <- chol2inv(chol(apply(toeplitz(0:(M-1)),c(1,2),alphasf)))%*%alphas
+      rhos <- matrix(0,maxsize-1,1)
+      rhos[1:M] <- alphas
+      for(i in (M+1):(maxsize-1)) rhos[i] <- sum(phises*rhos[i-c(1:M)])
+      R <- toeplitz(c(1,rhos))
     }
     if(corstr=="Exchangeable"){
       diag(resume[1:maxsize,1:maxsize]) <- rep(0,maxsize)
@@ -296,7 +312,7 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
     wi <- sqrt(family$variance(mui)/D[,q+3])
     Xiw <- Xi*matrix(family$mu.eta(etai),nrow(Xi),p)
     Vi <- t(R[D[,q+4],D[,q+4]]*matrix(wi,ni,ni))*matrix(wi,ni,ni)
-    if(corstr=="Independence") Vi2 <- diag(1/wi[D[,q+4]]^2)
+    if(corstr=="Independence") Vi2 <- diag(as.vector(1/wi[D[,q+4]]^2))
     else{Vi2 <- try(chol(Vi),silent=TRUE)
          if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)}
     Xiw2 <- crossprod(Vi2,Xiw)
@@ -336,7 +352,7 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
   if(niter==maxit) warning("Iteration limit exceeded!!\n",call.=FALSE)
   eta <- tcrossprod(X,t(beta_new)) + offs
   mu <- family$linkinv(eta)
-  phi <- sum(diag(resume[1:maxsize,1:maxsize]))/(sum(sizes)-p)
+  phi <- sum(diag(matrix(resume[1:maxsize,1:maxsize])))/(sum(sizes)-p)
   sera <- try(chol(R),silent=TRUE)
   if(!is.matrix(sera)) warning("Estimate of correlation matrix is not positive definite",call.=FALSE)
   nano <- list(...)
@@ -407,7 +423,7 @@ summary.glmgee <- function(object, ...,digits=5,corr.digits=3,varest=c("robust",
   cat("\nSample size")
   cat("\n   Number of observations: ",sum(object$sizes))
   cat("\n       Number of clusters: ",length(object$sizes),"\n")
-  if(var(object$sizes) > 0){
+  if(var(range(object$sizes)) > 0){
   out_ <- matrix(quantile(object$sizes,probs=c(0,0.25,0.5,0.75,1)),1,5)
   rownames(out_)[1] <- "            Cluster sizes:";colnames(out_) <- c(" Min"," 25%"," 50%"," 75%"," Max")
   print(out_,digits=1)
@@ -486,42 +502,46 @@ return(invisible(results))
 #' @export
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' data(spruces)
 #' mod1 <- size ~ poly(days,4) + treat
-#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces)
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-M-dependent", data=spruces)
 #' dfbs1 <- dfbeta(fit1, method="full", coefs="treat", col="red", lty=1, lwd=1, col.lab="blue",
 #'          col.axis="blue", col.main="black", family="mono", cex=0.8, main="treat")
 #'
 #' ### Calculation by hand of dfbeta for the tree labeled by "N1T01"
-#' onestep1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces,
-#'             start=coef(fit1), subset=c(tree!="N1T01"), maxit=1)
+#' onestep1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-M-dependent",
+#'             data=spruces, start=coef(fit1), subset=c(tree!="N1T01"), maxit=1)
 #'
 #' coef(fit1)-coef(onestep1)
 #' dfbs1[rownames(dfbs1)=="N1T01",]
 #'
 #' ###### Example 2: Treatment for severe postnatal depression
+#' data(depression)
 #' mod2 <- depressd ~ visit + group
-#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent",
+#'                data=depression)
 #'
 #' dfbs2 <- dfbeta(fit2, method="full", coefs="group" ,col="red", lty=1, lwd=1, col.lab="blue",
 #'          col.axis="blue", col.main="black", family="mono", cex=0.8, main="group")
 #'
 #' ### Calculation by hand of dfbeta for the woman labeled by "18"
-#' onestep2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression,
-#'             start=coef(fit2), subset=c(subj!=18), maxit=1)
+#' onestep2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent",
+#'             data=depression, start=coef(fit2), subset=c(subj!=18), maxit=1)
 #'
 #' coef(fit2)-coef(onestep2)
 #' dfbs2[rownames(dfbs2)==18,]
 #'
 #' ###### Example 3: Treatment for severe postnatal depression (2)
 #' mod3 <- dep ~ visit*group
-#' fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+#' fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-M-dependent",
+#'                data=depression)
 #'
 #' dfbs3 <- dfbeta(fit3, method="full", coefs="visit:group" ,col="red", lty=1, lwd=1, col.lab="blue",
 #'          col.axis="blue", col.main="black", family="mono", cex=0.8, main="visit:group")
 #'
 #' ### Calculation by hand of dfbeta for the woman labeled by "18"
-#' onestep3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression,
-#'             start=coef(fit3), subset=c(subj!=18), maxit=1)
+#' onestep3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-M-dependent",
+#'             data=depression, start=coef(fit3), subset=c(subj!=18), maxit=1)
 #'
 #' coef(fit3)-coef(onestep3)
 #' dfbs3[rownames(dfbs3)==18,]
@@ -666,8 +686,9 @@ dfbeta.glmgee <- function(model, level=c("clusters","observations"), method=c("P
 #' @export
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' data(spruces)
 #' mod1 <- size ~ poly(days,4) + treat
-#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces, corstr="AR-M-dependent")
 #'
 #' ### Cook's distance for all parameters in the linear predictor
 #' cooks.distance(fit1, method="full", plot.it=TRUE, col="red", lty=1, lwd=1, cex=0.8,
@@ -678,8 +699,9 @@ dfbeta.glmgee <- function(model, level=c("clusters","observations"), method=c("P
 #'                lwd=1, col.lab="blue", col.axis="blue", col.main="black", cex=0.8)
 #'
 #' ###### Example 2: Treatment for severe postnatal depression
+#' data(depression)
 #' mod2 <- depressd ~ visit + group
-#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
 #'
 #' ### Cook's distance for all parameters in the linear predictor
 #' cooks.distance(fit2, method="full", plot.it=TRUE, col="red", lty=1, lwd=1, cex=0.8,
@@ -791,20 +813,22 @@ print.glmgee <- function(x, ...){
 #' @return A matrix with so many rows as \code{newdata} and one column with the predictions. If \code{se.fit=}TRUE then a second column with estimates standard errors is included.
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' data(spruces)
 #' mod1 <- size ~ poly(days,4) + treat
-#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces, corstr="AR-M-dependent")
 #' newdata1 <- data.frame(days=c(556,556),treat=as.factor(c("normal","ozone-enriched")))
 #' predict(fit1,newdata=newdata1,type="response",se.fit=TRUE)
 #'
 #' ###### Example 2: Treatment for severe postnatal depression
+#' data(depression)
 #' mod2 <- depressd ~ visit + group
-#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
 #' newdata2 <- data.frame(visit=c(6,6),group=as.factor(c("placebo","estrogen")))
 #' predict(fit2,newdata=newdata2,type="response",se.fit=TRUE)
 #'
 #' ###### Example 3: Treatment for severe postnatal depression (2)
 #' mod3 <- dep ~ visit*group
-#' fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+#' fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-M-dependent", data=depression)
 #' newdata3 <- data.frame(visit=c(6,6),group=as.factor(c("placebo","estrogen")))
 #' predict(fit3,newdata=newdata3,type="response",se.fit=TRUE)
 #'
@@ -848,8 +872,9 @@ predict.glmgee <- function(object, ...,newdata, se.fit=FALSE, type=c("link","res
 #' @examples
 #'
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' data(spruces)
 #' mod1 <- size ~ poly(days,4) + treat
-#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces, corstr="AR-M-dependent")
 #' ### Plot to assess the adequacy of the chosen variance function
 #' residuals(fit1, type="deviance", plot.it=TRUE, col="red", pch=20, col.lab="blue",
 #'           col.axis="blue", col.main="black", family="mono", cex=0.8)
@@ -858,15 +883,16 @@ predict.glmgee <- function(object, ...,newdata, se.fit=FALSE, type=c("link","res
 #'           col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
 #' ###### Example 2: Treatment for severe postnatal depression
+#' data(depression)
 #' mod2 <- depressd ~ visit + group
-#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
 #' ### Plot to identify women suspicious to be outliers
 #' residuals(fit2, type="mahalanobis", plot.it=TRUE, col="red", pch=20, col.lab="blue",
 #'           col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
 #' ###### Example 3: Treatment for severe postnatal depression (2)
 #' mod3 <- dep ~ visit*group
-#' fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+#' fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-M-dependent", data=depression)
 #' ### Plot to assess the adequacy of the chosen variance function
 #' residuals(fit3, type="pearson", plot.it=TRUE, col="red", pch=20, col.lab="blue",
 #'           col.axis="blue", col.main="black", family="mono", cex=0.8)
@@ -948,32 +974,37 @@ residuals.glmgee <- function(object,..., type=c("mahalanobis","pearson","devianc
 #' @export
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' data(spruces)
 #' mod1 <- size ~ poly(days,4) + treat
-#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces)
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-M-dependent", data=spruces)
 #' estequa(fit1)
 #'
 #' ###### Example 2: Treatment for severe postnatal depression
+#' data(depression)
 #' mod2 <- depressd ~ visit + group
-#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
 #' estequa(fit2)
 #'
 #' ###### Example 3: Treatment for severe postnatal depression (2)
 #' mod3 <- dep ~ visit*group
-#' fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+#' fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-M-dependent", data=depression)
 #' estequa(fit3)
 #'
 #' ###### Example 4: Dental Clinical Trial
+#' data(rinse)
 #' mod4 <- score/3.6 ~ rinse*time
 #' fit4 <- glmgee(mod4, family=binomial(log), id=subject, corstr="Exchangeable", data=rinse)
 #' estequa(fit4)
 #'
 #' ###### Example 5: Shoulder Pain after Laparoscopic Cholecystectomy
+#' data(cholecystectomy)
 #' mod5 <- pain2 ~ treatment + age + time
 #' corstr <- "Stationary-M-dependent(2)"
 #' fit5 <- glmgee(mod5, family=binomial(logit), id=id, corstr=corstr, data=cholecystectomy)
 #' estequa(fit5)
 #'
 #' ###### Example 6: Guidelines for Urinary Incontinence Discussion and Evaluation
+#' data(GUIDE)
 #' mod6 <- bothered ~ gender + age + dayacc + severe + toilet
 #' fit6 <- glmgee(mod6, family=binomial(logit), id=practice, corstr="Exchangeable", data=GUIDE)
 #' estequa(fit6)
@@ -1009,34 +1040,23 @@ estequa.glmgee <- function(object,...){
 #' @export
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' data(spruces)
 #' mod <- size ~ poly(days,4)
-#' fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
+#' fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-M-dependent")
 #' fit2 <- update(fit1, . ~ . + treat)
 #' fit3 <- update(fit2, . ~ . + poly(days,4):treat)
 #' anova(fit1,fit2,fit3,test="wald")
 #' anova(fit3,test="wald")
-#' anova(fit1,fit2,fit3,test="score")
-#' anova(fit3,test="score")
 #'
 #' ###### Example 2: Treatment for severe postnatal depression
+#' data(depression)
 #' mod2 <- depressd ~ group
-#' fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+#' fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
 #' fit2 <- update(fit1, . ~ . + visit)
 #' fit3 <- update(fit2, . ~ . + group:visit)
-#' anova(fit1,fit2,fit3,test="wald")
-#' anova(fit3,test="wald")
 #' anova(fit1,fit2,fit3,test="score")
 #' anova(fit3,test="score")
 #'
-#' ###### Example 3: Treatment for severe postnatal depression (2)
-#' mod3 <- dep ~ group
-#' fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
-#' fit2 <- update(fit1, . ~ . + visit)
-#' fit3 <- update(fit2, . ~ . + visit:group)
-#' anova(fit1,fit2,fit3,test="wald")
-#' anova(fit3,test="wald")
-#' anova(fit1,fit2,fit3,test="score")
-#' anova(fit3,test="score")
 #' @references Boos, D. (1992) On Generalized Score Tests. \emph{American Statistician} 46, 327–33.
 #' @references Rotnitzky, A. and Jewell, N.P. (1990). Hypothesis Testing of Regression Parameters in Semiparametric Generalized Linear Models for Cluster Correlated Data. \emph{Biometrika} 77, 485-497.
 anova.glmgee <- function(object,...,test=c("wald","score"),verbose=TRUE,varest=c("robust","df-adjusted","model","bias-corrected")){
@@ -1105,17 +1125,19 @@ anova.glmgee <- function(object,...,test=c("wald","score"),verbose=TRUE,varest=c
 #' @export QIC
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' data(spruces)
 #' mod1 <- size ~ poly(days,4) + treat
 #' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces)
-#' fit2 <- update(fit1, corstr="AR-1")
+#' fit2 <- update(fit1, corstr="AR-M-dependent")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 #' fit4 <- update(fit1, corstr="Exchangeable")
 #' QIC(fit1, fit2, fit3, fit4)
 #'
 #' ###### Example 2: Treatment for severe postnatal depression
+#' data(depression)
 #' mod2 <- depressd ~ visit + group
 #' fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), data=depression)
-#' fit2 <- update(fit1, corstr="AR-1")
+#' fit2 <- update(fit1, corstr="AR-M-dependent")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 #' fit4 <- update(fit1, corstr="Exchangeable")
 #' QIC(fit1, fit2, fit3, fit4)
@@ -1123,7 +1145,7 @@ anova.glmgee <- function(object,...,test=c("wald","score"),verbose=TRUE,varest=c
 #' ###### Example 3: Treatment for severe postnatal depression (2)
 #' mod3 <- dep ~ visit*group
 #' fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), data=depression)
-#' fit2 <- update(fit1, corstr="AR-1")
+#' fit2 <- update(fit1, corstr="AR-M-dependent")
 #' fit3 <- update(fit1, corstr="Exchangeable")
 #' QIC(fit1, fit2, fit3)
 #'
@@ -1177,17 +1199,19 @@ QIC <- function(...,k=2,u=FALSE,verbose=TRUE){
 #' @seealso \link{QIC}, \link{GHYC}, \link{RJC}, \link{AGPC}, \link{SGPC}
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' data(spruces)
 #' mod1 <- size ~ poly(days,4) + treat
 #' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces)
-#' fit2 <- update(fit1, corstr="AR-1")
+#' fit2 <- update(fit1, corstr="AR-M-dependent")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 #' fit4 <- update(fit1, corstr="Exchangeable")
 #' CIC(fit1, fit2, fit3, fit4)
 #'
 #' ###### Example 2: Treatment for severe postnatal depression
+#' data(depression)
 #' mod2 <- depressd ~ visit + group
 #' fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), data=depression)
-#' fit2 <- update(fit1, corstr="AR-1")
+#' fit2 <- update(fit1, corstr="AR-M-dependent")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 #' fit4 <- update(fit1, corstr="Exchangeable")
 #' CIC(fit1, fit2, fit3, fit4)
@@ -1195,7 +1219,7 @@ QIC <- function(...,k=2,u=FALSE,verbose=TRUE){
 #' ###### Example 3: Treatment for severe postnatal depression (2)
 #' mod3 <- dep ~ visit*group
 #' fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), data=depression)
-#' fit2 <- update(fit1, corstr="AR-1")
+#' fit2 <- update(fit1, corstr="AR-M-dependent")
 #' fit3 <- update(fit1, corstr="Exchangeable")
 #' CIC(fit1, fit2, fit3)
 #'
@@ -1253,17 +1277,19 @@ CIC <- function(...,verbose=TRUE){
 #' @seealso \link{QIC}, \link{CIC}, \link{RJC}, \link{AGPC}, \link{SGPC}
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' data(spruces)
 #' mod1 <- size ~ poly(days,4) + treat
 #' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces)
-#' fit2 <- update(fit1, corstr="AR-1")
+#' fit2 <- update(fit1, corstr="AR-M-dependent")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 #' fit4 <- update(fit1, corstr="Exchangeable")
 #' GHYC(fit1, fit2, fit3, fit4)
 #'
 #' ###### Example 2: Treatment for severe postnatal depression
+#' data(depression)
 #' mod2 <- depressd ~ visit + group
 #' fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), data=depression)
-#' fit2 <- update(fit1, corstr="AR-1")
+#' fit2 <- update(fit1, corstr="AR-M-dependent")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 #' fit4 <- update(fit1, corstr="Exchangeable")
 #' GHYC(fit1, fit2, fit3, fit4)
@@ -1271,7 +1297,7 @@ CIC <- function(...,verbose=TRUE){
 #' ###### Example 3: Treatment for severe postnatal depression (2)
 #' mod3 <- dep ~ visit*group
 #' fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), data=depression)
-#' fit2 <- update(fit1, corstr="AR-1")
+#' fit2 <- update(fit1, corstr="AR-M-dependent")
 #' fit3 <- update(fit1, corstr="Exchangeable")
 #' GHYC(fit1, fit2, fit3)
 #'
@@ -1348,17 +1374,19 @@ GHYC <- function(...,verbose=TRUE){
 #' Selection in GEE: Assessment via Simulation. \emph{The American Statistician} 61, 360-364.
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' data(spruces)
 #' mod1 <- size ~ poly(days,4) + treat
 #' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces)
-#' fit2 <- update(fit1, corstr="AR-1")
+#' fit2 <- update(fit1, corstr="AR-M-dependent")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 #' fit4 <- update(fit1, corstr="Exchangeable")
 #' RJC(fit1, fit2, fit3, fit4)
 #'
 #' ###### Example 2: Treatment for severe postnatal depression
+#' data(depression)
 #' mod2 <- depressd ~ visit + group
 #' fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), data=depression)
-#' fit2 <- update(fit1, corstr="AR-1")
+#' fit2 <- update(fit1, corstr="AR-M-dependent")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 #' fit4 <- update(fit1, corstr="Exchangeable")
 #' RJC(fit1, fit2, fit3, fit4)
@@ -1366,7 +1394,7 @@ GHYC <- function(...,verbose=TRUE){
 #' ###### Example 3: Treatment for severe postnatal depression (2)
 #' mod3 <- dep ~ visit*group
 #' fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), data=depression)
-#' fit2 <- update(fit1, corstr="AR-1")
+#' fit2 <- update(fit1, corstr="AR-M-dependent")
 #' fit3 <- update(fit1, corstr="Exchangeable")
 #' RJC(fit1, fit2, fit3)
 #'
@@ -1443,18 +1471,20 @@ RJC <- function(...,verbose=TRUE){
 #' @seealso \link{stepCriterion.lm}, \link{stepCriterion.glm}, \link{stepCriterion.overglm}
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' data(spruces)
 #' mod <- size ~ poly(days,4)*treat
-#' fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
+#' fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-M-dependent")
 #' stepCriterion(fit1, criterion="p-value", direction="forward", scope=list(lower=~1,upper=mod))
 #'
 #' ###### Example 2: Treatment for severe postnatal depression
+#' data(depression)
 #' mod <- depressd ~ visit*group
-#' fit2 <- glmgee(mod, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+#' fit2 <- glmgee(mod, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
 #' stepCriterion(fit2, criterion="adjr2", direction="forward", scope=list(lower=~1,upper=mod))
 #'
 #' ###### Example 3: Treatment for severe postnatal depression (2)
 #' mod <- dep ~ visit*group
-#' fit2 <- glmgee(mod, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+#' fit2 <- glmgee(mod, id=subj, family=gaussian("identity"), corstr="AR-M-dependent", data=depression)
 #' stepCriterion(fit2, criterion="adjr2", direction="forward", scope=list(lower=~1,upper=mod))
 #'
 #' @method stepCriterion glmgee
@@ -1791,17 +1821,19 @@ stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","adjr
 #' 983-996.
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' data(spruces)
 #' mod1 <- size ~ poly(days,4) + treat
 #' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces)
-#' fit2 <- update(fit1, corstr="AR-1")
+#' fit2 <- update(fit1, corstr="AR-M-dependent")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 #' fit4 <- update(fit1, corstr="Exchangeable")
 #' AGPC(fit1, fit2, fit3, fit4)
 #'
 #' ###### Example 2: Treatment for severe postnatal depression
+#' data(depression)
 #' mod2 <- depressd ~ visit + group
 #' fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), data=depression)
-#' fit2 <- update(fit1, corstr="AR-1")
+#' fit2 <- update(fit1, corstr="AR-M-dependent")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 #' fit4 <- update(fit1, corstr="Exchangeable")
 #' AGPC(fit1, fit2, fit3, fit4)
@@ -1809,7 +1841,7 @@ stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","adjr
 #' ###### Example 3: Treatment for severe postnatal depression (2)
 #' mod3 <- dep ~ visit*group
 #' fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), data=depression)
-#' fit2 <- update(fit1, corstr="AR-1")
+#' fit2 <- update(fit1, corstr="AR-M-dependent")
 #' fit3 <- update(fit1, corstr="Exchangeable")
 #' AGPC(fit1, fit2, fit3)
 #'
@@ -1844,7 +1876,7 @@ AGPC <- function(...,k=2,verbose=TRUE){
     }
     resume <- Reduce('+',lapply(model$arrangedata,VSi))
     q <- switch (model$corstr,
-                 "AR-1" = 1,
+                 "AR-M-dependent" = attr(model$corstr,"M"),
                  "Independence" = 0,
                  "Exchangeable" = 1,
                  "Unstructured" = maxsize*(maxsize-1)/2,
@@ -1901,17 +1933,19 @@ AGPC <- function(...,k=2,verbose=TRUE){
 #' 983-996.
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' data(spruces)
 #' mod1 <- size ~ poly(days,4) + treat
 #' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces)
-#' fit2 <- update(fit1, corstr="AR-1")
+#' fit2 <- update(fit1, corstr="AR-M-dependent")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 #' fit4 <- update(fit1, corstr="Exchangeable")
 #' SGPC(fit1, fit2, fit3, fit4)
 #'
 #' ###### Example 2: Treatment for severe postnatal depression
+#' data(depression)
 #' mod2 <- depressd ~ visit + group
 #' fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), data=depression)
-#' fit2 <- update(fit1, corstr="AR-1")
+#' fit2 <- update(fit1, corstr="AR-M-dependent")
 #' fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 #' fit4 <- update(fit1, corstr="Exchangeable")
 #' SGPC(fit1, fit2, fit3, fit4)
@@ -1919,7 +1953,7 @@ AGPC <- function(...,k=2,verbose=TRUE){
 #' ###### Example 3: Treatment for severe postnatal depression (2)
 #' mod3 <- dep ~ visit*group
 #' fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), data=depression)
-#' fit2 <- update(fit1, corstr="AR-1")
+#' fit2 <- update(fit1, corstr="AR-M-dependent")
 #' fit3 <- update(fit1, corstr="Exchangeable")
 #' SGPC(fit1, fit2, fit3)
 #'
@@ -1952,7 +1986,7 @@ SGPC <- function(...,verbose=TRUE){
     }
     resume <- Reduce('+',lapply(model$arrangedata,VSi))
     q <- switch (model$corstr,
-                 "AR-1" = 1,
+                 "AR-M-dependent" = attr(model$corstr,"M"),
                  "Independence" = 0,
                  "Exchangeable" = 1,
                  "Unstructured" = maxsize*(maxsize-1)/2,
@@ -2002,20 +2036,22 @@ SGPC <- function(...,verbose=TRUE){
 #' @export
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' data(spruces)
 #' mod <- size ~ poly(days,4) + treat
 #' fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
 #' vcov(fit1)
 #' vcov(fit1,type="bias-corrected")
 #'
 #' ###### Example 2: Treatment for severe postnatal depression
+#' data(depression)
 #' mod <- depressd ~ visit + group
-#' fit3 <- glmgee(mod, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+#' fit3 <- glmgee(mod, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
 #' vcov(fit3)
 #' vcov(fit3,type="bias-corrected")
 #'
 #' ###### Example 3: Treatment for severe postnatal depression (2)
 #' mod <- dep ~ visit*group
-#' fit2 <- glmgee(mod, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+#' fit2 <- glmgee(mod, id=subj, family=gaussian("identity"), corstr="AR-M-dependent", data=depression)
 #' vcov(fit2)
 #' vcov(fit2,type="bias-corrected")
 #'
@@ -2054,6 +2090,7 @@ vcov.glmgee <- function(object,...,type=c("robust","df-adjusted","model","bias-c
 #' leverage(fit1,level="clusters",plot.it=TRUE)
 #'
 #' ###### Example 2: Guidelines for Urinary Incontinence Discussion and Evaluation
+#' data(GUIDE)
 #' mod <- bothered ~ gender + age + dayacc + severe + toilet
 #' fit2 <- glmgee(mod, family=binomial(logit), id=practice, corstr="Exchangeable", data=GUIDE)
 #' leverage(fit2,level="clusters",plot.it=TRUE)
@@ -2126,18 +2163,20 @@ leverage.glmgee <- function(object,level=c("clusters","observations"),plot.it=FA
 #' @references Jung, K.-M. (2008) Local Influence in Generalized Estimating Equations. \emph{Scandinavian Journal of Statistics} 35, 286-294.
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+#' data(spruces)
 #' mod1 <- size ~ poly(days,4) + treat
-#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces)
+#' fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-M-dependent", data=spruces)
 #' localInfluence(fit1,type="total",perturbation="cw-clusters",coefs="treat",plot.it=TRUE)
 #'
 #' ###### Example 2: Treatment for severe postnatal depression
+#' data(depression)
 #' mod2 <- depressd ~ visit + group
-#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+#' fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
 #' localInfluence(fit2,type="total",perturbation="cw-clusters",coefs="group",plot.it=TRUE)
 #'
 #' ###### Example 3: Treatment for severe postnatal depression (2)
 #' mod3 <- dep ~ visit*group
-#' fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+#' fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-M-dependent", data=depression)
 #' localInfluence(fit3,type="total",perturbation="cw-clusters",coefs="visit:group",plot.it=TRUE)
 #'
 localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c("cw-clusters","cw-observations",

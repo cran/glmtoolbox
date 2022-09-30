@@ -27,6 +27,7 @@ root extract and whether there is any interaction. See Crowder (1978),
 Hinde and Demetrio (1998).
 }
 \examples{
+data(orobanche)
 out <- aggregate(cbind(germinated,seeds) ~ extract + specie, data=orobanche, sum)
 barplot(100*germinated/seeds ~ extract + specie, beside=TRUE, data=out, width=0.3,
         col=c("yellow","blue"), xlab="Specie", ylab="\% of germinated seeds")

@@ -52,10 +52,12 @@ fit1 <- glm(mpg ~ weight*horsepower, family=inverse.gaussian("log"), data=Auto)
 vdtest(fit1)
 
 ###### Example 2: Hill races in Scotland
+data(races)
 fit2 <- glm(rtime ~ log(distance) + log(cclimb), family=Gamma("log"), data=races)
 vdtest(fit2)
 
 ###### Example 3: Mammal brain and body weights
+data(brains)
 fit3 <- glm(BrainWt ~ log(BodyWt), family=Gamma("log"), data=brains)
 vdtest(fit3)
 }

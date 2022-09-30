@@ -24,6 +24,7 @@ analysis of these data is to explain the differences between the record time of
 the races using their differences on distance and cumulative climb. See Agresti (2015, page 62).
 }
 \examples{
+data(races)
 races2 <- within(races,cli <- cut(cclimb, include.lowest=TRUE,
                                   breaks=quantile(cclimb, probs=c(0:2)/2),
                                   labels=c("low","high")))

@@ -47,6 +47,7 @@ fit1 <- lm(mpg ~ log(hp) + log(wt), data=mtcars)
 vdtest(fit1)
 
 ###### Example 2: Species richness in plots
+data(richness)
 fit2 <- lm(Species ~ Biomass + pH, data=richness)
 vdtest(fit2)
 

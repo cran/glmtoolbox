@@ -28,6 +28,7 @@ synergy of phenytoin  and trichloropropene oxide to produce ossification at the 
 that is, teratogenic effects. See Morel and Nagaraj (2012, page 103).
 }
 \examples{
+data(ossification)
 boxplot(100*fetuses/litter ~ pht, data=subset(ossification, tcpo=="0 mg/kg"),
         at=c(1:2)-0.2, col="yellow", boxwex=0.25, outline=FALSE, xaxt="n",
         xlab="Dose of PHT", ylab="\% of fetuses showing ossification")

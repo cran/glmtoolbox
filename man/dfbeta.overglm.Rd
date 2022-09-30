@@ -37,6 +37,7 @@ a starting value which is the estimate of the same model but based on the datase
 }
 \examples{
 ###### Example 1: Self diagnozed ear infections in swimmers
+data(swimmers)
 fit1 <- overglm(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 dfbeta(fit1, coefs="frequency", col="red", lty=1, lwd=1, col.lab="blue",
        col.axis="blue", col.main="black", family="mono", cex=0.8, main="frequency")
@@ -48,6 +49,7 @@ dfbeta(fit2, coefs="fem", col="red", lty=1, lwd=1, col.lab="blue",
        col.axis="blue", col.main="black", family="mono", cex=0.8, main="fem")
 
 ###### Example 3: Agents to stimulate cellular differentiation
+data(cellular)
 fit3 <- overglm(cbind(cells,200-cells) ~ tnf + ifn, family="bb(logit)", data=cellular)
 dfbeta(fit3, coefs="tnf", col="red", lty=1, lwd=1, col.lab="blue",
        col.axis="blue", col.main="black", family="mono", cex=0.8, main="tnf")

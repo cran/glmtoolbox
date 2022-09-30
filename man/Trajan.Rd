@@ -29,6 +29,7 @@ is to assess the effect of both the photoperiod and the concentration levels of 
 number of roots produced.
 }
 \examples{
+data(Trajan)
 boxplot(roots ~ bap, data=subset(Trajan,photoperiod=="8"), at=c(1:4) - 0.15,
     col="blue", boxwex=0.2, outline=FALSE, xaxt="n", xlim=c(0.7,4.3), ylim=c(-0.5,17))
 boxplot(roots ~ bap, data=subset(Trajan,photoperiod=="16"), add=TRUE, at=c(1:4) + 0.15,

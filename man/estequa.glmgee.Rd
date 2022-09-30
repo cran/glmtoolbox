@@ -19,32 +19,37 @@ Extracts estimating equations evaluated at the parameter estimates and the obser
 }
 \examples{
 ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+data(spruces)
 mod1 <- size ~ poly(days,4) + treat
-fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces)
+fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-M-dependent", data=spruces)
 estequa(fit1)
 
 ###### Example 2: Treatment for severe postnatal depression
+data(depression)
 mod2 <- depressd ~ visit + group
-fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
 estequa(fit2)
 
 ###### Example 3: Treatment for severe postnatal depression (2)
 mod3 <- dep ~ visit*group
-fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-M-dependent", data=depression)
 estequa(fit3)
 
 ###### Example 4: Dental Clinical Trial
+data(rinse)
 mod4 <- score/3.6 ~ rinse*time
 fit4 <- glmgee(mod4, family=binomial(log), id=subject, corstr="Exchangeable", data=rinse)
 estequa(fit4)
 
 ###### Example 5: Shoulder Pain after Laparoscopic Cholecystectomy
+data(cholecystectomy)
 mod5 <- pain2 ~ treatment + age + time
 corstr <- "Stationary-M-dependent(2)"
 fit5 <- glmgee(mod5, family=binomial(logit), id=id, corstr=corstr, data=cholecystectomy)
 estequa(fit5)
 
 ###### Example 6: Guidelines for Urinary Incontinence Discussion and Evaluation
+data(GUIDE)
 mod6 <- bothered ~ gender + age + dayacc + severe + toilet
 fit6 <- glmgee(mod6, family=binomial(logit), id=practice, corstr="Exchangeable", data=GUIDE)
 estequa(fit6)

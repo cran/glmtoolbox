@@ -37,10 +37,12 @@ fit1 <- glm(death ~ age*inh_inj + tbsa*inh_inj, family=binomial("logit"), data=b
 hltest(fit1)
 
 ###### Example 2: Bladder cancer in mice
+data(bladder)
 fit2 <-  glm(cancer/exposed ~ dose, weights=exposed, family=binomial("cloglog"), data=bladder)
 hltest(fit2)
 
 ###### Example 3: Liver cancer in mice
+data(liver)
 fit3 <-  glm(cancer/exposed ~ dose, weights=exposed, family=binomial("probit"), data=liver)
 hltest(fit3)
 

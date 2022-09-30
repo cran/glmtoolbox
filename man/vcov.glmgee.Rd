@@ -25,20 +25,22 @@ Computes the type-\code{type} estimate of the variance-covariance matrix from an
 }
 \examples{
 ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+data(spruces)
 mod <- size ~ poly(days,4) + treat
 fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="Exchangeable")
 vcov(fit1)
 vcov(fit1,type="bias-corrected")
 
 ###### Example 2: Treatment for severe postnatal depression
+data(depression)
 mod <- depressd ~ visit + group
-fit3 <- glmgee(mod, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+fit3 <- glmgee(mod, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
 vcov(fit3)
 vcov(fit3,type="bias-corrected")
 
 ###### Example 3: Treatment for severe postnatal depression (2)
 mod <- dep ~ visit*group
-fit2 <- glmgee(mod, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+fit2 <- glmgee(mod, id=subj, family=gaussian("identity"), corstr="AR-M-dependent", data=depression)
 vcov(fit2)
 vcov(fit2,type="bias-corrected")
 

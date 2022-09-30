@@ -25,6 +25,7 @@ of analysis was to assess the difference in the development of tumors between
 the treated and control groups. See Morel and Nagaraj (2012, page 63).
 }
 \examples{
+data(mammary)
 boxplot(tumors ~ group, data=mammary, outline=FALSE, xlab="Group",
         ylab="Number of tumors", col=c("yellow","blue"))
 }

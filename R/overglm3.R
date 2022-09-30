@@ -1,3 +1,169 @@
+#' @title Test for Overdispersion
+#' @description This function uses the likelihood-ratio test to assess if the negative binomial model fits the data better than the poisson model, that is, it uses the likelihood-ratio test to assess the null hypothesis given by \eqn{H_0: \phi=0} versus the alternative hypothesis given by \eqn{H_1: \phi>0}, where \eqn{\phi} represents the dispersion parameter of the negative binomial distribution. This function also uses the likelihood-ratio test to assess if the beta binomial or the random-clumped binomial models fits the data better than the binomial model.
+#' @param object an object of the class \code{overglm}.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @return A matrix with 1 row and the following columns:
+#' \tabular{ll}{
+#' \code{Chi} \tab the value of the likelihood-ratio statistic,\cr
+#' \tab \cr
+#' \code{df}\tab the degrees-of-freedom,\cr
+#' \tab \cr
+#' \code{Pr(>Chi)}\tab the p-value associated with the test,\cr
+#' }
+#' @details
+#' The value of \eqn{\phi} specified at the null hypothesis is
+#' the lower limit of its parametric space. Therefore, the p-value
+#' associated with the test is computed as \eqn{\frac{1}{2}} if
+#' \eqn{\xi=0} and \eqn{\frac{1}{2}*Pr[\chi^2(1)>\xi]} if
+#' \eqn{\xi>0}, where \eqn{\xi} represents the likelihood-ratio
+#' statistic.
+#'
+#' @examples
+#' ####### Example 1: Self diagnozed ear infections in swimmers
+#' data(swimmers)
+#' fit1 <- overglm(infections ~ frequency + location, family="nb1", data=swimmers)
+#' overtest(fit1)
+#'
+#' ####### Example 2: Article production by graduate students in biochemistry PhD programs
+#' bioChemists <- pscl::bioChemists
+#' fit2 <- overglm(art ~ fem + kid5 + ment, family="ztnb1", data=bioChemists, subset={art > 0})
+#' overtest(fit2)
+#'
+#' ####### Example 3: Agents to stimulate cellular differentiation
+#' data(cellular)
+#' fit3 <- overglm(cbind(cells,200-cells) ~ tnf + ifn, family="bb", data=cellular)
+#' overtest(fit3)
+#'
+#' @seealso \link{overglm}, \link{zero.excess}
+#' @export overtest
+#'
+overtest <- function(object,verbose=TRUE){
+  if(!is(object,"overglm")) stop("Only overglm-type objects are supported!!",call.=FALSE)
+  if(!(object$family$family %in% c("bb","rcb"))){
+    if(!(object$family$family %in% c("nbf","nb1","nb2"))) stop("Only 'ztnb1', 'ztnb2' and 'ztnbf' families of overglm-type objects are supported!!",call.=FALSE)
+    if(object$zero.trunc){
+      object2 <- object$call
+      object2$call$family <- "ztpoi"
+      fitpois <- eval(object2)
+      lr <- 2*(logLik(object) - logLik(fitpois))
+    }else{
+      familia <- object$family
+      familia$family <- "poisson"
+      fitpois <- glm.fit(x=model.matrix(object), y=object$y, weights=object$prior.weights,
+                         offset=object$offset, family=familia)
+      lr <- as.double(2*logLik(object) + fitpois$aic - 2*length(fitpois$coefficients))
+    }
+  }else{
+    if(sd(object$prior.weights)>0) stop("prior weights are not supported!!",call.=FALSE)
+    familia <- object$family
+    familia$family <- "binomial"
+    weights <- apply(object$y,1,sum)
+    fitbin <- glm.fit(x=model.matrix(object), y=object$y[,1]/weights, weights=weights,
+                      offset=object$offset, family=familia)
+    lr <- as.double(2*logLik(object) + fitbin$aic - 2*length(fitbin$coefficients))
+  }
+  p.value <- 1 - 0.5*(1 + pchisq(lr,1))
+  out_ <- matrix(cbind(lr,1,p.value),1,3)
+  colnames(out_) <- c(" Chi ","df"," Pr(>Chi) ")
+  rownames(out_) <- ""
+  if(verbose){
+    cat("Over-dispersion test\n")
+    if(object$family$family %in% c("bb","rcb")){
+      if(object$family$family=="bb") cat("Binomial vs Beta Binomial\n\n")
+      else cat("Binomial vs Random-Clumped Binomial\n\n")
+    }else{
+    if(object$zero.trunc) cat("zero-truncated Poisson vs zero-truncated Negative Binomial\n\n")
+    else cat("Poisson vs Negative Binomial\n\n")
+    }
+    printCoefmat(out_, P.values=TRUE, has.Pvalue=TRUE, digits=5, signif.legend=FALSE, cs.ind=2)
+  }
+  return(invisible(out_))
+}
+#'
+#'
+#' @title Test for zero-excess in Count Regression Models
+#' @description Allows to assess if the observed number of zeros is significantly higher than the expected according to the fitted count regression model (poisson or negative binomial).
+#' @param object an object of the class \code{glm}, for poisson regression models, or an object of the class \code{overglm}, for negative binomial regression models.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @return A matrix with 1 row and the following columns:
+#' \tabular{ll}{
+#' \code{Observed} \tab the observed number of zeros,\cr
+#' \tab \cr
+#' \code{Expected}\tab the expected number of zeros,\cr
+#' \tab \cr
+#' \code{z-value}\tab the value of the statistical test,\cr
+#' \tab \cr
+#' \code{Pr(>z)}\tab the p-value of the statistical test,\cr
+#' }
+#' @details
+#' According to the formulated count regression model, we have that
+#' \eqn{Y_k\sim P(y;\mu_k,\phi)} for \eqn{k=1,\ldots,n} are independent
+#' random variables. Then, the expected number of zeros is the sum of
+#' \eqn{P(0;\hat{\mu}_k,\hat{\phi})} for \eqn{k=1,\ldots,n}, where
+#' \eqn{\hat{\mu}_k} and \eqn{\hat{\phi}} represent the estimates of
+#' \eqn{\mu_k} and \eqn{\phi}, respectively, obtained from the fitted
+#' model. Thus, the statistical test reduces to the standardized
+#' difference between the observed and expected number of zeros,
+#' whose distribution, under the null hypothesis, tends to the standard
+#' normal when the sample size, \eqn{n}, tends to infinity.
+#'
+#' @examples
+#' ####### Example 1: Self diagnozed ear infections in swimmers
+#' data(swimmers)
+#' fit1 <- glm(infections ~ frequency + location, family=poisson, data=swimmers)
+#' zero.excess(fit1)
+#' fit2 <- overglm(infections ~ frequency + location, family="nb1", data=swimmers)
+#' zero.excess(fit2)
+#'
+#' ####### Example 2: Article production by graduate students in biochemistry PhD programs
+#' bioChemists <- pscl::bioChemists
+#' fit1 <- glm(art ~ fem + kid5 + ment, family=poisson, data = bioChemists)
+#' zero.excess(fit1)
+#' fit2 <- overglm(art ~ fem + kid5 + ment, family="nb1", data = bioChemists)
+#' zero.excess(fit2)
+
+#' ####### Example 3: Roots Produced by the Columnar Apple Cultivar Trajan
+#' data(Trajan)
+#' fit1 <- glm(roots ~ photoperiod, family=poisson, data=Trajan)
+#' zero.excess(fit1)
+#' fit2 <- overglm(roots ~ photoperiod, family="nbf", data=Trajan)
+#' zero.excess(fit2)
+#'
+#' @seealso \link{overglm}, \link{zeroinf}
+#' @export zero.excess
+zero.excess <- function(object,verbose=TRUE){
+  if(is(object,"overglm")){
+    if(!(object$family$family %in% c("nbf","nb1","nb2"))) stop("Only 'nb1', 'nb2' and 'nbf' families of overglm-type objects are supported!!",call.=FALSE)
+  }else{
+    if(is(object,"glm")){
+      if(object$family$family!="poisson") stop("Only 'poisson' family of glm-type objects are supported!!",call.=FALSE)
+    }else{
+      stop("Only 'nb1', 'nb2' and 'nbf' families of overglm-type objects and 'poisson' family of glm-type objects are supported!!",call.=FALSE)
+    }
+  }
+  if(object$family$family=="poisson"){
+    p0 <- exp(-fitted(object))
+  }else{
+    if(object$family$family=="nbf") tau <- object$coefficients[object$parms[1]+2]
+    if(object$family$family=="nb1") tau <- 0
+    if(object$family$family=="nb2") tau <- -1
+    mus <- object$fitted.values
+    phi <- exp(object$coefficients[object$parms[1]+1])
+    a <- 1/(phi*mus^tau)
+    p0 <- (a/(mus + a))^a
+  }
+  o <- sum(object$y==0)
+  z <- (o - sum(p0))/sqrt(sum(p0*(1-p0)))
+  out_ <- matrix(cbind(o,sum(p0),z,1-pnorm(z)),1,4)
+  colnames(out_) <- c("Observed","Expected","z-value","Pr(>z)")
+  rownames(out_) <- ""
+  if(verbose){
+    cat("  Number of Zeros\n")
+    printCoefmat(out_, P.values=TRUE, has.Pvalue=TRUE, digits=5, signif.legend=FALSE, cs.ind=2)
+  }
+  return(invisible(out_))
+}
+
 #' @title Alternatives to the Poisson and Binomial Regression Models under the presence of Overdispersion.
 #' @description Allows to fit regression models based on the negative binomial, beta-binomial, and random-clumped binomial
 #' distributions, which are alternatives to the Poisson and binomial regression models under the presence of overdispersion.
@@ -118,14 +284,17 @@
 #' @seealso \link{zeroalt}, \link{zeroinf}
 #' @examples
 #' ### Example 1: Ability of retinyl acetate to prevent mammary cancer in rats
+#' data(mammary)
 #' fit1 <- overglm(tumors ~ group, family="nb1(identity)", data=mammary)
 #' summary(fit1)
 #'
 #' ### Example 2: Self diagnozed ear infections in swimmers
+#' data(swimmers)
 #' fit2 <- overglm(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 #' summary(fit2)
 #'
 #' ### Example 3: Urinary tract infections in HIV-infected men
+#' data(uti)
 #' fit3 <- overglm(episodes ~ cd4 + offset(log(time)), family="nb1(log)", data = uti)
 #' summary(fit3)
 #'
@@ -135,15 +304,18 @@
 #' summary(fit4)
 #'
 #' ### Example 5: Agents to stimulate cellular differentiation
+#' data(cellular)
 #' fit5 <- overglm(cbind(cells,200-cells) ~ tnf + ifn, family="bb(logit)", data=cellular)
 #' summary(fit5)
 #'
 #' ### Example 6: Teratogenic effects of phenytoin and trichloropropene oxide
+#' data(ossification)
 #' model6 <- cbind(fetuses,litter-fetuses) ~ pht + tcpo
 #' fit6 <- overglm(model6, family="rcb(cloglog)", data=ossification)
 #' summary(fit6)
 #'
 #' ### Example 7: Germination of orobanche seeds
+#' data(orobanche)
 #' model7 <- cbind(germinated,seeds-germinated) ~ specie + extract
 #' fit7 <- overglm(model7, family="rcb(cloglog)", data=orobanche)
 #' summary(fit7)
@@ -584,10 +756,12 @@ overglm <- function(formula, family="nb1(log)", weights, data, subset, na.action
 #'
 #' @examples
 #' ####### Example 1: Roots Produced by the Columnar Apple Cultivar Trajan
+#' data(Trajan)
 #' fit1 <- zeroalt(roots ~ photoperiod, family="nbf(log)", zero.link="logit", data=Trajan)
 #' summary(fit1)
 #'
 #' ####### Example 2: Self diagnozed ear infections in swimmers
+#' data(swimmers)
 #' fit2 <- zeroalt(infections ~ frequency | location, family="nb1(log)", data=swimmers)
 #' summary(fit2)
 #'
@@ -923,10 +1097,12 @@ zeroalt <- function(formula, data, subset, na.action=na.omit(), weights, family=
 #'
 #' @examples
 #' ####### Example 1: Roots Produced by the Columnar Apple Cultivar Trajan
+#' data(Trajan)
 #' fit1 <- zeroinf(roots ~ photoperiod, family="nbf(log)", zero.link="logit", data=Trajan)
 #' summary(fit1)
 #'
 #' ####### Example 2: Self diagnozed ear infections in swimmers
+#' data(swimmers)
 #' fit2 <- zeroinf(infections ~ frequency | location, family="nb1(log)", data=swimmers)
 #' summary(fit2)
 #'
@@ -1234,6 +1410,7 @@ vcov.overglm <- function(object, ...) {
 logLik.zeroinflation <- function(object, ...){
   out_ <- object$logLik
   attr(out_,"df") <- sum(object$parms)
+  attr(out_,"nobs") <- length(object$prior.weights)
   class(out_) <- "logLik"
   return(out_)
 }
@@ -1244,6 +1421,7 @@ logLik.zeroinflation <- function(object, ...){
 logLik.overglm <- function(object, ...){
   out_ <- object$logLik
   attr(out_,"df") <- length(object$coefficients)
+  attr(out_,"nobs") <- length(object$prior.weights)
   class(out_) <- "logLik"
   return(out_)
 }
@@ -1340,14 +1518,17 @@ predict.zeroinflation <- function(object,newdata,submodel=c("counts","zeros"),se
 #' @export
 #' @examples
 #' ### Example 1: Ability of retinyl acetate to prevent mammary cancer in rats
+#' data(mammary)
 #' fit1 <- overglm(tumors ~ group, family="nb1(identity)", data=mammary)
 #' estequa(fit1)
 #'
 #' ### Example 2: Self diagnozed ear infections in swimmers
+#' data(swimmers)
 #' fit2 <- overglm(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 #' estequa(fit2)
 #'
 #' ### Example 3: Urinary tract infections in HIV-infected men
+#' data(uti)
 #' fit3 <- overglm(episodes ~ cd4 + offset(log(time)), family="nb1(log)", data = uti)
 #' estequa(fit3)
 #'
@@ -1357,15 +1538,18 @@ predict.zeroinflation <- function(object,newdata,submodel=c("counts","zeros"),se
 #' estequa(fit4)
 #'
 #' ### Example 5: Agents to stimulate cellular differentiation
+#' data(cellular)
 #' fit5 <- overglm(cbind(cells,200-cells) ~ tnf + ifn, family="bb(logit)", data=cellular)
 #' estequa(fit5)
 #'
 #' ### Example 6: Teratogenic effects of phenytoin and trichloropropene oxide
+#' data(ossification)
 #' model6 <- cbind(fetuses,litter-fetuses) ~ pht + tcpo
 #' fit6 <- overglm(model6, family="rcb(cloglog)", data=ossification)
 #' estequa(fit6)
 #'
 #' ### Example 7: Germination of orobanche seeds
+#' data(orobanche)
 #' model7 <- cbind(germinated,seeds-germinated) ~ specie + extract
 #' fit7 <- overglm(model7, family="rcb(cloglog)", data=orobanche)
 #' estequa(fit7)
@@ -1386,6 +1570,7 @@ estequa.overglm <- function(object, ...){
 #' @return A vector with the values of the estimating equations evaluated at the parameter estimates and the observed data.
 #' @examples
 #' ####### Example 1: Roots Produced by the Columnar Apple Cultivar Trajan
+#' data(Trajan)
 #' fit1 <- zeroalt(roots ~ photoperiod, family="nbf(log)", zero.link="logit", data=Trajan)
 #' estequa(fit1)
 #'
@@ -1393,6 +1578,7 @@ estequa.overglm <- function(object, ...){
 #' estequa(fit1a)
 #'
 #' ####### Example 2: Self diagnozed ear infections in swimmers
+#' data(swimmers)
 #' fit2 <- zeroalt(infections ~ frequency | location, family="nb1(log)", data=swimmers)
 #' estequa(fit2)
 #'
@@ -1550,6 +1736,7 @@ print.overglm <- function(x,...){
 #' @return A vector with the observed residuals type \code{type}.
 #' @examples
 #' ####### Example 1: Self diagnozed ear infections in swimmers
+#' data(swimmers)
 #' fit1 <- zeroalt(infections ~ frequency | location, family="nb1(log)", data=swimmers)
 #' residuals(fit1, type="quantile", col="red", pch=20, col.lab="blue", plot.it=TRUE,
 #'           col.axis="blue", col.main="black", family="mono", cex=0.8)
@@ -1634,6 +1821,7 @@ residuals.zeroinflation <- function(object,type=c("quantile","standardized","res
 #' @return A vector with the observed \code{type}-type residuals.
 #' @examples
 #' ###### Example 1: Self diagnozed ear infections in swimmers
+#' data(swimmers)
 #' fit1 <- overglm(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 #' residuals(fit1, type="quantile", plot.it=TRUE, col="red", pch=20, col.lab="blue",
 #'           col.axis="blue", col.main="black", family="mono", cex=0.8)
@@ -1645,6 +1833,7 @@ residuals.zeroinflation <- function(object,type=c("quantile","standardized","res
 #'           col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
 #' ###### Example 3: Agents to stimulate cellular differentiation
+#' data(cellular)
 #' fit3 <- overglm(cbind(cells,200-cells) ~ tnf + ifn, family="bb(logit)", data=cellular)
 #' residuals(fit3, type="quantile", plot.it=TRUE, col="red", pch=20, col.lab="blue",
 #'           col.axis="blue", col.main="black", family="mono", cex=0.8)
@@ -1771,6 +1960,7 @@ residuals.overglm <- function(object,type=c("quantile","standardized","response"
 #' @references Terrell, G.R. (2002) The gradient statistic. \emph{Computing Science and Statistics} 34, 206–215.
 #' @examples
 #' ## Example 1: Self diagnozed ear infections in swimmers
+#' data(swimmers)
 #' fit1 <- overglm(infections ~ frequency, family="nb1(log)", data=swimmers)
 #' fit2 <- update(fit1, . ~ . + location)
 #' fit3 <- update(fit2, . ~ . + age)
@@ -1781,6 +1971,7 @@ residuals.overglm <- function(object,type=c("quantile","standardized","response"
 #' anova(fit1, fit2, fit3, fit4, test="gradient")
 #'
 #' ## Example 2: Agents to stimulate cellular differentiation
+#' data(cellular)
 #' fit1 <- overglm(cbind(cells,200-cells) ~ tnf, family="bb(logit)", data=cellular)
 #' fit2 <- update(fit1, . ~ . + ifn)
 #' fit3 <- update(fit2, . ~ . + tnf:ifn)
@@ -2011,6 +2202,7 @@ anova.zeroinflation <- function(object,...,test=c("wald","lr","score","gradient"
 #' @export
 #' @examples
 #' ###### Example 1: Self diagnozed ear infections in swimmers
+#' data(swimmers)
 #' fit1 <- overglm(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 #' dfbeta(fit1, coefs="frequency", col="red", lty=1, lwd=1, col.lab="blue",
 #'        col.axis="blue", col.main="black", family="mono", cex=0.8, main="frequency")
@@ -2022,6 +2214,7 @@ anova.zeroinflation <- function(object,...,test=c("wald","lr","score","gradient"
 #'        col.axis="blue", col.main="black", family="mono", cex=0.8, main="fem")
 #'
 #' ###### Example 3: Agents to stimulate cellular differentiation
+#' data(cellular)
 #' fit3 <- overglm(cbind(cells,200-cells) ~ tnf + ifn, family="bb(logit)", data=cellular)
 #' dfbeta(fit3, coefs="tnf", col="red", lty=1, lwd=1, col.lab="blue",
 #'        col.axis="blue", col.main="black", family="mono", cex=0.8, main="tnf")
@@ -2119,6 +2312,7 @@ dfbeta.overglm <- function(model, coefs, identify, ...){
 #' @export
 #' @examples
 #' ####### Example 1: Self diagnozed ear infections in swimmers
+#' data(swimmers)
 #' fit <- zeroinf(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 #'
 #' dfbeta(fit, submodel="counts", coefs="frequency", col="red", lty=1, lwd=1,
@@ -2228,6 +2422,7 @@ dfbeta.zeroinflation <- function(model,submodel=c("counts","zeros"),coefs,identi
 #' @export
 #' @examples
 #' ###### Example 1: Self diagnozed ear infections in swimmers
+#' data(swimmers)
 #' fit1 <- overglm(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 #'
 #' ### Cook's distance for all parameters in the linear predictor
@@ -2251,6 +2446,7 @@ dfbeta.zeroinflation <- function(model,submodel=c("counts","zeros"),coefs,identi
 #'    col.lab="blue", col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
 #' ###### Example 3: Agents to stimulate cellular differentiation
+#' data(cellular)
 #' fit3 <- overglm(cbind(cells,200-cells) ~ tnf + ifn, family="bb(logit)", data=cellular)
 #'
 #' ### Cook's distance for all parameters in the linear predictor
@@ -2327,6 +2523,7 @@ cooks.distance.overglm <- function(model, plot.it=FALSE, coefs, identify,...){
 #' @examples
 #'
 #' ####### Example 1: Self diagnozed ear infections in swimmers
+#' data(swimmers)
 #' fit <- zeroinf(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 #'
 #' ### Cook's distance for all parameters in the "counts" model
@@ -2427,11 +2624,14 @@ cooks.distance.zeroinflation <- function(model, submodel=c("counts","zeros","ful
 #' @export
 #' @examples
 #' ####### Example 1: Self diagnozed ear infections in swimmers
+#' data(swimmers)
 #' fit <- zeroinf(infections ~ frequency | location, family="nb1(log)", data=swimmers)
 #' envelope(fit, rep=30, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
 #'          col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
-envelope.zeroinflation <- function(object, rep=20, conf=0.95, type=c("quantile","response","standardized"), plot.it=FALSE, identify, ...){
+envelope.zeroinflation <- function(object, rep=20, conf=0.95, type=c("quantile","response","standardized"), plot.it=TRUE, identify, ...){
+  defaultW <- getOption("warn")
+  options(warn = -1)
   type <- match.arg(type)
   phi <- exp(object$coefficients$counts[object$parms[1] + 1])
   tau <- switch(object$family$counts$family,nb1=0,nb2=-1,nbf=object$coefficientscounts[object$parms[1] + 2])
@@ -2461,30 +2661,30 @@ envelope.zeroinflation <- function(object, rep=20, conf=0.95, type=c("quantile",
   alpha <- 1 - max(min(abs(conf),1),0)
   es <- t(apply(e,1,function(x) return(quantile(x,probs=c(alpha/2,0.5,1-alpha/2)))))
   rd <- residuals(object,type=type,plot.it=FALSE)
+  out_ <- as.matrix(cbind(es,sort(rd)))
+  colnames(out_) <- c("Lower limit","Median","Upper limit","Residuals")
   if(plot.it){
-    rango <- 1.1*range(rd)
     nano <- list(...)
     nano$y <- rd
     nano$type <- "p"
-    if(is.null(nano$ylim)) nano$ylim <- rango
+    if(is.null(nano$ylim)) nano$ylim <- 1.1*range(out_)
     if(is.null(nano$pch)) nano$pch <- 20
     if(is.null(nano$col)) nano$col <- "black"
     if(is.null(nano$xlab)) nano$xlab <- "Expected quantiles"
     if(is.null(nano$ylab)) nano$ylab <- "Observed quantiles"
     if(is.null(nano$main)) nano$main <- paste0("Normal QQ plot with simulated envelope\n of ",type,"-type residuals")
-    if(is.null(nano$labels))  labels <- 1:length(rd)
+    if(is.null(nano$labels)) labels <- 1:length(rd)
     else{
       labels <- nano$labels
       nano$labels <- NULL
     }
     outm <- do.call("qqnorm",nano)
-    lines(sort(outm$x),es[,2],xlab="",ylab="",main="", type="l",ylim=rango,lty=3)
-    lines(sort(outm$x),es[,1],xlab="",ylab="",main="", type="l",ylim=rango,lty=1)
-    lines(sort(outm$x),es[,3],xlab="",ylab="",main="", type="l",ylim=rango,lty=1)
+    lines(sort(outm$x),es[,2],xlab="",ylab="",main="", type="l",lty=3)
+    lines(sort(outm$x),es[,1],xlab="",ylab="",main="", type="l",lty=1)
+    lines(sort(outm$x),es[,3],xlab="",ylab="",main="", type="l",lty=1)
     if(!missingArg(identify)) identify(outm$x,outm$y,n=max(1,floor(abs(identify))),labels=labels)
   }
-  out_ <- cbind(es,rd)
-  colnames(out_) <- c("Lower limit","Median","Upper limit","Observed")
+  options(warn = defaultW)
   return(invisible(out_))
 }
 
@@ -2529,6 +2729,7 @@ envelope.zeroinflation <- function(object, rep=20, conf=0.95, type=c("quantile",
 #' @export
 #' @examples
 #' ###### Example 1: Self diagnozed ear infections in swimmers
+#' data(swimmers)
 #' fit1 <- overglm(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 #' envelope(fit1, rep=30, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
 #'          col.axis="blue", col.main="black", family="mono", cex=0.8, plot.it=TRUE)
@@ -2540,11 +2741,14 @@ envelope.zeroinflation <- function(object, rep=20, conf=0.95, type=c("quantile",
 #'          col.axis="blue", col.main="black", family="mono", cex=0.8, plot.it=TRUE)
 #'
 #' ###### Example 3: Agents to stimulate cellular differentiation
+#' data(cellular)
 #' fit3 <- overglm(cbind(cells,200-cells) ~ tnf + ifn, family="bb(logit)", data=cellular)
 #' envelope(fit3, rep=30, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
 #'          col.axis="blue", col.main="black", family="mono", cex=0.8, plot.it=TRUE)
 #'
-envelope.overglm <- function(object, rep=25, conf=0.95, type=c("quantile","response","standardized"), plot.it=FALSE, identify, ...){
+envelope.overglm <- function(object, rep=25, conf=0.95, type=c("quantile","response","standardized"), plot.it=TRUE, identify, ...){
+  defaultW <- getOption("warn")
+  options(warn = -1)
   type <- match.arg(type)
   mu <- object$fitted.values
   n <- length(mu)
@@ -2592,115 +2796,31 @@ envelope.overglm <- function(object, rep=25, conf=0.95, type=c("quantile","respo
   alpha <- 1 - max(min(abs(conf),1),0)
   es <- t(apply(e,1,function(x) return(quantile(x,probs=c(alpha/2,0.5,1-alpha/2)))))
   rd <- residuals(object,type=type,plot.it=FALSE)
+  out_ <- as.matrix(cbind(es,sort(rd)))
+  colnames(out_) <- c("Lower limit","Median","Upper limit","Residuals")
   if(plot.it){
-    rango <- 1.1*range(rd)
     nano <- list(...)
     nano$y <- rd
     nano$type <- "p"
-    if(is.null(nano$ylim)) nano$ylim <- rango
+    if(is.null(nano$ylim)) nano$ylim <- 1.1*range(out_)
     if(is.null(nano$pch)) nano$pch <- 20
     if(is.null(nano$col)) nano$col <- "black"
     if(is.null(nano$xlab)) nano$xlab <- "Expected quantiles"
     if(is.null(nano$ylab)) nano$ylab <- "Observed quantiles"
     if(is.null(nano$main)) nano$main <- paste0("Normal QQ plot with simulated envelope\n of ",type,"-type residuals")
-    if(is.null(nano$labels))  labels <- 1:length(rd)
+    if(is.null(nano$labels)) labels <- 1:length(rd)
     else{
       labels <- nano$labels
       nano$labels <- NULL
     }
     outm <- do.call("qqnorm",nano)
-    lines(sort(outm$x),es[,2],xlab="",ylab="",main="", type="l",ylim=rango,lty=3)
-    lines(sort(outm$x),es[,1],xlab="",ylab="",main="", type="l",ylim=rango,lty=1)
-    lines(sort(outm$x),es[,3],xlab="",ylab="",main="", type="l",ylim=rango,lty=1)
+    lines(sort(outm$x),es[,2],xlab="",ylab="",main="", type="l",lty=3)
+    lines(sort(outm$x),es[,1],xlab="",ylab="",main="", type="l",lty=1)
+    lines(sort(outm$x),es[,3],xlab="",ylab="",main="", type="l",lty=1)
     if(!missingArg(identify)) identify(outm$x,outm$y,n=max(1,floor(abs(identify))),labels=labels)
   }
-  out_ <- cbind(es,rd)
-  colnames(out_) <- c("Lower limit","Median","Upper limit","Observed")
+  options(warn = defaultW)
   return(invisible(out_))
-}
-
-#' @method AIC overglm
-#' @export
-AIC.overglm <- function(object,...,k=2,verbose=TRUE){
-  x <- list(object,...); call. <- match.call()
-  if(!all(unlist(lapply(x,function(a) return(class(a)[1]=="overglm" | class(a)[1]=="glm")))))
-    stop("Only glm- and overglm-type objects are supported!!",call.=FALSE)
-  results <- matrix(NA,length(x),3); results2 <- matrix(NA,length(x),4); rows <- matrix(NA,length(x),1)
-  for(i in 1:length(x)){
-    results[i,1]  <- -2*sum(logLik(x[[i]]))
-    results[i,2]  <- attr(logLik(x[[i]]),"df")
-    results[i,3]  <- ifelse(class(x[[i]])[1]=="overglm",-2*sum(logLik(x[[i]])) + 2*attr(logLik(x[[i]]),"df"),AIC(x[[i]]))
-    results2[i,1] <- as.character(call.[i + 1])
-    if(class(x[[i]])[1]=="overglm"){
-      results2[i,2] <- switch(x[[i]]$family$family,"nb1"="Negative Binomial I",
-                              "nb2"="Negative Binomial II","nbf"="Negative Binomial Family",
-                              "rcb"="Random-clumped Binomial","bb"="Beta-Binomial","poi"="poisson")
-      if(x[[i]]$zero.trunc) results2[i,2] <- paste("Zero-truncated",results2[i,2])
-    }else results2[i,2] <- x[[i]]$family$family
-    results2[i,3] <- x[[i]]$family$link
-    results2[i,4] <- paste(c(ifelse(is.null(attr(x[[i]]$terms,"offset")),attr(x[[i]]$terms,"intercept"),
-                                    paste(c(attr(x[[i]]$terms,"intercept"),as.character(attr(x[[i]]$terms,"variables"))[[attr(x[[i]]$terms,"offset")+1]]),collapse=" + ")),
-                             attr(x[[i]]$terms,"term.labels")),collapse=" + ")
-  }
-  if(nrow(results) > 1){
-    if(verbose){
-      cat("\n")
-      if(all(results2[,2]==results2[1,2]))
-        cat("   Family: ",results2[1,2],"\n")
-      if(all(results2[,3]==results2[1,3]))
-        cat("     Link: ",results2[1,3],"\n")
-      if(all(results2[,4]==results2[1,4]))
-        cat("Predictor: ",results2[1,4],"\n")
-      cat("\n")
-      ids <- c(TRUE,!all(results2[,2]==results2[1,2]),!all(results2[,3]==results2[1,3]),!all(results2[,4]==results2[1,4]))
-      temp <- as.matrix(results2[,ids]); out_ <- data.frame(temp,results)
-      colnames(out_) <- c(c("Object","Family","Link","Predictor")[ids],"-2*log-likelihood","df","AIC ")
-      print(out_,row.names=FALSE); cat("\n")
-      return(invisible(out_))
-    }
-  }else return(results[,3])
-}
-
-#' @method BIC overglm
-#' @export
-BIC.overglm <- function(object,...,verbose=TRUE){
-  x <- list(object,...); call. <- match.call()
-  if(!all(unlist(lapply(x,function(a) return(class(a)[1]=="overglm" | class(a)[1]=="glm")))))
-    stop("Only glm- and overglm-type objects are supported!!",call.=FALSE)
-  results <- matrix(NA,length(x),3); results2 <- matrix(NA,length(x),4); rows <- matrix(NA,length(x),1)
-  for(i in 1:length(x)){
-    results[i,1]  <- -2*sum(logLik(x[[i]]))
-    results[i,2]  <- attr(logLik(x[[i]]),"df")
-    results[i,3]  <- ifelse(class(x[[i]])[1]=="overglm",-2*sum(logLik(x[[i]])) + log(nrow(x[[i]]$model))*attr(logLik(x[[i]]),"df"),BIC(x[[i]]))
-    results2[i,1] <- as.character(call.[i + 1])
-    if(class(x[[i]])[1]=="overglm"){
-      results2[i,2] <- switch(x[[i]]$family$family,"nb1"="Negative Binomial I",
-                              "nb2"="Negative Binomial II","nbf"="Negative Binomial Family",
-                              "rcb"="Random-clumped Binomial","bb"="Beta-Binomial","poi"="poisson")
-      if(x[[i]]$zero.trunc) results2[i,2] <- paste("Zero-truncated",results2[i,2])
-    }else results2[i,2] <- x[[i]]$family$family
-    results2[i,3] <- x[[i]]$family$link
-    results2[i,4] <- paste(c(ifelse(is.null(attr(x[[i]]$terms,"offset")),attr(x[[i]]$terms,"intercept"),
-                                    paste(c(attr(x[[i]]$terms,"intercept"),as.character(attr(x[[i]]$terms,"variables"))[[attr(x[[i]]$terms,"offset")+1]]),collapse=" + ")),
-                             attr(x[[i]]$terms,"term.labels")),collapse=" + ")
-  }
-  if(nrow(results) > 1){
-    if(verbose){
-      cat("\n")
-      if(all(results2[,2]==results2[1,2]))
-        cat("   Family: ",results2[1,2],"\n")
-      if(all(results2[,3]==results2[1,3]))
-        cat("     Link: ",results2[1,3],"\n")
-      if(all(results2[,4]==results2[1,4]))
-        cat("Predictor: ",results2[1,4],"\n")
-      cat("\n")
-      ids <- c(TRUE,!all(results2[,2]==results2[1,2]),!all(results2[,3]==results2[1,3]),!all(results2[,4]==results2[1,4]))
-      temp <- as.matrix(results2[,ids]); out_ <- data.frame(temp,results)
-      colnames(out_) <- c(c("Object","Family","Link","Predictor")[ids],"-2*log-likelihood","df","BIC ")
-      print(out_,row.names=FALSE); cat("\n")
-      return(invisible(out_))
-    }
-  }else return(results[,3])
 }
 
 #' @title Variable selection for alternatives to the Poisson and Binomial Regression Models under the presence of Overdispersion
@@ -2740,6 +2860,7 @@ BIC.overglm <- function(object,...,verbose=TRUE){
 #' @seealso \link{stepCriterion.lm}, \link{stepCriterion.glm}, \link{stepCriterion.glmgee}
 #' @examples
 #' ###### Example 1: Self diagnozed ear infections in swimmers
+#' data(swimmers)
 #' fit1 <- overglm(infections ~ age + gender + frequency + location, family="nb1(log)", data=swimmers)
 #'
 #' stepCriterion(fit1, criterion="p-value", direction="forward", test="lr")
@@ -2755,6 +2876,7 @@ BIC.overglm <- function(object,...,verbose=TRUE){
 #' stepCriterion(fit2, criterion="bic", direction="backward", test="score")
 #'
 #' ###### Example 3: Agents to stimulate cellular differentiation
+#' data(cellular)
 #' fit3 <- overglm(cbind(cells,200-cells) ~ tnf + ifn + tnf*ifn, family="bb(logit)", data=cellular)
 #'
 #' stepCriterion(fit3, criterion="p-value", direction="backward", test="lr")
@@ -2788,7 +2910,7 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), tes
     lower <- scope$lower
     upper <- scope$upper
   }
-  U <- attr(terms(upper),"term.labels")
+  U <- unlist(lapply(strsplit(attr(terms(upper),"term.labels"),":"),function(x) paste(sort(x),collapse =":")))
   fs <- attr(terms(upper),"factors")
   long <- max(nchar(U)) + 2
   nonename <- paste("<none>",paste(replicate(max(long-6,0)," "),collapse=""),collapse="")
@@ -2814,7 +2936,7 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), tes
     while(tol){
       oldformula <-  update(oldformula,paste(as.character(eval(model$call$formula))[2],"~ ."))
       fit.x <- update(model,formula=oldformula,start=NULL)
-      S <- attr(terms(oldformula),"term.labels")
+      S <- unlist(lapply(strsplit(attr(terms(oldformula),"term.labels"),":"),function(x) paste(sort(x),collapse =":")))
       entran <- seq(1:length(U))[is.na(match(U,S))]
       salen <- seq(1:length(U))[!is.na(match(U,S))]
       mas <- TRUE
@@ -2943,7 +3065,7 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), tes
     while(tol){
       oldformula <-  update(oldformula,paste(as.character(eval(model$call$formula))[2],"~ ."))
       fit.x <- update(model,formula=oldformula,start=NULL)
-      S <- attr(terms(oldformula),"term.labels")
+      S <- unlist(lapply(strsplit(attr(terms(oldformula),"term.labels"),":"),function(x) paste(sort(x),collapse =":")))
       entran <- seq(1:length(U))[is.na(match(U,S))]
       salen <- seq(1:length(U))[!is.na(match(U,S))]
       menos <- TRUE
@@ -3098,6 +3220,7 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), tes
 #' @references Cook R.D. (1986) Assessment of Local Influence. \emph{Journal of the Royal Statistical Society: Series B (Methodological)} 48, 133-155.
 #' @examples
 #' ###### Example 1: Self diagnozed ear infections in swimmers
+#' data(swimmers)
 #' fit1 <- overglm(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 #'
 #' ### Local influence for all parameters in the linear predictor
@@ -3121,6 +3244,7 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), tes
 #'                coef="fem", col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
 #' ###### Example 3: Agents to stimulate cellular differentiation
+#' data(cellular)
 #' fit3 <- overglm(cbind(cells,200-cells) ~ tnf + ifn, family="bb(logit)", data=cellular)
 #'
 #' ### Local influence for all parameters in the linear predictor
@@ -3247,6 +3371,7 @@ localInfluence.overglm <- function(object,type=c("total","local"),coefs,plot.it=
 #' @export
 #' @examples
 #' ###### Example 1: Self diagnozed ear infections in swimmers
+#' data(swimmers)
 #' fit1 <- overglm(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 #' gvif(fit1)
 #'
@@ -3256,6 +3381,7 @@ localInfluence.overglm <- function(object,type=c("total","local"),coefs,plot.it=
 #' gvif(fit2)
 #'
 #' ###### Example 3: Agents to stimulate cellular differentiation
+#' data(cellular)
 #' fit3 <- overglm(cbind(cells,200-cells) ~ tnf + ifn, family="bb(logit)", data=cellular)
 #' gvif(fit3)
 #'

@@ -30,24 +30,18 @@ Computes the exact area under the ROC curve (AUROC), the Gini coefficient, and t
 \examples{
 ###### Example: Patients with burn injuries
 burn1000 <- aplore3::burn1000
+burn1000 <- within(burn1000, death2 <- ifelse(death=="Dead",1,0))
 
 ### splitting the sample: 70\% for the training sample and 30\% for the validation sample
-burn1000 <- within(burn1000, sampleof <- "validation")
-s <- sample(nrow(burn1000),nrow(burn1000)*0.7)
-burn1000$sampleof[s] <- "training"
+train <- sample(1:nrow(burn1000),size=nrow(burn1000)*0.7)
+traindata <- burn1000[train,]
+testdata <- burn1000[-train,]
 
-training <- subset(burn1000,sampleof=="training")
-fit <- glm(death ~ age*inh_inj + tbsa*inh_inj, family=binomial("logit"), data=training)
-
-### ROC curve for the training sample
-ROCc(fit, col="red", col.lab="blue", col.axis="black", col.main="black", family="mono")
-
-validation <- subset(burn1000, sampleof=="validation")
-probs <- predict(fit, newdata=validation, type="response")
-responses <- with(validation, ifelse(death=="Dead",1,0))
+fit <- glm(death ~ age*inh_inj + tbsa*inh_inj, family=binomial("logit"), data=traindata)
+probs <- predict(fit, newdata=testdata, type="response")
 
 ### ROC curve for the validation sample
-ROCc(cbind(responses,probs), col="red", col.lab="blue", col.axis="black",
+ROCc(cbind(testdata[,"death2"],probs), col="red", col.lab="blue", col.axis="black",
      col.main="black", family="mono")
 }
 \references{

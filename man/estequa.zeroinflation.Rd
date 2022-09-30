@@ -22,6 +22,7 @@ Computes the estimating equations evaluated at the parameter estimates and the o
 }
 \examples{
 ####### Example 1: Roots Produced by the Columnar Apple Cultivar Trajan
+data(Trajan)
 fit1 <- zeroalt(roots ~ photoperiod, family="nbf(log)", zero.link="logit", data=Trajan)
 estequa(fit1)
 
@@ -29,6 +30,7 @@ fit1a <- zeroinf(roots ~ photoperiod, family="nbf(log)", zero.link="logit", data
 estequa(fit1a)
 
 ####### Example 2: Self diagnozed ear infections in swimmers
+data(swimmers)
 fit2 <- zeroalt(infections ~ frequency | location, family="nb1(log)", data=swimmers)
 estequa(fit2)
 

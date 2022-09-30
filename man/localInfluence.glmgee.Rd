@@ -37,18 +37,20 @@ Computes some measures and, optionally, display	graphs of them to perform influe
 }
 \examples{
 ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+data(spruces)
 mod1 <- size ~ poly(days,4) + treat
-fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-1", data=spruces)
+fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-M-dependent", data=spruces)
 localInfluence(fit1,type="total",perturbation="cw-clusters",coefs="treat",plot.it=TRUE)
 
 ###### Example 2: Treatment for severe postnatal depression
+data(depression)
 mod2 <- depressd ~ visit + group
-fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
 localInfluence(fit2,type="total",perturbation="cw-clusters",coefs="group",plot.it=TRUE)
 
 ###### Example 3: Treatment for severe postnatal depression (2)
 mod3 <- dep ~ visit*group
-fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-M-dependent", data=depression)
 localInfluence(fit3,type="total",perturbation="cw-clusters",coefs="visit:group",plot.it=TRUE)
 
 }

@@ -32,6 +32,7 @@ fit2 <- glm(mod2, family=binomial("logit"), data=burn1000)
 estequa(fit2)
 
 ## Example 3
+data(skincancer)
 fit3 <- glm(cases ~ offset(log(population)) + city + age, family=poisson("log"), data=skincancer)
 estequa(fit3)
 }

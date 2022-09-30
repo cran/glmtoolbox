@@ -1,3 +1,242 @@
+#'
+#' @title Fisher Scoring algorithm in Generalized Linear Models
+#' @description This function displays the entire path performed by the Fisher Scoring
+#' algorithm for the parameter estimation in Generalized Linear Models, from the
+#' starting value until the convergence is achieved or the maximum number of iterations
+#' is exceed.
+#' @param object one object of the class \emph{glm}.
+#' @param verbose an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param digits an (optional) integer value indicating the number of decimal places to be used. By default, \code{digits} is set to be 10.
+#' @return a matrix whose first three columns are the following
+#' \tabular{ll}{
+#' \code{Iteration} \tab the iteration number,\cr
+#' \tab \cr
+#' \code{Deviance} \tab value of the (unscaled) deviance computed using the current value of the parameter vector,\cr
+#' \tab \cr
+#' \code{Tolerance} \tab value of \eqn{|deviance-deviance_{old}|/(deviance_{old} + 0.1)},\cr
+#' }
+#' @examples
+#' ###### Example 1: Fuel efficiency of cars
+#' Auto <- ISLR::Auto
+#' fit1 <- glm(mpg ~ horsepower + weight + horsepower*weight, family=Gamma(inverse), data=Auto,
+#'             control=list(trace=TRUE))
+#' FisherScoring(fit1)
+#'
+#' ###### Example 2: Hill races in Scotland
+#' data(races)
+#' fit2 <- glm(rtime ~ log(distance) + log(cclimb), family=Gamma("log"), data=races,
+#'             control=list(trace=TRUE))
+#' FisherScoring(fit2)
+#'
+#' ###### Example 3:
+#' burn1000 <- aplore3::burn1000
+#' burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
+#' fit3 <- glm(death ~ age*inh_inj + tbsa*inh_inj, family=binomial("logit"), data=burn1000,
+#'             control=list(trace=TRUE))
+#' FisherScoring(fit3)
+#'
+#' ###### Example 4: Skin cancer in women
+#' data(skincancer)
+#' fit4 <- glm(cases ~ offset(log(population)) + city + age, family=poisson, data=skincancer,
+#'             control=list(trace=TRUE))
+#' FisherScoring(fit4)
+#'
+#' ###### Example 5: Agents to stimulate cellular differentiation
+#' data(cellular)
+#' fit5 <- glm(cbind(cells,200-cells) ~ tnf + ifn, family=binomial(logit), data=cellular,
+#'             control=list(trace=TRUE))
+#' FisherScoring(fit5)
+#'
+#' @export FisherScoring
+FisherScoring <- function(object,verbose=TRUE,digits=10){
+  options(warn=-1)
+  X <- model.matrix(object)
+  y <- object$y
+  mustart <- object$call$mustart
+  etastart <- object$call$etastart
+  start <- object$call$start
+  nobs <- nrow(X)
+  omega <- weights <- object$prior.weights
+  if(is.null(object$offset)) offset <- matrix(0,nrow(X),1) else offset <- object$offset
+  if(is.null(mustart)){
+    if(is.null(etastart)){
+      if(is.null(start)){
+        eval(object$family$initialize)
+        mu <- mustart
+        eta <- object$family$linkfun(mu)
+      }
+      else{betanew <- eval(object$call$start)
+      eta <- offset + X%*%betanew
+      mu <- object$family$linkinv(eta)}
+    }else{eta <- eval(object$call$etastart)
+    mu <- object$family$linkinv(eta)
+    }
+  }else{mu <- eval(object$call$mustart)
+  eta <- object$family$linkfun(mu)
+  }
+  epsilon <- object$control$epsilon
+  tol <- epsilon + 1
+  atras <- matrix(1e-15,1,3+ncol(X))
+  i <- 1
+  while(tol > epsilon & i <= object$control$maxit){
+    if(i > 1){
+      betaold <- betanew
+      devold <- devnew
+      eta <- offset + X%*%betaold
+      mu <- object$family$linkinv(eta)
+    }
+    G <- object$family$mu.eta(eta)
+    V <- object$family$variance(mu)
+    W <- omega*G^2/V
+    X2 <- X*matrix(W,nrow(X),ncol(X))
+    z <- eta - offset + (y-mu)/G
+    betanew <- chol2inv(chol(t(X)%*%X2))%*%t(X2)%*%z
+    eta <- offset + X%*%betanew
+    mu <- object$family$linkinv(eta)
+    devnew <- sum(object$family$dev.resids(y,mu,omega))
+    if(i==1) tol <- epsilon + 1
+    else tol <- abs(devnew - devold)/(devold + 0.1)
+    atras <- rbind(atras,c(i,devnew,tol,t(betanew)))
+    i <- i + 1
+  }
+  atras <- atras[-1,]
+  colnames(atras) <- c("Iteration","Deviance","Tolerance",colnames(X))
+  rownames(atras) <- rep("",nrow(atras))
+  cat("Tolerance Limit: ",epsilon,"\n")
+  cat("Maximum number of iterations: ",object$control$maxit,"\n\n")
+  atras[1,3] <- NA
+  atras[,-c(1:3)] <- round(atras[,-c(1:3)],digits=digits)
+  if(object$family$family=="gaussian" & object$family$link=="identity") atras[,1] <- atras[,1] - 1
+  if(verbose) print(atras,digits=digits)
+  if(tol > epsilon) cat("\nConvergence was not achieved!!!\n")
+  options(warn=0)
+  return(invisible(atras))
+}
+
+#' @title Adjusted R-squared
+#' @description Computes the adjusted R-squared
+#' @param ... one of several model fit objects.
+#' @param verbose an (optional) logical indicating if should the report of results be printed.
+#' @param digits an (optional) integer value indicating the number of decimal places to be used.
+#' @return A matrix with the values of the adjusted R-squared for all model fit objects.
+#' @export adjR2
+adjR2 <- function(...,digits,verbose){
+  UseMethod("adjR2")
+}
+#'
+#' @title Adjusted R-squared in Generalized Linear Models
+#' @description Computes the adjusted deviance-based R-squared in generalized linear models.
+#' @param ... one or several objects of the class \emph{glm}, which are obtained from the fit of generalized linear models.
+#' @param verbose an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param digits an (optional) integer value indicating the number of decimal places to be used. By default, \code{digits} is set to be 4.
+#' @details The deviance-based R-squared is computed as \eqn{R^2=1 - Deviance/Null.Deviance}. Then,
+#' the adjusted deviance-based R-squared is computed as
+#' \eqn{1 - \frac{n-1}{n-p}(1-R^2)}, where \eqn{p} is the
+#' number of parameters in the linear predictor and \eqn{n} is the sample size.
+#' @return a matrix with the following columns
+#' \tabular{ll}{
+#' \code{Deviance} \tab value of the residual deviance,\cr
+#' \tab \cr
+#' \code{R-squared} \tab value of the deviance-based R-squared,\cr
+#' \tab \cr
+#' \code{df}       \tab number of parameters in the linear predictor,\cr
+#' \tab \cr
+#' \code{adj.R-squared} \tab value of the adjusted deviance-based R-squared,\cr
+#' }
+#' @method adjR2 glm
+#' @export
+#' @examples
+#' ###### Example 1: Fuel efficiency of cars
+#' Auto <- ISLR::Auto
+#' fit1 <- glm(mpg ~ horsepower*weight, family=Gamma(inverse), data=Auto)
+#' fit2 <- update(fit1, formula=mpg ~ horsepower*weight*cylinders)
+#' fit3 <- update(fit1, family=Gamma(log))
+#' fit4 <- update(fit2, family=Gamma(log))
+#' fit5 <- update(fit1, family=inverse.gaussian(log))
+#' fit6 <- update(fit2, family=inverse.gaussian(log))
+#'
+#' AIC(fit1,fit2,fit3,fit4,fit5,fit6)
+#' BIC(fit1,fit2,fit3,fit4,fit5,fit6)
+#' adjR2(fit1,fit2,fit3,fit4,fit5,fit6)
+#'
+adjR2.glm <- function(...,digits=4,verbose=TRUE){
+  x <- list(...)
+  if(any(unlist(lapply(x,function(xx) !is(xx,"glm")))))
+    stop("Only glm-type objects are supported!!",call.=FALSE)
+  if(any(unlist(lapply(x,function(x) names(coef(x))[1]!="(Intercept)"))))
+    stop("zero-intercept models are not supported!!",call.=FALSE)
+  out_ <- matrix(NA,length(x),4)
+  call. <- match.call()
+  for(i in 1:length(x)){
+    out_[i,1] <- x[[i]]$deviance
+    out_[i,3] <- length(x[[i]]$coefficients)
+    out_[i,2] <- round(1 - x[[i]]$deviance/x[[i]]$null.deviance,digits=digits)
+    out_[i,4] <- round(1 - (x[[i]]$deviance/x[[i]]$df.residual)/(x[[i]]$null.deviance/x[[i]]$df.null),digits=digits)
+  }
+  rownames(out_) <- as.character(call.[2:(length(x) + 1)])
+  colnames(out_) <- c("Deviance","R-squared","df","adj.R-squared")
+  if(length(x)==1) out_ <- out_[1,4]
+  if(verbose) print(out_)
+  return(invisible(out_))
+}
+#'
+#' @title Adjusted R-squared in Normal Linear Models
+#' @description Extracts the adjusted R-squared in normal linear models.
+#' @param ... one or several objects of the class \emph{lm}, which are obtained from the fit of normal linear models.
+#' @param verbose an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param digits an (optional) integer value indicating the number of decimal places to be used. By default, \code{digits} is set to be 4.
+#' @details The R-squared is computed as \eqn{R^2=1 - RSS/Null.RSS}. Then,
+#' the adjusted R-squared is computed as
+#' \eqn{1 - \frac{n-1}{n-p}(1-R^2)}, where \eqn{p} is the
+#' number of parameters in the linear predictor and \eqn{n} is the sample size.
+#' @return a matrix with the following columns
+#' \tabular{ll}{
+#' \code{RSS} \tab value of the residual sum of squares,\cr
+#' \tab \cr
+#' \code{R-squared} \tab value of the R-squared,\cr
+#' \tab \cr
+#' \code{df}       \tab number of parameters in the linear predictor,\cr
+#' \tab \cr
+#' \code{adj.R-squared} \tab value of the adjusted R-squared,\cr
+#' }
+#' @method adjR2 lm
+#' @export
+#' @examples
+#' ###### Example 1: Fuel efficiency of cars
+#' fit1 <- lm(mpg ~ log(hp) + log(wt) + qsec, data=mtcars)
+#' fit2 <- lm(mpg ~ log(hp) + log(wt) + qsec + log(hp)*log(wt), data=mtcars)
+#' fit3 <- lm(mpg ~ log(hp)*log(wt)*qsec, data=mtcars)
+#'
+#' AIC(fit1,fit2,fit3)
+#' BIC(fit1,fit2,fit3)
+#' adjR2(fit1,fit2,fit3)
+#'
+adjR2.lm <- function(...,digits=4,verbose=TRUE){
+  x <- list(...)
+  if(any(unlist(lapply(x,function(xx) !is(xx,"lm")))))
+    stop("Only lm-type objects are supported!!",call.=FALSE)
+  if(any(unlist(lapply(x,function(x) names(coef(x))[1]!="(Intercept)"))))
+    stop("zero-intercept models are not supported!!",call.=FALSE)
+  out_ <- matrix(NA,length(x),4)
+  call. <- match.call()
+  for(i in 1:length(x)){
+    temporal <- summary(x[[i]])
+    out_[i,1] <- temporal$sigma^2*x[[i]]$df.residual
+    out_[i,3] <- length(x[[i]]$coefficients)
+    out_[i,2] <- round(temporal$r.squared,digits=digits)
+    out_[i,4] <- round(temporal$adj.r.squared,digits=digits)
+  }
+  rownames(out_) <- as.character(call.[2:(length(x) + 1)])
+  colnames(out_) <- c("RSS","R-squared","df","adj.R-squared")
+  if(length(x)==1) out_ <- out_[1,4]
+  if(verbose) print(out_)
+  return(invisible(out_))
+}
+
+
+
+
+
 #' @title Local Influence
 #' @description Computes measures of local influence for a fitted model object.
 #' @param object a fitted model object.
@@ -101,6 +340,7 @@ vdtest <- function(model,...) {
 #' vdtest(fit1)
 #'
 #' ###### Example 2: Species richness in plots
+#' data(richness)
 #' fit2 <- lm(Species ~ Biomass + pH, data=richness)
 #' vdtest(fit2)
 #'
@@ -181,10 +421,12 @@ vdtest.lm <- function(model,varformula,verbose=TRUE,...){
 #' vdtest(fit1)
 #'
 #' ###### Example 2: Hill races in Scotland
+#' data(races)
 #' fit2 <- glm(rtime ~ log(distance) + log(cclimb), family=Gamma("log"), data=races)
 #' vdtest(fit2)
 #'
 #' ###### Example 3: Mammal brain and body weights
+#' data(brains)
 #' fit3 <- glm(BrainWt ~ log(BodyWt), family=Gamma("log"), data=brains)
 #' vdtest(fit3)
 #' @method vdtest glm
@@ -679,16 +921,19 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp"
 #'          col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
 #' ###### Example 3: Skin cancer in women
+#' data(skincancer)
 #' fit3 <- glm(cases ~ offset(log(population)) + city + age, family=poisson, data=skincancer)
 #' envelope(fit3, rep=100, conf=0.95, type="quantile", col="red", pch=20,col.lab="blue",
 #'          col.axis="blue",col.main="black",family="mono",cex=0.8)
 #'
 #' ###### Example 4: Self diagnozed ear infections in swimmers
+#' data(swimmers)
 #' fit4 <- glm(infections ~ frequency + location, family=poisson(log), data=swimmers)
 #' envelope(fit4, rep=100, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
 #'          col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
 #' ###### Example 5: Agents to stimulate cellular differentiation
+#' data(cellular)
 #' fit5 <- glm(cbind(cells,200-cells) ~ tnf + ifn, family=binomial(logit), data=cellular)
 #' envelope(fit5, rep=100, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
 #'          col.axis="blue", col.main="black", family="mono", cex=0.8)
@@ -705,6 +950,8 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp"
 #' @method envelope glm
 #' @export
 envelope.glm <- function(object, rep=25, conf=0.95, type=c("quantile","deviance","pearson"), standardized=FALSE, plot.it=TRUE, identify, ...){
+  defaultW <- getOption("warn")
+  options(warn = -1)
   if(object$family$family=="quasi" | object$family$family=="quasipoisson" | object$family$family=="quasibinomial")
     stop("Quasi-likelihood models are not supported!!",call.=FALSE)
   if(any(object$prior.weights == 0)) stop("Only positive weights are supported!!",call.=FALSE)
@@ -778,40 +1025,30 @@ envelope.glm <- function(object, rep=25, conf=0.95, type=c("quantile","deviance"
     h <- apply(salida$u^2,1,sum)
     rd <- rd/sqrt(1-h)
   }
+  out_ <- as.matrix(cbind(t(es),sort(rd)))
+  colnames(out_) <- c("Lower limit","Median","Upper limit","Residuals")
   if(plot.it){
-    rango <- 1.1*range(rd)
-    oldpar <- par(no.readonly=TRUE)
-    on.exit(par(oldpar))
-    par(pty="s")
-    qqnorm(es[2,],axes=FALSE,xlab="",ylab="",main="", type="l",ylim=rango,lty=3)
-    par(new=TRUE)
-    qqnorm(es[1,],axes=FALSE,xlab="",ylab="",main="", type="l",ylim=rango,lty=1)
-    par(new=TRUE)
-    qqnorm(es[3,],axes=FALSE,xlab="",ylab="", main="", type="l",ylim=rango,lty=1)
-    par(new=TRUE)
     nano <- list(...)
     nano$y <- rd
     nano$type <- "p"
-    nano$ylim <- rango
-    if(is.null(nano$labels)) labels <- 1:nrow(X)
-    else labels <- nano$labels
+    if(is.null(nano$ylim)) nano$ylim <- 1.1*range(out_)
     if(is.null(nano$pch)) nano$pch <- 20
     if(is.null(nano$col)) nano$col <- "black"
     if(is.null(nano$xlab)) nano$xlab <- "Expected quantiles"
     if(is.null(nano$ylab)) nano$ylab <- "Observed quantiles"
     if(is.null(nano$main)) nano$main <- paste0("Normal QQ plot with simulated envelope\n of ",type,"-type residuals")
-    if(is.null(nano$labels))  labels <- 1:length(rd)
+    if(is.null(nano$labels)) labels <- 1:length(rd)
     else{
       labels <- nano$labels
       nano$labels <- NULL
     }
     outm <- do.call("qqnorm",nano)
-    if(!missingArg(identify)){
-      identify(outm$x,outm$y,labels=labels,n=max(1,floor(abs(identify))),labels=labels)
-    }
+    lines(sort(outm$x),es[2,],xlab="",ylab="",main="", type="l",lty=3)
+    lines(sort(outm$x),es[1,],xlab="",ylab="",main="", type="l",lty=1)
+    lines(sort(outm$x),es[3,],xlab="",ylab="",main="", type="l",lty=1)
+    if(!missingArg(identify)) identify(outm$x,outm$y,n=max(1,floor(abs(identify))),labels=labels)
   }
-  out_ <- cbind(t(es),rd)
-  colnames(out_) <- c("Lower limit","Median","Upper limit","Residuals")
+  options(warn = defaultW)
   return(invisible(out_))
 }
 
@@ -856,6 +1093,7 @@ envelope.glm <- function(object, rep=25, conf=0.95, type=c("quantile","deviance"
 #'          col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
 #' ###### Example 2: Species richness in plots
+#' data(richness)
 #' fit2 <- lm(Species ~ Biomass + pH + Biomass*pH, data=richness)
 #' envelope(fit2, rep=100, conf=0.95, type="internal", col="red", pch=20, col.lab="blue",
 #'          col.axis="blue", col.main="black", family="mono", cex=0.8)
@@ -887,7 +1125,7 @@ envelope.lm <- function(object, rep=100, conf=0.95, type=c("external","internal"
   i <- 1
   while(i <= rep){
     resp <- sqrt(sigma2/weights)*rnorm(n) + mu - offset
-    fits <- try(lm.fit(x=X,y=resp,w=weights,offset=offset),silent=TRUE)
+    fits <- try(lm.wfit(x=X,y=resp,w=weights,offset=offset),silent=TRUE)
     if(is.list(fits)){
       phis <- sum((resp-fits$fitted.values)^2*weights)/(n-p)
       t <- (resp-fits$fitted.values)/sqrt(phis*(1-h))
@@ -903,40 +1141,29 @@ envelope.lm <- function(object, rep=100, conf=0.95, type=c("external","internal"
   es <- apply(e,1,function(x) return(quantile(x,probs=c(alpha/2,0.5,1-alpha/2))))
   td <- residuals(object,type="response")/sqrt(sigma2*(1-h))
   if(type=="external") td <- td*sqrt((n-p-1)/(n-p-td^2))
+  out_ <- as.matrix(cbind(t(es),sort(td)))
+  colnames(out_) <- c("Lower limit","Median","Upper limit","Residuals")
   if(plot.it){
-    rango <- 1.1*range(td)
-    oldpar <- par(no.readonly=TRUE)
-    on.exit(par(oldpar))
-    par(pty="s")
-    qqnorm(es[2,],axes=FALSE,xlab="",ylab="",main="", type="l",ylim=rango,lty=3)
-    par(new=TRUE)
-    qqnorm(es[1,],axes=FALSE,xlab="",ylab="",main="", type="l",ylim=rango,lty=1)
-    par(new=TRUE)
-    qqnorm(es[3,],axes=FALSE,xlab="",ylab="", main="", type="l",ylim=rango,lty=1)
-    par(new=TRUE)
     nano <- list(...)
     nano$y <- td
     nano$type <- "p"
-    nano$ylim <- rango
-    if(is.null(nano$labels)) labels <- 1:nrow(X)
-    else labels <- nano$labels
+    if(is.null(nano$ylim)) nano$ylim <- 1.1*range(out_)
     if(is.null(nano$pch)) nano$pch <- 20
     if(is.null(nano$col)) nano$col <- "black"
     if(is.null(nano$xlab)) nano$xlab <- "Expected quantiles"
     if(is.null(nano$ylab)) nano$ylab <- "Observed quantiles"
-    if(is.null(nano$main)) nano$main <- paste0("Normal QQ plot with simulated envelope\n of ",type,"lly studentized residuals")
-    if(is.null(nano$labels))  labels <- 1:length(td)
+    if(is.null(nano$main)) nano$main <- paste0("Normal QQ plot with simulated envelope\n of ",type,"ly studentized residuals")
+    if(is.null(nano$labels)) labels <- 1:length(td)
     else{
       labels <- nano$labels
       nano$labels <- NULL
     }
     outm <- do.call("qqnorm",nano)
-    if(!missingArg(identify)){
-      identify(outm$x,outm$y,labels=labels,n=max(1,floor(abs(identify))),labels=labels)
-    }
+    lines(sort(outm$x),es[2,],xlab="",ylab="",main="", type="l",lty=3)
+    lines(sort(outm$x),es[1,],xlab="",ylab="",main="", type="l",lty=1)
+    lines(sort(outm$x),es[3,],xlab="",ylab="",main="", type="l",lty=1)
+    if(!missingArg(identify)) identify(outm$x,outm$y,n=max(1,floor(abs(identify))),labels=labels)
   }
-  out_ <- cbind(t(es),td)
-  colnames(out_) <- c("Lower limit","Median","Upper limit","Residuals")
   return(invisible(out_))
 }
 #'
@@ -965,10 +1192,12 @@ envelope.lm <- function(object, rep=100, conf=0.95, type=c("external","internal"
 #' hltest(fit1)
 #'
 #' ###### Example 2: Bladder cancer in mice
+#' data(bladder)
 #' fit2 <-  glm(cancer/exposed ~ dose, weights=exposed, family=binomial("cloglog"), data=bladder)
 #' hltest(fit2)
 #'
 #' ###### Example 3: Liver cancer in mice
+#' data(liver)
 #' fit3 <-  glm(cancer/exposed ~ dose, weights=exposed, family=binomial("probit"), data=liver)
 #' hltest(fit3)
 #'
@@ -999,21 +1228,23 @@ hltest <- function(model,verbose=TRUE,...){
     group2[nrow(temp2)] <- group2[nrow(temp2)-1]
     temp3 <- data.frame(temp2,gr=group)
     temp4 <- data.frame(temp2,gr=group2)
-    hm <- aggregate(cbind(m,events,mus*m/sum(m))~gr,data=temp3,sum)
-    hm1 <- aggregate(cbind(m,events,mus*m/sum(m))~gr,data=temp4,sum)
+    hm <- aggregate(cbind(m,events,mus*m)~gr,data=temp3,sum)
+    hm1 <- aggregate(cbind(m,events,mus*m)~gr,data=temp4,sum)
     if(sd(hm[,2]) > sd(hm1[,2])) hm <- hm1
   }
-  if(nrow(temp2) < 10) hm <- cbind(1:nrow(temp2),temp2[,c(2,3,1)])
-  hm2 <- cbind(hm[,1],hm[,2],hm[,3],hm[,2]*hm[,4])
-  colnames(hm2) <- c("Group","Size","Observed","Expected")
-  rownames(hm2) <- rep("",nrow(hm2))
-  hmt <- sum((hm[,3] - hm[,2]*hm[,4])^2/(hm[,2]*hm[,4]*(1-hm[,4])))
+  if(nrow(temp2) < 10){
+    hm <- cbind(1:nrow(temp2),temp2[,c(2,3,1)])
+    hm[,4] <- temp2[,1]*temp2[,2]
+  }
+  colnames(hm) <- c("Group","Size","Observed","Expected")
+  rownames(hm) <- NULL
+  hmt <- sum((hm[,3] - hm[,4])^2/(hm[,4]*(1-hm[,4]/hm[,2])))
   if(verbose){
     cat("\n   The Hosmer-Lemeshow goodness-of-fit test\n\n")
-    printCoefmat(hm2,digits=4,na.print="")
+    print(hm,row.names=FALSE)
     cat("\n         Statistic = ",round(hmt,digits=5),"\ndegrees of freedom = ",nrow(hm)-2,"\n           p-value = ",format.pval(1-pchisq(hmt,nrow(hm)-2)),"\n\n")
   }
-  return(invisible(list(hm=hm2,statistic=hmt,df=nrow(hm)-2,p.value=format.pval(1-pchisq(hmt,nrow(hm)-2)))))
+  return(invisible(list(hm=hm,statistic=hmt,df=nrow(hm)-2,p.value=format.pval(1-pchisq(hmt,nrow(hm)-2),digits=7))))
 }
 
 #' @title The Receiver Operating Characteristic (ROC) Curve
@@ -1033,35 +1264,29 @@ hltest <- function(model,verbose=TRUE,...){
 #' @examples
 #' ###### Example: Patients with burn injuries
 #' burn1000 <- aplore3::burn1000
+#' burn1000 <- within(burn1000, death2 <- ifelse(death=="Dead",1,0))
 #'
 #' ### splitting the sample: 70% for the training sample and 30% for the validation sample
-#' burn1000 <- within(burn1000, sampleof <- "validation")
-#' s <- sample(nrow(burn1000),nrow(burn1000)*0.7)
-#' burn1000$sampleof[s] <- "training"
+#' train <- sample(1:nrow(burn1000),size=nrow(burn1000)*0.7)
+#' traindata <- burn1000[train,]
+#' testdata <- burn1000[-train,]
 #'
-#' training <- subset(burn1000,sampleof=="training")
-#' fit <- glm(death ~ age*inh_inj + tbsa*inh_inj, family=binomial("logit"), data=training)
-#'
-#' ### ROC curve for the training sample
-#' ROCc(fit, col="red", col.lab="blue", col.axis="black", col.main="black", family="mono")
-#'
-#' validation <- subset(burn1000, sampleof=="validation")
-#' probs <- predict(fit, newdata=validation, type="response")
-#' responses <- with(validation, ifelse(death=="Dead",1,0))
+#' fit <- glm(death ~ age*inh_inj + tbsa*inh_inj, family=binomial("logit"), data=traindata)
+#' probs <- predict(fit, newdata=testdata, type="response")
 #'
 #' ### ROC curve for the validation sample
-#' ROCc(cbind(responses,probs), col="red", col.lab="blue", col.axis="black",
+#' ROCc(cbind(testdata[,"death2"],probs), col="red", col.lab="blue", col.axis="black",
 #'      col.main="black", family="mono")
 #' @export ROCc
 #' @importFrom stats aggregate sd
 #'
 ROCc <- function(object,plot.it=TRUE,verbose=TRUE,...){
-  if(is.list(object)){
-    if(class(object)[1]!="glm") stop("Only glm-type objects are supported!!",call.=FALSE)
+  if(is(object,"glm")){
     if(object$family$family!="binomial") stop("Only binomial regression models are supported!!",call.=FALSE)
     temp <- data.frame(mus=fitted(object),ys=object$y*object$prior.weights,size=object$prior.weights)
   }else{
-    temp <- data.frame(ys=object[,1],mus=object[,2],size=rep(1,nrow(object)))
+    object <- as.matrix(object)
+    temp <- data.frame(ys=as.numeric(object[,1])-min(as.numeric(object[,1])),mus=object[,2],size=rep(1,nrow(object)))
     if(any(temp$ys!=0 & temp$ys!=1)) stop("First column of object should contain only 1's or 0's!!",call.=FALSE)
   }
   temp2 <- aggregate(cbind(m=size,events=ys)~mus,data=temp,sum)
@@ -1076,7 +1301,7 @@ ROCc <- function(object,plot.it=TRUE,verbose=TRUE,...){
     results[i,1] <- mus[i]
     results[i,2] <- sum(temp2[temp2[,1] >= mus[i],3])/d1
     results[i,3] <- (sum(temp2[temp2[,1] < mus[i],2]) - sum(temp2[temp2[,1] < mus[i],3]))/d2
-    if(i>=2) C <- C +  (1/2)*(results[i,3] - results[i-1,3])*(min(results[i,2],results[i-1,2]) + max(results[i,2],results[i-1,2]))
+    if(i >= 2) C <- C + (1/2)*(results[i,3] - results[i-1,3])*(min(results[i,2],results[i-1,2]) + max(results[i,2],results[i-1,2]))
   }
   if(plot.it){
     nano <- list(...)
@@ -1138,6 +1363,7 @@ ROCc <- function(object,plot.it=TRUE,verbose=TRUE,...){
 #' anova2(fit1, fit2, test="gradient")
 #'
 #' ## Example 3
+#' data(aucuba)
 #' fit <- glm(lesions ~ 1 + time, family=poisson("log"), data=aucuba)
 #' anova2(fit, test="lr")
 #' anova2(fit, test="score")
@@ -1221,17 +1447,25 @@ anova2 <- function(object,...,test=c("wald","lr","score","gradient"),verbose=TRU
 #' estequa(fit2)
 #'
 #' ## Example 3
+#' data(skincancer)
 #' fit3 <- glm(cases ~ offset(log(population)) + city + age, family=poisson("log"), data=skincancer)
 #' estequa(fit3)
 estequa.glm <- function(object,...){
-  xx <- model.matrix(object)
-  n <- nrow(xx)
-  p <- ncol(xx)
-  delta <- ifelse(object$family$mu.eta(object$linear.predictor)>=0,1,-1)
-  salida <- crossprod(xx,delta*resid(object,type="pearson")*sqrt(object$weights))
-  colnames(salida) <- " "
-  rownames(salida) <- names(coef(object))
-  return(salida)
+  X <- model.matrix(object)
+  y <- object$y
+  if(is.null(object$prior.weights)) omega <- matrix(1,nrow(X),1) else omega <- object$prior.weights
+  if(is.null(object$offset)) offset <- matrix(0,nrow(X),1) else offset <- object$offset
+  beta <- coef(object)
+  eta <- offset + X%*%beta
+  mu <- object$family$linkinv(eta)
+  G <- object$family$mu.eta(eta)
+  V <- object$family$variance(mu)
+  z <- (y-mu)*omega*G/V
+  out_ <- t(X)%*%z
+  colnames(out_) <- " "
+  rownames(out_) <- names(coef(object))
+  print(out_)
+  return(invisible(out_))
 }
 #' @title Generalized Variance Inflation Factor
 #' @description Computes the generalized variance inflation factor (GVIF) for a weighted or unweighted normal linear model.
@@ -1327,6 +1561,7 @@ gvif.lm <- function(model,verbose=TRUE,...){
 #' gvif(fit2)
 #'
 #' ###### Example 3: Hill races in Scotland
+#' data(races)
 #' fit3 <- glm(rtime ~ log(distance) + log(cclimb), family=Gamma("log"), data=races)
 #' gvif(fit3)
 #'
@@ -1455,36 +1690,41 @@ confint2 <- function(model, level=0.95, test=c("wald","lr","score","gradient"), 
 #' @title Residuals for Linear and Generalized Linear Models
 #' @description Computes residuals for a fitted linear or generalized linear model.
 #' @param object a object of the class \emph{lm} or \emph{glm}.
-#' @param type an (optional) character string giving the type of residuals which should be returned. The available options for LMs are: (1) externally studentized ("external"); (2) internally studentized ("internal") (default). The available options for GLMs are: (1) "pearson"; (2) "deviance";  (3) "quantile" (default).
+#' @param type an (optional) character string giving the type of residuals which should be returned. The available options for LMs are: (1) externally studentized ("external"); (2) internally studentized ("internal") (default). The available options for GLMs are: (1) "pearson"; (2) "deviance" (default);  (3) "quantile".
 #' @param standardized an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. By default, \code{standardized} is set to be FALSE.
-#' @param plot.it an (optional) logical switch indicating if a plot of the residuals is required. By default, \code{plot.it} is set to be FALSE.
+#' @param plot.it an (optional) logical switch indicating if a plot of the residuals versus the fitted values is required. By default, \code{plot.it} is set to be FALSE.
 #' @param identify an (optional) integer value indicating the number of individuals to identify on the plot of residuals. This is only appropriate when \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods
 #' @return A vector with the observed residuals type \code{type}.
 #' @examples
 #' ###### Example 1: Species richness in plots
+#' data(richness)
 #' fit1 <- lm(Species ~ Biomass + pH, data=richness)
 #' residuals2(fit1, type="external", col="red", pch=20, col.lab="blue", plot.it=TRUE,
 #'            col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
 #' ###### Example 2: Lesions of Aucuba mosaic virus
+#' data(aucuba)
 #' fit2 <- glm(lesions ~ time, family=poisson, data=aucuba)
 #' residuals2(fit2, type="quantile", col="red", pch=20, col.lab="blue", plot.it=TRUE,
 #'            col.axis="blue",col.main="black",family="mono",cex=0.8)
 #' @export residuals2
 residuals2 <- function(object,type,standardized=FALSE,plot.it=TRUE,identify,...){
   if(class(object)[1]!="glm" & class(object)[1]!="lm") stop("Only lm- and glm-type objects are supported!!",call.=FALSE)
-  if(class(object)[1]=="glm" & missingArg(type)) type <- "quantile"
+  if(class(object)[1]=="glm" & missingArg(type)) type <- "deviance"
   if(class(object)[1]=="lm" & missingArg(type)) type <- "internal"
   if(class(object)[1]=="glm" & type!="quantile" & type!="pearson" & type!="deviance")
     stop("Only quantile-, pearson- and deviance-type residuals are supported for glm-type objects !!",call.=FALSE)
   if(class(object)[1]=="lm" & type!="internal" & type!="external")
     stop("Only internal-, and external-type residuals are supported for lm-type objects !!",call.=FALSE)
+  if(class(object)[1]=="glm" & type=="quantile")
+    if(object$family$family %in% c("quasi","quasibinomial","quasipoisson"))
+      stop("Quantile-type residuals are not supported for quasi-likelihood models !!",call.=FALSE)
   if(class(object)[1]=="glm"){
     quantileres <- function(family,y,mu,phi){
       resi <- switch(family,
                      Gamma = pgamma(y,shape=1/phi,scale=mu*phi),
-                     inverse.gaussian = pnorm((y/mu-1)/sqrt(y*phi)) + exp(2/(mu*phi))*pnorm(-(y/mu+1)/sqrt(y*phi)),
+                     inverse.gaussian = pnorm((y/mu-1)/sqrt(phi*y)) + exp(2/(mu*phi))*pnorm(-(y/mu+1)/sqrt(y*phi)),
                      gaussian = pnorm((y-mu)/sqrt(phi)),
                      poisson = ppois(y-1,lambda=mu) + dpois(y,lambda=mu)*runif(length(mu)),
                      binomial = pbinom(y/phi-1,size=1/phi,prob=mu) + dbinom(y/phi,size=1/phi,prob=mu)*runif(length(mu)))
@@ -1588,6 +1828,7 @@ residuals2 <- function(object,type,standardized=FALSE,plot.it=TRUE,identify,...)
 #' stepCriterion(fit2, direction="forward", criterion="p-value", test="score")
 #'
 #' ###### Example 3: Skin cancer in women
+#' data(skincancer)
 #' upper <- cases ~ city + age + city*age
 #' fit3 <- glm(upper, family=poisson("log"), offset=log(population), data=skincancer)
 #' stepCriterion(fit3, direction="backward", criterion="aic", scope=list(lower=~ 1,upper=upper))
@@ -1674,6 +1915,7 @@ stepCriterion.glm <- function(model, criterion=c("bic","aic","adjr2","p-value","
   else datas <- na.omit(get_all_vars(upper,eval(model$call$data)))
 
   U <- attr(terms(upper),"term.labels")
+  U <- lapply(lapply(strsplit(U,":"),sort),paste,collapse=":")
   fs <- attr(terms(upper),"factors")
   long <- max(nchar(U)) + 2
   nonename <- paste("<none>",paste(replicate(max(long-6,0)," "),collapse=""),collapse="")
@@ -1681,12 +1923,12 @@ stepCriterion.glm <- function(model, criterion=c("bic","aic","adjr2","p-value","
   paso <- 1
   tol <- TRUE
   if(trace){
-    cat("\n       Family: ",model$family$family,"\n")
-    cat("Link function: ",model$family$link,"\n")
-  }
-  if(quasi){
-    if(model$family$varfun!="constant") cat("     Variance: proportional to",model$family$varfun,"\n")
-    else cat("     Variance: ",model$family$varfun,"\n")
+    if(quasi){
+      if(model$family$family!="quasi") model$family$varfun <- switch(model$family$family,"quasibinomial"="mu(1-mu)","quasipoisson"="mu")
+      if(model$family$varfun!="constant") cat("     Variance:  proportional to",model$family$varfun,"\n")
+      else cat("     Variance: ",model$family$varfun,"\n")
+    }else cat("\n       Family: ",model$family$family,"\n")
+  cat("Link function: ",model$family$link,"\n")
   }
 
   if(direction=="forward"){
@@ -1701,6 +1943,7 @@ stepCriterion.glm <- function(model, criterion=c("bic","aic","adjr2","p-value","
       X <- model.matrix(oldformula,data=datas)
       fit.x <- glm.fit(y=model$y,x=X,family=model$family,offset=model$offset,weights=model$prior.weights)
       S <- attr(terms(oldformula),"term.labels")
+      S <- lapply(lapply(strsplit(S,":"),sort),paste,collapse=":")
       entran <- seq(1:length(U))[is.na(match(U,S))]
       salen <- seq(1:length(U))[!is.na(match(U,S))]
       mas <- TRUE
@@ -1856,6 +2099,7 @@ stepCriterion.glm <- function(model, criterion=c("bic","aic","adjr2","p-value","
       X <- model.matrix(oldformula,data=datas)
       fit.x <- glm.fit(y=model$y,x=X,family=model$family,offset=model$offset,weights=model$prior.weights)
       S <- attr(terms(oldformula),"term.labels")
+      S <- lapply(lapply(strsplit(S,":"),sort),paste,collapse=":")
       entran <- seq(1:length(U))[is.na(match(U,S))]
       salen <- seq(1:length(U))[!is.na(match(U,S))]
       menos <- TRUE

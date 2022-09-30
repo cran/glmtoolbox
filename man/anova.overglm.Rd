@@ -35,6 +35,7 @@ The comparisons are performed by using the Wald, score, gradient or likelihood r
 }
 \examples{
 ## Example 1: Self diagnozed ear infections in swimmers
+data(swimmers)
 fit1 <- overglm(infections ~ frequency, family="nb1(log)", data=swimmers)
 fit2 <- update(fit1, . ~ . + location)
 fit3 <- update(fit2, . ~ . + age)
@@ -45,6 +46,7 @@ anova(fit1, fit2, fit3, fit4, test="lr")
 anova(fit1, fit2, fit3, fit4, test="gradient")
 
 ## Example 2: Agents to stimulate cellular differentiation
+data(cellular)
 fit1 <- overglm(cbind(cells,200-cells) ~ tnf, family="bb(logit)", data=cellular)
 fit2 <- update(fit1, . ~ . + ifn)
 fit3 <- update(fit2, . ~ . + tnf:ifn)

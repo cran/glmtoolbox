@@ -33,6 +33,7 @@ Higher scores on the EDPS are indicative of higher levels of
 depression.
 }
 \examples{
+ data(depression)
  boxplot(dep ~ visit, data=subset(depression,group=="placebo"), at=c(0:6)-0.2,
          col="yellow", boxwex=0.3, outline=FALSE, xaxt="n", ylab="EDPS",
          xlab="Months since the treatment began", ylim=range(na.omit(depression$dep)))

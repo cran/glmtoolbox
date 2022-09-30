@@ -41,6 +41,7 @@ may be chosen to correspond to all parameters in the linear predictor or (via \c
 }
 \examples{
 ###### Example 1: Self diagnozed ear infections in swimmers
+data(swimmers)
 fit1 <- overglm(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 
 ### Local influence for all parameters in the linear predictor
@@ -64,6 +65,7 @@ localInfluence(fit2, type="local", plot.it=TRUE, col="red", lty=1, lwd=1, col.la
                coef="fem", col.axis="blue", col.main="black", family="mono", cex=0.8)
 
 ###### Example 3: Agents to stimulate cellular differentiation
+data(cellular)
 fit3 <- overglm(cbind(cells,200-cells) ~ tnf + ifn, family="bb(logit)", data=cellular)
 
 ### Local influence for all parameters in the linear predictor

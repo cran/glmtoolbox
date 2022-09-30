@@ -142,10 +142,12 @@ including methods to the generic functions such as \link{print}, \link{summary},
 }
 \examples{
 ####### Example 1: Roots Produced by the Columnar Apple Cultivar Trajan
+data(Trajan)
 fit1 <- zeroalt(roots ~ photoperiod, family="nbf(log)", zero.link="logit", data=Trajan)
 summary(fit1)
 
 ####### Example 2: Self diagnozed ear infections in swimmers
+data(swimmers)
 fit2 <- zeroalt(infections ~ frequency | location, family="nb1(log)", data=swimmers)
 summary(fit2)
 

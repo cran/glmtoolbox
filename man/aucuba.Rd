@@ -20,6 +20,7 @@ of \emph{Aucuba mosaic} virus developing after exposure to X
 rays for various times. See Snedecor and Cochran (1980, page 404).
 }
 \examples{
+data(aucuba)
 barplot(lesions ~ time, col="red", data=aucuba)
 
 }

@@ -40,6 +40,7 @@ a starting value which is the estimate of the same model but based on the datase
 }
 \examples{
 ####### Example 1: Self diagnozed ear infections in swimmers
+data(swimmers)
 fit <- zeroinf(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 
 dfbeta(fit, submodel="counts", coefs="frequency", col="red", lty=1, lwd=1,

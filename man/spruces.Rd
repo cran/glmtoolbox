@@ -26,6 +26,7 @@ whereas in a second group, 25 were grown under a normal atmosphere. The size of 
 the objective is to compare the growth patterns of the trees under the two conditions. See Diggle et al. (2002, page 4).
 }
 \examples{
+data(spruces)
 boxplot(size ~ days, data=subset(spruces,treat=="normal"), at=c(1:13)-0.2,
         col="yellow", boxwex=0.3, outline=FALSE, xaxt="n", xlim=c(0.9,13.1))
 boxplot(size ~ days, data=subset(spruces,treat=="ozone-enriched"), add=TRUE,

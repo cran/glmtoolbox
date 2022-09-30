@@ -33,6 +33,7 @@ predicts whether or not a patient considers their UI a problem that
 interferes with him/her daily life.
 }
 \examples{
+data(GUIDE)
 mod <- bothered ~ gender + age + dayacc + severe + toilet
 fit <- glmgee(mod, family=binomial(logit), id=practice, corstr="Exchangeable", data=GUIDE)
 summary(fit)

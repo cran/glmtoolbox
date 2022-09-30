@@ -27,6 +27,7 @@ risk of contracting ear infections than non-beach swimmers.
 See Hand et al. (1994. page 266).
 }
 \examples{
+data(swimmers)
 boxplot(infections ~ frequency, data=subset(swimmers,location=="non-beach"),
         at=c(1:2)-0.2, col="yellow", boxwex=0.25, outline=FALSE, xaxt="n")
 boxplot(infections ~ frequency, data=subset(swimmers,location=="beach"), add=TRUE,

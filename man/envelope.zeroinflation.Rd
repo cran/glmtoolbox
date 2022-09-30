@@ -9,7 +9,7 @@
   rep = 20,
   conf = 0.95,
   type = c("quantile", "response", "standardized"),
-  plot.it = FALSE,
+  plot.it = TRUE,
   identify,
   ...
 )
@@ -63,6 +63,7 @@ the \eqn{i}-th order statistic of the \code{type}-type residuals for \eqn{i=1,2,
 }
 \examples{
 ####### Example 1: Self diagnozed ear infections in swimmers
+data(swimmers)
 fit <- zeroinf(infections ~ frequency | location, family="nb1(log)", data=swimmers)
 envelope(fit, rep=30, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
          col.axis="blue", col.main="black", family="mono", cex=0.8)

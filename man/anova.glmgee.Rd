@@ -36,34 +36,23 @@ Allows to compare nested generalized estimating equations using the Wald and gen
 }
 \examples{
 ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+data(spruces)
 mod <- size ~ poly(days,4)
-fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
+fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-M-dependent")
 fit2 <- update(fit1, . ~ . + treat)
 fit3 <- update(fit2, . ~ . + poly(days,4):treat)
 anova(fit1,fit2,fit3,test="wald")
 anova(fit3,test="wald")
-anova(fit1,fit2,fit3,test="score")
-anova(fit3,test="score")
 
 ###### Example 2: Treatment for severe postnatal depression
+data(depression)
 mod2 <- depressd ~ group
-fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
 fit2 <- update(fit1, . ~ . + visit)
 fit3 <- update(fit2, . ~ . + group:visit)
-anova(fit1,fit2,fit3,test="wald")
-anova(fit3,test="wald")
 anova(fit1,fit2,fit3,test="score")
 anova(fit3,test="score")
 
-###### Example 3: Treatment for severe postnatal depression (2)
-mod3 <- dep ~ group
-fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
-fit2 <- update(fit1, . ~ . + visit)
-fit3 <- update(fit2, . ~ . + visit:group)
-anova(fit1,fit2,fit3,test="wald")
-anova(fit3,test="wald")
-anova(fit1,fit2,fit3,test="score")
-anova(fit3,test="score")
 }
 \references{
 Rotnitzky, A. and Jewell, P. (1990) Hypothesis Testing of Regression Parameters

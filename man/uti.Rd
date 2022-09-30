@@ -29,6 +29,7 @@ a decreasing CD4+ count is an indication of the progression of HIV. See
 Hoepelman et al. (1992), van den Broek (1995), Morel and Nagaraj (2012, page 175).
 }
 \examples{
+data(uti)
 uti2 <- within(uti,cd4C <- cut(log(cd4),4,labels=c("Low","Mid-Low","Mid-High","High")))
 out <- aggregate(cbind(episodes,time) ~ cd4C, sum, data=uti2)
 barplot(12*episodes/time ~ cd4C, beside=TRUE, data=out, col="red",

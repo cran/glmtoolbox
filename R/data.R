@@ -1,3 +1,153 @@
+#' @title Fabric faults
+#'
+#' @description The main objective of the analysis of this dataset is to assess
+#' if there is an association between the number of faults in rolls of fabric and
+#' their length.
+#'
+#' @docType data
+#'
+#' @usage data(fabric)
+#'
+#' @format A data frame with 32 rows and 2 variables:
+#' \describe{
+#'   \item{roll}{a numeric vector indicating the length of the rolls.}
+#'   \item{faults}{a numeric vector indicating the number of faults.}
+#' }
+#' @keywords datasets
+#' @examples
+#' data(fabric)
+#' with(fabric,plot(roll, faults, pch=16, xlab="Length of roll", ylab="Number of faults"))
+#' @references Hinde J., Demetrio C.G.B. (1998) Over-dispersion: models and estimation. Computational Statistics & Data Analysis. 27:151–170.
+"fabric"
+#'
+#' @title Discount coupons
+#'
+#' @description The market research department of a soft drink manufacturer is
+#' investigating the effectiveness of a price discount coupon on the purchase
+#' of a two-litre beverage product. A sample of 5500 costumers received coupons
+#' for varying price discounts between 5 and 25 cents. The main objective of
+#' the analysis is to determine if there is an effect of the price discount on
+#' the proportion of redeemed coupons after one month.
+#'
+#' @docType data
+#'
+#' @usage data(coupons)
+#'
+#' @format A data frame with 11 rows and 3 variables:
+#' \describe{
+#'   \item{discounts}{a numeric vector indicating the price discount, in cents.}
+#'   \item{costumers}{a numeric vector indicating the number of customers who received coupons.}
+#'   \item{redeemed}{a numeric vector indicating the number of redeemed coupons.}
+#' }
+#' @keywords datasets
+#' @examples
+#' data(coupons)
+#' barplot(100*redeemed/costumers ~ discounts, data=coupons, xlab="Discount price",
+#'         ylab="(%) Redeemed coupons", col="blue")
+#' @references Montgomery D.C., Peck E.A., Vining G. (2012, page 464) Introduction to linear regression analysis. 5th ed. Berlin, Wiley.
+"coupons"
+#'
+#' @title Hardened Steel
+#'
+#' @description This dataset consists of the failure times for hardened steel
+#' specimens in a rolling contact fatigue test. Ten independent observations
+#' were taken at each of the four values of contact stress. The response is
+#' the length of the time until each specimen of the hardened steel failed.
+#'
+#' @docType data
+#'
+#' @usage data(Steel)
+#'
+#' @format A data frame with 40 rows and 2 variables:
+#' \describe{
+#'   \item{stress}{a numeric vector indicating the values of contact stress, in pounds per square inch x \eqn{10^{-6}}.}
+#'   \item{life}{a numeric vector indicating the length of the time until the specimen of the hardened steel failed.}
+#' }
+#' @keywords datasets
+#' @examples
+#' data(Steel)
+#' with(Steel,plot(log(stress), log(life), pch=16, xlab="Log(Stress)", ylab="log(Life)"))
+#' @references McCool, J. (1980) Confidence limits for Weibull regression with censored data. Transactions on Reliability, 29: 145-150.
+"Steel"
+#'
+#' @title Advertising
+#'
+#' @description The Advertising data set consists of the sales of that product in
+#' 200 different markets, along with advertising budgets for the product in each
+#' of those markets for three different media: TV, radio, and newspaper.
+#'
+#' @docType data
+#'
+#' @usage data(advertising)
+#'
+#' @format A data frame with 200 rows and 4 variables:
+#' \describe{
+#'   \item{TV}{a numeric vector indicating the advertising budget on TV.}
+#'   \item{radio}{a numeric vector indicating the advertising budget on radio.}
+#'   \item{newspaper}{a numeric vector indicating the advertising budget on newspaper.}
+#'   \item{sales}{a numeric vector indicating the sales of the interest product.}
+#' }
+#' @keywords datasets
+#' @source \url{https://www.statlearning.com/s/Advertising.csv}
+#' @examples
+#' data(advertising)
+#' pairs(~ sales + TV + radio + newspaper, pch=20, data = advertising)
+#' @references James, G. and Witten, D. and Hastie, T. and Tibshirani, R. (2013, page 15) An Introduction to Statistical Learning with Applications in R, Springer, New York.
+"advertising"
+#'
+#'
+#' @title Alaska pipeline
+#'
+#' @description The Alaska pipeline data consists of in-field ultrasonic measurements of
+#' the depths of defects in the Alaska pipeline. The depth of the defects were then
+#' re-measured in the laboratory. These measurements were performed in six different
+#' batches. The data were analyzed to calibrate the bias of the field measurements
+#' relative to the laboratory measurements. In this analysis, the field measurement
+#' is the response variable and the laboratory measurement is the predictor variable.
+#'
+#' @docType data
+#'
+#' @usage data(pipeline)
+#'
+#' @format A data frame with 107 rows and 2 variables:
+#' \describe{
+#'   \item{Field}{a numeric vector indicating the number of defects measured in the field.}
+#'   \item{Lab}{a numeric vector indicating the number of defects measured in the laboratory.}
+#' }
+#' @keywords datasets
+#' @source \url{https://www.itl.nist.gov/div898/handbook/pmd/section6/pmd621.htm}
+#' @examples
+#' data(pipeline)
+#' with(pipeline, plot(Lab,Field,pch=20,
+#'                     xlab="In-laboratory measurements",ylab="In-field measurements"))
+#' @references Weisberg, S. (2005). \emph{Applied Linear Regression}, 3rd edition. Wiley, New York.
+"pipeline"
+#'
+#'
+#' @title Dilution Assay
+#'
+#' @description These data are counts of virus
+#' particles at 5 different dilutions. There are 4
+#' replicate counts at each dilution except the last
+#' for which there are 5 counts. The aim is to
+#' estimate the number of virus particles per unit volume.
+#'
+#' @docType data
+#'
+#' @usage data(dilution)
+#'
+#' @format A data frame with 21 rows and 2 variables:
+#' \describe{
+#'   \item{Count}{a numeric vector indicating the count of virus particles.}
+#'   \item{Dilution}{a numeric vector indicating the dilution volume.}
+#' }
+#' @keywords datasets
+#' @source https://sada2013.sciencesconf.org/16138/glmSession4_Cotonou.pdf
+#' @examples
+#' data(dilution)
+#' with(dilution,plot(Dilution,Count,pch=20,xlab="Dilution volume",
+#'                    ylab="Count of virus particles"))
+"dilution"
 #'
 #' @title Mammal brain and body weights
 #'
@@ -15,8 +165,10 @@
 #'   \item{BodyWt}{a numeric vector indicating the average body weight, in kilograms.}
 #' }
 #' @keywords datasets
-#' @examples with(brains, plot(log(BodyWt),log(BrainWt),pch=20,
-#'                xlab="log(Body Weight)",ylab="log(Brain Weight)"))
+#' @examples
+#' data(brains)
+#' with(brains, plot(log(BodyWt),log(BrainWt),pch=20,
+#'              xlab="log(Body Weight)",ylab="log(Brain Weight)"))
 #' @references Allison, T. and Cicchetti, D. (1976). Sleep in mammals: Ecology and constitutional correlates. \emph{Science} 194, 732-734.
 #' @references Weisberg, S. (2005). \emph{Applied Linear Regression}, 3rd edition. Wiley, New York.
 "brains"
@@ -48,6 +200,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#' data(rinse)
 #' boxplot(score ~ time, data=subset(rinse,rinse=="Placebo"), at=c(1:3)-0.2,
 #'  ylim=c(0,3.3), col="yellow", boxwex=0.15, outline=FALSE, xaxt="n", xlim=c(0.8,3.2))
 #' boxplot(score ~ time, data=subset(rinse,rinse=="A"), add=TRUE,
@@ -85,6 +238,7 @@
 #' @source \url{https://support.sas.com/rnd/app/stat/examples/GENMODZIP/sas.html}
 #' @keywords datasets
 #' @examples
+#' data(Trajan)
 #' boxplot(roots ~ bap, data=subset(Trajan,photoperiod=="8"), at=c(1:4) - 0.15,
 #'     col="blue", boxwex=0.2, outline=FALSE, xaxt="n", xlim=c(0.7,4.3), ylim=c(-0.5,17))
 #' boxplot(roots ~ bap, data=subset(Trajan,photoperiod=="16"), add=TRUE, at=c(1:4) + 0.15,
@@ -130,6 +284,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#' data(uti)
 #' uti2 <- within(uti,cd4C <- cut(log(cd4),4,labels=c("Low","Mid-Low","Mid-High","High")))
 #' out <- aggregate(cbind(episodes,time) ~ cd4C, sum, data=uti2)
 #' barplot(12*episodes/time ~ cd4C, beside=TRUE, data=out, col="red",
@@ -177,6 +332,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#' data(cholecystectomy)
 #' out <- aggregate(pain2 ~ treatment + time, data=cholecystectomy, mean)
 #' barplot(100*pain2 ~ treatment + time, beside=TRUE, data=out, xlab="Time",
 #'         col=c("yellow","blue"), ylab="% of patients with \"low\" pain")
@@ -217,6 +373,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#' data(orobanche)
 #' out <- aggregate(cbind(germinated,seeds) ~ extract + specie, data=orobanche, sum)
 #' barplot(100*germinated/seeds ~ extract + specie, beside=TRUE, data=out, width=0.3,
 #'         col=c("yellow","blue"), xlab="Specie", ylab="% of germinated seeds")
@@ -257,6 +414,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#' data(GUIDE)
 #' mod <- bothered ~ gender + age + dayacc + severe + toilet
 #' fit <- glmgee(mod, family=binomial(logit), id=practice, corstr="Exchangeable", data=GUIDE)
 #' summary(fit)
@@ -289,6 +447,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#' data(spruces)
 #' boxplot(size ~ days, data=subset(spruces,treat=="normal"), at=c(1:13)-0.2,
 #'         col="yellow", boxwex=0.3, outline=FALSE, xaxt="n", xlim=c(0.9,13.1))
 #' boxplot(size ~ days, data=subset(spruces,treat=="ozone-enriched"), add=TRUE,
@@ -322,6 +481,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#' data(cellular)
 #' barplot(100*cells/200 ~ ifn + tnf, beside=TRUE, data=cellular, col=terrain.colors(4),
 #'         xlab="Dose of TNF", ylab="% of cells with markers of differentiation")
 #' legend(-3, 97, c("0","4","20","100"), fill=terrain.colors(4), bty="n", cex=0.9,
@@ -359,6 +519,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#' data(ossification)
 #' boxplot(100*fetuses/litter ~ pht, data=subset(ossification, tcpo=="0 mg/kg"),
 #'         at=c(1:2)-0.2, col="yellow", boxwex=0.25, outline=FALSE, xaxt="n",
 #'         xlab="Dose of PHT", ylab="% of fetuses showing ossification")
@@ -397,6 +558,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#' data(swimmers)
 #' boxplot(infections ~ frequency, data=subset(swimmers,location=="non-beach"),
 #'         at=c(1:2)-0.2, col="yellow", boxwex=0.25, outline=FALSE, xaxt="n")
 #' boxplot(infections ~ frequency, data=subset(swimmers,location=="beach"), add=TRUE,
@@ -435,6 +597,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#' data(mammary)
 #' boxplot(tumors ~ group, data=mammary, outline=FALSE, xlab="Group",
 #'         ylab="Number of tumors", col=c("yellow","blue"))
 #' @references Lawless, J.F. (1987) Regression Methods for Poisson Process Data. \emph{Journal of the American
@@ -461,6 +624,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#' data(richness)
 #' with(richness,{
 #'   plot(Biomass, Species,
 #'        col=apply(as.matrix(pH),1,function(x) switch(x,"low"="red","mid"="black","high"="blue")),
@@ -494,6 +658,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#' data(races)
 #' races2 <- within(races,cli <- cut(cclimb, include.lowest=TRUE,
 #'                                   breaks=quantile(cclimb, probs=c(0:2)/2),
 #'                                   labels=c("low","high")))
@@ -530,6 +695,7 @@
 #' @keywords datasets
 #' @seealso \link{liver}
 #' @examples
+#' data(bladder)
 #' barplot(100*cancer/exposed ~ dose, beside=TRUE, data=bladder, col="red",
 #'         xlab="Dose of 2-AAF", ylab="% of mice with bladder cancer")
 #' @references Zhang, H. and Zelterman, D. (1999) Binary Regression for Risks in Excess of
@@ -557,6 +723,7 @@
 #' @keywords datasets
 #' @seealso \link{bladder}
 #' @examples
+#' data(liver)
 #' barplot(100*cancer/exposed ~ dose, beside=TRUE, data=liver, col="red",
 #'         xlab="Dose of 2-AAF", ylab="% of mice with liver cancer")
 #' @references Zhang, H. and Zelterman, D. (1999) Binary Regression for Risks in Excess of Subject-Specific Thresholds. \emph{Biometrics} 55, 1247-1251.
@@ -582,6 +749,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#' data(skincancer)
 #' barplot(1000*cases/population ~ city + age, beside=TRUE,
 #'         col=c("yellow","blue"), data=skincancer)
 #' legend(1.5, 8.5, legend=c("St.Paul","Ft.Worth"), title="City",
@@ -608,6 +776,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#' data(aucuba)
 #' barplot(lesions ~ time, col="red", data=aucuba)
 #'
 #' @references Snedecor, G.W. and Cochran, W.G. (1989) \emph{Statistical Methods, Eight Edition}, Iowa State University Press, Ames.
@@ -640,6 +809,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#'  data(depression)
 #'  boxplot(dep ~ visit, data=subset(depression,group=="placebo"), at=c(0:6)-0.2,
 #'          col="yellow", boxwex=0.3, outline=FALSE, xaxt="n", ylab="EDPS",
 #'          xlab="Months since the treatment began", ylim=range(na.omit(depression$dep)))

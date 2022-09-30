@@ -65,6 +65,7 @@ envelope(fit1, rep=100, conf=0.95, type="external", col="red", pch=20, col.lab="
          col.axis="blue", col.main="black", family="mono", cex=0.8)
 
 ###### Example 2: Species richness in plots
+data(richness)
 fit2 <- lm(Species ~ Biomass + pH + Biomass*pH, data=richness)
 envelope(fit2, rep=100, conf=0.95, type="internal", col="red", pch=20, col.lab="blue",
          col.axis="blue", col.main="black", family="mono", cex=0.8)

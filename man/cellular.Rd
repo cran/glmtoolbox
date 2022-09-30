@@ -24,6 +24,7 @@ TNF/INF, 200 cells were examined. The main question is whether the two
 agents stimulate cell differentiation synergistically or independently.
 }
 \examples{
+data(cellular)
 barplot(100*cells/200 ~ ifn + tnf, beside=TRUE, data=cellular, col=terrain.colors(4),
         xlab="Dose of TNF", ylab="\% of cells with markers of differentiation")
 legend(-3, 97, c("0","4","20","100"), fill=terrain.colors(4), bty="n", cex=0.9,

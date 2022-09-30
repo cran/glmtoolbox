@@ -35,6 +35,7 @@ to deal with zero-excess in count data.
 }
 \examples{
 ####### Example 1: Self diagnozed ear infections in swimmers
+data(swimmers)
 fit1 <- zeroalt(infections ~ frequency | location, family="nb1(log)", data=swimmers)
 residuals(fit1, type="quantile", col="red", pch=20, col.lab="blue", plot.it=TRUE,
           col.axis="blue", col.main="black", family="mono", cex=0.8)

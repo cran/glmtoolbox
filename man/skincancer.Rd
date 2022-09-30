@@ -22,6 +22,7 @@ skin cancer for women stratified by age in Minneapolis
 (St. Paul) and Dallas (Fort Worth). See Kleinbaum et al. (2013, page 751).
 }
 \examples{
+data(skincancer)
 barplot(1000*cases/population ~ city + age, beside=TRUE,
         col=c("yellow","blue"), data=skincancer)
 legend(1.5, 8.5, legend=c("St.Paul","Ft.Worth"), title="City",

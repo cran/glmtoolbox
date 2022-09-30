@@ -56,6 +56,7 @@ anova2(fit1, fit2, test="wald")
 anova2(fit1, fit2, test="gradient")
 
 ## Example 3
+data(aucuba)
 fit <- glm(lesions ~ 1 + time, family=poisson("log"), data=aucuba)
 anova2(fit, test="lr")
 anova2(fit, test="score")

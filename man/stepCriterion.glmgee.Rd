@@ -67,18 +67,20 @@ and backward stepwise.
 }
 \examples{
 ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
+data(spruces)
 mod <- size ~ poly(days,4)*treat
-fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-1")
+fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-M-dependent")
 stepCriterion(fit1, criterion="p-value", direction="forward", scope=list(lower=~1,upper=mod))
 
 ###### Example 2: Treatment for severe postnatal depression
+data(depression)
 mod <- depressd ~ visit*group
-fit2 <- glmgee(mod, id=subj, family=binomial("logit"), corstr="AR-1", data=depression)
+fit2 <- glmgee(mod, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
 stepCriterion(fit2, criterion="adjr2", direction="forward", scope=list(lower=~1,upper=mod))
 
 ###### Example 3: Treatment for severe postnatal depression (2)
 mod <- dep ~ visit*group
-fit2 <- glmgee(mod, id=subj, family=gaussian("identity"), corstr="AR-1", data=depression)
+fit2 <- glmgee(mod, id=subj, family=gaussian("identity"), corstr="AR-M-dependent", data=depression)
 stepCriterion(fit2, criterion="adjr2", direction="forward", scope=list(lower=~1,upper=mod))
 
 }

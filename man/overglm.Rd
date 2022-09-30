@@ -145,14 +145,17 @@ In addition, the model fitted to the	data may be assessed using functions such a
 }
 \examples{
 ### Example 1: Ability of retinyl acetate to prevent mammary cancer in rats
+data(mammary)
 fit1 <- overglm(tumors ~ group, family="nb1(identity)", data=mammary)
 summary(fit1)
 
 ### Example 2: Self diagnozed ear infections in swimmers
+data(swimmers)
 fit2 <- overglm(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 summary(fit2)
 
 ### Example 3: Urinary tract infections in HIV-infected men
+data(uti)
 fit3 <- overglm(episodes ~ cd4 + offset(log(time)), family="nb1(log)", data = uti)
 summary(fit3)
 
@@ -162,15 +165,18 @@ fit4 <- overglm(art ~ fem + kid5 + ment, family="nb1(log)", data = bioChemists)
 summary(fit4)
 
 ### Example 5: Agents to stimulate cellular differentiation
+data(cellular)
 fit5 <- overglm(cbind(cells,200-cells) ~ tnf + ifn, family="bb(logit)", data=cellular)
 summary(fit5)
 
 ### Example 6: Teratogenic effects of phenytoin and trichloropropene oxide
+data(ossification)
 model6 <- cbind(fetuses,litter-fetuses) ~ pht + tcpo
 fit6 <- overglm(model6, family="rcb(cloglog)", data=ossification)
 summary(fit6)
 
 ### Example 7: Germination of orobanche seeds
+data(orobanche)
 model7 <- cbind(germinated,seeds-germinated) ~ specie + extract
 fit7 <- overglm(model7, family="rcb(cloglog)", data=orobanche)
 summary(fit7)

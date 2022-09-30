@@ -36,6 +36,7 @@ and a score of 5 reflected "high pain". See Jorgensen et al. (1995),
 Lumley (1996), Morel and Nagaraj (2012, page 319).
 }
 \examples{
+data(cholecystectomy)
 out <- aggregate(pain2 ~ treatment + time, data=cholecystectomy, mean)
 barplot(100*pain2 ~ treatment + time, beside=TRUE, data=out, xlab="Time",
         col=c("yellow","blue"), ylab="\% of patients with \"low\" pain")

@@ -80,6 +80,7 @@ stepCriterion(fit2, direction="backward", criterion="bic", scope=list(lower=lowe
 stepCriterion(fit2, direction="forward", criterion="p-value", test="score")
 
 ###### Example 3: Skin cancer in women
+data(skincancer)
 upper <- cases ~ city + age + city*age
 fit3 <- glm(upper, family=poisson("log"), offset=log(population), data=skincancer)
 stepCriterion(fit3, direction="backward", criterion="aic", scope=list(lower=~ 1,upper=upper))

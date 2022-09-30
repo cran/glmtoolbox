@@ -34,6 +34,7 @@ Inflation Factor (VIF).
 }
 \examples{
 ###### Example 1: Self diagnozed ear infections in swimmers
+data(swimmers)
 fit1 <- overglm(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 gvif(fit1)
 
@@ -43,6 +44,7 @@ fit2 <- overglm(art ~ fem + kid5 + ment, family="nb1(log)", data = bioChemists)
 gvif(fit2)
 
 ###### Example 3: Agents to stimulate cellular differentiation
+data(cellular)
 fit3 <- overglm(cbind(cells,200-cells) ~ tnf + ifn, family="bb(logit)", data=cellular)
 gvif(fit3)
 

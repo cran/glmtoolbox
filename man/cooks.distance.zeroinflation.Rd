@@ -50,6 +50,7 @@ is computed from a dataset including all individuals, and the second one is comp
 \examples{
 
 ####### Example 1: Self diagnozed ear infections in swimmers
+data(swimmers)
 fit <- zeroinf(infections ~ frequency + location, family="nb1(log)", data=swimmers)
 
 ### Cook's distance for all parameters in the "counts" model
