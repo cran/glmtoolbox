@@ -20,7 +20,7 @@ A matrix with 1 row and the following columns:
 \tab \cr
 \code{z-value}\tab the value of the statistical test,\cr
 \tab \cr
-\code{Pr(>z)}\tab the p-value of the statistical test,\cr
+\code{Pr(>z)}\tab the p-value of the statistical test.\cr
 }
 }
 \description{

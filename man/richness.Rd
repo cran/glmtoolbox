@@ -31,6 +31,6 @@ with(richness,{
 })
 }
 \references{
-Crawley, M.J. (2007) \emph{The R Book}. John Wiley & Sons, Chichester.
+Crawley M.J. (2007) \emph{The R Book}. John Wiley & Sons, Chichester.
 }
 \keyword{datasets}

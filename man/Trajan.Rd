@@ -40,15 +40,15 @@ legend(0, 18, legend=c("8","16"), title="Photoperiod", bty="n", ncol=1,
 
 }
 \references{
-Ridout, M. and Demétrio, C.G. and Hinde, J. (1998). Models for count data with many zeros. In
+Ridout M., Demétrio C.G., Hinde J. (1998). Models for count data with many zeros. In
 \emph{Proceedings of the XIXth international biometric conference}, 179–192.
 
-Ridout, M. and Hinde, J. and Demétrio, C.G. (2001). A score test for testing a zero-inflated
-Poisson regression model against zero-inflated negative binomial alternatives. \emph{Biometrics},
-57, 219-223.
+Ridout M., Hinde J., Demétrio C.G. (2001). A score test for testing a zero-inflated
+Poisson regression model against zero-inflated negative binomial alternatives. \emph{Biometrics}
+57:219-223.
 
-Garay, A.M. and Hashimoto, E.M. and Ortega, E.M.M. and Lachos, V. (2011). On estimation and
+Garay A.M., Hashimoto E.M., Ortega E.M.M., Lachos V. (2011). On estimation and
 influence diagnostics for zero-inflated negative binomial regression models. \emph{Computational
-Statistics & Data Analysis} 55, 1304-1318.
+Statistics & Data Analysis} 55:1304-1318.
 }
 \keyword{datasets}

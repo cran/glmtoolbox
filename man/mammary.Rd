@@ -30,9 +30,9 @@ boxplot(tumors ~ group, data=mammary, outline=FALSE, xlab="Group",
         ylab="Number of tumors", col=c("yellow","blue"))
 }
 \references{
-Lawless, J.F. (1987) Regression Methods for Poisson Process Data. \emph{Journal of the American
-Statistical Association}, 82, 808-815.
+Lawless J.F. (1987) Regression Methods for Poisson Process Data. \emph{Journal of the American
+Statistical Association} 82:808-815.
 
-Morel, J.G. and Nagaraj, N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc., Cary, North Carolina, USA.
+Morel J.G., Nagaraj N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc., Cary, North Carolina, USA.
 }
 \keyword{datasets}

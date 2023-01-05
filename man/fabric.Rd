@@ -24,6 +24,6 @@ data(fabric)
 with(fabric,plot(roll, faults, pch=16, xlab="Length of roll", ylab="Number of faults"))
 }
 \references{
-Hinde J., Demetrio C.G.B. (1998) Over-dispersion: models and estimation. Computational Statistics & Data Analysis. 27:151–170.
+Hinde J., Demetrio C.G.B. (1998) Over-dispersion: models and estimation. \emph{Computational Statistics & Data Analysis} 27:151–170.
 }
 \keyword{datasets}

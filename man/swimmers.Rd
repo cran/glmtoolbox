@@ -37,11 +37,11 @@ legend(0.2, 6.3, legend=c("non-beach","beach"), fill=c("yellow","blue"),
         bty="n", cex=0.7, x.intersp=0.2, y.intersp=1)
 }
 \references{
-Hand, D.J. and Daly, F. and Lunn, A.D. and McConway, K.J. and Ostrowsky, E. (1994)
+Hand D.J., Daly F., Lunn A.D., McConway K.J., Ostrowsky E. (1994)
 \emph{A Handbook of Small Data Sets}, Chapman and Hall, London.
 
-Vanegas, L.H. and Rondon, L.M. (2020) A data transformation to deal with
+Vanegas L.H., Rondon L.M. (2020) A data transformation to deal with
 constant under/over-dispersion in binomial and poisson regression models. \emph{Journal
-of Statistical Computation and Simulation} 90, 1811-1833.
+of Statistical Computation and Simulation} 90:1811-1833.
 }
 \keyword{datasets}

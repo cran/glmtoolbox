@@ -28,7 +28,7 @@ barplot(100*cancer/exposed ~ dose, beside=TRUE, data=liver, col="red",
         xlab="Dose of 2-AAF", ylab="\% of mice with liver cancer")
 }
 \references{
-Zhang, H. and Zelterman, D. (1999) Binary Regression for Risks in Excess of Subject-Specific Thresholds. \emph{Biometrics} 55, 1247-1251.
+Zhang H., Zelterman D. (1999) Binary Regression for Risks in Excess of Subject-Specific Thresholds. \emph{Biometrics} 55:1247-1251.
 }
 \seealso{
 \link{bladder}

@@ -30,8 +30,8 @@ is set to be TRUE.}
 \value{
 A matrix with the following three columns:
 \itemize{
-\item \code{Chi:}{ The value of the statistic of the test.}
-\item \code{Df:}{ The number of degrees of freedom.}
+\item \code{Chi:}{ The value of the statistic of the test,}
+\item \code{Df:}{ The number of degrees of freedom,}
 \item \code{Pr(>Chi):}{ The \emph{p}-value of the test \emph{test} computed using the Chi-square distribution.}
 }
 }

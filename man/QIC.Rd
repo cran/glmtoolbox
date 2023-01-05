@@ -25,7 +25,7 @@ Computes the quasi-likelihood under the independence model criterion (QIC) for o
 ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 data(spruces)
 mod1 <- size ~ poly(days,4) + treat
-fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces)
+fit1 <- glmgee(mod1, id=tree, family=Gamma(log), data=spruces)
 fit2 <- update(fit1, corstr="AR-M-dependent")
 fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 fit4 <- update(fit1, corstr="Exchangeable")
@@ -34,7 +34,7 @@ QIC(fit1, fit2, fit3, fit4)
 ###### Example 2: Treatment for severe postnatal depression
 data(depression)
 mod2 <- depressd ~ visit + group
-fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), data=depression)
+fit1 <- glmgee(mod2, id=subj, family=binomial(logit), data=depression)
 fit2 <- update(fit1, corstr="AR-M-dependent")
 fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 fit4 <- update(fit1, corstr="Exchangeable")
@@ -42,17 +42,17 @@ QIC(fit1, fit2, fit3, fit4)
 
 ###### Example 3: Treatment for severe postnatal depression (2)
 mod3 <- dep ~ visit*group
-fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), data=depression)
+fit1 <- glmgee(mod3, id=subj, family=gaussian(identity), data=depression)
 fit2 <- update(fit1, corstr="AR-M-dependent")
 fit3 <- update(fit1, corstr="Exchangeable")
 QIC(fit1, fit2, fit3)
 
 }
 \references{
-Pan, W. (2001) Akaike's information criterion in generalized estimating equations, \emph{Biometrics} 57, 120-125.
+Pan W. (2001) Akaike's information criterion in generalized estimating equations, \emph{Biometrics} 57:120-125.
 
-Hin, L.-Y. and Carey, V.J. and Wang, Y.-G. (2007) Criteria for Working–Correlation–Structure Selection in GEE:
-Assessment via Simulation. \emph{The American Statistician} 61, 360–364.
+Hin L.-Y., Carey V.J., Wang Y.-G. (2007) Criteria for Working–Correlation–Structure Selection in GEE:
+Assessment via Simulation. \emph{The American Statistician} 61:360–364.
 }
 \seealso{
 \link{CIC}, \link{GHYC}, \link{RJC}, \link{AGPC}, \link{SGPC}

@@ -37,7 +37,7 @@ with(races2,{
 })
 }
 \references{
-Agresti, A. (2015) \emph{Foundations of Linear and Generalized Linear Models}.
+Agresti A. (2015) \emph{Foundations of Linear and Generalized Linear Models}.
 John Wiley & Sons, New Jersey.
 }
 \keyword{datasets}

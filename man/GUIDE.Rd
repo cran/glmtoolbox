@@ -39,8 +39,8 @@ fit <- glmgee(mod, family=binomial(logit), id=practice, corstr="Exchangeable", d
 summary(fit)
 }
 \references{
-Hammill, B.G. and Preisser, J.S. (2006) A SAS/IML software program for GEE and regression diagnostics. \emph{Computational Statistics & Data Analysis} 51, 1197-1212.
+Hammill B.G., Preisser J.S. (2006) A SAS/IML software program for GEE and regression diagnostics. \emph{Computational Statistics & Data Analysis} 51:1197-1212.
 
-Jung, K.-M. (2008) Local Influence in Generalized Estimating Equations. \emph{Scandinavian Journal of Statistics} 35, 286-294.
+Jung K.-M. (2008) Local Influence in Generalized Estimating Equations. \emph{Scandinavian Journal of Statistics} 35:286-294.
 }
 \keyword{datasets}

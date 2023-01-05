@@ -45,14 +45,14 @@ legend(-1, 98, c("Placebo","Abdominal\n suction"), fill=c("yellow","blue"),
 
 }
 \references{
-Jorgensen, J.O. and Gillies, R.B. and Hunt, D.R. and Caplehorn, J.R.M. and Lumley, T. (1995)
+Jorgensen J.O., Gillies R.B., Hunt D.R., Caplehorn J.R.M., Lumley T. (1995)
 A simple and effective way to reduce postoperative pain after laparoscopic cholecystectomy.
-\emph{Australian and New Zealand Journal of Surgery} 65, 466–469.
+\emph{Australian and New Zealand Journal of Surgery} 65:466–469.
 
-Lumley, T. (1996) Generalized Estimating Equations for Ordinal Data: A Note on Working Correlation Structures.
-\emph{Biometrics} 52, 354–361.
+Lumley T. (1996) Generalized Estimating Equations for Ordinal Data: A Note on Working Correlation Structures.
+\emph{Biometrics} 52:354–361.
 
-Morel, J.G. and Nagaraj, N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc.,
+Morel J.G., Nagaraj N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc.,
 Cary, North Carolina, USA.
 }
 \keyword{datasets}

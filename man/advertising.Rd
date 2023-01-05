@@ -29,6 +29,6 @@ data(advertising)
 pairs(~ sales + TV + radio + newspaper, pch=20, data = advertising)
 }
 \references{
-James, G. and Witten, D. and Hastie, T. and Tibshirani, R. (2013, page 15) An Introduction to Statistical Learning with Applications in R, Springer, New York.
+James G., Witten D., Hastie T., Tibshirani R. (2013, page 15) \emph{An Introduction to Statistical Learning with Applications in R}, Springer, New York.
 }
 \keyword{datasets}

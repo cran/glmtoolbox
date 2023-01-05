@@ -99,7 +99,7 @@ An object of class  \emph{zeroinflation} in which the main results of the model 
 \code{R}            \tab a matrix with the Cholesky decomposition of the inverse of the variance-covariance\cr
                     \tab matrix of all parameters in the model,\cr
 \tab \cr
-\code{call}         \tab the original function call,\cr
+\code{call}         \tab the original function call.\cr
 }
 }
 \description{

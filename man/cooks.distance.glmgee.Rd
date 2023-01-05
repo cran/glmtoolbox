@@ -50,7 +50,7 @@ the first one set of estimates is computed from a dataset including all clusters
 ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 data(spruces)
 mod1 <- size ~ poly(days,4) + treat
-fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces, corstr="AR-M-dependent")
+fit1 <- glmgee(mod1, id=tree, family=Gamma(log), data=spruces, corstr="AR-M-dependent")
 
 ### Cook's distance for all parameters in the linear predictor
 cooks.distance(fit1, method="full", plot.it=TRUE, col="red", lty=1, lwd=1, cex=0.8,
@@ -63,7 +63,7 @@ cooks.distance(fit1, coef="treat", method="full", plot.it=TRUE, col="red", lty=1
 ###### Example 2: Treatment for severe postnatal depression
 data(depression)
 mod2 <- depressd ~ visit + group
-fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
+fit2 <- glmgee(mod2, id=subj, family=binomial(logit), corstr="AR-M-dependent", data=depression)
 
 ### Cook's distance for all parameters in the linear predictor
 cooks.distance(fit2, method="full", plot.it=TRUE, col="red", lty=1, lwd=1, cex=0.8,
@@ -75,11 +75,11 @@ cooks.distance(fit2, coef="group", method="full", plot.it=TRUE, col="red", lty=1
 
 }
 \references{
-Pregibon, D. (1981). Logistic regression diagnostics. \emph{The Annals of Statistics} 9, 705-724.
+Pregibon D. (1981). Logistic regression diagnostics. \emph{The Annals of Statistics} 9, 705-724.
 
-Preisser, J.S. and Qaqish, B.F. (1996) Deletion diagnostics for generalised estimating equations.
-\emph{Biometrika} 83, 551–562.
+Preisser J.S., Qaqish B.F. (1996) Deletion diagnostics for generalised estimating equations.
+\emph{Biometrika} 83:551–562.
 
-Hammill, B.G. and Preisser, J.S. (2006) A SAS/IML software program for GEE and regression diagnostics.
-\emph{Computational Statistics & Data Analysis} 51, 1197-1212.
+Hammill B.G., Preisser J.S. (2006) A SAS/IML software program for GEE and regression diagnostics.
+\emph{Computational Statistics & Data Analysis} 51:1197-1212.
 }

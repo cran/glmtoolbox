@@ -42,7 +42,7 @@ legend(0.7, 1, legend=c("Placebo","A","B"), fill=c("yellow","gray","blue"),
        bty="n", cex=0.6)
 }
 \references{
-Hadgu, A. and Koch, G. (1999) Application of generalized estimating equations
-to a dental randomized clinical trial. \emph{Journal of Biopharmaceutical Statistics} 9, 161-178.
+Hadgu A., Koch G. (1999) Application of generalized estimating equations
+to a dental randomized clinical trial. \emph{Journal of Biopharmaceutical Statistics} 9:161-178.
 }
 \keyword{datasets}

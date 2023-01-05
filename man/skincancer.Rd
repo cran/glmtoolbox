@@ -30,7 +30,7 @@ legend(1.5, 8.5, legend=c("St.Paul","Ft.Worth"), title="City",
 
 }
 \references{
-Kleinbaum, D. and Kupper, L. and Nizam, A. and Rosenberg, E.S. (2013) \emph{Applied Regression Analysis and
+Kleinbaum D., Kupper L., Nizam A., Rosenberg E.S. (2013) \emph{Applied Regression Analysis and
 other Multivariable Methods, Fifth Edition}, Cengage Learning, Boston.
 }
 \keyword{datasets}

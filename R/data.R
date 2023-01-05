@@ -1,3 +1,32 @@
+#' @title Seizures
+#'
+#' @description The dataset reports the number of epileptic seizures in each
+#' of four two-week intervals, and in a baseline eight-week inverval, for
+#' Progabide treatment and placebo groups with a total of 59 individuals.
+#'
+#' @docType data
+#'
+#' @usage data(Seizures)
+#'
+#' @format A data frame with 236 rows and 6 variables:
+#' \describe{
+#'   \item{seizures}{a numeric vector indicating the number of epileptic seizures.}
+#'   \item{treatment}{a factor indicating the applied treatment: "Progabide" and "Placebo".}
+#'   \item{base}{a numeric vector indicating the number of epileptic seizures in the baseline eight-week inverval.}
+#'   \item{age}{a numeric vector indicating the age of the individuals.}
+#'   \item{time}{a numeric vector indicating which the two-week interval corresponds to the reported number of epileptic seizures.}
+#'   \item{id}{a numeric vector indicating the identifier of each individual.}
+#' }
+#' @keywords datasets
+#' @examples
+#' data(Seizures)
+#' boxplot(seizures ~ treatment:time, data=Seizures, ylim=c(0,25), col=c("blue","yellow"))
+#' @source Thall P.F., Vail S.C. (1990) Some covariance models for longitudinal count data with overdispersion. \emph{Biometrics} 46:657–671.
+#' @references Carey V.J., Wang Y.-G. (2011) Working covariance model selection for generalized estimating equations. \emph{Statistics in Medicine} 30:3117–3124.
+#' @references Fu L., Hao Y., Wang Y.-G. (2018) Working correlation structure selection in generalized estimating equations. \emph{Computational Statistics & Data Analysis} 33:983–996.
+#' @references Diggle P.J., Liang K.Y., Zeger S.L. (1994, page 166) \emph{Analysis of Longitudinal Data}. Clarendon Press.
+"Seizures"
+#'
 #' @title Fabric faults
 #'
 #' @description The main objective of the analysis of this dataset is to assess
@@ -17,7 +46,7 @@
 #' @examples
 #' data(fabric)
 #' with(fabric,plot(roll, faults, pch=16, xlab="Length of roll", ylab="Number of faults"))
-#' @references Hinde J., Demetrio C.G.B. (1998) Over-dispersion: models and estimation. Computational Statistics & Data Analysis. 27:151–170.
+#' @references Hinde J., Demetrio C.G.B. (1998) Over-dispersion: models and estimation. \emph{Computational Statistics & Data Analysis} 27:151–170.
 "fabric"
 #'
 #' @title Discount coupons
@@ -44,7 +73,7 @@
 #' data(coupons)
 #' barplot(100*redeemed/costumers ~ discounts, data=coupons, xlab="Discount price",
 #'         ylab="(%) Redeemed coupons", col="blue")
-#' @references Montgomery D.C., Peck E.A., Vining G. (2012, page 464) Introduction to linear regression analysis. 5th ed. Berlin, Wiley.
+#' @references Montgomery D.C., Peck E.A., Vining G. (2012, page 464) \emph{Introduction to linear regression analysis. 5th ed.} Berlin, Wiley.
 "coupons"
 #'
 #' @title Hardened Steel
@@ -67,7 +96,7 @@
 #' @examples
 #' data(Steel)
 #' with(Steel,plot(log(stress), log(life), pch=16, xlab="Log(Stress)", ylab="log(Life)"))
-#' @references McCool, J. (1980) Confidence limits for Weibull regression with censored data. Transactions on Reliability, 29: 145-150.
+#' @references McCool J. (1980) Confidence limits for Weibull regression with censored data. \emph{ Transactions on Reliability} 29:145-150.
 "Steel"
 #'
 #' @title Advertising
@@ -92,7 +121,7 @@
 #' @examples
 #' data(advertising)
 #' pairs(~ sales + TV + radio + newspaper, pch=20, data = advertising)
-#' @references James, G. and Witten, D. and Hastie, T. and Tibshirani, R. (2013, page 15) An Introduction to Statistical Learning with Applications in R, Springer, New York.
+#' @references James G., Witten D., Hastie T., Tibshirani R. (2013, page 15) \emph{An Introduction to Statistical Learning with Applications in R}, Springer, New York.
 "advertising"
 #'
 #'
@@ -120,7 +149,7 @@
 #' data(pipeline)
 #' with(pipeline, plot(Lab,Field,pch=20,
 #'                     xlab="In-laboratory measurements",ylab="In-field measurements"))
-#' @references Weisberg, S. (2005). \emph{Applied Linear Regression}, 3rd edition. Wiley, New York.
+#' @references Weisberg S. (2005). \emph{Applied Linear Regression}, 3rd edition. Wiley, New York.
 "pipeline"
 #'
 #'
@@ -169,8 +198,8 @@
 #' data(brains)
 #' with(brains, plot(log(BodyWt),log(BrainWt),pch=20,
 #'              xlab="log(Body Weight)",ylab="log(Brain Weight)"))
-#' @references Allison, T. and Cicchetti, D. (1976). Sleep in mammals: Ecology and constitutional correlates. \emph{Science} 194, 732-734.
-#' @references Weisberg, S. (2005). \emph{Applied Linear Regression}, 3rd edition. Wiley, New York.
+#' @references Allison T., Cicchetti D. (1976). Sleep in mammals: Ecology and constitutional correlates. \emph{Science} 194:732-734.
+#' @references Weisberg S. (2005). \emph{Applied Linear Regression}, 3rd edition. Wiley, New York.
 "brains"
 #'
 #' @title Dental Clinical Trial
@@ -210,8 +239,8 @@
 #' axis(1, at=1:3, labels=unique(rinse$time))
 #' legend(0.7, 1, legend=c("Placebo","A","B"), fill=c("yellow","gray","blue"),
 #'        bty="n", cex=0.6)
-#' @references Hadgu, A. and Koch, G. (1999) Application of generalized estimating equations
-#' to a dental randomized clinical trial. \emph{Journal of Biopharmaceutical Statistics} 9, 161-178.
+#' @references Hadgu A., Koch G. (1999) Application of generalized estimating equations
+#' to a dental randomized clinical trial. \emph{Journal of Biopharmaceutical Statistics} 9:161-178.
 "rinse"
 #'
 #' @title Roots Produced by the Columnar Apple Cultivar Trajan.
@@ -247,14 +276,14 @@
 #' legend(0, 18, legend=c("8","16"), title="Photoperiod", bty="n", ncol=1,
 #'     fill=c("blue","yellow"), cex=0.6, x.intersp=0.2, y.intersp=1)
 #'
-#' @references Ridout, M. and Demétrio, C.G. and Hinde, J. (1998). Models for count data with many zeros. In
+#' @references Ridout M., Demétrio C.G., Hinde J. (1998). Models for count data with many zeros. In
 #' \emph{Proceedings of the XIXth international biometric conference}, 179–192.
-#' @references Ridout, M. and Hinde, J. and Demétrio, C.G. (2001). A score test for testing a zero-inflated
-#' Poisson regression model against zero-inflated negative binomial alternatives. \emph{Biometrics},
-#' 57, 219-223.
-#' @references Garay, A.M. and Hashimoto, E.M. and Ortega, E.M.M. and Lachos, V. (2011). On estimation and
+#' @references Ridout M., Hinde J., Demétrio C.G. (2001). A score test for testing a zero-inflated
+#' Poisson regression model against zero-inflated negative binomial alternatives. \emph{Biometrics}
+#' 57:219-223.
+#' @references Garay A.M., Hashimoto E.M., Ortega E.M.M., Lachos V. (2011). On estimation and
 #' influence diagnostics for zero-inflated negative binomial regression models. \emph{Computational
-#' Statistics & Data Analysis} 55, 1304-1318.
+#' Statistics & Data Analysis} 55:1304-1318.
 "Trajan"
 
 #'
@@ -290,12 +319,12 @@
 #' barplot(12*episodes/time ~ cd4C, beside=TRUE, data=out, col="red",
 #'         xlab="CD4+ cell count", ylab="Number of UTIs per year")
 #'
-#' @references Hoepelman, A.I.M. and Van Buren, M. and Van den Broek, J., and Borleffs, J.C.C. (1992) Bacteriuria
-#' in men infected with HIV-1 is related to their immune status (CD4+ cell count). \emph{AIDS} 6, 179-184.
-#' @references Morel, J.G. and Nagaraj, N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc.,
+#' @references Hoepelman A.I.M., Van Buren M., Van den Broek J., Borleffs J.C.C. (1992) Bacteriuria
+#' in men infected with HIV-1 is related to their immune status (CD4+ cell count). \emph{AIDS} 6:179-184.
+#' @references Morel J.G., Nagaraj N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc.,
 #' Cary, North Carolina, USA.
-#' @references van den Broek, J. (1995) A Score Test for Zero Inflation in a Poisson Distribution.
-#' \emph{Biometrics} 51, 738–743.
+#' @references van den Broek J. (1995) A Score Test for Zero Inflation in a Poisson Distribution.
+#' \emph{Biometrics} 51:738–743.
 "uti"
 #'
 #'
@@ -339,12 +368,12 @@
 #' legend(-1, 98, c("Placebo","Abdominal\n suction"), fill=c("yellow","blue"),
 #'        bty="n", cex=0.6, x.intersp=0.2, y.intersp=1)
 #'
-#' @references Jorgensen, J.O. and Gillies, R.B. and Hunt, D.R. and Caplehorn, J.R.M. and Lumley, T. (1995)
+#' @references Jorgensen J.O., Gillies R.B., Hunt D.R., Caplehorn J.R.M., Lumley T. (1995)
 #' A simple and effective way to reduce postoperative pain after laparoscopic cholecystectomy.
-#' \emph{Australian and New Zealand Journal of Surgery} 65, 466–469.
-#' @references Lumley, T. (1996) Generalized Estimating Equations for Ordinal Data: A Note on Working Correlation Structures.
-#' \emph{Biometrics} 52, 354–361.
-#' @references Morel, J.G. and Nagaraj, N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc.,
+#' \emph{Australian and New Zealand Journal of Surgery} 65:466–469.
+#' @references Lumley T. (1996) Generalized Estimating Equations for Ordinal Data: A Note on Working Correlation Structures.
+#' \emph{Biometrics} 52:354–361.
+#' @references Morel J.G., Nagaraj N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc.,
 #' Cary, North Carolina, USA.
 "cholecystectomy"
 #'
@@ -380,10 +409,10 @@
 #' legend(0.3, 70, c("Bean","Cucumber"), fill=c("yellow","blue"), bty="n",
 #'        cex=0.6, x.intersp=0.2, y.intersp=1)
 #'
-#' @references Crowder, M.J. (1978) Beta-binomial anova for proportions. \emph{Journal of the Royal Statistical Society.
-#' Series C (Applied Statistics)} 27, 34-37.
-#' @references Hinde, J. and Demetrio, C.G.B. (1998) Overdispersion: Models and estimation. \emph{Computational Statistics
-#' & Data Analysis} 27, 151-170.
+#' @references Crowder M.J. (1978) Beta-binomial anova for proportions. \emph{Journal of the Royal Statistical Society.
+#' Series C (Applied Statistics)} 27:34-37.
+#' @references Hinde J., Demetrio C.G.B. (1998) Overdispersion: Models and estimation. \emph{Computational Statistics
+#' & Data Analysis} 27:151-170.
 "orobanche"
 #'
 #'
@@ -418,8 +447,8 @@
 #' mod <- bothered ~ gender + age + dayacc + severe + toilet
 #' fit <- glmgee(mod, family=binomial(logit), id=practice, corstr="Exchangeable", data=GUIDE)
 #' summary(fit)
-#' @references Hammill, B.G. and Preisser, J.S. (2006) A SAS/IML software program for GEE and regression diagnostics. \emph{Computational Statistics & Data Analysis} 51, 1197-1212.
-#' @references Jung, K.-M. (2008) Local Influence in Generalized Estimating Equations. \emph{Scandinavian Journal of Statistics} 35, 286-294.
+#' @references Hammill B.G., Preisser J.S. (2006) A SAS/IML software program for GEE and regression diagnostics. \emph{Computational Statistics & Data Analysis} 51:1197-1212.
+#' @references Jung K.-M. (2008) Local Influence in Generalized Estimating Equations. \emph{Scandinavian Journal of Statistics} 35:286-294.
 #' @source \url{http://www.bios.unc.edu/~preisser/personal/uidata/preqaq99.dat}
 "GUIDE"
 
@@ -456,8 +485,8 @@
 #' axis(2, at=seq(0,1500,250), labels=seq(0,1500,250))
 #' legend(0.3, 1500, legend=c("normal","ozone-enriched"), fill=c("yellow","blue"),
 #'        bty="n", cex=0.7, x.intersp=0.2, y.intersp=1)
-#' @references Diggle, P.J. and Heagarty, P. and Liang, K.-Y. and Zeger, S.L. (2002) \emph{Analysis of Longitudinal Data}. Oxford University Press, Oxford.
-#' @references Crainiceanu, C.M. and Ruppert, D. and Wand, M.P. (2005). Bayesian Analysis for Penalized Spline Regression Using WinBUGS. \emph{Journal of Statistical Software} 14(14).
+#' @references Diggle P.J., Heagarty P., Liang K.-Y., Zeger S.L. (2002) \emph{Analysis of Longitudinal Data}. Oxford University Press, Oxford.
+#' @references Crainiceanu C.M., Ruppert D., Wand M.P. (2005). Bayesian Analysis for Penalized Spline Regression Using WinBUGS. \emph{Journal of Statistical Software} 14(14):1-24.
 "spruces"
 
 #' @title Agents to stimulate cellular differentiation
@@ -486,12 +515,12 @@
 #'         xlab="Dose of TNF", ylab="% of cells with markers of differentiation")
 #' legend(-3, 97, c("0","4","20","100"), fill=terrain.colors(4), bty="n", cex=0.9,
 #'        title="Dose of IFN", x.intersp=0.2, y.intersp=1)
-#' @references Piegorsch, W.W. and Weinberg, C.R. and Margolin, B.H. (1988) Exploring
-#' simple independent action in multifactor tables of proportions. \emph{Biometrics} 44, 595-603.
+#' @references Piegorsch W.W., Weinberg C.R., Margolin B.H. (1988) Exploring
+#' simple independent action in multifactor tables of proportions. \emph{Biometrics} 44:595-603.
 #'
 #' Vanegas, L.H. and Rondon, L.M. (2020) A data transformation to deal with
 #' constant under/over-dispersion in binomial and poisson regression models. \emph{Journal
-#' of Statistical Computation and Simulation} 90, 1811-1833.
+#' of Statistical Computation and Simulation} 90:1811-1833.
 "cellular"
 
 #' @title Teratogenic effects of phenytoin and trichloropropene oxide
@@ -528,10 +557,10 @@
 #' axis(1, at=1:2, labels=levels(ossification$pht))
 #' legend(0.1, 20, legend=c("0 mg/kg","100 mg/kg"), fill=c("yellow","blue"),
 #'        bty="n", cex=0.7, x.intersp=0.2, y.intersp=1)
-#' @references Morel, J.G. and Neerchal, N.K. (1997) Clustered binary logistic regression in teratology data
-#' using a finite mixture distribution. \emph{Statistics in Medicine} 16, 2843-2853.
+#' @references Morel J.G., Neerchal N.K. (1997) Clustered binary logistic regression in teratology data
+#' using a finite mixture distribution. \emph{Statistics in Medicine} 16:2843-2853.
 #'
-#' Morel, J.G. and Nagaraj, N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc., Cary, North Carolina, USA.
+#' Morel J.G., Nagaraj N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc., Cary, North Carolina, USA.
 "ossification"
 
 #' @title Self diagnozed ear infections in swimmers
@@ -566,12 +595,12 @@
 #' axis(1, at=1:2, labels=levels(swimmers$frequency))
 #' legend(0.2, 6.3, legend=c("non-beach","beach"), fill=c("yellow","blue"),
 #'         bty="n", cex=0.7, x.intersp=0.2, y.intersp=1)
-#' @references Hand, D.J. and Daly, F. and Lunn, A.D. and McConway, K.J. and Ostrowsky, E. (1994)
+#' @references Hand D.J., Daly F., Lunn A.D., McConway K.J., Ostrowsky E. (1994)
 #' \emph{A Handbook of Small Data Sets}, Chapman and Hall, London.
 #'
-#' Vanegas, L.H. and Rondon, L.M. (2020) A data transformation to deal with
+#' Vanegas L.H., Rondon L.M. (2020) A data transformation to deal with
 #' constant under/over-dispersion in binomial and poisson regression models. \emph{Journal
-#' of Statistical Computation and Simulation} 90, 1811-1833.
+#' of Statistical Computation and Simulation} 90:1811-1833.
 "swimmers"
 
 
@@ -600,10 +629,10 @@
 #' data(mammary)
 #' boxplot(tumors ~ group, data=mammary, outline=FALSE, xlab="Group",
 #'         ylab="Number of tumors", col=c("yellow","blue"))
-#' @references Lawless, J.F. (1987) Regression Methods for Poisson Process Data. \emph{Journal of the American
-#' Statistical Association}, 82, 808-815.
+#' @references Lawless J.F. (1987) Regression Methods for Poisson Process Data. \emph{Journal of the American
+#' Statistical Association} 82:808-815.
 #'
-#' Morel, J.G. and Nagaraj, N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc., Cary, North Carolina, USA.
+#' Morel J.G., Nagaraj N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc., Cary, North Carolina, USA.
 "mammary"
 
 #' @title Species richness
@@ -632,7 +661,7 @@
 #'   legend(8.2, 43, legend=c("low","mid","high"), col=c("red","black","blue"),
 #'          pch=c(15,16,17), bty="n", cex=0.8, title="pH level")
 #' })
-#' @references Crawley, M.J. (2007) \emph{The R Book}. John Wiley & Sons, Chichester.
+#' @references Crawley M.J. (2007) \emph{The R Book}. John Wiley & Sons, Chichester.
 "richness"
 
 
@@ -669,7 +698,7 @@
 #'     legend(0.7, 5.4, legend=c("low","high"), title="Cumulative climb", col=c("red","blue"),
 #'            pch=c(15,16), bty="n", x.intersp=0.2, y.intersp=1)
 #' })
-#' @references Agresti, A. (2015) \emph{Foundations of Linear and Generalized Linear Models}.
+#' @references Agresti A. (2015) \emph{Foundations of Linear and Generalized Linear Models}.
 #' John Wiley & Sons, New Jersey.
 "races"
 
@@ -698,8 +727,8 @@
 #' data(bladder)
 #' barplot(100*cancer/exposed ~ dose, beside=TRUE, data=bladder, col="red",
 #'         xlab="Dose of 2-AAF", ylab="% of mice with bladder cancer")
-#' @references Zhang, H. and Zelterman, D. (1999) Binary Regression for Risks in Excess of
-#' Subject-Specific Thresholds. \emph{Biometrics} 55, 1247-1251.
+#' @references Zhang H., Zelterman D. (1999) Binary Regression for Risks in Excess of
+#' Subject-Specific Thresholds. \emph{Biometrics} 55:1247-1251.
 "bladder"
 #'
 #' @title Liver cancer in mice
@@ -726,7 +755,7 @@
 #' data(liver)
 #' barplot(100*cancer/exposed ~ dose, beside=TRUE, data=liver, col="red",
 #'         xlab="Dose of 2-AAF", ylab="% of mice with liver cancer")
-#' @references Zhang, H. and Zelterman, D. (1999) Binary Regression for Risks in Excess of Subject-Specific Thresholds. \emph{Biometrics} 55, 1247-1251.
+#' @references Zhang H., Zelterman D. (1999) Binary Regression for Risks in Excess of Subject-Specific Thresholds. \emph{Biometrics} 55:1247-1251.
 "liver"
 
 
@@ -755,7 +784,7 @@
 #' legend(1.5, 8.5, legend=c("St.Paul","Ft.Worth"), title="City",
 #'        fill=c("yellow","blue"), bty="n", cex=0.9)
 #'
-#' @references Kleinbaum, D. and Kupper, L. and Nizam, A. and Rosenberg, E.S. (2013) \emph{Applied Regression Analysis and
+#' @references Kleinbaum D., Kupper L., Nizam A., Rosenberg E.S. (2013) \emph{Applied Regression Analysis and
 #' other Multivariable Methods, Fifth Edition}, Cengage Learning, Boston.
 "skincancer"
 
@@ -779,7 +808,7 @@
 #' data(aucuba)
 #' barplot(lesions ~ time, col="red", data=aucuba)
 #'
-#' @references Snedecor, G.W. and Cochran, W.G. (1989) \emph{Statistical Methods, Eight Edition}, Iowa State University Press, Ames.
+#' @references Snedecor G.W., Cochran W.G. (1989) \emph{Statistical Methods, Eight Edition}, Iowa State University Press, Ames.
 "aucuba"
 
 #' @title Treatment for severe postnatal depression
@@ -801,7 +830,7 @@
 #'
 #' @format A data frame with 427 rows and 5 variables:
 #' \describe{
-#'   \item{subj}{ a numeric vector giving the identifier of each woman .}
+#'   \item{subj}{ a numeric vector giving the identifier of each woman.}
 #'   \item{group}{ a factor giving the received treatment: "placebo" or "estrogen".}
 #'   \item{visit}{ a numeric vector giving the number of months since the treatment began, where -1 indicates the pretreatment assessment of the EDPS.}
 #'   \item{dep}{ a numeric vector giving the value of the EDPS.}
@@ -820,6 +849,6 @@
 #'         bty="n", x.intersp=0.2, y.intersp=1)
 #'
 #' @source \url{https://stats.oarc.ucla.edu/spss/library/spss-librarypanel-data-analysis-using-gee/}
-#' @references Gregoire, A.J.P. and Kumar, R. and Everitt, B. and Henderson, A.F. and Studd, J.W.W. (1996) Transdermal oestrogen for treatment of severe postnatal depression,
-#' \emph{The Lancet} 347, 930-933.
+#' @references Gregoire A.J.P., Kumar R., Everitt B., Henderson A.F., Studd, J.W.W. (1996) Transdermal oestrogen for treatment of severe postnatal depression,
+#' \emph{The Lancet} 347:930-933.
 "depression"

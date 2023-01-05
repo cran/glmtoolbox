@@ -17,7 +17,7 @@
 \arguments{
 \item{object}{an object of class \emph{glmgee}.}
 
-\item{type}{an (optional) character string indicating the type of approach to study the local influence. The options are: the absolute value of the elements of the eigenvector which corresponds to the maximum absolute eigenvalue ("local"); and the absolute value of the elements of the main diagonal ("total"). By default, \code{type} is set to be "total".}
+\item{type}{an (optional) character string indicating the type of approach to study the local influence. The options are: the absolute value of the elements of the eigenvector which corresponds to the maximum absolute eigenvalue ("local"); and the elements of the main diagonal ("total"). By default, \code{type} is set to be "total".}
 
 \item{perturbation}{an (optional) character string indicating the perturbation scheme to apply. The options are: case weight perturbation of clusters ("cw-clusters"); Case weight perturbation of observations ("cw-observations"); and perturbation of response ("response"). By default, \code{perturbation} is set to be "cw-clusters".}
 
@@ -39,23 +39,23 @@ Computes some measures and, optionally, display	graphs of them to perform influe
 ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 data(spruces)
 mod1 <- size ~ poly(days,4) + treat
-fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-M-dependent", data=spruces)
+fit1 <- glmgee(mod1, id=tree, family=Gamma(log), corstr="AR-M-dependent", data=spruces)
 localInfluence(fit1,type="total",perturbation="cw-clusters",coefs="treat",plot.it=TRUE)
 
 ###### Example 2: Treatment for severe postnatal depression
 data(depression)
 mod2 <- depressd ~ visit + group
-fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
+fit2 <- glmgee(mod2, id=subj, family=binomial(logit), corstr="AR-M-dependent", data=depression)
 localInfluence(fit2,type="total",perturbation="cw-clusters",coefs="group",plot.it=TRUE)
 
 ###### Example 3: Treatment for severe postnatal depression (2)
 mod3 <- dep ~ visit*group
-fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-M-dependent", data=depression)
+fit3 <- glmgee(mod3, id=subj, family=gaussian(identity), corstr="AR-M-dependent", data=depression)
 localInfluence(fit3,type="total",perturbation="cw-clusters",coefs="visit:group",plot.it=TRUE)
 
 }
 \references{
-Cook, D. (1986) Assessment of Local Influence. \emph{Journal of the Royal Statistical Society: Series B (Methodological)} 48, 133-155.
+Cook D. (1986) Assessment of Local Influence. \emph{Journal of the Royal Statistical Society: Series B (Methodological)} 48:133-155.
 
-Jung, K.-M. (2008) Local Influence in Generalized Estimating Equations. \emph{Scandinavian Journal of Statistics} 35, 286-294.
+Jung K.-M. (2008) Local Influence in Generalized Estimating Equations. \emph{Scandinavian Journal of Statistics} 35:286-294.
 }

@@ -36,20 +36,20 @@ Produces predictions and optionally estimates standard errors of those predictio
 ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 data(spruces)
 mod1 <- size ~ poly(days,4) + treat
-fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces, corstr="AR-M-dependent")
+fit1 <- glmgee(mod1, id=tree, family=Gamma(log), data=spruces, corstr="AR-M-dependent")
 newdata1 <- data.frame(days=c(556,556),treat=as.factor(c("normal","ozone-enriched")))
 predict(fit1,newdata=newdata1,type="response",se.fit=TRUE)
 
 ###### Example 2: Treatment for severe postnatal depression
 data(depression)
 mod2 <- depressd ~ visit + group
-fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
+fit2 <- glmgee(mod2, id=subj, family=binomial(logit), corstr="AR-M-dependent", data=depression)
 newdata2 <- data.frame(visit=c(6,6),group=as.factor(c("placebo","estrogen")))
 predict(fit2,newdata=newdata2,type="response",se.fit=TRUE)
 
 ###### Example 3: Treatment for severe postnatal depression (2)
 mod3 <- dep ~ visit*group
-fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-M-dependent", data=depression)
+fit3 <- glmgee(mod3, id=subj, family=gaussian(identity), corstr="AR-M-dependent", data=depression)
 newdata3 <- data.frame(visit=c(6,6),group=as.factor(c("placebo","estrogen")))
 predict(fit3,newdata=newdata3,type="response",se.fit=TRUE)
 

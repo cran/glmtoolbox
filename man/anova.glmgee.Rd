@@ -38,7 +38,7 @@ Allows to compare nested generalized estimating equations using the Wald and gen
 ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 data(spruces)
 mod <- size ~ poly(days,4)
-fit1 <- glmgee(mod, id=tree, family=Gamma("log"), data=spruces, corstr="AR-M-dependent")
+fit1 <- glmgee(mod, id=tree, family=Gamma(log), data=spruces, corstr="AR-M-dependent")
 fit2 <- update(fit1, . ~ . + treat)
 fit3 <- update(fit2, . ~ . + poly(days,4):treat)
 anova(fit1,fit2,fit3,test="wald")
@@ -47,7 +47,7 @@ anova(fit3,test="wald")
 ###### Example 2: Treatment for severe postnatal depression
 data(depression)
 mod2 <- depressd ~ group
-fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
+fit1 <- glmgee(mod2, id=subj, family=binomial(logit), corstr="AR-M-dependent", data=depression)
 fit2 <- update(fit1, . ~ . + visit)
 fit3 <- update(fit2, . ~ . + group:visit)
 anova(fit1,fit2,fit3,test="score")
@@ -55,12 +55,12 @@ anova(fit3,test="score")
 
 }
 \references{
-Rotnitzky, A. and Jewell, P. (1990) Hypothesis Testing of Regression Parameters
-in Semiparametric Generalized Linear Models for Cluster Correlated Data. \emph{Biometrika} 77, 485-497.
+Rotnitzky A., Jewell P. (1990) Hypothesis Testing of Regression Parameters
+in Semiparametric Generalized Linear Models for Cluster Correlated Data. \emph{Biometrika} 77:485-497.
 
-Boos, D.D. (1992) On Generalized Score Tests. \emph{The American Statistician} 46, 327-333.
+Boos D.D. (1992) On Generalized Score Tests. \emph{The American Statistician} 46:327-333.
 
-Boos, D. (1992) On Generalized Score Tests. \emph{American Statistician} 46, 327–33.
+Boos D. (1992) On Generalized Score Tests. \emph{American Statistician} 46:327–33.
 
-Rotnitzky, A. and Jewell, N.P. (1990). Hypothesis Testing of Regression Parameters in Semiparametric Generalized Linear Models for Cluster Correlated Data. \emph{Biometrika} 77, 485-497.
+Rotnitzky A., Jewell N.P. (1990). Hypothesis Testing of Regression Parameters in Semiparametric Generalized Linear Models for Cluster Correlated Data. \emph{Biometrika} 77:485-497.
 }

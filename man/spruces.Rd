@@ -37,8 +37,8 @@ legend(0.3, 1500, legend=c("normal","ozone-enriched"), fill=c("yellow","blue"),
        bty="n", cex=0.7, x.intersp=0.2, y.intersp=1)
 }
 \references{
-Diggle, P.J. and Heagarty, P. and Liang, K.-Y. and Zeger, S.L. (2002) \emph{Analysis of Longitudinal Data}. Oxford University Press, Oxford.
+Diggle P.J., Heagarty P., Liang K.-Y., Zeger S.L. (2002) \emph{Analysis of Longitudinal Data}. Oxford University Press, Oxford.
 
-Crainiceanu, C.M. and Ruppert, D. and Wand, M.P. (2005). Bayesian Analysis for Penalized Spline Regression Using WinBUGS. \emph{Journal of Statistical Software} 14(14).
+Crainiceanu C.M., Ruppert D., Wand M.P. (2005). Bayesian Analysis for Penalized Spline Regression Using WinBUGS. \emph{Journal of Statistical Software} 14(14):1-24.
 }
 \keyword{datasets}

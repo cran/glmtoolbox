@@ -27,7 +27,7 @@ glmgee(
 \item{formula}{a \code{formula} expression of the form \code{response ~ x1 + x2 + ...}, which is a symbolic description of the linear predictor of the model to be fitted to the data.}
 
 \item{family}{an (optional) \code{family} object, that is, a list of functions and expressions for defining link and variance functions. Families (and links) supported are the same supported by \link{glm} using its \link{family} argument, that is,
-\code{gaussian}, \code{binomial}, \code{poisson}, \code{Gamma}, \code{inverse.gaussian}, and \code{quasi}. The family \code{negative.binomial} in the library \pkg{MASS} are also available. By default, the argument \code{family} is set to be \code{gaussian("identity")}.}
+\code{gaussian}, \code{binomial}, \code{poisson}, \code{Gamma}, \code{inverse.gaussian}, and \code{quasi}. The family \code{negative.binomial} in the library \pkg{MASS} are also available. By default, the argument \code{family} is set to be \code{gaussian(identity)}.}
 
 \item{weights}{an (optional) vector of positive "prior weights" to be used in the fitting process. The length of \code{weights} should be the same as the total number of observations.}
 
@@ -147,52 +147,60 @@ The variable selection may be accomplished using the routine
 ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 data(spruces)
 mod1 <- size ~ poly(days,4) + treat
-fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), corstr="AR-M-dependent", data=spruces)
+fit1 <- glmgee(mod1, id=tree, family=Gamma(log), corstr="AR-M-dependent(1)", data=spruces)
 summary(fit1, corr.digits=2)
 
 ###### Example 2: Treatment for severe postnatal depression
 data(depression)
 mod2 <- depressd ~ visit + group
-fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
+fit2 <- glmgee(mod2, id=subj, family=binomial(logit), corstr="AR-M-dependent(1)", data=depression)
 summary(fit2, corr.digits=2)
 
 ###### Example 3: Treatment for severe postnatal depression (2)
 data(depression)
 mod3 <- dep ~ visit*group
-fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-M-dependent", data=depression)
+fit3 <- glmgee(mod3, id=subj, family=gaussian, corstr="AR-M-dependent(1)", data=depression)
 summary(fit3, corr.digits=2)
 
 ###### Example 4: Dental Clinical Trial
 data(rinse)
 mod4 <- score/3.6 ~ rinse*time
-fit4 <- glmgee(mod4, family=binomial("log"), id=subject, corstr="Exchangeable", data=rinse)
+fit4 <- glmgee(mod4, family=binomial(log), id=subject, corstr="Exchangeable", data=rinse)
 summary(fit4, corr.digits=2)
 
 ###### Example 5: Shoulder Pain after Laparoscopic Cholecystectomy
 data(cholecystectomy)
 mod5 <- pain2 ~ treatment + age + time
 corstr <- "Stationary-M-dependent(2)"
-fit5 <- glmgee(mod5, family=binomial("logit"), id=id, corstr=corstr, data=cholecystectomy)
+fit5 <- glmgee(mod5, family=binomial(logit), id=id, corstr=corstr, data=cholecystectomy)
 summary(fit5,varest="bias-corrected")
 
 ###### Example 6: Guidelines for Urinary Incontinence Discussion and Evaluation
 data(GUIDE)
 mod6 <- bothered ~ gender + age + dayacc + severe + toilet
-fit6 <- glmgee(mod6, family=binomial("logit"), id=practice, corstr="Exchangeable", data=GUIDE)
+fit6 <- glmgee(mod6, family=binomial(logit), id=practice, corstr="Exchangeable", data=GUIDE)
 summary(fit6)
 
 ###### Example 7: Tests of Auditory Perception in Children with OME
 OME <- MASS::OME
 mod7 <- cbind(Correct, Trials-Correct) ~ Loud + Age + OME
-fit7 <- glmgee(mod7, family = binomial("cloglog"), id = ID, corstr = "Exchangeable", data = OME)
+fit7 <- glmgee(mod7, family = binomial(cloglog), id = ID, corstr = "Exchangeable", data = OME)
 summary(fit7, corr=FALSE)
+
+###### Example 8: Epileptic seizures
+data(Seizures)
+Seizures2 <- within(Seizures, time4 <- ifelse(time==4,1,0))
+mod8 <- seizures ~ log(age) + time4 + log(base/4)*treatment
+fit8 <- glmgee(mod8, family=poisson(log), id=id, corstr="Exchangeable", data=Seizures2)
+summary(fit8)
+
 }
 \references{
-Liang, K.Y. and Zeger, S.L. (1986) Longitudinal data analysis using generalized linear models.
-\emph{Biometrika} 73, 13-22.
+Liang K.Y., Zeger S.L. (1986) Longitudinal data analysis using generalized linear models.
+\emph{Biometrika} 73:13-22.
 
-Zeger, S.L. and Liang, K.Y. (1986) Longitudinal data analysis for discrete and continuous outcomes.
-\emph{Biometrics} 42, 121-130.
+Zeger S.L., Liang K.Y. (1986) Longitudinal data analysis for discrete and continuous outcomes.
+\emph{Biometrics} 42:121-130.
 
-Hardin, J.W. and Hilbe, J.M. (2013). \emph{Generalized Estimating Equations}. Chapman & Hall, London.
+Hardin J.W., Hilbe J.M. (2013) \emph{Generalized Estimating Equations}. Chapman & Hall, London.
 }

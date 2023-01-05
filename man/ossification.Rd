@@ -39,9 +39,9 @@ legend(0.1, 20, legend=c("0 mg/kg","100 mg/kg"), fill=c("yellow","blue"),
        bty="n", cex=0.7, x.intersp=0.2, y.intersp=1)
 }
 \references{
-Morel, J.G. and Neerchal, N.K. (1997) Clustered binary logistic regression in teratology data
-using a finite mixture distribution. \emph{Statistics in Medicine} 16, 2843-2853.
+Morel J.G., Neerchal N.K. (1997) Clustered binary logistic regression in teratology data
+using a finite mixture distribution. \emph{Statistics in Medicine} 16:2843-2853.
 
-Morel, J.G. and Nagaraj, N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc., Cary, North Carolina, USA.
+Morel J.G., Nagaraj N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc., Cary, North Carolina, USA.
 }
 \keyword{datasets}

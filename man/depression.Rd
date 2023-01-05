@@ -7,7 +7,7 @@
 \format{
 A data frame with 427 rows and 5 variables:
 \describe{
-  \item{subj}{ a numeric vector giving the identifier of each woman .}
+  \item{subj}{ a numeric vector giving the identifier of each woman.}
   \item{group}{ a factor giving the received treatment: "placebo" or "estrogen".}
   \item{visit}{ a numeric vector giving the number of months since the treatment began, where -1 indicates the pretreatment assessment of the EDPS.}
   \item{dep}{ a numeric vector giving the value of the EDPS.}
@@ -45,7 +45,7 @@ depression.
 
 }
 \references{
-Gregoire, A.J.P. and Kumar, R. and Everitt, B. and Henderson, A.F. and Studd, J.W.W. (1996) Transdermal oestrogen for treatment of severe postnatal depression,
-\emph{The Lancet} 347, 930-933.
+Gregoire A.J.P., Kumar R., Everitt B., Henderson A.F., Studd, J.W.W. (1996) Transdermal oestrogen for treatment of severe postnatal depression,
+\emph{The Lancet} 347:930-933.
 }
 \keyword{datasets}

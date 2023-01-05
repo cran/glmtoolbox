@@ -37,13 +37,13 @@ barplot(12*episodes/time ~ cd4C, beside=TRUE, data=out, col="red",
 
 }
 \references{
-Hoepelman, A.I.M. and Van Buren, M. and Van den Broek, J., and Borleffs, J.C.C. (1992) Bacteriuria
-in men infected with HIV-1 is related to their immune status (CD4+ cell count). \emph{AIDS} 6, 179-184.
+Hoepelman A.I.M., Van Buren M., Van den Broek J., Borleffs J.C.C. (1992) Bacteriuria
+in men infected with HIV-1 is related to their immune status (CD4+ cell count). \emph{AIDS} 6:179-184.
 
-Morel, J.G. and Nagaraj, N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc.,
+Morel J.G., Nagaraj N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc.,
 Cary, North Carolina, USA.
 
-van den Broek, J. (1995) A Score Test for Zero Inflation in a Poisson Distribution.
-\emph{Biometrics} 51, 738–743.
+van den Broek J. (1995) A Score Test for Zero Inflation in a Poisson Distribution.
+\emph{Biometrics} 51:738–743.
 }
 \keyword{datasets}

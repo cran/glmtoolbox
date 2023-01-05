@@ -34,7 +34,7 @@ Calculates residuals for a fitted generalized estimating equation.
 ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 data(spruces)
 mod1 <- size ~ poly(days,4) + treat
-fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces, corstr="AR-M-dependent")
+fit1 <- glmgee(mod1, id=tree, family=Gamma(log), data=spruces, corstr="AR-M-dependent")
 ### Plot to assess the adequacy of the chosen variance function
 residuals(fit1, type="deviance", plot.it=TRUE, col="red", pch=20, col.lab="blue",
           col.axis="blue", col.main="black", family="mono", cex=0.8)
@@ -45,14 +45,14 @@ residuals(fit1, type="mahalanobis", plot.it=TRUE, col="red", pch=20, col.lab="bl
 ###### Example 2: Treatment for severe postnatal depression
 data(depression)
 mod2 <- depressd ~ visit + group
-fit2 <- glmgee(mod2, id=subj, family=binomial("logit"), corstr="AR-M-dependent", data=depression)
+fit2 <- glmgee(mod2, id=subj, family=binomial(logit), corstr="AR-M-dependent", data=depression)
 ### Plot to identify women suspicious to be outliers
 residuals(fit2, type="mahalanobis", plot.it=TRUE, col="red", pch=20, col.lab="blue",
           col.axis="blue", col.main="black", family="mono", cex=0.8)
 
 ###### Example 3: Treatment for severe postnatal depression (2)
 mod3 <- dep ~ visit*group
-fit3 <- glmgee(mod3, id=subj, family=gaussian("identity"), corstr="AR-M-dependent", data=depression)
+fit3 <- glmgee(mod3, id=subj, family=gaussian(identity), corstr="AR-M-dependent", data=depression)
 ### Plot to assess the adequacy of the chosen variance function
 residuals(fit3, type="pearson", plot.it=TRUE, col="red", pch=20, col.lab="blue",
           col.axis="blue", col.main="black", family="mono", cex=0.8)

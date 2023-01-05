@@ -25,7 +25,7 @@ A matrix with the following three columns:
 \tab \cr
 \code{Df}\tab The number of degrees of freedom,\cr
 \tab \cr
-\code{Pr(>Chi)} \tab The \emph{p}-value of the \code{test}-type test computed using the Chi-square distribution,\cr
+\code{Pr(>Chi)} \tab The \emph{p}-value of the \code{test}-type test computed using the Chi-square distribution.\cr
 }
 }
 \description{

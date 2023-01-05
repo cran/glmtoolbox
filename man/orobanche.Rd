@@ -36,10 +36,10 @@ legend(0.3, 70, c("Bean","Cucumber"), fill=c("yellow","blue"), bty="n",
 
 }
 \references{
-Crowder, M.J. (1978) Beta-binomial anova for proportions. \emph{Journal of the Royal Statistical Society.
-Series C (Applied Statistics)} 27, 34-37.
+Crowder M.J. (1978) Beta-binomial anova for proportions. \emph{Journal of the Royal Statistical Society.
+Series C (Applied Statistics)} 27:34-37.
 
-Hinde, J. and Demetrio, C.G.B. (1998) Overdispersion: Models and estimation. \emph{Computational Statistics
-& Data Analysis} 27, 151-170.
+Hinde J., Demetrio C.G.B. (1998) Overdispersion: Models and estimation. \emph{Computational Statistics
+& Data Analysis} 27:151-170.
 }
 \keyword{datasets}

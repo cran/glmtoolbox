@@ -43,7 +43,7 @@ A matrix with the following four columns:
 \code{Upper limit} \tab the quantile (1 + \code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
                    \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
 \tab \cr
-\code{Residuals}\tab the observed \code{type}-type residuals,\cr
+\code{Residuals}\tab the observed \code{type}-type residuals.\cr
 }
 }
 \description{

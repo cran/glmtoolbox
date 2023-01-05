@@ -21,7 +21,7 @@ Computes the Schwarz-type penalized Gaussian pseudo-likelihood criterion (SGPC) 
 ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 data(spruces)
 mod1 <- size ~ poly(days,4) + treat
-fit1 <- glmgee(mod1, id=tree, family=Gamma("log"), data=spruces)
+fit1 <- glmgee(mod1, id=tree, family=Gamma(log), data=spruces)
 fit2 <- update(fit1, corstr="AR-M-dependent")
 fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 fit4 <- update(fit1, corstr="Exchangeable")
@@ -30,7 +30,7 @@ SGPC(fit1, fit2, fit3, fit4)
 ###### Example 2: Treatment for severe postnatal depression
 data(depression)
 mod2 <- depressd ~ visit + group
-fit1 <- glmgee(mod2, id=subj, family=binomial("logit"), data=depression)
+fit1 <- glmgee(mod2, id=subj, family=binomial(logit), data=depression)
 fit2 <- update(fit1, corstr="AR-M-dependent")
 fit3 <- update(fit1, corstr="Stationary-M-dependent(2)")
 fit4 <- update(fit1, corstr="Exchangeable")
@@ -38,23 +38,22 @@ SGPC(fit1, fit2, fit3, fit4)
 
 ###### Example 3: Treatment for severe postnatal depression (2)
 mod3 <- dep ~ visit*group
-fit1 <- glmgee(mod3, id=subj, family=gaussian("identity"), data=depression)
+fit1 <- glmgee(mod3, id=subj, family=gaussian(identity), data=depression)
 fit2 <- update(fit1, corstr="AR-M-dependent")
 fit3 <- update(fit1, corstr="Exchangeable")
 SGPC(fit1, fit2, fit3)
 
 }
 \references{
-Carey, V.J. and Wang, Y.-G. (2011) Working covariance model selection for
-generalized estimating equations. \emph{Statistics in Medicine} 30, 3117-3124.
+Carey V.J., Wang Y.-G. (2011) Working covariance model selection for
+generalized estimating equations. \emph{Statistics in Medicine} 30:3117-3124.
 
-Zhu, X. and Zhu, Z. (2013) Comparison of Criteria to Select Working Correlation
+Zhu X., Zhu Z. (2013) Comparison of Criteria to Select Working Correlation
 Matrix in Generalized Estimating Equations. \emph{Chinese Journal of Applied Probability
-and Statistics} 29, 515-530.
+and Statistics} 29:515-530.
 
-Fu, L. and Hao, Y. and Wang, Y.-G. (2018) Working correlation structure
-selection in generalized estimating equations. \emph{Computational Statistics} 33,
-983-996.
+Fu L., Hao Y., Wang Y.-G. (2018) Working correlation structure
+selection in generalized estimating equations. \emph{Computational Statistics} 33:983-996.
 }
 \seealso{
 \link{QIC}, \link{CIC}, \link{RJC}, \link{GHYC}, \link{AGPC}

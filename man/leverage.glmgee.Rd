@@ -46,7 +46,7 @@ leverage(fit2,level="observations",plot.it=TRUE)
 
 }
 \references{
-Preisser, J.S. and Qaqish, B.F. (1996). Deletion diagnostics for generalised estimating equations. \emph{Biometrika}, 83, 551-562.
+Preisser J.S., Qaqish B.F. (1996). Deletion diagnostics for generalised estimating equations. \emph{Biometrika}, 83:551-562.
 
-Hammill, B.G. and Preisser, J.S. (2006). A SAS/IML software program for GEE and regression diagnostics. \emph{Computational Statistics & Data Analysis}, 51, 1197-1212.
+Hammill B.G., Preisser J.S. (2006). A SAS/IML software program for GEE and regression diagnostics. \emph{Computational Statistics & Data Analysis}, 51:1197-1212.
 }

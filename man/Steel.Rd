@@ -25,6 +25,6 @@ data(Steel)
 with(Steel,plot(log(stress), log(life), pch=16, xlab="Log(Stress)", ylab="log(Life)"))
 }
 \references{
-McCool, J. (1980) Confidence limits for Weibull regression with censored data. Transactions on Reliability, 29: 145-150.
+McCool J. (1980) Confidence limits for Weibull regression with censored data. \emph{ Transactions on Reliability} 29:145-150.
 }
 \keyword{datasets}

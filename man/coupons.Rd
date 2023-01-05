@@ -29,6 +29,6 @@ barplot(100*redeemed/costumers ~ discounts, data=coupons, xlab="Discount price",
         ylab="(\%) Redeemed coupons", col="blue")
 }
 \references{
-Montgomery D.C., Peck E.A., Vining G. (2012, page 464) Introduction to linear regression analysis. 5th ed. Berlin, Wiley.
+Montgomery D.C., Peck E.A., Vining G. (2012, page 464) \emph{Introduction to linear regression analysis. 5th ed.} Berlin, Wiley.
 }
 \keyword{datasets}

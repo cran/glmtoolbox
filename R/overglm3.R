@@ -1,85 +1,3 @@
-#' @title Test for Overdispersion
-#' @description This function uses the likelihood-ratio test to assess if the negative binomial model fits the data better than the poisson model, that is, it uses the likelihood-ratio test to assess the null hypothesis given by \eqn{H_0: \phi=0} versus the alternative hypothesis given by \eqn{H_1: \phi>0}, where \eqn{\phi} represents the dispersion parameter of the negative binomial distribution. This function also uses the likelihood-ratio test to assess if the beta binomial or the random-clumped binomial models fits the data better than the binomial model.
-#' @param object an object of the class \code{overglm}.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @return A matrix with 1 row and the following columns:
-#' \tabular{ll}{
-#' \code{Chi} \tab the value of the likelihood-ratio statistic,\cr
-#' \tab \cr
-#' \code{df}\tab the degrees-of-freedom,\cr
-#' \tab \cr
-#' \code{Pr(>Chi)}\tab the p-value associated with the test,\cr
-#' }
-#' @details
-#' The value of \eqn{\phi} specified at the null hypothesis is
-#' the lower limit of its parametric space. Therefore, the p-value
-#' associated with the test is computed as \eqn{\frac{1}{2}} if
-#' \eqn{\xi=0} and \eqn{\frac{1}{2}*Pr[\chi^2(1)>\xi]} if
-#' \eqn{\xi>0}, where \eqn{\xi} represents the likelihood-ratio
-#' statistic.
-#'
-#' @examples
-#' ####### Example 1: Self diagnozed ear infections in swimmers
-#' data(swimmers)
-#' fit1 <- overglm(infections ~ frequency + location, family="nb1", data=swimmers)
-#' overtest(fit1)
-#'
-#' ####### Example 2: Article production by graduate students in biochemistry PhD programs
-#' bioChemists <- pscl::bioChemists
-#' fit2 <- overglm(art ~ fem + kid5 + ment, family="ztnb1", data=bioChemists, subset={art > 0})
-#' overtest(fit2)
-#'
-#' ####### Example 3: Agents to stimulate cellular differentiation
-#' data(cellular)
-#' fit3 <- overglm(cbind(cells,200-cells) ~ tnf + ifn, family="bb", data=cellular)
-#' overtest(fit3)
-#'
-#' @seealso \link{overglm}, \link{zero.excess}
-#' @export overtest
-#'
-overtest <- function(object,verbose=TRUE){
-  if(!is(object,"overglm")) stop("Only overglm-type objects are supported!!",call.=FALSE)
-  if(!(object$family$family %in% c("bb","rcb"))){
-    if(!(object$family$family %in% c("nbf","nb1","nb2"))) stop("Only 'ztnb1', 'ztnb2' and 'ztnbf' families of overglm-type objects are supported!!",call.=FALSE)
-    if(object$zero.trunc){
-      object2 <- object$call
-      object2$call$family <- "ztpoi"
-      fitpois <- eval(object2)
-      lr <- 2*(logLik(object) - logLik(fitpois))
-    }else{
-      familia <- object$family
-      familia$family <- "poisson"
-      fitpois <- glm.fit(x=model.matrix(object), y=object$y, weights=object$prior.weights,
-                         offset=object$offset, family=familia)
-      lr <- as.double(2*logLik(object) + fitpois$aic - 2*length(fitpois$coefficients))
-    }
-  }else{
-    if(sd(object$prior.weights)>0) stop("prior weights are not supported!!",call.=FALSE)
-    familia <- object$family
-    familia$family <- "binomial"
-    weights <- apply(object$y,1,sum)
-    fitbin <- glm.fit(x=model.matrix(object), y=object$y[,1]/weights, weights=weights,
-                      offset=object$offset, family=familia)
-    lr <- as.double(2*logLik(object) + fitbin$aic - 2*length(fitbin$coefficients))
-  }
-  p.value <- 1 - 0.5*(1 + pchisq(lr,1))
-  out_ <- matrix(cbind(lr,1,p.value),1,3)
-  colnames(out_) <- c(" Chi ","df"," Pr(>Chi) ")
-  rownames(out_) <- ""
-  if(verbose){
-    cat("Over-dispersion test\n")
-    if(object$family$family %in% c("bb","rcb")){
-      if(object$family$family=="bb") cat("Binomial vs Beta Binomial\n\n")
-      else cat("Binomial vs Random-Clumped Binomial\n\n")
-    }else{
-    if(object$zero.trunc) cat("zero-truncated Poisson vs zero-truncated Negative Binomial\n\n")
-    else cat("Poisson vs Negative Binomial\n\n")
-    }
-    printCoefmat(out_, P.values=TRUE, has.Pvalue=TRUE, digits=5, signif.legend=FALSE, cs.ind=2)
-  }
-  return(invisible(out_))
-}
-#'
 #'
 #' @title Test for zero-excess in Count Regression Models
 #' @description Allows to assess if the observed number of zeros is significantly higher than the expected according to the fitted count regression model (poisson or negative binomial).
@@ -93,7 +11,7 @@ overtest <- function(object,verbose=TRUE){
 #' \tab \cr
 #' \code{z-value}\tab the value of the statistical test,\cr
 #' \tab \cr
-#' \code{Pr(>z)}\tab the p-value of the statistical test,\cr
+#' \code{Pr(>z)}\tab the p-value of the statistical test.\cr
 #' }
 #' @details
 #' According to the formulated count regression model, we have that
@@ -227,7 +145,7 @@ zero.excess <- function(object,verbose=TRUE){
 #' \code{R}            \tab a matrix with the Cholesky decomposition of the inverse of the variance-covariance\cr
 #'                     \tab matrix of all parameters in the model,\cr
 #' \tab \cr
-#' \code{call}         \tab the original function call,\cr
+#' \code{call}         \tab the original function call.\cr
 #' }
 #'
 #' @details
@@ -717,7 +635,7 @@ overglm <- function(formula, family="nb1(log)", weights, data, subset, na.action
 #' \code{R}            \tab a matrix with the Cholesky decomposition of the inverse of the variance-covariance\cr
 #'                     \tab matrix of all parameters in the model,\cr
 #' \tab \cr
-#' \code{call}         \tab the original function call,\cr
+#' \code{call}         \tab the original function call.\cr
 #' }
 #' @details
 #' The zero-altered count distributions, also called \emph{hurdle models}, may be obtained as the mixture between
@@ -1061,7 +979,7 @@ zeroalt <- function(formula, data, subset, na.action=na.omit(), weights, family=
 #' \code{R}            \tab a matrix with the Cholesky decomposition of the inverse of the variance-covariance\cr
 #'                     \tab matrix of all parameters in the model,\cr
 #' \tab \cr
-#' \code{call}         \tab the original function call,\cr
+#' \code{call}         \tab the original function call.\cr
 #' }
 #' @details
 #' The zero-inflated count distributions may be obtained as the mixture between a count
@@ -1951,7 +1869,7 @@ residuals.overglm <- function(object,type=c("quantile","standardized","response"
 #' \tab \cr
 #' \code{Df}\tab The number of degrees of freedom,\cr
 #' \tab \cr
-#' \code{Pr(>Chi)} \tab The \emph{p}-value of the \code{test}-type test computed using the Chi-square distribution,\cr
+#' \code{Pr(>Chi)} \tab The \emph{p}-value of the \code{test}-type test computed using the Chi-square distribution.\cr
 #' }
 #' @method anova overglm
 #' @export
@@ -2066,8 +1984,8 @@ anova.overglm <- function(object,...,test=c("wald","lr","score","gradient"),verb
 #' is set to be TRUE.
 #' @return A matrix with the following three columns:
 #' \itemize{
-#' \item \code{Chi:}{ The value of the statistic of the test.}
-#' \item \code{Df:}{ The number of degrees of freedom.}
+#' \item \code{Chi:}{ The value of the statistic of the test,}
+#' \item \code{Df:}{ The number of degrees of freedom,}
 #' \item \code{Pr(>Chi):}{ The \emph{p}-value of the test \emph{test} computed using the Chi-square distribution.}
 #' }
 #' @method anova zeroinflation
@@ -2606,7 +2524,7 @@ cooks.distance.zeroinflation <- function(model, submodel=c("counts","zeros","ful
 #' \code{Upper limit} \tab the quantile (1 + \code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
 #'                    \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
 #' \tab \cr
-#' \code{Residuals}\tab the observed \code{type}-type residuals,\cr
+#' \code{Residuals}\tab the observed \code{type}-type residuals.\cr
 #' }
 #' @details The simulated envelope is builded by simulating \code{rep} independent realizations of the response variable for each
 #' individual, which is accomplished taking into account the following: (1) the model assumption about the distribution of
@@ -2642,12 +2560,19 @@ envelope.zeroinflation <- function(object, rep=20, conf=0.95, type=c("quantile",
   rep <- max(1,floor(abs(rep)))
   e <- matrix(0,n,rep)
   bar <- txtProgressBar(min=0, max=rep, initial=0, width=min(50,rep), char="+", style=3)
+  X1 <- model.matrix(object,submodel="counts")
+  X2 <- model.matrix(object,submodel="zeros")
+  familia <- paste0(object$family$counts$family,"(",object$family$counts$link,")")
   i <- 1
   while(i <= rep){
-    if(object$type=="Zero-inflation") resp <- ifelse(runif(n) <= pi,0,rnbinom(n,mu=mu,size=1/(phi*mu^tau)))
-    else resp <- ifelse(runif(n) <= pi,0,qnbinom(p0 + (1-p0)*runif(n),mu=mu,size=1/(phi*mu^tau)))
-    fits <- try(update(object,formula=resp ~ .,start=list(counts=coef(object),zeros=coef(object,submodel="zeros")),
-                       data=data.frame(object$model,resp=resp)),silent=TRUE)
+    if(object$type=="Zero-inflation"){
+      resp <- ifelse(runif(n) <= pi,0,rnbinom(n,mu=mu,size=1/(phi*mu^tau)))
+      fits <- try(zeroinf(resp ~ -1 + X1 + offset(object$offset$counts)|-1 + X2 + offset(object$offset$zeros),start=list(counts=coef(object),zeros=coef(object,submodel="zeros")),family=familia,zero.link=object$family$zeros$link,weights=object$prior.weights),silent=TRUE)
+    }
+    else{
+      resp <- ifelse(runif(n) <= pi,0,qnbinom(p0 + (1-p0)*runif(n),mu=mu,size=1/(phi*mu^tau)))
+      fits <- try(zeroalt(resp ~ -1 + X1 + offset(object$offset$counts)|-1 + X2 + offset(object$offset$zeros),start=list(counts=coef(object),zeros=coef(object,submodel="zeros")),family=familia,zero.link=object$family$zeros$link,weights=object$prior.weights),silent=TRUE)
+    }
     if(is.list(fits)){
       if(fits$converged==TRUE){
         rs <- residuals(fits,type=type,plot.it=FALSE)
@@ -2752,7 +2677,7 @@ envelope.overglm <- function(object, rep=25, conf=0.95, type=c("quantile","respo
   type <- match.arg(type)
   mu <- object$fitted.values
   n <- length(mu)
-  p <- object$params[1]
+  p <- object$parms[1]
   if(object$parms[2] > 0) phi <- exp(object$coefficients[object$parms[1] + 1])
   if(object$family$family %in% c("nb1","nb2","nbf")){
     tau <- switch(object$family$family,nb1=0,nb2=-1,nbf=object$coefficients[object$parms[1] + 2])
@@ -2763,25 +2688,27 @@ envelope.overglm <- function(object, rep=25, conf=0.95, type=c("quantile","respo
   e <- matrix(0,n,rep)
   bar <- txtProgressBar(min=0, max=rep, initial=0, width=min(50,rep), char="+", style=3)
   i <- 1
+  X <- model.matrix(object)
+  familia <- paste0(object$family$family,"(",object$family$link,")")
   while(i <= rep){
     if(object$family$family %in% c("nb1","nb2","nbf")){
       resp. <- qnbinom(p0 + (1 - p0)*runif(n),mu=mu,size=1/(phi*mu^tau))
-      fits <- try(update(object,formula=resp. ~ .,start=coef(object),data=data.frame(object$model,resp.=resp.)),silent=TRUE)
+      fits <- try(overglm(resp. ~ -1 + X + offset(object$offset),start=coef(object),weights=object$prior.weights,zero.trunc=object$zero.trunc,family=familia),silent=TRUE)
     }
     if(object$family$family == "poi"){
       resp. <- qpois(p0 + (1 - p0)*runif(n),lambda=mu)
-      fits <- try(update(object,formula=resp. ~ .,start=coef(object),data=data.frame(object$model,resp.=resp.)),silent=TRUE)
+      fits <- try(overglm(resp. ~ -1 + X + offset(object$offset),start=coef(object),weights=object$prior.weights,zero.trunc=object$zero.trunc,family=familia),silent=TRUE)
     }
     if(object$family$family == "bb"){
       size. <- apply(object$y,1,sum); prob <- rbeta(n,shape1=mu/phi,shape2=(1 - mu)/phi)
       resp. <- rbinom(n,size=size.,prob=prob)
-      fits <- try(update(object,formula=cbind(resp.,size. - resp.) ~ .,start=coef(object),data=data.frame(object$model,resp.=resp.,size.=size.)),silent=TRUE)
+      fits <- try(overglm(cbind(resp.,size.-resp.) ~ -1 + X + offset(object$offset),start=coef(object),weights=object$prior.weights,zero.trunc=object$zero.trunc,family=familia),silent=TRUE)
     }
     if(object$family$family == "rcb"){
       phi <- exp(object$coefficients[p + 1])/(1 + exp(object$coefficients[p + 1]))
       size. <- apply(object$y,1,sum)
       resp. <- ifelse(runif(n) <= mu,rbinom(n,size=size.,prob=(1 - phi)*mu + phi),rbinom(n,size=size.,prob=(1 - phi)*mu))
-      fits <- try(update(object,formula=cbind(resp.,size. - resp.) ~ .,start=coef(object),data=data.frame(object$model,resp.=resp.,size.=size.)),silent=TRUE)
+      fits <- try(overglm(cbind(resp.,size.-resp.) ~ -1 + X + offset(object$offset),start=coef(object),weights=object$prior.weights,zero.trunc=object$zero.trunc,family=familia),silent=TRUE)
     }
     if(is.list(fits)){
       if(fits$converged==TRUE){

@@ -6,7 +6,7 @@
 \usage{
 \method{stepCriterion}{glm}(
   model,
-  criterion = c("bic", "aic", "adjr2", "p-value", "qicu"),
+  criterion = c("adjr2", "bic", "aic", "p-value", "qicu"),
   test = c("wald", "lr", "score", "gradient"),
   direction = c("forward", "backward"),
   levels = c(0.05, 0.05),
@@ -18,7 +18,7 @@
 \arguments{
 \item{model}{an object of the class \emph{glm}.}
 
-\item{criterion}{an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted deviance-based R-squared ("adjr2"), and \emph{p}-value of the \code{test} test ("p-value"). By default, \code{criterion} is set to be "bic".}
+\item{criterion}{an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted deviance-based R-squared ("adjr2"), and \emph{p}-value of the \code{test} test ("p-value"). By default, \code{criterion} is set to be "adjr2".}
 
 \item{test}{an (optional) character string indicating the statistical test which should be used to compare nested models. The available options are: Wald ("wald"), Rao's score ("score"), likelihood-ratio ("lr") and gradient ("gradient") tests. By default, \code{test} is set to be "wald".}
 
