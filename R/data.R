@@ -1,3 +1,108 @@
+#' @title amenorrhea
+#'
+#' @description A total of 1151 women completed menstrual diaries and
+#' the diary data were used to generate binary sequence for each woman,
+#' indicating whether or not she had experienced amenorrhea (the
+#' absence of menstrual bleeding for a specified number of days) on
+#' the day of randomization and three additional 90-day intervals. The
+#' goal of this trial was to compare the two treatments (100 mg or 150
+#' mg of depot-medroxyprogesterone acetate (DMPA)) in terms of how the
+#' rates of amenorrhea change over time with continued use of the
+#' contraceptive method.
+#'
+#' @docType data
+#'
+#' @usage data(amenorrhea)
+#'
+#' @format A data frame with 4604 rows and 4 variables:
+#' \describe{
+#'   \item{ID}{a numeric vector indicating the woman's ID.}
+#'   \item{Dose}{a factor with two levels: "100mg" for treatment with 100 mg injection; and "150mg" for treatment with 150 mg injection.}
+#'   \item{Time}{a numeric vector indicating the number of 90-day intervals since the trial beagn.}
+#'   \item{amenorrhea}{a numeric vector indicating the amenorrhea status (1 for amenorrhea; 0 otherwise).}
+#' }
+#' @keywords datasets
+#' @references Fitzmaurice G.M., Laird N.M., Ware J.H. (2011, page 397). \emph{Applied Longitudinal Analysis. 2nd ed.} John Wiley & Sons.
+#' @references Machin D., Farley T.M., Busca B., Campbell M.J., d'Arcangues C. (1988) Assessing
+#' changes in vaginal bleeding patterns in contracepting women. \emph{Contraception}, 38, 165-79.
+#' @examples
+#' data(amenorrhea)
+#' dev.new()
+#' amenorrhea2 <- aggregate(amenorrhea ~ Time + Dose,mean,data=amenorrhea,na.rm=TRUE)
+#' barplot(100*amenorrhea ~ Dose+Time,data=amenorrhea2,beside=TRUE,col=c("blue","yellow"),ylab="%")
+#' legend("topleft",legend=c("100 mg","150 mg"),fill=c("blue","yellow"),title="Dose",bty="n")
+"amenorrhea"
+#'
+#' @title ldh
+#'
+#' @description The data consists of the proportion of lactic dehydrogenase
+#' enzyme leakage obtained as a response of hepatocyte cell toxicity to the
+#' effects of different combinations of carbon tetrachloride (CCl4) and
+#' chloroform (CHCl3). Thus, the main objective of the data analysis is to
+#' evaluate the effects of CCl4, CHCl3 and their interactions on the
+#' response.
+#'
+#' @docType data
+#'
+#' @usage data(ldh)
+#'
+#' @format A data frame with 448 rows and 5 variables:
+#' \describe{
+#'   \item{LDH}{a numeric vector indicating the proportion of lactic dehydrogenase enzyme leakage, a surrogate for cell toxicity.}
+#'   \item{CCl4}{a numeric vector indicating the carbon tetrachloride at 0, 1, 2.5 and 5 mM.}
+#'   \item{CHCl3}{a numeric vector indicating the chloroform at 0, 5, 10 and 25 mM.}
+#'   \item{Flask}{a numeric vector indicating the flask of isolated hepatocyte suspensions.}
+#'   \item{Time}{a numeric vector indicating the time at 0, 0.01, 0.25, 0.50, 1, 2 and 3 hours.}
+#' }
+#' @keywords datasets
+#' @examples
+#' data(ldh)
+#' opt <- unique(ldh$CCl4)
+#' dev.new()
+#' par(mfrow=c(1,length(opt)))
+#' for(i in 1:length(opt))
+#' boxplot(LDH ~ Time, data=subset(ldh,CCl4==opt[i]), ylim=c(0,0.8), main=paste("CCl4=",opt[i]))
+#'
+#' dev.new()
+#' opt <- unique(ldh$CHCl3)
+#' par(mfrow=c(1,length(opt)))
+#' for(i in 1:length(opt))
+#' boxplot(LDH ~ Time, data=subset(ldh,CHCl3==opt[i]), ylim=c(0,0.8), main=paste("CHCl3=",opt[i]))
+#'
+#' @source Gennings, C., Chinchilli, V.M., Carter, W.H. (1989). Response
+#' Surface Analysis with Correlated Data: A Nonlinear Model Approach.
+#' \emph{Journal of the American Statistical Association}, 84, 805–809.
+#' @references Vonesh, E.F. (2012) Generalized Linear and Nonlinear Models
+#' for Correlated Data: Theory and Applications Using SAS.
+#' \emph{Cary, NC: SAS Institute Inc}.
+"ldh"
+#'
+#' @title Oranges
+#'
+#' @description The data arose from five orange trees grown at Riverside,
+#' California, during the period 1969-1973. The response is the trunk
+#' circumference, in millimeters, and the predictor variable is the time,
+#' in days, with an arbitrary origin taken on December 31, 1968.
+#'
+#' @docType data
+#'
+#' @usage data(Oranges)
+#'
+#' @format A data frame with 35 rows and 3 variables:
+#' \describe{
+#'   \item{Trunk}{a numeric vector indicating the trunk circumference, in millimeters.}
+#'   \item{Days}{a numeric vector indicating the time, in days, since December 31, 1968.}
+#'   \item{Tree}{a numeric vector with the identifier of each orange tree.}
+#' }
+#' @keywords datasets
+#' @examples
+#' dev.new()
+#' data(Oranges)
+#' with(Oranges,plot(Days, Trunk, pch=16, col="blue"))
+#' @references Draper N., Smith H. (1998) Applied Regression Analysis, Third Edition. \emph{John Wiley & Sons}.
+"Oranges"
+#'
+#'
 #' @title Seizures
 #'
 #' @description The dataset reports the number of epileptic seizures in each
@@ -19,6 +124,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#' dev.new()
 #' data(Seizures)
 #' boxplot(seizures ~ treatment:time, data=Seizures, ylim=c(0,25), col=c("blue","yellow"))
 #' @source Thall P.F., Vail S.C. (1990) Some covariance models for longitudinal count data with overdispersion. \emph{Biometrics} 46:657–671.
@@ -44,6 +150,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#' dev.new()
 #' data(fabric)
 #' with(fabric,plot(roll, faults, pch=16, xlab="Length of roll", ylab="Number of faults"))
 #' @references Hinde J., Demetrio C.G.B. (1998) Over-dispersion: models and estimation. \emph{Computational Statistics & Data Analysis} 27:151–170.
@@ -70,6 +177,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#' dev.new()
 #' data(coupons)
 #' barplot(100*redeemed/costumers ~ discounts, data=coupons, xlab="Discount price",
 #'         ylab="(%) Redeemed coupons", col="blue")
@@ -94,6 +202,7 @@
 #' }
 #' @keywords datasets
 #' @examples
+#' dev.new()
 #' data(Steel)
 #' with(Steel,plot(log(stress), log(life), pch=16, xlab="Log(Stress)", ylab="log(Life)"))
 #' @references McCool J. (1980) Confidence limits for Weibull regression with censored data. \emph{ Transactions on Reliability} 29:145-150.
@@ -120,7 +229,12 @@
 #' @source \url{https://www.statlearning.com/s/Advertising.csv}
 #' @examples
 #' data(advertising)
-#' pairs(~ sales + TV + radio + newspaper, pch=20, data = advertising)
+#' breaks <- with(advertising,quantile(radio,probs=c(0:3)/3))
+#' labels <- c("low","mid","high")
+#' advertising2 <- within(advertising,radioC <- cut(radio,breaks,labels,include.lowest=TRUE))
+#' dev.new()
+#' with(advertising2,plot(TV,sales,pch=16,col=as.numeric(radioC)))
+#' legend("topleft",legend=c("low","mid","high"),fill=c(1:3),title="Radio",bty="n")
 #' @references James G., Witten D., Hastie T., Tibshirani R. (2013, page 15) \emph{An Introduction to Statistical Learning with Applications in R}, Springer, New York.
 "advertising"
 #'
@@ -147,8 +261,10 @@
 #' @source \url{https://www.itl.nist.gov/div898/handbook/pmd/section6/pmd621.htm}
 #' @examples
 #' data(pipeline)
-#' with(pipeline, plot(Lab,Field,pch=20,
-#'                     xlab="In-laboratory measurements",ylab="In-field measurements"))
+#' dev.new()
+#' xlab <- "In-laboratory measurements"
+#' ylab <- "In-field measurements"
+#' with(pipeline,plot(Lab,Field,pch=20,xlab=xlab,ylab=ylab))
 #' @references Weisberg S. (2005). \emph{Applied Linear Regression}, 3rd edition. Wiley, New York.
 "pipeline"
 #'
@@ -174,8 +290,10 @@
 #' @source https://sada2013.sciencesconf.org/16138/glmSession4_Cotonou.pdf
 #' @examples
 #' data(dilution)
-#' with(dilution,plot(Dilution,Count,pch=20,xlab="Dilution volume",
-#'                    ylab="Count of virus particles"))
+#' xlab <- "Dilution volume"
+#' ylab <- "Count of virus particles"
+#' dev.new()
+#' with(dilution,plot(Dilution,Count,pch=20,xlab=xlab,ylab=ylab))
 "dilution"
 #'
 #' @title Mammal brain and body weights
@@ -196,8 +314,10 @@
 #' @keywords datasets
 #' @examples
 #' data(brains)
-#' with(brains, plot(log(BodyWt),log(BrainWt),pch=20,
-#'              xlab="log(Body Weight)",ylab="log(Brain Weight)"))
+#' xlab <- "log(Body Weight)"
+#' ylab <- "log(Brain Weight)"
+#' dev.new()
+#' with(brains,plot(log(BodyWt),log(BrainWt),pch=20,xlab=xlab,ylab=ylab))
 #' @references Allison T., Cicchetti D. (1976). Sleep in mammals: Ecology and constitutional correlates. \emph{Science} 194:732-734.
 #' @references Weisberg S. (2005). \emph{Applied Linear Regression}, 3rd edition. Wiley, New York.
 "brains"
@@ -230,15 +350,16 @@
 #' @keywords datasets
 #' @examples
 #' data(rinse)
-#' boxplot(score ~ time, data=subset(rinse,rinse=="Placebo"), at=c(1:3)-0.2,
-#'  ylim=c(0,3.3), col="yellow", boxwex=0.15, outline=FALSE, xaxt="n", xlim=c(0.8,3.2))
+#' dev.new()
+#' boxplot(score ~ time, data=subset(rinse,rinse=="Placebo"),ylim=c(0,3.5),
+#'         at=c(1:3)-0.2, col="yellow", xaxt="n", boxwex=0.15)
 #' boxplot(score ~ time, data=subset(rinse,rinse=="A"), add=TRUE,
-#'         at=c(1:3), col="gray", boxwex=0.15, outline=FALSE, xaxt="n")
+#'         at=c(1:3), col="gray", xaxt="n", boxwex=0.15)
 #' boxplot(score ~ time, data=subset(rinse,rinse=="B"), add=TRUE,
-#'         at=c(1:3)+0.2, col="blue", boxwex=0.15, outline=FALSE, xaxt="n")
-#' axis(1, at=1:3, labels=unique(rinse$time))
-#' legend(0.7, 1, legend=c("Placebo","A","B"), fill=c("yellow","gray","blue"),
-#'        bty="n", cex=0.6)
+#'         at=c(1:3) + 0.2, col="blue", xaxt="n", boxwex=0.15)
+#' axis(1, at=c(1:3), labels=unique(rinse$time))
+#' legend("bottomleft",legend=c("placebo","rinse A","rinse B"),
+#'        title="Treatment",fill=c("yellow","gray","blue"),bty="n")
 #' @references Hadgu A., Koch G. (1999) Application of generalized estimating equations
 #' to a dental randomized clinical trial. \emph{Journal of Biopharmaceutical Statistics} 9:161-178.
 "rinse"
@@ -268,13 +389,14 @@
 #' @keywords datasets
 #' @examples
 #' data(Trajan)
+#' dev.new()
 #' boxplot(roots ~ bap, data=subset(Trajan,photoperiod=="8"), at=c(1:4) - 0.15,
-#'     col="blue", boxwex=0.2, outline=FALSE, xaxt="n", xlim=c(0.7,4.3), ylim=c(-0.5,17))
-#' boxplot(roots ~ bap, data=subset(Trajan,photoperiod=="16"), add=TRUE, at=c(1:4) + 0.15,
-#'     col="yellow", boxwex=0.2, outline=FALSE, xaxt="n")
-#' axis(1, at=1:4, labels=levels(Trajan$bap))
-#' legend(0, 18, legend=c("8","16"), title="Photoperiod", bty="n", ncol=1,
-#'     fill=c("blue","yellow"), cex=0.6, x.intersp=0.2, y.intersp=1)
+#'         col="blue", boxwex=0.2, xaxt="n", ylim=c(-0.5,17))
+#' boxplot(roots ~ bap, data=subset(Trajan,photoperiod=="16"), add=TRUE,
+#'         at=c(1:4) + 0.15, col="yellow", boxwex=0.2, xaxt="n")
+#' axis(1, at=c(1:4), labels=levels(Trajan$bap))
+#' legend("topright", legend=c("8","16"), title="Photoperiod", bty="n",
+#'        fill=c("blue","yellow"))
 #'
 #' @references Ridout M., Demétrio C.G., Hinde J. (1998). Models for count data with many zeros. In
 #' \emph{Proceedings of the XIXth international biometric conference}, 179–192.
@@ -314,7 +436,8 @@
 #' @keywords datasets
 #' @examples
 #' data(uti)
-#' uti2 <- within(uti,cd4C <- cut(log(cd4),4,labels=c("Low","Mid-Low","Mid-High","High")))
+#' dev.new()
+#' uti2 <- within(uti,cd4C <- cut(log(cd4),4,labels=c("low","mid-low","mid-high","high")))
 #' out <- aggregate(cbind(episodes,time) ~ cd4C, sum, data=uti2)
 #' barplot(12*episodes/time ~ cd4C, beside=TRUE, data=out, col="red",
 #'         xlab="CD4+ cell count", ylab="Number of UTIs per year")
@@ -363,10 +486,11 @@
 #' @examples
 #' data(cholecystectomy)
 #' out <- aggregate(pain2 ~ treatment + time, data=cholecystectomy, mean)
+#' dev.new()
 #' barplot(100*pain2 ~ treatment + time, beside=TRUE, data=out, xlab="Time",
-#'         col=c("yellow","blue"), ylab="% of patients with \"low\" pain")
-#' legend(-1, 98, c("Placebo","Abdominal\n suction"), fill=c("yellow","blue"),
-#'        bty="n", cex=0.6, x.intersp=0.2, y.intersp=1)
+#'         col=c("yellow","blue"), ylab="% of patients with low pain")
+#' legend("topleft", c("Placebo","Abdominal suction"), fill=c("yellow","blue"),
+#'        title="Treatment", cex=0.9, bty="n")
 #'
 #' @references Jorgensen J.O., Gillies R.B., Hunt D.R., Caplehorn J.R.M., Lumley T. (1995)
 #' A simple and effective way to reduce postoperative pain after laparoscopic cholecystectomy.
@@ -404,10 +528,10 @@
 #' @examples
 #' data(orobanche)
 #' out <- aggregate(cbind(germinated,seeds) ~ extract + specie, data=orobanche, sum)
+#' dev.new()
 #' barplot(100*germinated/seeds ~ extract + specie, beside=TRUE, data=out, width=0.3,
 #'         col=c("yellow","blue"), xlab="Specie", ylab="% of germinated seeds")
-#' legend(0.3, 70, c("Bean","Cucumber"), fill=c("yellow","blue"), bty="n",
-#'        cex=0.6, x.intersp=0.2, y.intersp=1)
+#' legend("topleft",c("Bean","Cucumber"),fill=c("yellow","blue"),title="Extract",bty="n")
 #'
 #' @references Crowder M.J. (1978) Beta-binomial anova for proportions. \emph{Journal of the Royal Statistical Society.
 #' Series C (Applied Statistics)} 27:34-37.
@@ -477,14 +601,16 @@
 #' @keywords datasets
 #' @examples
 #' data(spruces)
-#' boxplot(size ~ days, data=subset(spruces,treat=="normal"), at=c(1:13)-0.2,
-#'         col="yellow", boxwex=0.3, outline=FALSE, xaxt="n", xlim=c(0.9,13.1))
+#' dev.new()
+#' boxplot(size ~ days, data=subset(spruces,treat=="normal"), at=c(1:13) - 0.2,
+#'         col="yellow", boxwex=0.3, xaxt="n", xlim=c(0.9,13.1))
 #' boxplot(size ~ days, data=subset(spruces,treat=="ozone-enriched"), add=TRUE,
-#'         at=c(1:13)+0.2, col="blue", boxwex=0.3, outline=FALSE, xaxt="n")
-#' axis(1, at=1:13, labels=unique(spruces$days))
-#' axis(2, at=seq(0,1500,250), labels=seq(0,1500,250))
-#' legend(0.3, 1500, legend=c("normal","ozone-enriched"), fill=c("yellow","blue"),
-#'        bty="n", cex=0.7, x.intersp=0.2, y.intersp=1)
+#'         at=c(1:13) + 0.2, col="blue", boxwex=0.3, xaxt="n")
+#' axis(1, at=c(1:13), labels=unique(spruces$days))
+#' axis(2, at=seq(0,2000,250), labels=seq(0,2000,250))
+#' legend("topleft", legend=c("normal","ozone-enriched"), fill=c("yellow","blue"),
+#'        title="Atmosphere", bty="n")
+#'
 #' @references Diggle P.J., Heagarty P., Liang K.-Y., Zeger S.L. (2002) \emph{Analysis of Longitudinal Data}. Oxford University Press, Oxford.
 #' @references Crainiceanu C.M., Ruppert D., Wand M.P. (2005). Bayesian Analysis for Penalized Spline Regression Using WinBUGS. \emph{Journal of Statistical Software} 14(14):1-24.
 "spruces"
@@ -511,10 +637,11 @@
 #' @keywords datasets
 #' @examples
 #' data(cellular)
+#' dev.new()
 #' barplot(100*cells/200 ~ ifn + tnf, beside=TRUE, data=cellular, col=terrain.colors(4),
 #'         xlab="Dose of TNF", ylab="% of cells with markers of differentiation")
-#' legend(-3, 97, c("0","4","20","100"), fill=terrain.colors(4), bty="n", cex=0.9,
-#'        title="Dose of IFN", x.intersp=0.2, y.intersp=1)
+#' legend("topleft", legend=c("0","4","20","100"), fill=terrain.colors(4),
+#'        title="Dose of IFN", bty="n")
 #' @references Piegorsch W.W., Weinberg C.R., Margolin B.H. (1988) Exploring
 #' simple independent action in multifactor tables of proportions. \emph{Biometrics} 44:595-603.
 #'
@@ -549,14 +676,15 @@
 #' @keywords datasets
 #' @examples
 #' data(ossification)
-#' boxplot(100*fetuses/litter ~ pht, data=subset(ossification, tcpo=="0 mg/kg"),
-#'         at=c(1:2)-0.2, col="yellow", boxwex=0.25, outline=FALSE, xaxt="n",
+#' dev.new()
+#' boxplot(100*fetuses/litter ~ pht, data=subset(ossification,tcpo=="0 mg/kg"),
+#'         at=c(1:2) - 0.2, col="yellow", boxwex=0.25, xaxt="n",
 #'         xlab="Dose of PHT", ylab="% of fetuses showing ossification")
-#' boxplot(100*fetuses/litter ~ pht, data=subset(ossification, tcpo=="100 mg/kg"),
-#'         add=TRUE, at=c(1:2)+0.2, col="blue", boxwex=0.25, outline=FALSE, xaxt="n")
-#' axis(1, at=1:2, labels=levels(ossification$pht))
-#' legend(0.1, 20, legend=c("0 mg/kg","100 mg/kg"), fill=c("yellow","blue"),
-#'        bty="n", cex=0.7, x.intersp=0.2, y.intersp=1)
+#' boxplot(100*fetuses/litter ~ pht, data=subset(ossification,tcpo=="100 mg/kg"),
+#'         add=TRUE, at=c(1:2) + 0.2, col="blue", boxwex=0.25, xaxt="n")
+#' axis(1, at=c(1:2), labels=levels(ossification$pht))
+#' legend("bottomleft", legend=c("0 mg/kg","100 mg/kg"), fill=c("yellow","blue"),
+#'        title="Dose of TCPO", bty="n", cex=0.9)
 #' @references Morel J.G., Neerchal N.K. (1997) Clustered binary logistic regression in teratology data
 #' using a finite mixture distribution. \emph{Statistics in Medicine} 16:2843-2853.
 #'
@@ -588,13 +716,14 @@
 #' @keywords datasets
 #' @examples
 #' data(swimmers)
+#' dev.new()
 #' boxplot(infections ~ frequency, data=subset(swimmers,location=="non-beach"),
-#'         at=c(1:2)-0.2, col="yellow", boxwex=0.25, outline=FALSE, xaxt="n")
+#'         at=c(1:2) - 0.2, col="yellow", boxwex=0.25, xaxt="n")
 #' boxplot(infections ~ frequency, data=subset(swimmers,location=="beach"), add=TRUE,
-#'         at=c(1:2)+0.2, col="blue", boxwex=0.25, outline=FALSE, xaxt="n")
-#' axis(1, at=1:2, labels=levels(swimmers$frequency))
-#' legend(0.2, 6.3, legend=c("non-beach","beach"), fill=c("yellow","blue"),
-#'         bty="n", cex=0.7, x.intersp=0.2, y.intersp=1)
+#'         at=c(1:2) + 0.2, col="blue", boxwex=0.25, xaxt="n")
+#' axis(1, at=c(1:2), labels=levels(swimmers$frequency))
+#' legend("topleft", title="Location",legend=c("non-beach","beach"),
+#'        fill=c("yellow","blue"),bty="n")
 #' @references Hand D.J., Daly F., Lunn A.D., McConway K.J., Ostrowsky E. (1994)
 #' \emph{A Handbook of Small Data Sets}, Chapman and Hall, London.
 #'
@@ -627,6 +756,7 @@
 #' @keywords datasets
 #' @examples
 #' data(mammary)
+#' dev.new()
 #' boxplot(tumors ~ group, data=mammary, outline=FALSE, xlab="Group",
 #'         ylab="Number of tumors", col=c("yellow","blue"))
 #' @references Lawless J.F. (1987) Regression Methods for Poisson Process Data. \emph{Journal of the American
@@ -654,18 +784,13 @@
 #' @keywords datasets
 #' @examples
 #' data(richness)
-#' with(richness,{
-#'   plot(Biomass, Species,
-#'        col=apply(as.matrix(pH),1,function(x) switch(x,"low"="red","mid"="black","high"="blue")),
-#'        pch=apply(as.matrix(pH),1,function(x) switch(x,"low"=15,"mid"=16,"high"=17)))
-#'   legend(8.2, 43, legend=c("low","mid","high"), col=c("red","black","blue"),
-#'          pch=c(15,16,17), bty="n", cex=0.8, title="pH level")
-#' })
+#' dev.new()
+#' with(richness,plot(Biomass,Species,col=as.numeric(pH),pch=16))
+#' legend("topright", legend=c("low","mid","high"), col=c(1:3), pch=16,
+#'        title="pH level", bty="n")
 #' @references Crawley M.J. (2007) \emph{The R Book}. John Wiley & Sons, Chichester.
 "richness"
-
-
-
+#'
 #' @title Hill races in Scotland
 #'
 #' @description Each year the Scottish Hill Runners Association publishes a list of
@@ -688,21 +813,17 @@
 #' @keywords datasets
 #' @examples
 #' data(races)
-#' races2 <- within(races,cli <- cut(cclimb, include.lowest=TRUE,
-#'                                   breaks=quantile(cclimb, probs=c(0:2)/2),
-#'                                   labels=c("low","high")))
-#' with(races2,{
-#'     plot(log(distance), log(rtime),
-#'          col=apply(as.matrix(cli),1,function(x) switch(x,"low"="red","high"="blue")),
-#'          pch=apply(as.matrix(cli),1,function(x) switch(x,"low"=15,"high"=16)))
-#'     legend(0.7, 5.4, legend=c("low","high"), title="Cumulative climb", col=c("red","blue"),
-#'            pch=c(15,16), bty="n", x.intersp=0.2, y.intersp=1)
-#' })
+#' breaks <- with(races,quantile(cclimb,probs=c(0:2)/2))
+#' labels <- c("low","high")
+#' races2 <- within(races,cli <- cut(cclimb,include.lowest=TRUE,breaks,labels))
+#' dev.new()
+#' with(races2,plot(log(distance),log(rtime),pch=16,col=as.numeric(cli)))
+#' legend("topleft", legend=c("low","high"), title="Cumulative climb",
+#'        col=c(1:2), pch=16, bty="n")
 #' @references Agresti A. (2015) \emph{Foundations of Linear and Generalized Linear Models}.
 #' John Wiley & Sons, New Jersey.
 "races"
-
-
+#'
 #' @title Bladder cancer in mice
 #'
 #' @description Female mice were continuously fed dietary concentrations of
@@ -725,6 +846,7 @@
 #' @seealso \link{liver}
 #' @examples
 #' data(bladder)
+#' dev.new()
 #' barplot(100*cancer/exposed ~ dose, beside=TRUE, data=bladder, col="red",
 #'         xlab="Dose of 2-AAF", ylab="% of mice with bladder cancer")
 #' @references Zhang H., Zelterman D. (1999) Binary Regression for Risks in Excess of
@@ -753,6 +875,7 @@
 #' @seealso \link{bladder}
 #' @examples
 #' data(liver)
+#' dev.new()
 #' barplot(100*cancer/exposed ~ dose, beside=TRUE, data=liver, col="red",
 #'         xlab="Dose of 2-AAF", ylab="% of mice with liver cancer")
 #' @references Zhang H., Zelterman D. (1999) Binary Regression for Risks in Excess of Subject-Specific Thresholds. \emph{Biometrics} 55:1247-1251.
@@ -779,10 +902,12 @@
 #' @keywords datasets
 #' @examples
 #' data(skincancer)
-#' barplot(1000*cases/population ~ city + age, beside=TRUE,
-#'         col=c("yellow","blue"), data=skincancer)
-#' legend(1.5, 8.5, legend=c("St.Paul","Ft.Worth"), title="City",
-#'        fill=c("yellow","blue"), bty="n", cex=0.9)
+#' dev.new()
+#' barplot(1000*cases/population ~ city + age, beside=TRUE, col=c("yellow","blue"),
+#'         data=skincancer)
+#' legend("topleft", legend=c("St.Paul","Ft.Worth"), title="City",
+#'        fill=c("yellow","blue"), bty="n")
+#'
 #'
 #' @references Kleinbaum D., Kupper L., Nizam A., Rosenberg E.S. (2013) \emph{Applied Regression Analysis and
 #' other Multivariable Methods, Fifth Edition}, Cengage Learning, Boston.
@@ -806,6 +931,7 @@
 #' @keywords datasets
 #' @examples
 #' data(aucuba)
+#' dev.new()
 #' barplot(lesions ~ time, col="red", data=aucuba)
 #'
 #' @references Snedecor G.W., Cochran W.G. (1989) \emph{Statistical Methods, Eight Edition}, Iowa State University Press, Ames.
@@ -831,24 +957,54 @@
 #' @format A data frame with 427 rows and 5 variables:
 #' \describe{
 #'   \item{subj}{ a numeric vector giving the identifier of each woman.}
-#'   \item{group}{ a factor giving the received treatment: "placebo" or "estrogen".}
+#'   \item{group}{ a factor giving the received treatment: "placebo" or "oestrogen".}
 #'   \item{visit}{ a numeric vector giving the number of months since the treatment began, where -1 indicates the pretreatment assessment of the EDPS.}
 #'   \item{dep}{ a numeric vector giving the value of the EDPS.}
 #'   \item{depressd}{ a numeric vector coded as 1 when the value of the EDPS is greater than or equal to 11 and coded as 0 in other cases.}
 #' }
 #' @keywords datasets
 #' @examples
-#'  data(depression)
-#'  boxplot(dep ~ visit, data=subset(depression,group=="placebo"), at=c(0:6)-0.2,
-#'          col="yellow", boxwex=0.3, outline=FALSE, xaxt="n", ylab="EDPS",
-#'          xlab="Months since the treatment began", ylim=range(na.omit(depression$dep)))
-#'  boxplot(dep ~ visit, data=subset(depression,group=="estrogen"), add=TRUE,
-#'          at=c(0:6)+0.2, col="blue", boxwex=0.3, outline=FALSE, xaxt="n")
-#'  axis(1, at=0:6, labels=c(-1,1:6))
-#'  legend(5, 29, legend=c("placebo","estrogen"), fill=c("yellow","blue"),
-#'         bty="n", x.intersp=0.2, y.intersp=1)
+#' data(depression)
+#' dev.new()
+#' boxplot(dep ~ visit, data=subset(depression,group=="placebo"), at=c(0:6) - 0.2,
+#'         col="yellow", boxwex=0.3, xaxt="n", ylim=range(na.omit(depression$dep)),
+#'         xlab="Months since the treatment began", ylab="EDPS")
+#' boxplot(dep ~ visit, data=subset(depression,group=="oestrogen"), add=TRUE,
+#'         at=c(0:6) + 0.2, col="blue", boxwex=0.3, xaxt="n")
+#' axis(1, at=c(0:6), labels=c(-1,1:6))
+#' legend("bottomleft", legend=c("placebo","oestrogen"), fill=c("yellow","blue"),
+#'        title="Treatment", bty="n")
 #'
 #' @source \url{https://stats.oarc.ucla.edu/spss/library/spss-librarypanel-data-analysis-using-gee/}
 #' @references Gregoire A.J.P., Kumar R., Everitt B., Henderson A.F., Studd, J.W.W. (1996) Transdermal oestrogen for treatment of severe postnatal depression,
 #' \emph{The Lancet} 347:930-933.
 "depression"
+
+#' @title Shelf life of a photographic developer
+#'
+#' @description These data arise from an experiment using accelerated
+#' life testing to determine the estimated shelf life of a photographic
+#' developer. The maximum density as well as the temperature seem to
+#' be good indicators of overall developer/film performance.
+#'
+#' @docType data
+#'
+#' @usage data(shelflife)
+#'
+#' @format A data frame with 21 rows and 3 variables:
+#' \describe{
+#'   \item{Time}{ a numeric vector giving the shelf life, in hours.}
+#'   \item{Temp}{ a factor giving the temperature, in degrees celsius.}
+#'   \item{Dmax}{ a numeric vector giving the maximum density.}
+#' }
+#' @keywords datasets
+#' @examples
+#' data(shelflife)
+#' dev.new()
+#' with(shelflife,plot(Dmax, Time, pch=16, col=as.numeric(Temp)))
+#' legend("topright", legend=c("72C","82C","92C"), col=c(1:3), pch=16,
+#'        title="Temperature", bty="n")
+#'
+#' @references Chapman, R.E. (1997) Degradation study of a photographic developer to determine shelf life,
+#' \emph{Quality Engineering} 10:1, 137-140.
+"shelflife"

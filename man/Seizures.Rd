@@ -27,6 +27,7 @@ of four two-week intervals, and in a baseline eight-week inverval, for
 Progabide treatment and placebo groups with a total of 59 individuals.
 }
 \examples{
+dev.new()
 data(Seizures)
 boxplot(seizures ~ treatment:time, data=Seizures, ylim=c(0,25), col=c("blue","yellow"))
 }

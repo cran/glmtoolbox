@@ -24,7 +24,7 @@
 #'
 #' ###### Example 2: Hill races in Scotland
 #' data(races)
-#' fit2 <- glm(rtime ~ log(distance) + log(cclimb), family=Gamma("log"), data=races,
+#' fit2 <- glm(rtime ~ log(distance) + log(cclimb), family=Gamma(log), data=races,
 #'             control=list(trace=TRUE))
 #' FisherScoring(fit2)
 #'
@@ -47,6 +47,12 @@
 #'             control=list(trace=TRUE))
 #' FisherScoring(fit5)
 #'
+#' ###### Example 6: Advertising
+#' data(advertising)
+#' fit6 <- glm(sales ~ log(TV) + radio + log(TV)*radio, family=gaussian(log), data=advertising,
+#'             control=list(trace=TRUE))
+#' FisherScoring(fit6)
+#'
 #' @export FisherScoring
 FisherScoring <- function(object,verbose=TRUE,digits=10){
   options(warn=-1)
@@ -61,6 +67,7 @@ FisherScoring <- function(object,verbose=TRUE,digits=10){
   if(is.null(mustart)){
     if(is.null(etastart)){
       if(is.null(start)){
+        family <- object$family
         eval(object$family$initialize)
         mu <- mustart
         eta <- object$family$linkfun(mu)
@@ -175,7 +182,10 @@ adjR2.glm <- function(...,digits=4,verbose=TRUE){
   }
   rownames(out_) <- as.character(call.[2:(length(x) + 1)])
   colnames(out_) <- c("Deviance","R-squared","df","adj.R-squared")
-  if(length(x)==1) out_ <- out_[1,4]
+  if(length(x)==1){
+    out_ <- as.numeric(out_[1,4])
+    verbose <- FALSE
+  }
   if(verbose) print(out_)
   return(invisible(out_))
 }
@@ -228,7 +238,10 @@ adjR2.lm <- function(...,digits=4,verbose=TRUE){
   }
   rownames(out_) <- as.character(call.[2:(length(x) + 1)])
   colnames(out_) <- c("RSS","R-squared","df","adj.R-squared")
-  if(length(x)==1) out_ <- out_[1,4]
+  if(length(x)==1){
+    out_ <- as.numeric(out_[1,4])
+    verbose <- FALSE
+  }
   if(verbose) print(out_)
   return(invisible(out_))
 }
@@ -545,13 +558,13 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp"
   if(missingArg(scope)){
     upper <- formula(eval(model$call$formula))
     lower <- formula(eval(model$call$formula))
-    lower <- formula(paste(deparse(lower[[2]]),"~",attr(terms(lower),"intercept")))
+    lower <- formula(paste(deparse(lower[[2]]),"~",attr(terms(lower,data=eval(model$call$data)),"intercept")))
   }else{
     lower <- scope$lower
     upper <- scope$upper
   }
-  formulae <- update(upper, paste(deparse(eval(model$call$formula)[[2]]),"~ ."))
-  model <- update(model,formula=formulae)
+  #formulae <- update(upper, paste(deparse(eval(model$call$formula)[[2]]),"~ ."))
+  model <- update(model,formula=upper)
   mf <- model$model
   y <- mf[,attr(model$terms,"response")]
   if(is.null(model$offset)) offset <- matrix(0,length(y),1)	else offset <- model$offset
@@ -579,8 +592,8 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp"
     cp <- (n-p)*(sigma2/sigma20-1) + p
     return(c(aic,bic,adjr2,predr2,cp,sigma2))
   }
-  U <- unlist(lapply(strsplit(attr(terms(upper),"term.labels"),":"),function(x) paste(sort(x),collapse =":")))
-  fs <- attr(terms(upper),"factors")
+  U <- unlist(lapply(strsplit(attr(terms(upper,data=eval(model$call$data)),"term.labels"),":"),function(x) paste(sort(x),collapse =":")))
+  fs <- attr(terms(upper,data=eval(model$call$data)),"factors")
   long <- max(nchar(U)) + 2
   nonename <- paste("<none>",paste(replicate(max(long-6,0)," "),collapse=""),collapse="")
   cambio <- ""
@@ -943,7 +956,7 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp"
 #'              rgamma rpois rbinom  qqnorm dnbinom residuals pnbinom
 #'             qnbinom qpois rbeta rnbinom .getXlevels lm optim
 #' @importFrom utils setTxtProgressBar txtProgressBar
-#' @importFrom numDeriv grad hessian
+#' @importFrom numDeriv grad hessian jacobian
 #' @importFrom Rfast Digamma Lgamma
 #' @importFrom Formula Formula model.part
 #' @importFrom methods is
@@ -1906,7 +1919,7 @@ stepCriterion.glm <- function(model, criterion=c("adjr2","bic","aic","p-value","
   if(missingArg(scope)){
     upper <- formula(eval(model$call$formula))
     lower <- formula(eval(model$call$formula))
-    lower <- formula(paste(deparse(lower[[2]]),"~",attr(terms(lower),"intercept")))
+    lower <- formula(paste(deparse(lower[[2]]),"~",attr(terms(lower,data=eval(model$call$data)),"intercept")))
   }else{
     lower <- scope$lower
     upper <- scope$upper
@@ -1916,9 +1929,9 @@ stepCriterion.glm <- function(model, criterion=c("adjr2","bic","aic","p-value","
   if(!is.null(model$call$subset)) datas <- datas[eval(model$call$subset,datas),]
   datas <- na.omit(datas)
 
-  U <- attr(terms(upper),"term.labels")
+  U <- attr(terms(upper,data=datas),"term.labels")
   U <- lapply(lapply(strsplit(U,":"),sort),paste,collapse=":")
-  fs <- attr(terms(upper),"factors")
+  fs <- attr(terms(upper,data=datas),"factors")
   long <- max(nchar(U)) + 2
   nonename <- paste("<none>",paste(replicate(max(long-6,0)," "),collapse=""),collapse="")
   cambio <- ""

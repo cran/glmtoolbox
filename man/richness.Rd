@@ -22,13 +22,10 @@ three different soil pH levels: low, mid, and high. See Crawley (2007, page 534)
 }
 \examples{
 data(richness)
-with(richness,{
-  plot(Biomass, Species,
-       col=apply(as.matrix(pH),1,function(x) switch(x,"low"="red","mid"="black","high"="blue")),
-       pch=apply(as.matrix(pH),1,function(x) switch(x,"low"=15,"mid"=16,"high"=17)))
-  legend(8.2, 43, legend=c("low","mid","high"), col=c("red","black","blue"),
-         pch=c(15,16,17), bty="n", cex=0.8, title="pH level")
-})
+dev.new()
+with(richness,plot(Biomass,Species,col=as.numeric(pH),pch=16))
+legend("topright", legend=c("low","mid","high"), col=c(1:3), pch=16,
+       title="pH level", bty="n")
 }
 \references{
 Crawley M.J. (2007) \emph{The R Book}. John Wiley & Sons, Chichester.

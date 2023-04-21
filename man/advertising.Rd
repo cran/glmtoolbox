@@ -26,7 +26,12 @@ of those markets for three different media: TV, radio, and newspaper.
 }
 \examples{
 data(advertising)
-pairs(~ sales + TV + radio + newspaper, pch=20, data = advertising)
+breaks <- with(advertising,quantile(radio,probs=c(0:3)/3))
+labels <- c("low","mid","high")
+advertising2 <- within(advertising,radioC <- cut(radio,breaks,labels,include.lowest=TRUE))
+dev.new()
+with(advertising2,plot(TV,sales,pch=16,col=as.numeric(radioC)))
+legend("topleft",legend=c("low","mid","high"),fill=c(1:3),title="Radio",bty="n")
 }
 \references{
 James G., Witten D., Hastie T., Tibshirani R. (2013, page 15) \emph{An Introduction to Statistical Learning with Applications in R}, Springer, New York.

@@ -38,7 +38,7 @@ FisherScoring(fit1)
 
 ###### Example 2: Hill races in Scotland
 data(races)
-fit2 <- glm(rtime ~ log(distance) + log(cclimb), family=Gamma("log"), data=races,
+fit2 <- glm(rtime ~ log(distance) + log(cclimb), family=Gamma(log), data=races,
             control=list(trace=TRUE))
 FisherScoring(fit2)
 
@@ -60,5 +60,11 @@ data(cellular)
 fit5 <- glm(cbind(cells,200-cells) ~ tnf + ifn, family=binomial(logit), data=cellular,
             control=list(trace=TRUE))
 FisherScoring(fit5)
+
+###### Example 6: Advertising
+data(advertising)
+fit6 <- glm(sales ~ log(TV) + radio + log(TV)*radio, family=gaussian(log), data=advertising,
+            control=list(trace=TRUE))
+FisherScoring(fit6)
 
 }

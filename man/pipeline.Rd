@@ -27,8 +27,10 @@ is the response variable and the laboratory measurement is the predictor variabl
 }
 \examples{
 data(pipeline)
-with(pipeline, plot(Lab,Field,pch=20,
-                    xlab="In-laboratory measurements",ylab="In-field measurements"))
+dev.new()
+xlab <- "In-laboratory measurements"
+ylab <- "In-field measurements"
+with(pipeline,plot(Lab,Field,pch=20,xlab=xlab,ylab=ylab))
 }
 \references{
 Weisberg S. (2005). \emph{Applied Linear Regression}, 3rd edition. Wiley, New York.

@@ -21,6 +21,7 @@ were taken at each of the four values of contact stress. The response is
 the length of the time until each specimen of the hardened steel failed.
 }
 \examples{
+dev.new()
 data(Steel)
 with(Steel,plot(log(stress), log(life), pch=16, xlab="Log(Stress)", ylab="log(Life)"))
 }

@@ -25,16 +25,13 @@ the races using their differences on distance and cumulative climb. See Agresti 
 }
 \examples{
 data(races)
-races2 <- within(races,cli <- cut(cclimb, include.lowest=TRUE,
-                                  breaks=quantile(cclimb, probs=c(0:2)/2),
-                                  labels=c("low","high")))
-with(races2,{
-    plot(log(distance), log(rtime),
-         col=apply(as.matrix(cli),1,function(x) switch(x,"low"="red","high"="blue")),
-         pch=apply(as.matrix(cli),1,function(x) switch(x,"low"=15,"high"=16)))
-    legend(0.7, 5.4, legend=c("low","high"), title="Cumulative climb", col=c("red","blue"),
-           pch=c(15,16), bty="n", x.intersp=0.2, y.intersp=1)
-})
+breaks <- with(races,quantile(cclimb,probs=c(0:2)/2))
+labels <- c("low","high")
+races2 <- within(races,cli <- cut(cclimb,include.lowest=TRUE,breaks,labels))
+dev.new()
+with(races2,plot(log(distance),log(rtime),pch=16,col=as.numeric(cli)))
+legend("topleft", legend=c("low","high"), title="Cumulative climb",
+       col=c(1:2), pch=16, bty="n")
 }
 \references{
 Agresti A. (2015) \emph{Foundations of Linear and Generalized Linear Models}.

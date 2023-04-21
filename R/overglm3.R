@@ -2832,13 +2832,18 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), tes
   if(missingArg(scope)){
     upper <- formula(eval(model$call$formula))
     lower <- formula(eval(model$call$formula))
-    lower <- formula(paste(deparse(lower[[2]]),"~",attr(terms(lower),"intercept")))
+    lower <- formula(paste(deparse(lower[[2]]),"~",attr(terms(lower,data=eval(model$call$data)),"intercept")))
   }else{
     lower <- scope$lower
     upper <- scope$upper
   }
-  U <- unlist(lapply(strsplit(attr(terms(upper),"term.labels"),":"),function(x) paste(sort(x),collapse =":")))
-  fs <- attr(terms(upper),"factors")
+  if(is.null(model$call$data)) datas <- get_all_vars(upper,environment(eval(model$call$formula)))
+  else datas <- get_all_vars(upper,eval(model$call$data))
+  if(!is.null(model$call$subset)) datas <- datas[eval(model$call$subset,datas),]
+  datas <- na.omit(datas)
+
+  U <- unlist(lapply(strsplit(attr(terms(upper,data=datas),"term.labels"),":"),function(x) paste(sort(x),collapse =":")))
+  fs <- attr(terms(upper,data=datas),"factors")
   long <- max(nchar(U)) + 2
   nonename <- paste("<none>",paste(replicate(max(long-6,0)," "),collapse=""),collapse="")
   cambio <- ""

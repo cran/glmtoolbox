@@ -38,10 +38,11 @@ Lumley (1996), Morel and Nagaraj (2012, page 319).
 \examples{
 data(cholecystectomy)
 out <- aggregate(pain2 ~ treatment + time, data=cholecystectomy, mean)
+dev.new()
 barplot(100*pain2 ~ treatment + time, beside=TRUE, data=out, xlab="Time",
-        col=c("yellow","blue"), ylab="\% of patients with \"low\" pain")
-legend(-1, 98, c("Placebo","Abdominal\n suction"), fill=c("yellow","blue"),
-       bty="n", cex=0.6, x.intersp=0.2, y.intersp=1)
+        col=c("yellow","blue"), ylab="\% of patients with low pain")
+legend("topleft", c("Placebo","Abdominal suction"), fill=c("yellow","blue"),
+       title="Treatment", cex=0.9, bty="n")
 
 }
 \references{

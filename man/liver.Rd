@@ -24,6 +24,7 @@ neoplasms in the mice observed during 18 months.
 }
 \examples{
 data(liver)
+dev.new()
 barplot(100*cancer/exposed ~ dose, beside=TRUE, data=liver, col="red",
         xlab="Dose of 2-AAF", ylab="\% of mice with liver cancer")
 }

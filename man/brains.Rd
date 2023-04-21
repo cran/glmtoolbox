@@ -21,8 +21,10 @@ These data corresponds to the (average) body weight and the
 }
 \examples{
 data(brains)
-with(brains, plot(log(BodyWt),log(BrainWt),pch=20,
-             xlab="log(Body Weight)",ylab="log(Brain Weight)"))
+xlab <- "log(Body Weight)"
+ylab <- "log(Brain Weight)"
+dev.new()
+with(brains,plot(log(BodyWt),log(BrainWt),pch=20,xlab=xlab,ylab=ylab))
 }
 \references{
 Allison T., Cicchetti D. (1976). Sleep in mammals: Ecology and constitutional correlates. \emph{Science} 194:732-734.

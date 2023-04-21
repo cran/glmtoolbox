@@ -26,7 +26,9 @@ estimate the number of virus particles per unit volume.
 }
 \examples{
 data(dilution)
-with(dilution,plot(Dilution,Count,pch=20,xlab="Dilution volume",
-                   ylab="Count of virus particles"))
+xlab <- "Dilution volume"
+ylab <- "Count of virus particles"
+dev.new()
+with(dilution,plot(Dilution,Count,pch=20,xlab=xlab,ylab=ylab))
 }
 \keyword{datasets}

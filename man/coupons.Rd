@@ -24,6 +24,7 @@ the analysis is to determine if there is an effect of the price discount on
 the proportion of redeemed coupons after one month.
 }
 \examples{
+dev.new()
 data(coupons)
 barplot(100*redeemed/costumers ~ discounts, data=coupons, xlab="Discount price",
         ylab="(\%) Redeemed coupons", col="blue")

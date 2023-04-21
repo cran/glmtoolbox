@@ -28,13 +28,14 @@ See Hand et al. (1994. page 266).
 }
 \examples{
 data(swimmers)
+dev.new()
 boxplot(infections ~ frequency, data=subset(swimmers,location=="non-beach"),
-        at=c(1:2)-0.2, col="yellow", boxwex=0.25, outline=FALSE, xaxt="n")
+        at=c(1:2) - 0.2, col="yellow", boxwex=0.25, xaxt="n")
 boxplot(infections ~ frequency, data=subset(swimmers,location=="beach"), add=TRUE,
-        at=c(1:2)+0.2, col="blue", boxwex=0.25, outline=FALSE, xaxt="n")
-axis(1, at=1:2, labels=levels(swimmers$frequency))
-legend(0.2, 6.3, legend=c("non-beach","beach"), fill=c("yellow","blue"),
-        bty="n", cex=0.7, x.intersp=0.2, y.intersp=1)
+        at=c(1:2) + 0.2, col="blue", boxwex=0.25, xaxt="n")
+axis(1, at=c(1:2), labels=levels(swimmers$frequency))
+legend("topleft", title="Location",legend=c("non-beach","beach"),
+       fill=c("yellow","blue"),bty="n")
 }
 \references{
 Hand D.J., Daly F., Lunn A.D., McConway K.J., Ostrowsky E. (1994)

@@ -29,14 +29,15 @@ that is, teratogenic effects. See Morel and Nagaraj (2012, page 103).
 }
 \examples{
 data(ossification)
-boxplot(100*fetuses/litter ~ pht, data=subset(ossification, tcpo=="0 mg/kg"),
-        at=c(1:2)-0.2, col="yellow", boxwex=0.25, outline=FALSE, xaxt="n",
+dev.new()
+boxplot(100*fetuses/litter ~ pht, data=subset(ossification,tcpo=="0 mg/kg"),
+        at=c(1:2) - 0.2, col="yellow", boxwex=0.25, xaxt="n",
         xlab="Dose of PHT", ylab="\% of fetuses showing ossification")
-boxplot(100*fetuses/litter ~ pht, data=subset(ossification, tcpo=="100 mg/kg"),
-        add=TRUE, at=c(1:2)+0.2, col="blue", boxwex=0.25, outline=FALSE, xaxt="n")
-axis(1, at=1:2, labels=levels(ossification$pht))
-legend(0.1, 20, legend=c("0 mg/kg","100 mg/kg"), fill=c("yellow","blue"),
-       bty="n", cex=0.7, x.intersp=0.2, y.intersp=1)
+boxplot(100*fetuses/litter ~ pht, data=subset(ossification,tcpo=="100 mg/kg"),
+        add=TRUE, at=c(1:2) + 0.2, col="blue", boxwex=0.25, xaxt="n")
+axis(1, at=c(1:2), labels=levels(ossification$pht))
+legend("bottomleft", legend=c("0 mg/kg","100 mg/kg"), fill=c("yellow","blue"),
+       title="Dose of TCPO", bty="n", cex=0.9)
 }
 \references{
 Morel J.G., Neerchal N.K. (1997) Clustered binary logistic regression in teratology data

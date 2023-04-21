@@ -44,13 +44,13 @@ predict(fit1,newdata=newdata1,type="response",se.fit=TRUE)
 data(depression)
 mod2 <- depressd ~ visit + group
 fit2 <- glmgee(mod2, id=subj, family=binomial(logit), corstr="AR-M-dependent", data=depression)
-newdata2 <- data.frame(visit=c(6,6),group=as.factor(c("placebo","estrogen")))
+newdata2 <- data.frame(visit=c(6,6),group=as.factor(c("placebo","oestrogen")))
 predict(fit2,newdata=newdata2,type="response",se.fit=TRUE)
 
 ###### Example 3: Treatment for severe postnatal depression (2)
 mod3 <- dep ~ visit*group
 fit3 <- glmgee(mod3, id=subj, family=gaussian(identity), corstr="AR-M-dependent", data=depression)
-newdata3 <- data.frame(visit=c(6,6),group=as.factor(c("placebo","estrogen")))
+newdata3 <- data.frame(visit=c(6,6),group=as.factor(c("placebo","oestrogen")))
 predict(fit3,newdata=newdata3,type="response",se.fit=TRUE)
 
 }

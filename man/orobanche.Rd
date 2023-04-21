@@ -29,10 +29,10 @@ Hinde and Demetrio (1998).
 \examples{
 data(orobanche)
 out <- aggregate(cbind(germinated,seeds) ~ extract + specie, data=orobanche, sum)
+dev.new()
 barplot(100*germinated/seeds ~ extract + specie, beside=TRUE, data=out, width=0.3,
         col=c("yellow","blue"), xlab="Specie", ylab="\% of germinated seeds")
-legend(0.3, 70, c("Bean","Cucumber"), fill=c("yellow","blue"), bty="n",
-       cex=0.6, x.intersp=0.2, y.intersp=1)
+legend("topleft",c("Bean","Cucumber"),fill=c("yellow","blue"),title="Extract",bty="n")
 
 }
 \references{

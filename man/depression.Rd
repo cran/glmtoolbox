@@ -8,7 +8,7 @@
 A data frame with 427 rows and 5 variables:
 \describe{
   \item{subj}{ a numeric vector giving the identifier of each woman.}
-  \item{group}{ a factor giving the received treatment: "placebo" or "estrogen".}
+  \item{group}{ a factor giving the received treatment: "placebo" or "oestrogen".}
   \item{visit}{ a numeric vector giving the number of months since the treatment began, where -1 indicates the pretreatment assessment of the EDPS.}
   \item{dep}{ a numeric vector giving the value of the EDPS.}
   \item{depressd}{ a numeric vector coded as 1 when the value of the EDPS is greater than or equal to 11 and coded as 0 in other cases.}
@@ -33,15 +33,16 @@ Higher scores on the EDPS are indicative of higher levels of
 depression.
 }
 \examples{
- data(depression)
- boxplot(dep ~ visit, data=subset(depression,group=="placebo"), at=c(0:6)-0.2,
-         col="yellow", boxwex=0.3, outline=FALSE, xaxt="n", ylab="EDPS",
-         xlab="Months since the treatment began", ylim=range(na.omit(depression$dep)))
- boxplot(dep ~ visit, data=subset(depression,group=="estrogen"), add=TRUE,
-         at=c(0:6)+0.2, col="blue", boxwex=0.3, outline=FALSE, xaxt="n")
- axis(1, at=0:6, labels=c(-1,1:6))
- legend(5, 29, legend=c("placebo","estrogen"), fill=c("yellow","blue"),
-        bty="n", x.intersp=0.2, y.intersp=1)
+data(depression)
+dev.new()
+boxplot(dep ~ visit, data=subset(depression,group=="placebo"), at=c(0:6) - 0.2,
+        col="yellow", boxwex=0.3, xaxt="n", ylim=range(na.omit(depression$dep)),
+        xlab="Months since the treatment began", ylab="EDPS")
+boxplot(dep ~ visit, data=subset(depression,group=="oestrogen"), add=TRUE,
+        at=c(0:6) + 0.2, col="blue", boxwex=0.3, xaxt="n")
+axis(1, at=c(0:6), labels=c(-1,1:6))
+legend("bottomleft", legend=c("placebo","oestrogen"), fill=c("yellow","blue"),
+       title="Treatment", bty="n")
 
 }
 \references{

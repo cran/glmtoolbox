@@ -21,6 +21,7 @@ rays for various times. See Snedecor and Cochran (1980, page 404).
 }
 \examples{
 data(aucuba)
+dev.new()
 barplot(lesions ~ time, col="red", data=aucuba)
 
 }

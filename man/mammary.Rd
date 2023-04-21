@@ -26,6 +26,7 @@ the treated and control groups. See Morel and Nagaraj (2012, page 63).
 }
 \examples{
 data(mammary)
+dev.new()
 boxplot(tumors ~ group, data=mammary, outline=FALSE, xlab="Group",
         ylab="Number of tumors", col=c("yellow","blue"))
 }

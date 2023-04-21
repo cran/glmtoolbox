@@ -30,13 +30,14 @@ number of roots produced.
 }
 \examples{
 data(Trajan)
+dev.new()
 boxplot(roots ~ bap, data=subset(Trajan,photoperiod=="8"), at=c(1:4) - 0.15,
-    col="blue", boxwex=0.2, outline=FALSE, xaxt="n", xlim=c(0.7,4.3), ylim=c(-0.5,17))
-boxplot(roots ~ bap, data=subset(Trajan,photoperiod=="16"), add=TRUE, at=c(1:4) + 0.15,
-    col="yellow", boxwex=0.2, outline=FALSE, xaxt="n")
-axis(1, at=1:4, labels=levels(Trajan$bap))
-legend(0, 18, legend=c("8","16"), title="Photoperiod", bty="n", ncol=1,
-    fill=c("blue","yellow"), cex=0.6, x.intersp=0.2, y.intersp=1)
+        col="blue", boxwex=0.2, xaxt="n", ylim=c(-0.5,17))
+boxplot(roots ~ bap, data=subset(Trajan,photoperiod=="16"), add=TRUE,
+        at=c(1:4) + 0.15, col="yellow", boxwex=0.2, xaxt="n")
+axis(1, at=c(1:4), labels=levels(Trajan$bap))
+legend("topright", legend=c("8","16"), title="Photoperiod", bty="n",
+       fill=c("blue","yellow"))
 
 }
 \references{

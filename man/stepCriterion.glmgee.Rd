@@ -6,7 +6,7 @@
 \usage{
 \method{stepCriterion}{glmgee}(
   model,
-  criterion = c("p-value", "qic", "qicu", "adjr2", "agpc", "sgpc"),
+  criterion = c("p-value", "qic", "qicu", "agpc", "sgpc"),
   test = c("wald", "score"),
   direction = c("forward", "backward"),
   levels = c(0.05, 0.05),
@@ -21,9 +21,9 @@
 \item{model}{an object of the class glmgee which is obtained from the fit of a generalized estimating equation.}
 
 \item{criterion}{an (optional) character string indicating the criterion which should be used to compare the candidate
-models. The available options are: QIC ("qic"), QICu ("qicu"), adjusted deviance-based R-squared ("adjr2"),
-Akaike-type penalized gaussian pseudo-likelihood criterion ("agpc"), Schwarz-type penalized gaussian pseudo-likelihood
-criterion ("sgpc") and \emph{p}-value of the \code{test} test ("p-value"). By default, \code{criterion} is set to be "p-value".}
+models. The available options are: QIC ("qic"), QICu ("qicu"), Akaike-type penalized gaussian pseudo-likelihood criterion ("agpc"),
+Schwarz-type penalized gaussian pseudo-likelihood criterion ("sgpc") and \emph{p}-value of the \code{test} test ("p-value"). By
+default, \code{criterion} is set to be "p-value".}
 
 \item{test}{an (optional) character string indicating the statistical test which should be used to compare nested
 models. The available options are: Wald ("wald") and generalized score ("score") tests. By default, \code{test} is
@@ -76,12 +76,12 @@ stepCriterion(fit1, criterion="p-value", direction="forward", scope=list(lower=~
 data(depression)
 mod <- depressd ~ visit*group
 fit2 <- glmgee(mod, id=subj, family=binomial(probit), corstr="AR-M-dependent", data=depression)
-stepCriterion(fit2, criterion="adjr2", direction="forward", scope=list(lower=~1,upper=mod))
+stepCriterion(fit2, criterion="agpc", direction="forward", scope=list(lower=~1,upper=mod))
 
 ###### Example 3: Treatment for severe postnatal depression (2)
 mod <- dep ~ visit*group
 fit2 <- glmgee(mod, id=subj, family=gaussian(identity), corstr="AR-M-dependent", data=depression)
-stepCriterion(fit2, criterion="adjr2", direction="forward", scope=list(lower=~1,upper=mod))
+stepCriterion(fit2, criterion="sgpc", direction="forward", scope=list(lower=~1,upper=mod))
 
 }
 \references{

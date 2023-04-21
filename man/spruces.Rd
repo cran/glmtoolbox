@@ -27,14 +27,16 @@ the objective is to compare the growth patterns of the trees under the two condi
 }
 \examples{
 data(spruces)
-boxplot(size ~ days, data=subset(spruces,treat=="normal"), at=c(1:13)-0.2,
-        col="yellow", boxwex=0.3, outline=FALSE, xaxt="n", xlim=c(0.9,13.1))
+dev.new()
+boxplot(size ~ days, data=subset(spruces,treat=="normal"), at=c(1:13) - 0.2,
+        col="yellow", boxwex=0.3, xaxt="n", xlim=c(0.9,13.1))
 boxplot(size ~ days, data=subset(spruces,treat=="ozone-enriched"), add=TRUE,
-        at=c(1:13)+0.2, col="blue", boxwex=0.3, outline=FALSE, xaxt="n")
-axis(1, at=1:13, labels=unique(spruces$days))
-axis(2, at=seq(0,1500,250), labels=seq(0,1500,250))
-legend(0.3, 1500, legend=c("normal","ozone-enriched"), fill=c("yellow","blue"),
-       bty="n", cex=0.7, x.intersp=0.2, y.intersp=1)
+        at=c(1:13) + 0.2, col="blue", boxwex=0.3, xaxt="n")
+axis(1, at=c(1:13), labels=unique(spruces$days))
+axis(2, at=seq(0,2000,250), labels=seq(0,2000,250))
+legend("topleft", legend=c("normal","ozone-enriched"), fill=c("yellow","blue"),
+       title="Atmosphere", bty="n")
+
 }
 \references{
 Diggle P.J., Heagarty P., Liang K.-Y., Zeger S.L. (2002) \emph{Analysis of Longitudinal Data}. Oxford University Press, Oxford.

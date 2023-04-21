@@ -23,10 +23,12 @@ skin cancer for women stratified by age in Minneapolis
 }
 \examples{
 data(skincancer)
-barplot(1000*cases/population ~ city + age, beside=TRUE,
-        col=c("yellow","blue"), data=skincancer)
-legend(1.5, 8.5, legend=c("St.Paul","Ft.Worth"), title="City",
-       fill=c("yellow","blue"), bty="n", cex=0.9)
+dev.new()
+barplot(1000*cases/population ~ city + age, beside=TRUE, col=c("yellow","blue"),
+        data=skincancer)
+legend("topleft", legend=c("St.Paul","Ft.Worth"), title="City",
+       fill=c("yellow","blue"), bty="n")
+
 
 }
 \references{

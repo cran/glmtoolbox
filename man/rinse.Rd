@@ -31,15 +31,16 @@ development of dental plaque.
 }
 \examples{
 data(rinse)
-boxplot(score ~ time, data=subset(rinse,rinse=="Placebo"), at=c(1:3)-0.2,
- ylim=c(0,3.3), col="yellow", boxwex=0.15, outline=FALSE, xaxt="n", xlim=c(0.8,3.2))
+dev.new()
+boxplot(score ~ time, data=subset(rinse,rinse=="Placebo"),ylim=c(0,3.5),
+        at=c(1:3)-0.2, col="yellow", xaxt="n", boxwex=0.15)
 boxplot(score ~ time, data=subset(rinse,rinse=="A"), add=TRUE,
-        at=c(1:3), col="gray", boxwex=0.15, outline=FALSE, xaxt="n")
+        at=c(1:3), col="gray", xaxt="n", boxwex=0.15)
 boxplot(score ~ time, data=subset(rinse,rinse=="B"), add=TRUE,
-        at=c(1:3)+0.2, col="blue", boxwex=0.15, outline=FALSE, xaxt="n")
-axis(1, at=1:3, labels=unique(rinse$time))
-legend(0.7, 1, legend=c("Placebo","A","B"), fill=c("yellow","gray","blue"),
-       bty="n", cex=0.6)
+        at=c(1:3) + 0.2, col="blue", xaxt="n", boxwex=0.15)
+axis(1, at=c(1:3), labels=unique(rinse$time))
+legend("bottomleft",legend=c("placebo","rinse A","rinse B"),
+       title="Treatment",fill=c("yellow","gray","blue"),bty="n")
 }
 \references{
 Hadgu A., Koch G. (1999) Application of generalized estimating equations

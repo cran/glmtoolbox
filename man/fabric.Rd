@@ -20,6 +20,7 @@ if there is an association between the number of faults in rolls of fabric and
 their length.
 }
 \examples{
+dev.new()
 data(fabric)
 with(fabric,plot(roll, faults, pch=16, xlab="Length of roll", ylab="Number of faults"))
 }
