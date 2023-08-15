@@ -45,18 +45,19 @@ a list list with components including
 Performs variable selection in normal linear models using a hybrid versions of forward stepwise and backward stepwise.
 }
 \details{
-The "hybrid forward stepwise"  algorithm starts with the simplest
-model (which may be specified at the argument \code{scope}, and by default,
-is a model whose parameters in the linear predictor, except the intercept,
-if any, are set to be 0), and then the candidate models are builded by
-hierarchically adding effects in the linear predictor, whose "relevance"
-and/or "importance" in the model fit is assessed by comparing nested models
-(that is, by comparing the models with and without the added effect) using a
-criterion previously specified. If an effect is added to the model then this strategy may
-also remove any effect which, according to the criterion previously specified, no
-longer provide an improvement in the model fit. That process remain until no more effects may be included or excluded.
-
-The "hybrid backward stepwise" algorithm works similarly.
+The "hybrid forward stepwise" algorithm starts with the
+simplest model (which may be chosen at the argument \code{scope}, and
+by default, is a model whose parameters in the linear predictor,
+except the intercept, if any, are set to be 0), and then the candidate
+models are built by hierarchically including effects in the linear
+predictor, whose "relevance" and/or "importance" in the model fit is
+assessed by comparing nested models (that is, by comparing the models
+with and without the added effect) using a criterion previously
+specified. If an effect is added to the equation, this strategy may
+also remove any effect which, according to the previously specified
+criteria, no longer provides an improvement in the model fit. That
+process continues until no more effects are included or excluded. The
+"hybrid backward stepwise" algorithm works similarly.
 }
 \examples{
 ###### Example 1: New York air quality measurements
@@ -82,7 +83,7 @@ stepCriterion(fit3, direction="forward", criterion="p-value")
 
 }
 \references{
-James, G. and Witten, D. and Hastie, T. and Tibshirani, R. (2013, page 210) An Introduction to Statistical Learning with Applications in R, Springer, New York.
+James G., Witten D., Hastie T., Tibshirani R. (2013, page 210) An Introduction to Statistical Learning with Applications in R, Springer, New York.
 }
 \seealso{
 \link{stepCriterion.glm}, \link{stepCriterion.overglm}, \link{stepCriterion.glmgee}

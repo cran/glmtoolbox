@@ -18,10 +18,11 @@ zeroalt(
 )
 }
 \arguments{
-\item{formula}{a \code{Formula} expression of the form \code{response ~ x1 + x2 + ...| z1 + z2 + ...}, which is a symbolic description
-of the linear predictors of the models to be fitted to \eqn{\mu} and \eqn{\pi}, respectively.    See \link{Formula} documentation.  If a
-formula of the form \code{response ~ x1 + x2 + ...} is supplied, then the same regressors are employed in both components. This is equivalent to
-\code{response ~ x1 + x2 + ...| x1 + x2 + ...}.}
+\item{formula}{a \code{Formula} expression of the form \code{response ~ x1 + x2 + ...| z1 + z2 + ...},
+which is a symbolic description of the linear predictors of the models to be fitted to
+\eqn{\mu} and \eqn{\pi}, respectively.    See \link{Formula} documentation. If a formula
+of the form \code{response ~ x1 + x2 + ...} is supplied, the same regressors are
+employed in both components. This is equivalent to \code{response ~ x1 + x2 + ...| x1 + x2 + ...}.}
 
 \item{data}{an (optional) \code{data frame} in which to look for variables involved in the \code{formula} expression,
 as well as for variables specified in the arguments \code{weights} and \code{subset}.}
@@ -33,11 +34,14 @@ as well as for variables specified in the arguments \code{weights} and \code{sub
 \item{weights}{an (optional) vector of positive "prior weights" to be used in the fitting process. The length of
 \code{weights} should be the same as the number of observations. By default, \code{weights} is set to be a vector of 1s.}
 
-\item{family}{an (optional) character string which allows to specify the distribution to describe the response variable, as well as the link
-function to be used in the model for \eqn{\mu}. The following distributions are supported: (zero-altered) negative binomial I ("nb1"),
-(zero-altered) negative binomial II ("nb2"), (zero-altered) negative binomial ("nbf"), and (zero-altered) poisson ("poi").
-Link functions available are the same than those available in Poisson models via \link{glm}. See \link{family} documentation. By
-default, \code{family} is set to be Poisson with log link.}
+\item{family}{an (optional) character string that allows you to specify the distribution
+to describe the response variable, as well as the link function to be used in
+the model for \eqn{\mu}. The following distributions are supported:
+(zero-altered) negative binomial I ("nb1"), (zero-altered) negative binomial II
+("nb2"), (zero-altered) negative binomial ("nbf"), and (zero-altered) poisson
+("poi"). Link functions are the same as those available in Poisson models via
+\link{glm}. See \link{family} documentation. By default, \code{family} is set to
+be Poisson with log link.}
 
 \item{zero.link}{an (optional) character string which allows to specify the link function to be used in the model for \eqn{\pi}.
 Link functions available are the same than those available in binomial models via \link{glm}. See \link{family} documentation.
@@ -123,18 +127,20 @@ Zero-Altered Negative Binomial II \eqn{(\mu,\phi,\pi)} distributions are special
 The "counts" model may be expressed as \eqn{g(\mu_i)=x_i^{\top}\beta} for \eqn{i=1,\ldots,n}, where
 \eqn{g(\cdot)} is the link function specified at the argument \code{family}. Similarly, the "zeros" model may
 be expressed as \eqn{h(\pi_i)=z_i^{\top}\gamma} for \eqn{i=1,\ldots,n}, where \eqn{h(\cdot)} is the
-link function specified at the argument \code{zero.link}. The parameter estimation is performed by using the
-maximum likelihood method. The parameter vector \eqn{\gamma} is estimated by using the routine \link{glm.fit},
-where a binary-response model (\eqn{1} or "success" if \code{response}=0 and \eqn{0} or "fail" if \code{response}>0)
-is fitted. Then, the rest of the model parameters are estimated by maximizing the log-likelihood function
-based on the zero-truncated count distribution using the BFGS method available in the routine \link{optim}.
-The accuracy and speed of the BFGS
-method are increased because of the call to the routine \link{optim} is performed using the analytical instead of the numerical
-derivatives. The estimate of the variance-covariance matrix is obtained as being minus the inverse of the (analytical) hessian matrix
+link function specified at the argument \code{zero.link}. Parameter estimation is
+performed using the maximum likelihood method. The parameter vector \eqn{\gamma} is
+estimated by applying the routine \link{glm.fit}, where a binary-response model
+(\eqn{1} or "success" if \code{response}=0 and \eqn{0} or "fail" if \code{response}>0)
+is fitted. Then, the rest of the model parameters are estimated by maximizing the
+log-likelihood function based on the zero-truncated count distribution through the
+BFGS method available in the routine \link{optim}. The accuracy and speed of the BFGS
+method are increased because the call to the routine \link{optim} is performed using
+the analytical instead of the numerical derivatives. The variance-covariance matrix
+estimate is obtained as being minus the inverse of the (analytical) hessian matrix
 evaluated at the parameter estimates and the observed data.
-
-A set of standard extractor functions for fitted model objects is available for objects of class  \emph{zeroinflation},
-including methods to the generic functions such as \link{print}, \link{summary}, \link{model.matrix}, \link{estequa},
+A set of standard extractor functions for fitted model objects is available for objects
+of class  \emph{zeroinflation}, including methods to the generic functions such as
+\link{print}, \link{summary}, \link{model.matrix}, \link{estequa},
 \link{coef}, \link{vcov}, \link{logLik}, \link{fitted}, \link{confint}, \link{AIC}, \link{BIC} and
 \link{predict}. In addition, the model fitted to the	data may be assessed using functions such as
 \link{anova.zeroinflation}, \link{residuals.zeroinflation}, \link{dfbeta.zeroinflation},
@@ -158,10 +164,10 @@ summary(fit3)
 
 }
 \references{
-Cameron, A.C. and Trivedi, P.K. 1998. \emph{Regression Analysis of Count Data}. New York:
+Cameron A.C., Trivedi P.K. (1998) \emph{Regression Analysis of Count Data}. New York:
             Cambridge University Press.
 
-Mullahy, J. 1986. Specification and Testing of Some Modified Count Data Models. \emph{Journal of
+Mullahy J. (1986) Specification and Testing of Some Modified Count Data Models. \emph{Journal of
             Econometrics} 33, 341–365.
 }
 \seealso{

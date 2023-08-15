@@ -16,17 +16,17 @@ A data frame with 98 rows and 3 variables:
 data(uti)
 }
 \description{
-These data arose from a study conducted in the Department of
-Internal Medicine at the Utrecht University Hospital, the Netherlands, where
-98 human immunodeficiency virus (HIV)-infected men were followed up to two
-years. Urinary cultures were obtained during the first visit and every six
-months thereafter. Also, cultures were obtained between regular scheduled
-visits when signs and symptoms of urinary tract infections (UTI) occurred,
-or when patients had fever of unknown origin. CD4+ cell counts were also
-measured. A CD4+ count is a blood test to determine how well the immune
-system is working in people who have been diagnosed with HIV. In general,
-a decreasing CD4+ count is an indication of the progression of HIV. See
-Hoepelman et al. (1992), van den Broek (1995), Morel and Nagaraj (2012, page 175).
+These data arose from a study conducted in the Department
+of Internal Medicine at Utrecht University Hospital, in the
+Netherlands. In this study, 98 HIV-infected men were followed for
+up to two years. Urinary cultures were obtained during the first
+visit and every six months thereafter. Also, cultures were obtained
+between regular scheduled visits when signs and symptoms of urinary
+tract infections (UTI) occurred, or when patients had a fever of
+unknown origin. CD4+ cell counts were also measured. A CD4+ count
+is a blood test to determine how well the immune system works in
+people diagnosed with HIV. In general, a decreasing CD4+ count
+indicates HIV progression.
 }
 \examples{
 data(uti)

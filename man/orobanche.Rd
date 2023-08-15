@@ -17,14 +17,14 @@ A data frame with 21 rows and 4 variables:
 data(orobanche)
 }
 \description{
-These data arose from a study of the germination of two species
-of Orobanche seeds (O. aegyptiaca 75 and O. aegyptiaca 73) grown on 1/125
-dilutions of two different root extract media (cucumber and bean) in a 2×2
-factorial layout with replicates. The data consist of the number of seeds
-and the number germinating for each replicate. Interest focusses on the
-possible differences in germination rates for the two types of seed and
-root extract and whether there is any interaction. See Crowder (1978),
-Hinde and Demetrio (1998).
+These data arose from a study of the germination of two
+species of Orobanche seeds (O. aegyptiaca 75 and O. aegyptiaca 73)
+grown on 1/125 dilutions of two different root extract media (cucumber
+and bean) in a 2×2 factorial layout with replicates. The data consist
+of the number of seeds and germinating seeds for each replicate.
+Interest is focused on the possible differences in germination rates
+for the two types of seed and root extract and whether there is any
+interaction.
 }
 \examples{
 data(orobanche)

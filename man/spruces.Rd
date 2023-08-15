@@ -17,13 +17,18 @@ A data frame with 1027 rows and 4 variables:
 data(spruces)
 }
 \description{
-The main objective of the analysis of these data is to assess the effect of the ozone pollution on the tree growth. As ozone pollution
-is common in urban areas, the impact of increased ozone concentrations on tree growth is of considerable interest. The
-response variable is tree size, where size is conventionally measured by the product of tree height and stem diameter squared.
-In a first group, a total of 54 trees were grown under an ozone-enriched atmosphere, that is, ozone exposure at 70 parts per billion,
-whereas in a second group, 25 were grown under a normal atmosphere. The size of each tree was observed 13 times across the time, that is,
-152, 174, 201, 227, 258, 469, 496, 528, 556, 579, 613, 639 and 674 days since the beginning of the experiment. Hence,
-the objective is to compare the growth patterns of the trees under the two conditions. See Diggle et al. (2002, page 4).
+These data are analyzed primarily to determine how ozone
+pollution affects tree growth. As ozone pollution is common in urban
+areas, the impact of increased ozone concentrations on tree growth is
+of considerable interest. The response variable is tree size, where
+size is conventionally measured by the product of tree height and
+stem diameter squared. In the first group, 54 trees were grown under
+an ozone-enriched atmosphere, ozone exposure at 70 parts per billion.
+In the second group, 25 trees were grown under normal conditions. The
+size of each tree was observed 13 times across time, that is, 152,
+174, 201, 227, 258, 469, 496, 528, 556, 579, 613, 639 and 674 days
+since the beginning of the experiment. Hence, the objective is to
+compare the trees' growth patterns under the two conditions.
 }
 \examples{
 data(spruces)

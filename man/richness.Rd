@@ -16,9 +16,9 @@ A data frame with 90 rows and 3 variables:
 data(richness)
 }
 \description{
-In these data the response is the species richness represented by a
-count of the number of plant species on plots that have different biomass and
-three different soil pH levels: low, mid, and high. See Crawley (2007, page 534).
+In these data the response is species richness represented
+by a count of the number of plant species on plots with different
+biomass and three different soil pH levels: low, mid, and high.
 }
 \examples{
 data(richness)

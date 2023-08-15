@@ -17,15 +17,11 @@ A data frame with 81 rows and 4 variables:
 data(ossification)
 }
 \description{
-The data come from a 2x2 factorial design with 81 pregnant mice. In the experiment each
-pregnant mouse was randomly allocated to an control group and three treated groups, which
-received daily, by gastric gavages, 60 mg/kg of phenytoin, 100 mg/kg of
-trichloropropene oxide, or 60 mg/kg phenytoin and 100 mg/kg of trichloropropene
-oxide. On day 18 of gestation, fetuses were recovered, stained, and cleared. Then, by
-visual inspection, the presence or absence of ossification was determined for the different
-joints of the right and left forepaws. The purpose of the experiment was to investigate the
-synergy of phenytoin  and trichloropropene oxide to produce ossification at the phalanges,
-that is, teratogenic effects. See Morel and Nagaraj (2012, page 103).
+The data come from a 2x2 factorial design with 81 pregnant
+mice. In the experiment each pregnant mouse was randomly allocated to a
+control group and three treated groups. These groups received daily, by
+gastric gavage, 60 mg/kg of phenytoin, 100 mg/kg of trichloropropene
+oxide, or 60 mg/kg of phenytoin and 100 mg/kg of trichloropropene oxide. On day 18 of gestation, the fetuses were recovered, stained, and cleared. Then, by visual inspection, the presence or absence of ossification was determined for the different joints of the right and left forepaws. The experiment investigated the synergy of phenytoin and trichloropropene oxide to produce ossification at the phalanges, teratogenic effects.
 }
 \examples{
 data(ossification)

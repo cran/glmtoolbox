@@ -52,15 +52,18 @@ Produces a normal QQ-plot with simulated envelope of residuals
 for generalized linear models.
 }
 \details{
-The simulated envelope is builded by simulating \code{rep} independent realizations of the response variable for each
-individual, which is accomplished taking into account the following: (1) the model assumption about the distribution of
-the response variable; (2) the estimates of the parameters in the linear predictor; and (3) the estimate of the
-dispersion parameter. The interest model is re-fitted \code{rep} times, as each time the vector of observed responses
-is replaced by one of the simulated samples. The \code{type}-type residuals are computed and then sorted for each
-replicate, so that for each \eqn{i=1,2,...,n}, where \eqn{n} is the number of individuals in the sample, there is a random
-sample of size \code{rep} of the \eqn{i}-th order statistic of the  \code{type}-type residuals. Therefore, the simulated
-envelope is composed of the quantiles (1 - \code{conf})/2 and (1 + \code{conf})/2 of the random sample of size \code{rep} of
-the \eqn{i}-th order statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n}.
+The simulated envelope is built by simulating \code{rep} independent realizations
+of the response variable for each individual, which is accomplished taking into account the
+following: (1) the model assumption about the distribution of the response variable; (2)
+the estimates of the parameters in the linear predictor; and (3) the estimate of the
+dispersion parameter. The interest model is re-fitted \code{rep} times, as each time the
+vector of observed responses is replaced by one of the simulated samples. The
+\code{type}-type residuals are computed and then sorted for each replicate, so that for
+each \eqn{i=1,2,...,n}, where \eqn{n} is the number of individuals in the sample, there is
+a random sample of size \code{rep} of the \eqn{i}-th order statistic of the
+\code{type}-type residuals. Therefore, the simulated envelope is composed of the quantiles
+(1 - \code{conf})/2 and (1 + \code{conf})/2 of the random sample of size \code{rep} of the
+\eqn{i}-th order statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n}.
 }
 \examples{
 
@@ -97,13 +100,13 @@ envelope(fit5, rep=100, conf=0.95, type="quantile", col="red", pch=20, col.lab="
 
 }
 \references{
-Atkinson, A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
+Atkinson A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
 
-Davison, A.C. and Gigli, A. (1989) Deviance Residuals and Normal Scores Plots. \emph{Biometrika} 76, 211-221.
+Davison A.C., Gigli A. (1989) Deviance Residuals and Normal Scores Plots. \emph{Biometrika} 76, 211-221.
 
-Dunn, P.K. and Smyth, G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics} 5, 236-244.
+Dunn P.K., Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics} 5, 236-244.
 
-Pierce, D.A. and Schafer, D.W. (1986) Residuals in Generalized Linear Models. \emph{Journal of the American Statistical Association} 81, 977-986.
+Pierce D.A., Schafer D.W. (1986) Residuals in Generalized Linear Models. \emph{Journal of the American Statistical Association} 81, 977-986.
 }
 \seealso{
 \link{envelope.lm}, \link{envelope.overglm}

@@ -21,16 +21,14 @@ A data frame with 427 rows and 5 variables:
 data(depression)
 }
 \description{
-These data arose from a study on the efficacy of
-oestrogen give transdermally for treatment of severe postnatal
-depression. Women with major depression were randomly assigned
-to either a placebo control group or estrogen patch group.
-Prior to the treatment all women were assessed by
-self-ratings of depressive symptoms on the Edinburgh
-Postnatal Depression Scale (EPDS). The data on EPDS were
-collected monthly for six months once the treatment began.
-Higher scores on the EDPS are indicative of higher levels of
-depression.
+These data arose from a study on the efficacy of oestrogen
+given transdermally for the treatment of severe postnatal depression.
+Women with major depression were randomly assigned to a placebo control
+group or an oestrogen patch group. Prior to the treatment all women
+were assessed by self-rated depressive symptoms on the Edinburgh
+Postnatal Depression Scale (EPDS). EPDS data were collected monthly
+for six months once treatment began. Higher EDPS scores are indicative
+of higher depression levels.
 }
 \examples{
 data(depression)
@@ -46,7 +44,7 @@ legend("bottomleft", legend=c("placebo","oestrogen"), fill=c("yellow","blue"),
 
 }
 \references{
-Gregoire A.J.P., Kumar R., Everitt B., Henderson A.F., Studd, J.W.W. (1996) Transdermal oestrogen for treatment of severe postnatal depression,
+Gregoire A.J.P., Kumar R., Everitt B., Henderson A.F., Studd J.W.W. (1996) Transdermal oestrogen for treatment of severe postnatal depression,
 \emph{The Lancet} 347:930-933.
 }
 \keyword{datasets}

@@ -22,9 +22,10 @@ Thall P.F., Vail S.C. (1990) Some covariance models for longitudinal count data 
 data(Seizures)
 }
 \description{
-The dataset reports the number of epileptic seizures in each
-of four two-week intervals, and in a baseline eight-week inverval, for
-Progabide treatment and placebo groups with a total of 59 individuals.
+The dataset reports the number of epileptic seizures in
+each of four two-week intervals, and in a baseline eight-week interval,
+for Progabide treatment and placebo groups with a total of 59
+individuals.
 }
 \examples{
 dev.new()

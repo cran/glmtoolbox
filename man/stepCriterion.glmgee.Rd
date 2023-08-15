@@ -85,7 +85,7 @@ stepCriterion(fit2, criterion="sgpc", direction="forward", scope=list(lower=~1,u
 
 }
 \references{
-James, G. and Witten, D. and Hastie, T. and Tibshirani, R. (2013, page 210) \emph{An Introduction to Statistical Learning
+James G., Witten D., Hastie T., Tibshirani R. (2013, page 210) \emph{An Introduction to Statistical Learning
 with Applications in R}. Springer, New York.
 
 Jianwen X., Jiamao Z., Liya F. (2019) Variable selection in generalized estimating equations via empirical

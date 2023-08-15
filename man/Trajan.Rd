@@ -20,13 +20,15 @@ A data frame with 270 rows and 4 variables:
 data(Trajan)
 }
 \description{
-The data arose from a horticultural experiment to study the number of roots produced by 270
-micropropagated shoots of the columnar apple cultivar Trajan.
-During the rooting period, all shoots were maintained under identical conditions, but the shoots
-themselves were cultured on media containing different concentrations of the cytokinin
-6-benzylaminopurine (BAP), in growth cabinets with an 8 or 16 hour photoperiod. The objective
-is to assess the effect of both the photoperiod and the concentration levels of BAP on the
-number of roots produced.
+The data arose from a horticultural experiment to study
+the number of roots produced by 270 micropropagated shoots of the
+columnar apple cultivar Trajan. During the rooting period, all shoots
+were maintained under identical conditions. However, the shoots
+themselves were cultured on media containing different concentrations
+of the cytokinin 6-benzylaminopurine (BAP), in growth cabinets with
+an 8 or 16 hour photoperiod. The objective is to assess the effect
+of both the photoperiod and BAP concentration levels on the number
+of roots produced.
 }
 \examples{
 data(Trajan)

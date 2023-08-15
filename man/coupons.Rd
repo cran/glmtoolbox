@@ -16,12 +16,13 @@ A data frame with 11 rows and 3 variables:
 data(coupons)
 }
 \description{
-The market research department of a soft drink manufacturer is
-investigating the effectiveness of a price discount coupon on the purchase
-of a two-litre beverage product. A sample of 5500 costumers received coupons
-for varying price discounts between 5 and 25 cents. The main objective of
-the analysis is to determine if there is an effect of the price discount on
-the proportion of redeemed coupons after one month.
+The market research department of a soft drink
+manufacturer is investigating the effectiveness of a price discount
+coupon on the purchase of a two-litre beverage product. A sample of
+5500 costumers received coupons for varying price discounts between
+5 and 25 cents. The main objective of the analysis is to determine
+if the price discount affects the proportion of redeemed coupons
+after one month.
 }
 \examples{
 dev.new()

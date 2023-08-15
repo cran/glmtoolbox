@@ -15,9 +15,9 @@ A data frame with 7 rows and 2 variables:
 data(aucuba)
 }
 \description{
-The investigators counted the number of lesions
-of \emph{Aucuba mosaic} virus developing after exposure to X
-rays for various times. See Snedecor and Cochran (1980, page 404).
+The investigators counted the number of lesions of
+\emph{Aucuba mosaic} virus developing after exposure to X rays for
+ various times.
 }
 \examples{
 data(aucuba)

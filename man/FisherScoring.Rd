@@ -24,10 +24,10 @@ a matrix whose first three columns are the following
 }
 }
 \description{
-This function displays the entire path performed by the Fisher Scoring
-algorithm for the parameter estimation in Generalized Linear Models, from the
-starting value until the convergence is achieved or the maximum number of iterations
-is exceed.
+This function displays the entire path performed by the
+Fisher Scoring algorithm for parameter estimation in Generalized Linear
+Models. It starts with the starting value until convergence is achieved
+or the maximum number of iterations is exceeded.
 }
 \examples{
 ###### Example 1: Fuel efficiency of cars

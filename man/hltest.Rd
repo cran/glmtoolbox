@@ -48,5 +48,5 @@ hltest(fit3)
 
 }
 \references{
-Hosmer, D.W. and Lemeshow, S. (2000) \emph{Applied Logistic Regression. 2nd ed.} John Wiley & Sons, New York.
+Hosmer D.W., Lemeshow S. (2000) \emph{Applied Logistic Regression. 2nd ed.} John Wiley & Sons, New York.
 }

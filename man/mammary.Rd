@@ -15,14 +15,15 @@ A data frame with 48 rows and 2 variables:
 data(mammary)
 }
 \description{
-A total of 76 female rats were injected with a carcinogen for
-mammary cancer. Then, all animals were given retinyl acetate (retinoid) to
-prevent mammary cancer for 60 days. After this phase, the 48 animals that
-remained tumor-free were randomly assigned to continue the retinoid prophylaxis
-or control. Rats were then palpated for tumors twice weekly, and observations
-ended 182 days after the initial carcinogen injections began. The main objective
-of analysis was to assess the difference in the development of tumors between
-the treated and control groups. See Morel and Nagaraj (2012, page 63).
+A total of 76 female rats were injected with a carcinogen
+for mammary cancer. Then, all animals were given retinyl acetate
+(retinoid) to prevent mammary cancer for 60 days. After this phase,
+the 48 animals that remained tumor-free were randomly assigned to
+continue retinoid prophylaxis or control. Rats were then palpated for
+tumors twice weekly, and observations ended 182 days after initial
+carcinogen injections began. The main objective of the analysis was
+to assess the difference in tumor development between the treated
+and control groups.
 }
 \examples{
 data(mammary)

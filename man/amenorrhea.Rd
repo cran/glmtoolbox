@@ -17,15 +17,15 @@ A data frame with 4604 rows and 4 variables:
 data(amenorrhea)
 }
 \description{
-A total of 1151 women completed menstrual diaries and
-the diary data were used to generate binary sequence for each woman,
-indicating whether or not she had experienced amenorrhea (the
-absence of menstrual bleeding for a specified number of days) on
-the day of randomization and three additional 90-day intervals. The
-goal of this trial was to compare the two treatments (100 mg or 150
-mg of depot-medroxyprogesterone acetate (DMPA)) in terms of how the
-rates of amenorrhea change over time with continued use of the
-contraceptive method.
+A total of 1151 women completed menstrual diaries. The
+diary data were used to generate a binary sequence for each woman,
+indicating whether or not she had experienced amenorrhea (the absence
+of menstrual bleeding for a specified number of days) on the day of
+randomization and three additional 90-day intervals. The goal of
+this trial was to compare the two treatments (100 mg or 150 mg of
+depot-medroxyprogesterone acetate (DMPA)) in terms of how the rates
+of amenorrhea change over time with continued use of the contraceptive
+method.
 }
 \examples{
 data(amenorrhea)

@@ -28,9 +28,9 @@ assessed if provider adherence to a set of guidelines for treatment of
 patients with urinary incontinence (UI) affected patient outcomes. Data
 were collected on 137 elderly patients from 38 medical practices. The
 number of patients per practice ranged from 1 to 8 and the median was
-4 patients. The interest of the present analysis is to determine what
-predicts whether or not a patient considers their UI a problem that
-interferes with him/her daily life.
+4 patients. The statistical analysis aims to determine what predicts
+whether or not a patient considers their UI a problem that interferes
+with him/her daily life.
 }
 \examples{
 data(GUIDE)

@@ -20,13 +20,18 @@ overglm(
 \item{formula}{a \code{formula} expression of the form \code{response ~ x1 + x2 + ...}, which is a symbolic description
 of the linear predictor of the model to be fitted to the data.}
 
-\item{family}{a character string which allows to specify the distribution to describe the response variable, as well as the link
-function to be used in the model for \eqn{\mu}. The following distributions are supported: negative binomial I ("nb1"),
-negative binomial II ("nb2"), negative binomial ("nbf"), zero-truncated negative binomial I ("ztnb1"),
-zero-truncated negative binomial II ("ztnb2"), zero-truncated negative binomial ("ztnbf"), zero-truncated
-poisson ("ztpoi"), beta-binomial ("bb") and random-clumped binomial ("rcb"). Link functions available for
-these models are the same than those available
-in Poisson and binomial models via \link{glm}. See \link{family} documentation.}
+\item{family}{A character string that allows you to specify the
+distribution describing the response variable. In addition,
+it allows you to specify the link function to be used in the
+model for \eqn{\mu}. The following distributions are
+supported: negative binomial I ("nb1"), negative binomial II
+("nb2"), negative binomial ("nbf"), zero-truncated negative
+binomial I ("ztnb1"), zero-truncated negative binomial II
+("ztnb2"), zero-truncated negative binomial ("ztnbf"),
+zero-truncated poisson ("ztpoi"), beta-binomial ("bb") and
+random-clumped binomial ("rcb"). Link functions available for
+these models are the same as those available for Poisson and
+binomial models via \link{glm}. See \link{family} documentation.}
 
 \item{weights}{an (optional) vector of positive "prior weights" to be used in the fitting process. The length of
 \code{weights} should be the same as the number of observations.}
@@ -90,7 +95,7 @@ list with components including
 }
 }
 \description{
-Allows to fit regression models based on the negative binomial, beta-binomial, and random-clumped binomial
+Allows to fit regression models based on the negative binomial, beta-binomial, and random-clumped binomial.
 distributions, which are alternatives to the Poisson and binomial regression models under the presence of overdispersion.
 }
 \details{
@@ -109,31 +114,37 @@ E\eqn{(Y)=\mu} and Var\eqn{(Y)=\mu(1 +\phi)}.
 E\eqn{(Y)=\mu} and Var\eqn{(Y)=\mu(1 +\phi\mu^{\tau+1})}.
 
 Therefore, the regression models based on the negative binomial and
-zero-truncated negative binomial distributions are alternatives under the presence of overdispersion
-to those based on the Poisson and zero-truncated Poisson distributions, respectively.
+zero-truncated negative binomial distributions are alternatives,
+under overdispersion, to those based on the Poisson and
+zero-truncated Poisson distributions, respectively.
 
-The beta-binomial distribution can be obtained as mixture of the binomial and beta distributions. If
+The beta-binomial distribution can be obtained as a mixture of the binomial and beta distributions. If
 \eqn{mY | \pi} ~ Binomial\eqn{(m,\pi)}, where E\eqn{(Y | \pi)=\pi} and Var\eqn{(Y | \pi)=m^{-1}\pi(1-\pi)},
 and \eqn{\pi} ~ Beta\eqn{(\mu,\phi)}, in which E\eqn{(\pi)=\mu} and Var\eqn{(\pi)=(\phi+1)^{-1}\mu(1-\mu)},
 with \eqn{\phi>0}, then \eqn{mY} ~ Beta-Binomial\eqn{(m,\mu,\phi)}, so that E\eqn{(Y)=\mu} and
 Var\eqn{(Y)=m^{-1}\mu(1-\mu)[1 + (\phi+1)^{-1}(m-1)]}. Therefore, the regression model based on the
-beta-binomial distribution is an alternative under the presence of overdispersion to the binomial regression model.
+beta-binomial distribution is an alternative, under overdispersion, to the binomial regression model.
 
-The random-clumped binomial distribution can be obtained as mixture of the binomial and Bernoulli distributions. If
+The random-clumped binomial distribution can be obtained as a mixture of the binomial and Bernoulli distributions. If
 \eqn{mY | \pi} ~ Binomial\eqn{(m,\pi)}, where E\eqn{(Y | \pi)=\pi} and Var\eqn{(Y | \pi)=m^{-1}\pi(1-\pi)},
 whereas \eqn{\pi=(1-\phi)\mu + \phi} with probability \eqn{\mu}, and \eqn{\pi=(1-\phi)\mu} with probability \eqn{1-\mu},
 in which E\eqn{(\pi)=\mu} and Var\eqn{(\pi)=\phi^{2}\mu(1-\mu)}, with \eqn{\phi \in (0,1)}, then \eqn{mY} ~ Random-clumped
 Binomial\eqn{(m,\mu,\phi)}, so that E\eqn{(Y)=\mu} and Var\eqn{(Y)=m^{-1}\mu(1-\mu)[1 + \phi^{2}(m-1)]}. Therefore,
-the regression model based on the random-clumped binomial distribution is an alternative under the presence of
-overdispersion to the binomial regression model.
+the regression model based on the random-clumped binomial distribution is an alternative, under
+overdispersion, to the binomial regression model.
 
-In all cases, even in those where the response variable is described using a zero-truncated distribution, the fitted
-model is aimed to describe the way in which \eqn{\mu} is dependent on some covariates. The parameter estimation is performed by using the
-maximum likelihood method. The model parameters are estimated by maximizing the log-likelihood
-function using the BFGS method available in the routine \link{optim}. The accuracy and speed of the BFGS
-method are increased because of the call to the routine \link{optim} is performed using the analytical instead of the numerical
-derivatives. The estimate of the variance-covariance matrix is obtained as being minus the inverse of the (analytical) hessian matrix
-evaluated at the parameter estimates and the observed data.
+In all cases, even where the response variable is described by a
+zero-truncated distribution, the fitted model describes the way in
+which \eqn{\mu} is dependent on some covariates. Parameter estimation
+is performed using the maximum likelihood method. The model
+parameters are estimated by maximizing the log-likelihood function
+through the BFGS method available in the routine \link{optim}. The
+accuracy and speed of the BFGS method are increased because the call
+to the routine \link{optim} is performed using analytical instead
+of the numerical  derivatives. The variance-covariance matrix
+estimate is obtained as being minus the inverse of the (analytical)
+hessian matrix evaluated at the parameter estimates and the observed
+data.
 
 A set of standard extractor functions for fitted model objects is available for objects of class  \emph{zeroinflation},
 including methods to the generic functions such as \code{print}, \code{summary},	\code{model.matrix}, \code{estequa},
@@ -183,16 +194,16 @@ summary(fit7)
 
 }
 \references{
-Crowder, M. (1978) Beta-binomial anova for proportions, \emph{Journal of the Royal Statistical
+Crowder M. (1978) Beta-binomial anova for proportions, \emph{Journal of the Royal Statistical
 Society Series C (Applied Statistics)} 27, 34-37.
 
-Lawless, J.F. (1987) Negative binomial and mixed poisson regression, \emph{The Canadian Journal
+Lawless J.F. (1987) Negative binomial and mixed poisson regression, \emph{The Canadian Journal
 of Statistics} 15, 209-225.
 
-Morel, J.G. and Neerchal, N.K. (1997) Clustered binary logistic regression in teratology data
+Morel J.G., Neerchal N.K. (1997) Clustered binary logistic regression in teratology data
 using a finite mixture distribution, \emph{Statistics in Medicine} 16, 2843-2853.
 
-Morel, J.G. and Nagaraj, N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc.,
+Morel J.G., Nagaraj N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc.,
 Cary, North Carolina, USA.
 }
 \seealso{

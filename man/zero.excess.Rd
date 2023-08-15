@@ -24,7 +24,7 @@ A matrix with 1 row and the following columns:
 }
 }
 \description{
-Allows to assess if the observed number of zeros is significantly higher than the expected according to the fitted count regression model (poisson or negative binomial).
+Allows to assess if the observed number of zeros is significantly higher than expected according to the fitted count regression model (poisson or negative binomial).
 }
 \details{
 According to the formulated count regression model, we have that
@@ -33,10 +33,11 @@ random variables. Then, the expected number of zeros is the sum of
 \eqn{P(0;\hat{\mu}_k,\hat{\phi})} for \eqn{k=1,\ldots,n}, where
 \eqn{\hat{\mu}_k} and \eqn{\hat{\phi}} represent the estimates of
 \eqn{\mu_k} and \eqn{\phi}, respectively, obtained from the fitted
-model. Thus, the statistical test reduces to the standardized
-difference between the observed and expected number of zeros,
-whose distribution, under the null hypothesis, tends to the standard
-normal when the sample size, \eqn{n}, tends to infinity.
+model. Thus, the test statistic reduces to the standardized
+difference between the observed and expected number of zeros. The
+distribution of that statistic, under the null hypothesis, tends
+to be the standard normal when the sample size, \eqn{n}, tends to
+infinity.
 }
 \examples{
 ####### Example 1: Self diagnozed ear infections in swimmers

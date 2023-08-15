@@ -48,15 +48,18 @@ A matrix with the following four columns:
 Produces a normal QQ-plot with simulated envelope of residuals obtained from the fit of a normal linear model.
 }
 \details{
-The simulated envelope is builded by simulating \code{rep} independent realizations of the response variable for each
-individual, which is accomplished taking into account the following: (1) the model assumption about the distribution of
-the response variable; (2) the estimates of the parameters in the linear predictor; and (3) the estimate of the
-dispersion parameter. The interest model is re-fitted \code{rep} times, as each time the vector of observed responses
-is replaced by one of the simulated samples. The \code{type}-type residuals are computed and then sorted for each
-replicate, so that for each \eqn{i=1,2,...,n}, where \eqn{n} is the number of individuals in the sample, there is a random
-sample of size \code{rep} of the \eqn{i}-th order statistic of the  \code{type}-type residuals. Therefore, the simulated
-envelope is composed of the quantiles (1 - \code{conf})/2 and (1 + \code{conf})/2 of the random sample of size \code{rep} of
-the \eqn{i}-th order statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n}.
+The simulated envelope is built by simulating \code{rep} independent realizations
+of the response variable for each individual, which is accomplished taking into account
+the following: (1) the model assumption about the distribution of the response variable;
+(2) the estimates of the parameters in the linear predictor; and (3) the estimate of the
+dispersion parameter. The interest model is re-fitted \code{rep} times, as each time the
+vector of observed responses is replaced by one of the simulated samples. The
+\code{type}-type residuals are computed and then sorted for each replicate, so that for
+each \eqn{i=1,2,...,n}, where \eqn{n} is the number of individuals in the sample, there
+is a random sample of size \code{rep} of the \eqn{i}-th order statistic of the
+\code{type}-type residuals. Therefore, the simulated envelope is composed of the quantiles
+(1 - \code{conf})/2 and (1 + \code{conf})/2 of the random sample of size \code{rep} of the
+\eqn{i}-th order statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n}.
 }
 \examples{
 ###### Example 1: Fuel consumption of automobiles
@@ -78,9 +81,9 @@ envelope(fit3, rep=100, conf=0.95, type="internal", col="red", pch=20, col.lab="
 
 }
 \references{
-Atkinson, A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
+Atkinson A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
 
-Cook, R.D. and Weisberg, S. (1982) \emph{Residuals and Influence in Regression}. Chapman and Hall, New York.
+Cook R.D., Weisberg S. (1982) \emph{Residuals and Influence in Regression}. Chapman and Hall, New York.
 }
 \seealso{
 \link{envelope.glm}, \link{envelope.overglm}

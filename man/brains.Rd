@@ -16,8 +16,8 @@ A data frame with 62 rows and 3 variables:
 data(brains)
 }
 \description{
-These data corresponds to the (average) body weight and the
-(average) brain weight for sixty-two species of mammals.
+These data correspond to the (average) body weight and
+the (average) brain weight for sixty-two species of mammals.
 }
 \examples{
 data(brains)

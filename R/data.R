@@ -1,14 +1,14 @@
 #' @title amenorrhea
 #'
-#' @description A total of 1151 women completed menstrual diaries and
-#' the diary data were used to generate binary sequence for each woman,
-#' indicating whether or not she had experienced amenorrhea (the
-#' absence of menstrual bleeding for a specified number of days) on
-#' the day of randomization and three additional 90-day intervals. The
-#' goal of this trial was to compare the two treatments (100 mg or 150
-#' mg of depot-medroxyprogesterone acetate (DMPA)) in terms of how the
-#' rates of amenorrhea change over time with continued use of the
-#' contraceptive method.
+#' @description A total of 1151 women completed menstrual diaries. The
+#' diary data were used to generate a binary sequence for each woman,
+#' indicating whether or not she had experienced amenorrhea (the absence
+#' of menstrual bleeding for a specified number of days) on the day of
+#' randomization and three additional 90-day intervals. The goal of
+#' this trial was to compare the two treatments (100 mg or 150 mg of
+#' depot-medroxyprogesterone acetate (DMPA)) in terms of how the rates
+#' of amenorrhea change over time with continued use of the contraceptive
+#' method.
 #'
 #' @docType data
 #'
@@ -72,17 +72,18 @@
 #' @source Gennings, C., Chinchilli, V.M., Carter, W.H. (1989). Response
 #' Surface Analysis with Correlated Data: A Nonlinear Model Approach.
 #' \emph{Journal of the American Statistical Association}, 84, 805–809.
-#' @references Vonesh, E.F. (2012) Generalized Linear and Nonlinear Models
+#' @references Vonesh E.F. (2012) Generalized Linear and Nonlinear Models
 #' for Correlated Data: Theory and Applications Using SAS.
 #' \emph{Cary, NC: SAS Institute Inc}.
 "ldh"
 #'
 #' @title Oranges
 #'
-#' @description The data arose from five orange trees grown at Riverside,
-#' California, during the period 1969-1973. The response is the trunk
-#' circumference, in millimeters, and the predictor variable is the time,
-#' in days, with an arbitrary origin taken on December 31, 1968.
+#' @description The data arose from five orange trees grown in Riverside,
+#' California, during 1969-1973. The response is the trunk circumference,
+#' in millimeters, and the predictor variable is time, in days. The
+#' predictor variable has an arbitrary origin and was taken on December
+#' 31, 1968.
 #'
 #' @docType data
 #'
@@ -105,9 +106,10 @@
 #'
 #' @title Seizures
 #'
-#' @description The dataset reports the number of epileptic seizures in each
-#' of four two-week intervals, and in a baseline eight-week inverval, for
-#' Progabide treatment and placebo groups with a total of 59 individuals.
+#' @description The dataset reports the number of epileptic seizures in
+#' each of four two-week intervals, and in a baseline eight-week interval,
+#' for Progabide treatment and placebo groups with a total of 59
+#' individuals.
 #'
 #' @docType data
 #'
@@ -135,9 +137,9 @@
 #'
 #' @title Fabric faults
 #'
-#' @description The main objective of the analysis of this dataset is to assess
-#' if there is an association between the number of faults in rolls of fabric and
-#' their length.
+#' @description The main objective of the analysis of this dataset is to
+#' assess if there is an association between the number of faults in
+#' fabric rolls and their length.
 #'
 #' @docType data
 #'
@@ -158,12 +160,13 @@
 #'
 #' @title Discount coupons
 #'
-#' @description The market research department of a soft drink manufacturer is
-#' investigating the effectiveness of a price discount coupon on the purchase
-#' of a two-litre beverage product. A sample of 5500 costumers received coupons
-#' for varying price discounts between 5 and 25 cents. The main objective of
-#' the analysis is to determine if there is an effect of the price discount on
-#' the proportion of redeemed coupons after one month.
+#' @description The market research department of a soft drink
+#' manufacturer is investigating the effectiveness of a price discount
+#' coupon on the purchase of a two-litre beverage product. A sample of
+#' 5500 costumers received coupons for varying price discounts between
+#' 5 and 25 cents. The main objective of the analysis is to determine
+#' if the price discount affects the proportion of redeemed coupons
+#' after one month.
 #'
 #' @docType data
 #'
@@ -186,10 +189,10 @@
 #'
 #' @title Hardened Steel
 #'
-#' @description This dataset consists of the failure times for hardened steel
-#' specimens in a rolling contact fatigue test. Ten independent observations
-#' were taken at each of the four values of contact stress. The response is
-#' the length of the time until each specimen of the hardened steel failed.
+#' @description This dataset consists of failure times for hardened steel
+#'  specimens in a rolling contact fatigue test. Ten independent
+#'  observations were taken at each of the four contact stress values.
+#'  Response is the time that each specimen of hardened steel failed.
 #'
 #' @docType data
 #'
@@ -210,9 +213,10 @@
 #'
 #' @title Advertising
 #'
-#' @description The Advertising data set consists of the sales of that product in
-#' 200 different markets, along with advertising budgets for the product in each
-#' of those markets for three different media: TV, radio, and newspaper.
+#' @description The advertising data set consists of sales of that product
+#' in 200 different markets. It also includes advertising budgets for the
+#' product in each of those markets for three different media: TV, radio,
+#' and newspapers.
 #'
 #' @docType data
 #'
@@ -241,12 +245,13 @@
 #'
 #' @title Alaska pipeline
 #'
-#' @description The Alaska pipeline data consists of in-field ultrasonic measurements of
-#' the depths of defects in the Alaska pipeline. The depth of the defects were then
-#' re-measured in the laboratory. These measurements were performed in six different
-#' batches. The data were analyzed to calibrate the bias of the field measurements
-#' relative to the laboratory measurements. In this analysis, the field measurement
-#' is the response variable and the laboratory measurement is the predictor variable.
+#' @description The Alaska pipeline data consists of in-field ultrasonic
+#' measurements of defects depths in the Alaska pipeline. The depth of
+#' the defects was measured again in the laboratory. These measurements
+#' were performed in six batches. The data were analyzed to calibrate
+#' the bias of field measurements relative to laboratory measurements.
+#' In this analysis, the field measurement is the response variable and
+#' the laboratory measurement is the predictor variable.
 #'
 #' @docType data
 #'
@@ -271,11 +276,10 @@
 #'
 #' @title Dilution Assay
 #'
-#' @description These data are counts of virus
-#' particles at 5 different dilutions. There are 4
-#' replicate counts at each dilution except the last
-#' for which there are 5 counts. The aim is to
-#' estimate the number of virus particles per unit volume.
+#' @description These data are counts of virus particles at 5 different
+#' dilutions. There are 4 replicate counts at each dilution except the
+#' last for which there are 5 counts. The aim is to estimate the expected
+#' number of virus particles per unit volume.
 #'
 #' @docType data
 #'
@@ -298,8 +302,8 @@
 #'
 #' @title Mammal brain and body weights
 #'
-#' @description These data corresponds to the (average) body weight and the
-#' (average) brain weight for sixty-two species of mammals.
+#' @description These data correspond to the (average) body weight and
+#' the (average) brain weight for sixty-two species of mammals.
 #'
 #' @docType data
 #'
@@ -324,14 +328,20 @@
 #'
 #' @title Dental Clinical Trial
 #'
-#' @description These data arose from a dental clinical study. In this trial, subjects were generally healthy adult
-#' male and female volunteers, ages 18–55, with pre-existing plaque but without advanced periodontal
-#' disease. Prior to entry, subjects were screened for a minimum of 20 sound, natural teeth and a minimum mean plaque index of 2.0. Subjects with gross oral pathology or on antibiotic, antibacterial,
-#' or anti-inflammatory therapy were excluded from the study. One hundred nine volunteers were randomized in a double-blinded way to one of two new mouth rinses (A and B) or to a control mouth
-#' rinse. Plaque was scored at baseline, at 3 months, and at 6 months by the Turesky modification of
-#' the Quigley-Hein index, a continuous measure. Four subjects had missing plaque scores. The main
-#' objective of the analysis is to measure the effectiveness of the three mouth rinses in inhibiting the
-#' development of dental plaque.
+#' @description These data arose from a study in dentistry. In this trial,
+#' subjects were generally healthy adult male and female volunteers, ages
+#' 18–55, with pre-existing plaque but without advanced periodontal
+#' disease. Prior to entry, subjects were screened for a minimum of 20
+#' sound, natural teeth and a minimum mean plaque index of 2.0. Subjects
+#' with gross oral pathology or on antibiotic, antibacterial, or
+#' anti-inflammatory therapy were excluded from the study. One hundred
+#' nine volunteers were randomized in a double-blinded way to one of two
+#' novel mouth rinses (A and B) or to a control mouth rinse. Plaque was
+#' scored at baseline, at 3 months, and at 6 months by the Turesky
+#' modification of the Quigley-Hein index, a continuous measure. Four
+#' subjects had missing plaque scores. The main objective of the
+#' analysis is to measure the effectiveness of three mouth rinses at
+#' inhibiting dental plaque.
 #'
 #' @docType data
 #'
@@ -366,13 +376,15 @@
 #'
 #' @title Roots Produced by the Columnar Apple Cultivar Trajan.
 #'
-#' @description The data arose from a horticultural experiment to study the number of roots produced by 270
-#' micropropagated shoots of the columnar apple cultivar Trajan.
-#' During the rooting period, all shoots were maintained under identical conditions, but the shoots
-#' themselves were cultured on media containing different concentrations of the cytokinin
-#' 6-benzylaminopurine (BAP), in growth cabinets with an 8 or 16 hour photoperiod. The objective
-#' is to assess the effect of both the photoperiod and the concentration levels of BAP on the
-#' number of roots produced.
+#' @description The data arose from a horticultural experiment to study
+#' the number of roots produced by 270 micropropagated shoots of the
+#' columnar apple cultivar Trajan. During the rooting period, all shoots
+#' were maintained under identical conditions. However, the shoots
+#' themselves were cultured on media containing different concentrations
+#' of the cytokinin 6-benzylaminopurine (BAP), in growth cabinets with
+#' an 8 or 16 hour photoperiod. The objective is to assess the effect
+#' of both the photoperiod and BAP concentration levels on the number
+#' of roots produced.
 #'
 #' @docType data
 #'
@@ -411,17 +423,17 @@
 #'
 #' @title Urinary Tract Infections in HIV-infected Men
 #'
-#' @description These data arose from a study conducted in the Department of
-#' Internal Medicine at the Utrecht University Hospital, the Netherlands, where
-#' 98 human immunodeficiency virus (HIV)-infected men were followed up to two
-#' years. Urinary cultures were obtained during the first visit and every six
-#' months thereafter. Also, cultures were obtained between regular scheduled
-#' visits when signs and symptoms of urinary tract infections (UTI) occurred,
-#' or when patients had fever of unknown origin. CD4+ cell counts were also
-#' measured. A CD4+ count is a blood test to determine how well the immune
-#' system is working in people who have been diagnosed with HIV. In general,
-#' a decreasing CD4+ count is an indication of the progression of HIV. See
-#' Hoepelman et al. (1992), van den Broek (1995), Morel and Nagaraj (2012, page 175).
+#' @description These data arose from a study conducted in the Department
+#' of Internal Medicine at Utrecht University Hospital, in the
+#' Netherlands. In this study, 98 HIV-infected men were followed for
+#' up to two years. Urinary cultures were obtained during the first
+#' visit and every six months thereafter. Also, cultures were obtained
+#' between regular scheduled visits when signs and symptoms of urinary
+#' tract infections (UTI) occurred, or when patients had a fever of
+#' unknown origin. CD4+ cell counts were also measured. A CD4+ count
+#' is a blood test to determine how well the immune system works in
+#' people diagnosed with HIV. In general, a decreasing CD4+ count
+#' indicates HIV progression.
 #'
 #' @docType data
 #'
@@ -453,18 +465,18 @@
 #'
 #' @title Shoulder Pain after Laparoscopic Cholecystectomy
 #'
-#' @description Inflation of the abdomen during laparoscopic cholecystectomy
-#' (removal of the gallbladder) separates the liver from the diaphragm and
-#' places strain on the attachments that connect both. This strain is felt as
-#' referred pain in the shoulder. Suction to remove residual gas may reduce
-#' shoulder pain. There were 22 subjects randomized in the active group (with
-#' abdominal suction) and 19 subjects randomized in the control group (without
-#' abdominal suction). After laparoscopic surgery, patients were asked to rate
-#' their shoulder pain on a visual analog scale morning and afternoon for three
-#' days after the operation (a total of six different times). The scale was
-#' coded into five ordered categories where a pain score of 1 indicated "low pain"
-#' and a score of 5 reflected "high pain". See Jorgensen et al. (1995),
-#' Lumley (1996), Morel and Nagaraj (2012, page 319).
+#' @description Inflation of the abdomen during laparoscopic
+#' cholecystectomy (removal of the gallbladder) separates the liver from
+#' the diaphragm and strains the attachments that connect both. This
+#' strain is felt as a referred shoulder pain. Suction to remove residual
+#' gas may reduce shoulder pain. There were 22 subjects randomized in the
+#' active group (with abdominal suction) and 19 subjects randomized in
+#' the control group (without abdominal suction). After laparoscopic
+#' surgery, patients were asked to rate their shoulder pain on a visual
+#' analog scale morning and afternoon for three days after the operation
+#' (a total of six different times). The scale was coded into five
+#' ordered categories where a pain score of 1 indicated "low pain" and
+#' a score of 5 reflected "high pain".
 #'
 #' @docType data
 #'
@@ -504,14 +516,14 @@
 #'
 #' @title Germination of Orobanche Seeds
 #'
-#' @description These data arose from a study of the germination of two species
-#' of Orobanche seeds (O. aegyptiaca 75 and O. aegyptiaca 73) grown on 1/125
-#' dilutions of two different root extract media (cucumber and bean) in a 2×2
-#' factorial layout with replicates. The data consist of the number of seeds
-#' and the number germinating for each replicate. Interest focusses on the
-#' possible differences in germination rates for the two types of seed and
-#' root extract and whether there is any interaction. See Crowder (1978),
-#' Hinde and Demetrio (1998).
+#' @description These data arose from a study of the germination of two
+#' species of Orobanche seeds (O. aegyptiaca 75 and O. aegyptiaca 73)
+#' grown on 1/125 dilutions of two different root extract media (cucumber
+#' and bean) in a 2×2 factorial layout with replicates. The data consist
+#' of the number of seeds and germinating seeds for each replicate.
+#' Interest is focused on the possible differences in germination rates
+#' for the two types of seed and root extract and whether there is any
+#' interaction.
 #'
 #' @docType data
 #'
@@ -547,9 +559,9 @@
 #' patients with urinary incontinence (UI) affected patient outcomes. Data
 #' were collected on 137 elderly patients from 38 medical practices. The
 #' number of patients per practice ranged from 1 to 8 and the median was
-#' 4 patients. The interest of the present analysis is to determine what
-#' predicts whether or not a patient considers their UI a problem that
-#' interferes with him/her daily life.
+#' 4 patients. The statistical analysis aims to determine what predicts
+#' whether or not a patient considers their UI a problem that interferes
+#' with him/her daily life.
 #'
 #' @docType data
 #'
@@ -579,13 +591,18 @@
 #'
 #' @title Effect of ozone-enriched atmosphere on growth of sitka spruces
 #'
-#' @description The main objective of the analysis of these data is to assess the effect of the ozone pollution on the tree growth. As ozone pollution
-#' is common in urban areas, the impact of increased ozone concentrations on tree growth is of considerable interest. The
-#' response variable is tree size, where size is conventionally measured by the product of tree height and stem diameter squared.
-#' In a first group, a total of 54 trees were grown under an ozone-enriched atmosphere, that is, ozone exposure at 70 parts per billion,
-#' whereas in a second group, 25 were grown under a normal atmosphere. The size of each tree was observed 13 times across the time, that is,
-#' 152, 174, 201, 227, 258, 469, 496, 528, 556, 579, 613, 639 and 674 days since the beginning of the experiment. Hence,
-#' the objective is to compare the growth patterns of the trees under the two conditions. See Diggle et al. (2002, page 4).
+#' @description These data are analyzed primarily to determine how ozone
+#' pollution affects tree growth. As ozone pollution is common in urban
+#' areas, the impact of increased ozone concentrations on tree growth is
+#' of considerable interest. The response variable is tree size, where
+#' size is conventionally measured by the product of tree height and
+#' stem diameter squared. In the first group, 54 trees were grown under
+#' an ozone-enriched atmosphere, ozone exposure at 70 parts per billion.
+#' In the second group, 25 trees were grown under normal conditions. The
+#' size of each tree was observed 13 times across time, that is, 152,
+#' 174, 201, 227, 258, 469, 496, 528, 556, 579, 613, 639 and 674 days
+#' since the beginning of the experiment. Hence, the objective is to
+#' compare the trees' growth patterns under the two conditions.
 #'
 #' @docType data
 #'
@@ -617,11 +634,13 @@
 
 #' @title Agents to stimulate cellular differentiation
 
-#' @description In a biomedical study of the immuno-activating ability of two agents, TNF (tumor necrosis factor)
-#' and IFN (interferon), to induce cell differentiation, the number of cells that exhibited markers of
-#' differentiation after exposure to TNF and IFN was recorded. At each of the 16 dose combinations of
-#' TNF/INF, 200 cells were examined. The main question is whether the two
-#' agents stimulate cell differentiation synergistically or independently.
+#' @description In a biomedical study of the immuno-activating ability of
+#' two agents, TNF (tumor necrosis factor) and IFN (interferon), to induce
+#' cell differentiation, the number of cells that exhibited markers of
+#' differentiation after exposure to TNF and IFN was recorded. At each of
+#' the 16 TNF/INF dose combinations, 200 cells were examined. The main
+#' question is whether the two agents stimulate cell differentiation
+#' synergistically or independently.
 #'
 #' @docType data
 #'
@@ -645,22 +664,18 @@
 #' @references Piegorsch W.W., Weinberg C.R., Margolin B.H. (1988) Exploring
 #' simple independent action in multifactor tables of proportions. \emph{Biometrics} 44:595-603.
 #'
-#' Vanegas, L.H. and Rondon, L.M. (2020) A data transformation to deal with
+#' Vanegas L.H., Rondon L.M. (2020) A data transformation to deal with
 #' constant under/over-dispersion in binomial and poisson regression models. \emph{Journal
 #' of Statistical Computation and Simulation} 90:1811-1833.
 "cellular"
 
 #' @title Teratogenic effects of phenytoin and trichloropropene oxide
 
-#' @description The data come from a 2x2 factorial design with 81 pregnant mice. In the experiment each
-#' pregnant mouse was randomly allocated to an control group and three treated groups, which
-#' received daily, by gastric gavages, 60 mg/kg of phenytoin, 100 mg/kg of
-#' trichloropropene oxide, or 60 mg/kg phenytoin and 100 mg/kg of trichloropropene
-#' oxide. On day 18 of gestation, fetuses were recovered, stained, and cleared. Then, by
-#' visual inspection, the presence or absence of ossification was determined for the different
-#' joints of the right and left forepaws. The purpose of the experiment was to investigate the
-#' synergy of phenytoin  and trichloropropene oxide to produce ossification at the phalanges,
-#' that is, teratogenic effects. See Morel and Nagaraj (2012, page 103).
+#' @description The data come from a 2x2 factorial design with 81 pregnant
+#' mice. In the experiment each pregnant mouse was randomly allocated to a
+#' control group and three treated groups. These groups received daily, by
+#' gastric gavage, 60 mg/kg of phenytoin, 100 mg/kg of trichloropropene
+#' oxide, or 60 mg/kg of phenytoin and 100 mg/kg of trichloropropene oxide. On day 18 of gestation, the fetuses were recovered, stained, and cleared. Then, by visual inspection, the presence or absence of ossification was determined for the different joints of the right and left forepaws. The experiment investigated the synergy of phenytoin and trichloropropene oxide to produce ossification at the phalanges, teratogenic effects.
 #'
 #' @docType data
 #'
@@ -693,12 +708,10 @@
 
 #' @title Self diagnozed ear infections in swimmers
 #'
-#' @description The data come from the Pilot Surf/Health
-#' Study of NSW Water Board performed in 1990 on 287
-#' recruits. The objective of the study was to determine,
-#' in particular, whether beach swimmers run a greater
-#' risk of contracting ear infections than non-beach swimmers.
-#' See Hand et al. (1994. page 266).
+#' @description A pilot surf/health study was conducted by NSW Water
+#' Board in 1990 on 287 recruits. The objective of the study was to
+#' determine whether beach swimmers run an increased risk of contracting
+#' ear infections than non-beach swimmers.
 #'
 #' @docType data
 #'
@@ -735,14 +748,15 @@
 
 #' @title Ability of retinyl acetate to prevent mammary cancer in rats
 #'
-#' @description A total of 76 female rats were injected with a carcinogen for
-#' mammary cancer. Then, all animals were given retinyl acetate (retinoid) to
-#' prevent mammary cancer for 60 days. After this phase, the 48 animals that
-#' remained tumor-free were randomly assigned to continue the retinoid prophylaxis
-#' or control. Rats were then palpated for tumors twice weekly, and observations
-#' ended 182 days after the initial carcinogen injections began. The main objective
-#' of analysis was to assess the difference in the development of tumors between
-#' the treated and control groups. See Morel and Nagaraj (2012, page 63).
+#' @description A total of 76 female rats were injected with a carcinogen
+#' for mammary cancer. Then, all animals were given retinyl acetate
+#' (retinoid) to prevent mammary cancer for 60 days. After this phase,
+#' the 48 animals that remained tumor-free were randomly assigned to
+#' continue retinoid prophylaxis or control. Rats were then palpated for
+#' tumors twice weekly, and observations ended 182 days after initial
+#' carcinogen injections began. The main objective of the analysis was
+#' to assess the difference in tumor development between the treated
+#' and control groups.
 #'
 #' @docType data
 #'
@@ -767,9 +781,9 @@
 
 #' @title Species richness
 #'
-#' @description In these data the response is the species richness represented by a
-#' count of the number of plant species on plots that have different biomass and
-#' three different soil pH levels: low, mid, and high. See Crawley (2007, page 534).
+#' @description In these data the response is species richness represented
+#' by a count of the number of plant species on plots with different
+#' biomass and three different soil pH levels: low, mid, and high.
 #'
 #' @docType data
 #'
@@ -793,11 +807,12 @@
 #'
 #' @title Hill races in Scotland
 #'
-#' @description Each year the Scottish Hill Runners Association publishes a list of
-#' hill races in Scotland for the year. These data consist of record time,
-#' distance, and cumulative climb of 35 of those races. The aim of the statistical
-#' analysis of these data is to explain the differences between the record time of
-#' the races using their differences on distance and cumulative climb. See Agresti (2015, page 62).
+#' @description Each year the Scottish Hill Runners Association publishes
+#' a list of hill races in Scotland for the year. These data consist of
+#' the record time, distance, and cumulative climb of 35 of those races.
+#' The statistical analysis of these data aims to explain the differences
+#' between the record time of the races. This is done using their
+#' differences in distance and cumulative climb.
 #'
 #' @docType data
 #'
@@ -826,11 +841,12 @@
 #'
 #' @title Bladder cancer in mice
 #'
-#' @description Female mice were continuously fed dietary concentrations of
-#' 2-Acetylaminofluorene (2-AAF), a carcinogenic and mutagenic derivative of fluorene.
-#' Serially sacrificed, dead or moribund mice were examined for tumors and dates
-#' of deaths were recorded. These data consist of the incidences of bladder
-#' neoplasms in the mice observed during 33 months.
+#' @description Female mice were continuously fed dietary concentrations
+#' of 2-Acetylaminofluorene (2-AAF), a carcinogenic and mutagenic
+#' derivative of fluorene. Serially sacrificed, dead or moribund mice
+#' were examined for tumors and deaths dates recorded. These data consist
+#' of the incidences of bladder neoplasms in mice observed during 33
+#' months.
 #'
 #' @docType data
 #'
@@ -855,12 +871,11 @@
 #'
 #' @title Liver cancer in mice
 #'
-#' @description Female mice were continuously fed dietary concentrations of
-#' 2-Acetylaminofluorene (2-AAF), a carcinogenic and mutagenic derivative of fluorene.
-#' Serially sacrificed, dead or moribund mice were examined for tumors and dates
-#' of deaths were recorded. These data consist of the incidences of liver
-#' neoplasms in the mice observed during 18 months.
-#'
+#' @description Female mice were continuously fed dietary concentrations
+#' of 2-Acetylaminofluorene (2-AAF), a carcinogenic and mutagenic
+#' derivative of fluorene. Serially sacrificed, dead or moribund mice
+#' were examined for tumors and deaths dates recorded. These data consist
+#' of the incidences of liver neoplasms in mice observed during 18 months.
 #' @docType data
 #'
 #' @usage data(liver)
@@ -884,9 +899,9 @@
 
 #' @title Skin cancer in women
 #'
-#' @description The data describe the incidence of nonmelanoma
-#' skin cancer for women stratified by age in Minneapolis
-#' (St. Paul) and Dallas (Fort Worth). See Kleinbaum et al. (2013, page 751).
+#' @description The data describe the incidence of nonmelanoma skin
+#' cancer among women stratified by age in Minneapolis (St. Paul) and
+#'  Dallas (Fort Worth).
 #'
 #' @docType data
 #'
@@ -908,16 +923,15 @@
 #' legend("topleft", legend=c("St.Paul","Ft.Worth"), title="City",
 #'        fill=c("yellow","blue"), bty="n")
 #'
-#'
 #' @references Kleinbaum D., Kupper L., Nizam A., Rosenberg E.S. (2013) \emph{Applied Regression Analysis and
 #' other Multivariable Methods, Fifth Edition}, Cengage Learning, Boston.
 "skincancer"
 
 #' @title Lesions of Aucuba mosaic virus
 #'
-#' @description The investigators counted the number of lesions
-#' of \emph{Aucuba mosaic} virus developing after exposure to X
-#' rays for various times. See Snedecor and Cochran (1980, page 404).
+#' @description The investigators counted the number of lesions of
+#' \emph{Aucuba mosaic} virus developing after exposure to X rays for
+#'  various times.
 #'
 #' @docType data
 #'
@@ -939,17 +953,15 @@
 
 #' @title Treatment for severe postnatal depression
 #'
-#' @description These data arose from a study on the efficacy of
-#' oestrogen give transdermally for treatment of severe postnatal
-#' depression. Women with major depression were randomly assigned
-#' to either a placebo control group or estrogen patch group.
-#' Prior to the treatment all women were assessed by
-#' self-ratings of depressive symptoms on the Edinburgh
-#' Postnatal Depression Scale (EPDS). The data on EPDS were
-#' collected monthly for six months once the treatment began.
-#' Higher scores on the EDPS are indicative of higher levels of
-#' depression.
-
+#' @description These data arose from a study on the efficacy of oestrogen
+#' given transdermally for the treatment of severe postnatal depression.
+#' Women with major depression were randomly assigned to a placebo control
+#' group or an oestrogen patch group. Prior to the treatment all women
+#' were assessed by self-rated depressive symptoms on the Edinburgh
+#' Postnatal Depression Scale (EPDS). EPDS data were collected monthly
+#' for six months once treatment began. Higher EDPS scores are indicative
+#' of higher depression levels.
+#'
 #' @docType data
 #'
 #' @usage data(depression)
@@ -976,7 +988,7 @@
 #'        title="Treatment", bty="n")
 #'
 #' @source \url{https://stats.oarc.ucla.edu/spss/library/spss-librarypanel-data-analysis-using-gee/}
-#' @references Gregoire A.J.P., Kumar R., Everitt B., Henderson A.F., Studd, J.W.W. (1996) Transdermal oestrogen for treatment of severe postnatal depression,
+#' @references Gregoire A.J.P., Kumar R., Everitt B., Henderson A.F., Studd J.W.W. (1996) Transdermal oestrogen for treatment of severe postnatal depression,
 #' \emph{The Lancet} 347:930-933.
 "depression"
 
@@ -984,8 +996,8 @@
 #'
 #' @description These data arise from an experiment using accelerated
 #' life testing to determine the estimated shelf life of a photographic
-#' developer. The maximum density as well as the temperature seem to
-#' be good indicators of overall developer/film performance.
+#' developer. Maximum density and temperature seem to be reliable
+#' indicators of overall developer/film performance.
 #'
 #' @docType data
 #'
@@ -1005,6 +1017,6 @@
 #' legend("topright", legend=c("72C","82C","92C"), col=c(1:3), pch=16,
 #'        title="Temperature", bty="n")
 #'
-#' @references Chapman, R.E. (1997) Degradation study of a photographic developer to determine shelf life,
+#' @references Chapman R.E. (1997) Degradation study of a photographic developer to determine shelf life,
 #' \emph{Quality Engineering} 10:1, 137-140.
 "shelflife"

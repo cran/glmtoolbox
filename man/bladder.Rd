@@ -16,11 +16,12 @@ A data frame with 8 rows and 3 variables:
 data(bladder)
 }
 \description{
-Female mice were continuously fed dietary concentrations of
-2-Acetylaminofluorene (2-AAF), a carcinogenic and mutagenic derivative of fluorene.
-Serially sacrificed, dead or moribund mice were examined for tumors and dates
-of deaths were recorded. These data consist of the incidences of bladder
-neoplasms in the mice observed during 33 months.
+Female mice were continuously fed dietary concentrations
+of 2-Acetylaminofluorene (2-AAF), a carcinogenic and mutagenic
+derivative of fluorene. Serially sacrificed, dead or moribund mice
+were examined for tumors and deaths dates recorded. These data consist
+of the incidences of bladder neoplasms in mice observed during 33
+months.
 }
 \examples{
 data(bladder)

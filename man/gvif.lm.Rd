@@ -45,7 +45,7 @@ fit3 <- lm(Balance ~ Cards + Age + Rating + Income + Student + Limit, data=Credi
 gvif(fit3)
 }
 \references{
-Fox, J. and Monette, G. (1992) Generalized collinearity diagnostics, \emph{JASA} 87, 178–183.
+Fox J., Monette G. (1992) Generalized collinearity diagnostics, \emph{JASA} 87, 178–183.
 }
 \seealso{
 \link{gvif.glm}

@@ -45,5 +45,5 @@ ROCc(cbind(testdata[,"death2"],probs), col="red", col.lab="blue", col.axis="blac
      col.main="black", family="mono")
 }
 \references{
-Hanley, J.A. and McNeil, B.J. (1982) The Meaning and Use of the Area under a Receiver Operating Characteristic (ROC) Curve. \emph{Radiology} 143, 29–36.
+Hanley J.A., McNeil B.J. (1982) The Meaning and Use of the Area under a Receiver Operating Characteristic (ROC) Curve. \emph{Radiology} 143, 29–36.
 }

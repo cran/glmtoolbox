@@ -20,9 +20,10 @@ A data frame with 200 rows and 4 variables:
 data(advertising)
 }
 \description{
-The Advertising data set consists of the sales of that product in
-200 different markets, along with advertising budgets for the product in each
-of those markets for three different media: TV, radio, and newspaper.
+The advertising data set consists of sales of that product
+in 200 different markets. It also includes advertising budgets for the
+product in each of those markets for three different media: TV, radio,
+and newspapers.
 }
 \examples{
 data(advertising)

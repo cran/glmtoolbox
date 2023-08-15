@@ -55,5 +55,5 @@ dfbeta(fit3, coefs="tnf", col="red", lty=1, lwd=1, col.lab="blue",
        col.axis="blue", col.main="black", family="mono", cex=0.8, main="tnf")
 }
 \references{
-Pregibon, D. (1981). Logistic regression diagnostics. \emph{The Annals of Statistics}, 9, 705-724.
+Pregibon D. (1981). Logistic regression diagnostics. \emph{The Annals of Statistics}, 9, 705-724.
 }

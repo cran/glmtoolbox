@@ -16,10 +16,11 @@ A data frame with 35 rows and 3 variables:
 data(Oranges)
 }
 \description{
-The data arose from five orange trees grown at Riverside,
-California, during the period 1969-1973. The response is the trunk
-circumference, in millimeters, and the predictor variable is the time,
-in days, with an arbitrary origin taken on December 31, 1968.
+The data arose from five orange trees grown in Riverside,
+California, during 1969-1973. The response is the trunk circumference,
+in millimeters, and the predictor variable is time, in days. The
+predictor variable has an arbitrary origin and was taken on December
+31, 1968.
 }
 \examples{
 dev.new()

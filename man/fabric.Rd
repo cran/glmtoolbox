@@ -15,9 +15,9 @@ A data frame with 32 rows and 2 variables:
 data(fabric)
 }
 \description{
-The main objective of the analysis of this dataset is to assess
-if there is an association between the number of faults in rolls of fabric and
-their length.
+The main objective of the analysis of this dataset is to
+assess if there is an association between the number of faults in
+fabric rolls and their length.
 }
 \examples{
 dev.new()

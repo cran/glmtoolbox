@@ -55,5 +55,5 @@ residuals(fit3, type="quantile", plot.it=TRUE, col="red", pch=20, col.lab="blue"
 
 }
 \references{
-Dunn P.K. and Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics}, 5, 236-244.
+Dunn P.K., Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics}, 5, 236-244.
 }

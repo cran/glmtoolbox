@@ -4,7 +4,7 @@
 \alias{AGPC}
 \title{AGPC for Generalized Estimating Equations}
 \usage{
-AGPC(..., k = 2, verbose = TRUE)
+AGPC(..., k = 2, verbose = TRUE, digits = 2)
 }
 \arguments{
 \item{...}{one or several objects of the class \emph{glmgee}.}
@@ -12,6 +12,8 @@ AGPC(..., k = 2, verbose = TRUE)
 \item{k}{an (optional) non-negative value giving the magnitude of the penalty. By default, \code{k} is set to be 2.}
 
 \item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+
+\item{digits}{an (optional) integer indicating the number of digits to print.}
 }
 \value{
 A \code{data.frame} with the values of the gaussian pseudo-likelihood, the number of parameters in the linear predictor plus the number of parameters in the correlation matrix, and the value of AGPC for each \emph{glmgee} object in the input.

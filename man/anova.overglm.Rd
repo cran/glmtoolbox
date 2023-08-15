@@ -57,8 +57,8 @@ anova(fit1, fit2, fit3, test="gradient")
 
 }
 \references{
-Buse, A. (1982) The Likelihood Ratio, Wald, and Lagrange Multiplier Tests: An Expository Note.
+Buse A. (1982) The Likelihood Ratio, Wald, and Lagrange Multiplier Tests: An Expository Note.
                             \emph{The American Statistician} 36, 153-157.
 
-Terrell, G.R. (2002) The gradient statistic. \emph{Computing Science and Statistics} 34, 206–215.
+Terrell G.R. (2002) The gradient statistic. \emph{Computing Science and Statistics} 34, 206–215.
 }

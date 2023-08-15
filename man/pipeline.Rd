@@ -18,12 +18,13 @@ A data frame with 107 rows and 2 variables:
 data(pipeline)
 }
 \description{
-The Alaska pipeline data consists of in-field ultrasonic measurements of
-the depths of defects in the Alaska pipeline. The depth of the defects were then
-re-measured in the laboratory. These measurements were performed in six different
-batches. The data were analyzed to calibrate the bias of the field measurements
-relative to the laboratory measurements. In this analysis, the field measurement
-is the response variable and the laboratory measurement is the predictor variable.
+The Alaska pipeline data consists of in-field ultrasonic
+measurements of defects depths in the Alaska pipeline. The depth of
+the defects was measured again in the laboratory. These measurements
+were performed in six batches. The data were analyzed to calibrate
+the bias of field measurements relative to laboratory measurements.
+In this analysis, the field measurement is the response variable and
+the laboratory measurement is the predictor variable.
 }
 \examples{
 data(pipeline)

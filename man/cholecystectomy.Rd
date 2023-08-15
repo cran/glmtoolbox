@@ -22,18 +22,18 @@ A data frame with 246 rows and 7 variables:
 data(cholecystectomy)
 }
 \description{
-Inflation of the abdomen during laparoscopic cholecystectomy
-(removal of the gallbladder) separates the liver from the diaphragm and
-places strain on the attachments that connect both. This strain is felt as
-referred pain in the shoulder. Suction to remove residual gas may reduce
-shoulder pain. There were 22 subjects randomized in the active group (with
-abdominal suction) and 19 subjects randomized in the control group (without
-abdominal suction). After laparoscopic surgery, patients were asked to rate
-their shoulder pain on a visual analog scale morning and afternoon for three
-days after the operation (a total of six different times). The scale was
-coded into five ordered categories where a pain score of 1 indicated "low pain"
-and a score of 5 reflected "high pain". See Jorgensen et al. (1995),
-Lumley (1996), Morel and Nagaraj (2012, page 319).
+Inflation of the abdomen during laparoscopic
+cholecystectomy (removal of the gallbladder) separates the liver from
+the diaphragm and strains the attachments that connect both. This
+strain is felt as a referred shoulder pain. Suction to remove residual
+gas may reduce shoulder pain. There were 22 subjects randomized in the
+active group (with abdominal suction) and 19 subjects randomized in
+the control group (without abdominal suction). After laparoscopic
+surgery, patients were asked to rate their shoulder pain on a visual
+analog scale morning and afternoon for three days after the operation
+(a total of six different times). The scale was coded into five
+ordered categories where a pain score of 1 indicated "low pain" and
+a score of 5 reflected "high pain".
 }
 \examples{
 data(cholecystectomy)

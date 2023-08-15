@@ -132,15 +132,17 @@ a vector of regression parameters and \eqn{m(x_{ij},\beta)} is a known nonlinear
 The parameter estimates are obtained by iteratively
 solving the estimating equations described by Liang and Zeger (1986).
 
-If the maximum cluster size is 6 and for a cluster of size 4 the value of \code{waves} is set
-to be 2, 4, 5, 6, then it means that the data on times 1 and 3 are missing, which should be
-taken into account by \code{gnmgee} when the structure of the correlation matrix is assumed
-to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent" or "AR-M-dependent".
-If in this scenario \code{waves} is not specified, then \code{gnmgee} assumes that the available
-data for this cluster were taken on point times 1, 2, 3 and 4.
+If the maximum cluster size is 6 and for a cluster of size 4 the value
+of \code{waves} is set to be 2, 4, 5, 6, then it means that the data at
+times 1 and 3 are missing, which should be taken into account by
+\code{gnmgee} when the structure of the correlation matrix is assumed
+to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent"
+or "AR-M-dependent". If in this scenario \code{waves} is not specified
+then \code{gnmgee} assumes that the available data for this cluster
+were taken at times 1, 2, 3 and 4.
 
-A set of standard extractor functions for fitted model objects is available for objects of class  \emph{glmgee},
-including methods to the generic functions such as \code{print}, \code{summary},	\code{model.matrix}, \code{estequa},
+A set of standard extractor functions for fitted model objects is
+available for objects of class \emph{glmgee}, including methods to generic functions such as   \code{print}, \code{summary},	\code{model.matrix}, \code{estequa},
 \code{coef}, \code{vcov}, \code{logLik}, \code{fitted}, \code{confint} and \code{predict}.
 In addition, the model may be assessed using functions such as \link{anova.glmgee},
 \link{residuals.glmgee}, \link{dfbeta.glmgee} and \link{cooks.distance.glmgee}.
@@ -169,5 +171,5 @@ Zeger S.L., Liang K.Y. (1986) Longitudinal data analysis for discrete and contin
 Hardin J.W., Hilbe J.M. (2013) \emph{Generalized Estimating Equations}. Chapman & Hall, London.
 }
 \seealso{
-\link{glmgee}
+\link{glmgee}, \link{wglmgee}
 }

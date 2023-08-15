@@ -19,12 +19,10 @@ A data frame with 287 rows and 5 variables:
 data(swimmers)
 }
 \description{
-The data come from the Pilot Surf/Health
-Study of NSW Water Board performed in 1990 on 287
-recruits. The objective of the study was to determine,
-in particular, whether beach swimmers run a greater
-risk of contracting ear infections than non-beach swimmers.
-See Hand et al. (1994. page 266).
+A pilot surf/health study was conducted by NSW Water
+Board in 1990 on 287 recruits. The objective of the study was to
+determine whether beach swimmers run an increased risk of contracting
+ear infections than non-beach swimmers.
 }
 \examples{
 data(swimmers)

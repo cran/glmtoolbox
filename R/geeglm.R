@@ -33,15 +33,17 @@
 #' a vector of regression parameters. The parameter estimates are obtained by iteratively
 #' solving the estimating equations described by Liang and Zeger (1986).
 #'
-#' If the maximum cluster size is 6 and for a cluster of size 4 the value of \code{waves} is set
-#' to be 2, 4, 5, 6, then it means that the data on times 1 and 3 are missing, which should be
-#' taken into account by \code{glmgee} when the structure of the correlation matrix is assumed
-#' to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent" or "AR-M-dependent".
-#' If in this scenario \code{waves} is not specified then \code{glmgee} assumes that the available
-#' data for this cluster were taken on point times 1, 2, 3 and 4.
+#' If the maximum cluster size is 6 and for a cluster of size 4 the value
+#' of \code{waves} is set to be 2, 4, 5, 6, then it means that the data at
+#' times 1 and 3 are missing, which should be taken into account by
+#' \code{glmgee} when the structure of the correlation matrix is assumed
+#' to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent"
+#' or "AR-M-dependent". If in this scenario \code{waves} is not specified
+#' then \code{glmgee} assumes that the available data for this cluster
+#' were taken at times 1, 2, 3 and 4.
 #'
-#' A set of standard extractor functions for fitted model objects is available for objects of class  \emph{glmgee},
-#' including methods to the generic functions such as \code{print}, \code{summary},	\code{model.matrix}, \code{estequa},
+#' A set of standard extractor functions for fitted model objects is
+#' available for objects of class \emph{glmgee}, including methods to generic functions such as  \code{print}, \code{summary},	\code{model.matrix}, \code{estequa},
 #' \code{coef}, \code{vcov}, \code{logLik}, \code{fitted}, \code{confint} and \code{predict}.
 #' In addition, the model may be assessed using functions such as \link{anova.glmgee},
 #' \link{residuals.glmgee}, \link{dfbeta.glmgee}, \link{cooks.distance.glmgee} and \link{localInfluence.glmgee}.
@@ -99,7 +101,7 @@
 #' \tab \cr
 #' \code{call}         \tab the original function call,\cr
 #' }
-#' @seealso \link{gnmgee}
+#' @seealso \link{gnmgee}, \link{wglmgee}
 #' @export glmgee
 #' @importFrom MASS negative.binomial
 #' @importFrom statmod tweedie
@@ -434,7 +436,7 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
 }
 #' @method summary glmgee
 #' @export
-summary.glmgee <- function(object, ...,digits=5,corr.digits=3,varest=c("robust","df-adjusted","bias-corrected","model"),corr=TRUE){
+summary.glmgee <- function(object, ...,digits=max(3, getOption("digits") - 2),corr.digits=3,varest=c("robust","df-adjusted","bias-corrected","model"),corr=TRUE){
   varest <- match.arg(varest)
   .Theta <- function() return(.Theta)
   environment(.Theta) <- environment(object$family$variance)
@@ -463,11 +465,6 @@ summary.glmgee <- function(object, ...,digits=5,corr.digits=3,varest=c("robust",
   colnames(TAB) <- c("Estimate", "Std.Error", "z-value", "Pr(>|z|)")
   rownames(TAB) <- c(rownames(object$coefficients),"","Dispersion")
   printCoefmat(TAB, P.values=TRUE, signif.stars=FALSE, has.Pvalue=TRUE, digits=digits, dig.tst=digits, signif.legend=FALSE, tst.ind=c(1,2,3), na.print="")
-#  cat("*************************************************************\n")
-#  cat("Goodness-of-fit statistics\n")
-#  cat("      -2*quasi-likelihood: ",round(-2*object$logLik,digits=3),"\n")
-#  cat("                      QIC: ",round(-2*object$logLik+2*object$CIC,digits=3),"\n")
-#  cat("                     QICu: ",round(-2*object$logLik+2*length(object$coefficients),digits=3),"\n")
   cat("*************************************************************\n")
   if(corr){
     cat("Working correlation\n")
@@ -478,19 +475,29 @@ summary.glmgee <- function(object, ...,digits=5,corr.digits=3,varest=c("robust",
 
 #' @method confint glmgee
 #' @export
-confint.glmgee <- function(object,parm,level=0.95,digits=4,verbose=TRUE,varest=c("robust","df-adjusted","model","bias-corrected"),...){
-type <- match.arg(varest)
-ee <- sqrt(diag(vcov(object,type=varest)))
+confint.glmgee <- function(object,parm,level=0.95,contrast,digits=max(3, getOption("digits") - 2),verbose=TRUE,varest=c("robust","df-adjusted","model","bias-corrected"),...){
+varest <- match.arg(varest)
+name.s <- rownames(object$coefficients)
+if(missingArg(contrast)){
+  bs <- coef(object)
+  ee <- sqrt(diag(vcov(object,type=varest)))
+}else{
+  contrast <- as.matrix(contrast)
+  if(ncol(contrast)!=length(name.s)) stop(paste("Number of columns of contrast matrix must to be",length(name.s)),call.=FALSE)
+  bs <- contrast%*%coef(object)
+  ee <- sqrt(diag(contrast%*%vcov(object,type=varest)%*%t(contrast)))
+  name.s <- apply(contrast,1,function(x) paste0(x[x!=0],"*",name.s[x!=0],collapse=" + "))
+}
 results <- matrix(0,length(ee),2)
-results[,1] <- coef(object) - qnorm(1-level/2)*ee
-results[,2] <- coef(object) + qnorm(1-level/2)*ee
-rownames(results) <- rownames(object$coefficients)
+results[,1] <- bs - qnorm((1+level)/2)*ee
+results[,2] <- bs + qnorm((1+level)/2)*ee
+rownames(results) <- name.s
 colnames(results) <- c("Lower limit","Upper limit")
 if(verbose){
-  cat("\n Approximate",round(100*(1-level),digits=1),"percent confidence intervals based on the Wald test \n\n")
+  cat("\n Approximate",round(100*level,digits=1),"percent confidence intervals based on the Wald test \n\n")
   print(round(results,digits=digits))
 }
-return(invisible(results))
+return(invisible(round(results,digits=digits)))
 }
 #' @title Dfbeta for Generalized Estimating Equations
 #' @description Produces an approximation, better known as the \emph{one-step approximation},
@@ -1113,9 +1120,9 @@ anova.glmgee <- function(object,...,test=c("wald","score"),verbose=TRUE,varest=c
   test <- match.arg(test)
   varest <- match.arg(varest)
   x <- list(object,...)
-  if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
+  if(any(unlist(lapply(x,function(xx) class(xx)[1])!="glmgee")))
     stop("Only glmgee-type objects are supported!!",call.=FALSE)
-  if(any(lapply(x,function(xx) xx$linear!=TRUE)))
+  if(any(unlist(lapply(x,function(xx) xx$linear!=TRUE))))
     stop("Objects generated by the function gnmgee() are not supported!!",call.=FALSE)
     if(length(x)==1){
     terminos <- attr(object$terms,"term.labels")
@@ -1172,6 +1179,7 @@ anova.glmgee <- function(object,...,test=c("wald","score"),verbose=TRUE,varest=c
 #' @param k an (optional) non-negative value giving the magnitude of the penalty. By default, \code{k} is set to be 2.
 #' @param u an (optional) logical switch indicating if QIC should be replaced by QICu. By default, \code{u} is set to be FALSE.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param digits an (optional) integer indicating the number of digits to print.
 #' @return A \code{data.frame} with the values of -2*quasi-likelihood, the number of parameters in the linear predictor, and the value of QIC (or QICu if \code{u}=TRUE) for each \emph{glmgee} object in the input.
 #' @seealso \link{CIC}, \link{GHYC}, \link{RJC}, \link{AGPC}, \link{SGPC}
 #' @export QIC
@@ -1205,7 +1213,7 @@ anova.glmgee <- function(object,...,test=c("wald","score"),verbose=TRUE,varest=c
 #' @references Hin L.-Y., Carey V.J., Wang Y.-G. (2007) Criteria for Working–Correlation–Structure Selection in GEE:
 #' Assessment via Simulation. \emph{The American Statistician} 61:360–364.
 #'
-QIC <- function(...,k=2,u=FALSE,verbose=TRUE){
+QIC <- function(...,k=2,u=FALSE,verbose=TRUE,digits=2){
   .Theta <- function() return(.Theta)
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -1215,7 +1223,7 @@ QIC <- function(...,k=2,u=FALSE,verbose=TRUE){
   rows <-  matrix(NA,length(x),1)
   call. <- match.call()
   for(i in 1:length(x)){
-    results[i,1] <- round(-2*x[[i]]$logLik,digits=3)
+    results[i,1] <- round(-2*x[[i]]$logLik,digits=digits)
     results[i,2] <- length(coef(x[[i]]))
     results[i,3] <- round(-2*x[[i]]$logLik+ifelse(u,k*length(x[[i]]$coefficients),k*x[[i]]$CIC),digits=3)
     results2[i,1] <- as.character(call.[i+1])
@@ -1251,6 +1259,7 @@ QIC <- function(...,k=2,u=FALSE,verbose=TRUE){
 #' @description Computes the Correlation Information Criterion (CIC) for one or more objects of the class glmgee.
 #' @param ...	one or several objects of the class \emph{glmgee}.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param digits an (optional) integer indicating the number of digits to print.
 #' @return A \code{data.frame} with the values of the CIC for each \emph{glmgee} object in the input.
 #' @export CIC
 #' @seealso \link{QIC}, \link{GHYC}, \link{RJC}, \link{AGPC}, \link{SGPC}
@@ -1284,7 +1293,7 @@ QIC <- function(...,k=2,u=FALSE,verbose=TRUE){
 #' @references Hin L.-Y., Carey V.J., Wang Y.-G. (2007) Criteria for Working–Correlation–Structure Selection in GEE:
 #' Assessment via Simulation. \emph{The American Statistician} 61:360–364.
 #'
-CIC <- function(...,verbose=TRUE){
+CIC <- function(...,verbose=TRUE,digits=3){
   .Theta <- function() return(.Theta)
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -1294,7 +1303,7 @@ CIC <- function(...,verbose=TRUE){
   rows <-  matrix(NA,length(x),1)
   call. <- match.call()
   for(i in 1:length(x)){
-    results[i,1] <- round(x[[i]]$CIC,digits=3)
+    results[i,1] <- round(x[[i]]$CIC,digits=digits)
     results2[i,1] <- as.character(call.[i+1])
     if(x[[i]]$family$family=="Negative Binomial"){
       environment(.Theta) <- environment(x[[i]]$family$variance)
@@ -1327,9 +1336,10 @@ CIC <- function(...,verbose=TRUE){
 #' @description Computes the Pardo-Alonso's criterion (PAC) for one or more objects of the class glmgee.
 #' @param ...	one or several objects of the class \emph{glmgee}.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param digits an (optional) integer indicating the number of digits to print.
 #' @return A \code{data.frame} with the values of the PAC for each \emph{glmgee} object in the input.
 #' @export PAC
-#' @references Pardo M.C. and Alonso R. (2019) Working correlation structure selection in GEE analysis.
+#' @references Pardo M.C., Alonso R. (2019) Working correlation structure selection in GEE analysis.
 #' \emph{Statistical Papers} 60:1447–1467.
 #' @seealso \link{QIC}, \link{CIC}, \link{RJC}, \link{AGPC}, \link{SGPC}, \link{GHYC}
 #' @examples
@@ -1358,7 +1368,7 @@ CIC <- function(...,verbose=TRUE){
 #' fit3 <- update(fit1, corstr="Exchangeable")
 #' PAC(fit1, fit2, fit3)
 #'
-PAC <- function(...,verbose=TRUE){
+PAC <- function(...,verbose=TRUE,digits=4){
   .Theta <- function() return(.Theta)
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -1395,7 +1405,7 @@ PAC <- function(...,verbose=TRUE){
     return(cr)
   }
   for(i in 1:length(x)){
-    results[i,1] <- round(Gosho(x[[i]]),digits=3)
+    results[i,1] <- round(Gosho(x[[i]]),digits=digits)
     results2[i,1] <- as.character(call.[i+1])
     if(x[[i]]$family$family=="Negative Binomial"){
       environment(.Theta) <- environment(x[[i]]$family$variance)
@@ -1431,6 +1441,7 @@ PAC <- function(...,verbose=TRUE){
 #' @description Computes the Gosho-Hamada-Yoshimura's criterion (GHYC) for one or more objects of the class glmgee.
 #' @param ...	one or several objects of the class \emph{glmgee}.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param digits an (optional) integer indicating the number of digits to print.
 #' @return A \code{data.frame} with the values of the GHYC for each \emph{glmgee} object in the input.
 #' @export GHYC
 #' @references Gosho M., Hamada C., Yoshimura I. (2011) Criterion for the Selection
@@ -1465,7 +1476,7 @@ PAC <- function(...,verbose=TRUE){
 #' fit3 <- update(fit1, corstr="Exchangeable")
 #' GHYC(fit1, fit2, fit3)
 #'
-GHYC <- function(...,verbose=TRUE){
+GHYC <- function(...,verbose=TRUE,digits=3){
   .Theta <- function() return(.Theta)
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -1502,7 +1513,7 @@ GHYC <- function(...,verbose=TRUE){
     return(cr)
   }
   for(i in 1:length(x)){
-    results[i,1] <- round(Gosho(x[[i]]),digits=3)
+    results[i,1] <- round(Gosho(x[[i]]),digits=digits)
     results2[i,1] <- as.character(call.[i+1])
     if(x[[i]]$family$family=="Negative Binomial"){
       environment(.Theta) <- environment(x[[i]]$family$variance)
@@ -1536,6 +1547,7 @@ GHYC <- function(...,verbose=TRUE){
 #' @description Computes the Rotnitzky–Jewell's criterion (RJC) for one or more objects of the class glmgee.
 #' @param ...	one or several objects of the class \emph{glmgee}.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param digits an (optional) integer indicating the number of digits to print.
 #' @return A \code{data.frame} with the values of the RJC for each \emph{glmgee} object in the input.
 #' @export RJC
 #' @seealso \link{QIC}, \link{CIC}, \link{GHYC}, \link{AGPC}, \link{SGPC}
@@ -1567,7 +1579,7 @@ GHYC <- function(...,verbose=TRUE){
 #' fit3 <- update(fit1, corstr="Exchangeable")
 #' RJC(fit1, fit2, fit3)
 #'
-RJC <- function(...,verbose=TRUE){
+RJC <- function(...,verbose=TRUE,digits=3){
   .Theta <- function() return(.Theta)
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -1577,7 +1589,7 @@ RJC <- function(...,verbose=TRUE){
   rows <-  matrix(NA,length(x),1)
   call. <- match.call()
   for(i in 1:length(x)){
-    results[i,1] <- round(x[[i]]$RJC,digits=3)
+    results[i,1] <- round(x[[i]]$RJC,digits=digits)
     results2[i,1] <- as.character(call.[i+1])
     if(x[[i]]$family$family=="Negative Binomial"){
       environment(.Theta) <- environment(x[[i]]$family$variance)
@@ -1663,7 +1675,7 @@ RJC <- function(...,verbose=TRUE){
 #'
 #' @method stepCriterion glmgee
 #' @export
-#' @references James, G. and Witten, D. and Hastie, T. and Tibshirani, R. (2013, page 210) \emph{An Introduction to Statistical Learning
+#' @references James G., Witten D., Hastie T., Tibshirani R. (2013, page 210) \emph{An Introduction to Statistical Learning
 #' with Applications in R}. Springer, New York.
 #' @references Jianwen X., Jiamao Z., Liya F. (2019) Variable selection in generalized estimating equations via empirical
 #' likelihood and Gaussian pseudo-likelihood. \emph{Communications in Statistics - Simulation and Computation} 48:1239-1250.
@@ -1978,6 +1990,7 @@ stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","agpc
 #' @param ...	one or several objects of the class \emph{glmgee}.
 #' @param k an (optional) non-negative value giving the magnitude of the penalty. By default, \code{k} is set to be 2.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param digits an (optional) integer indicating the number of digits to print.
 #' @return A \code{data.frame} with the values of the gaussian pseudo-likelihood, the number of parameters in the linear predictor plus the number of parameters in the correlation matrix, and the value of AGPC for each \emph{glmgee} object in the input.
 #' @details If \code{k} is set to be 0 then the AGPC reduces to the Gaussian pseudo-likelihood criterion (GPC), proposed by Carey and Wang (2011), which corresponds to the logarithm of the multivariate normal density function.
 #' @export AGPC
@@ -2015,7 +2028,7 @@ stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","agpc
 #' fit3 <- update(fit1, corstr="Exchangeable")
 #' AGPC(fit1, fit2, fit3)
 #'
-AGPC <- function(...,k=2,verbose=TRUE){
+AGPC <- function(...,k=2,verbose=TRUE,digits=2){
   .Theta <- function() return(.Theta)
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -2039,11 +2052,8 @@ AGPC <- function(...,k=2,verbose=TRUE){
       mui <- family$linkinv(etai)
       wi <- sqrt(family$variance(mui)/D[,p+3])
       Vi <- phi*t(model$corr[D[,p+4],D[,p+4]]*matrix(wi,ni,ni))*matrix(wi,ni,ni)
-      if(model$corstr=="Independence") Vi2 <- (1/phi)*diag(1/wi[D[,p+4]]^2)
-      else{
-        Vi2 <- try(chol(Vi),silent=TRUE)
-        if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)
-      }
+      Vi2 <- try(chol(Vi),silent=TRUE)
+      if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)
       return(ni*log(2*pi) + t(yi - mui)%*%Vi2%*%(yi - mui) + log(det(Vi)))
     }
     resume <- Reduce('+',lapply(model$arrangedata,VSi))
@@ -2060,9 +2070,9 @@ AGPC <- function(...,k=2,verbose=TRUE){
   }
   for(i in 1:length(x)){
     temporal <- Gosho(x[[i]])
-    results[i,1] <- round(temporal$cr0,digits=4)
+    results[i,1] <- round(temporal$cr0,digits=digits)
     results[i,2] <- temporal$cr2
-    results[i,3] <- round(temporal$cr1,digits=4)
+    results[i,3] <- round(temporal$cr1,digits=digits)
     results2[i,1] <- as.character(call.[i+1])
     if(x[[i]]$family$family=="Negative Binomial"){
       environment(.Theta) <- environment(x[[i]]$family$variance)
@@ -2096,6 +2106,7 @@ AGPC <- function(...,k=2,verbose=TRUE){
 #' @description Computes the Schwarz-type penalized Gaussian pseudo-likelihood criterion (SGPC) for one or more objects of the class glmgee.
 #' @param ...	one or several objects of the class \emph{glmgee}.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param digits an (optional) integer indicating the number of digits to print.
 #' @return A \code{data.frame} with the values of the gaussian pseudo-likelihood, the number of parameters in the linear predictor plus the number of parameters in the correlation matrix, and the value of SGPC for each \emph{glmgee} object in the input.
 #' @export SGPC
 #' @seealso \link{QIC}, \link{CIC}, \link{RJC}, \link{GHYC}, \link{AGPC}
@@ -2132,7 +2143,7 @@ AGPC <- function(...,k=2,verbose=TRUE){
 #' fit3 <- update(fit1, corstr="Exchangeable")
 #' SGPC(fit1, fit2, fit3)
 #'
-SGPC <- function(...,verbose=TRUE){
+SGPC <- function(...,verbose=TRUE,digits=2){
   .Theta <- function() return(.Theta)
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -2156,9 +2167,8 @@ SGPC <- function(...,verbose=TRUE){
       mui <- family$linkinv(etai)
       wi <- sqrt(family$variance(mui)/D[,p+3])
       Vi <- phi*t(model$corr[D[,p+4],D[,p+4]]*matrix(wi,ni,ni))*matrix(wi,ni,ni)
-      if(model$corstr=="Independence") Vi2 <- (1/phi)*diag(1/wi[D[,p+4]]^2)
-      else{Vi2 <- try(chol(Vi),silent=TRUE)
-      if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)}
+      Vi2 <- try(chol(Vi),silent=TRUE)
+      if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)
       return(ni*log(2*pi) + t(yi - mui)%*%Vi2%*%(yi - mui) + log(det(Vi)))
     }
     resume <- Reduce('+',lapply(model$arrangedata,VSi))
@@ -2175,9 +2185,9 @@ SGPC <- function(...,verbose=TRUE){
   }
   for(i in 1:length(x)){
     temporal <- Gosho(x[[i]])
-    results[i,1] <- round(temporal$cr0,digits=4)
+    results[i,1] <- round(temporal$cr0,digits=digits)
     results[i,2] <- temporal$cr2
-    results[i,3] <- round(temporal$cr1,digits=4)
+    results[i,3] <- round(temporal$cr1,digits=digits)
     results2[i,1] <- as.character(call.[i+1])
     if(x[[i]]$family$family=="Negative Binomial"){
       environment(.Theta) <- environment(x[[i]]$family$variance)
@@ -2489,15 +2499,17 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
 #' The parameter estimates are obtained by iteratively
 #' solving the estimating equations described by Liang and Zeger (1986).
 #'
-#' If the maximum cluster size is 6 and for a cluster of size 4 the value of \code{waves} is set
-#' to be 2, 4, 5, 6, then it means that the data on times 1 and 3 are missing, which should be
-#' taken into account by \code{gnmgee} when the structure of the correlation matrix is assumed
-#' to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent" or "AR-M-dependent".
-#' If in this scenario \code{waves} is not specified, then \code{gnmgee} assumes that the available
-#' data for this cluster were taken on point times 1, 2, 3 and 4.
+#' If the maximum cluster size is 6 and for a cluster of size 4 the value
+#' of \code{waves} is set to be 2, 4, 5, 6, then it means that the data at
+#' times 1 and 3 are missing, which should be taken into account by
+#' \code{gnmgee} when the structure of the correlation matrix is assumed
+#' to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent"
+#' or "AR-M-dependent". If in this scenario \code{waves} is not specified
+#' then \code{gnmgee} assumes that the available data for this cluster
+#' were taken at times 1, 2, 3 and 4.
 #'
-#' A set of standard extractor functions for fitted model objects is available for objects of class  \emph{glmgee},
-#' including methods to the generic functions such as \code{print}, \code{summary},	\code{model.matrix}, \code{estequa},
+#' A set of standard extractor functions for fitted model objects is
+#' available for objects of class \emph{glmgee}, including methods to generic functions such as   \code{print}, \code{summary},	\code{model.matrix}, \code{estequa},
 #' \code{coef}, \code{vcov}, \code{logLik}, \code{fitted}, \code{confint} and \code{predict}.
 #' In addition, the model may be assessed using functions such as \link{anova.glmgee},
 #' \link{residuals.glmgee}, \link{dfbeta.glmgee} and \link{cooks.distance.glmgee}.
@@ -2553,7 +2565,7 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
 #' \tab \cr
 #' \code{call}         \tab the original function call,\cr
 #' }
-#' @seealso \link{glmgee}
+#' @seealso \link{glmgee}, \link{wglmgee}
 #' @export gnmgee
 #' @examples
 #' ###### Example : Orange trees grown at Riverside, California
@@ -3285,7 +3297,7 @@ wglmgee <- function(formula,level=c("observations","clusters"),family=gaussian()
                prior.weights=weights,y=y,formula=formula,call=match.call(),offset=offs,model=mmf,data=data,score=score,ids=id2,
                converged=ifelse(niter<maxit,TRUE,FALSE),estfun=estfun,R=vcovs,terms=terms(mx),family=family,Rout=Rout,Rhat=Rhat,id=id,
                phi=phi,corr=R,clusters=c(length(sizes),max(sizes),min(sizes)),corstr=corstr,missingm=missingm,level=level,
-               levels=.getXlevels(attr(mmf,"terms"),mmf),contrasts=attr(X,"contrasts"),start=start,iter=niter)
+               levels=.getXlevels(attr(mmf,"terms"),mmf),contrasts=attr(X,"contrasts"),start=start,iter=niter,dmm=q)
   class(out_) <- "wglmgee"
   return(out_)
 }
@@ -3373,25 +3385,43 @@ estequa.wglmgee <- function(object,...){
   return(out_)
 }
 
+#' @method vcov wglmgee
+#' @export
+vcov.wglmgee <- function(object,...){
+  out_ <- object$R
+  rownames(out_) <- colnames(out_) <- rownames(object$coefficients)
+  return(out_)
+}
+
 #' @method confint wglmgee
 #' @export
-confint.wglmgee <- function(object,parm,level=0.95,digits=4,verbose=TRUE,...){
-  ee <- sqrt(diag(vcov(object)))
+confint.wglmgee <- function(object,parm,level=0.95,contrast,digits=max(3, getOption("digits") - 2),verbose=TRUE,...){
+  name.s <- rownames(object$coefficients)
+  if(missingArg(contrast)){
+    bs <- coef(object)
+    ee <- sqrt(diag(vcov(object)))
+  }else{
+    contrast <- as.matrix(contrast)
+    if(ncol(contrast)!=length(name.s)) stop(paste("Number of columns of contrast matrix must to be",length(name.s)),call.=FALSE)
+    bs <- contrast%*%coef(object)
+    ee <- sqrt(diag(contrast%*%vcov(object)%*%t(contrast)))
+    name.s <- apply(contrast,1,function(x) paste0(x[x!=0],"*",name.s[x!=0],collapse=" + "))
+  }
   results <- matrix(0,length(ee),2)
-  results[,1] <- coef(object) - qnorm(1-level/2)*ee
-  results[,2] <- coef(object) + qnorm(1-level/2)*ee
-  rownames(results) <- rownames(object$coefficients)
+  results[,1] <- bs - qnorm((1+level)/2)*ee
+  results[,2] <- bs + qnorm((1+level)/2)*ee
+  rownames(results) <- name.s
   colnames(results) <- c("Lower limit","Upper limit")
   if(verbose){
-    cat("\n Approximate",round(100*(1-level),digits=1),"percent confidence intervals based on the Wald test \n\n")
+    cat("\n Approximate",round(100*level,digits=1),"percent confidence intervals based on the Wald test \n\n")
     print(round(results,digits=digits))
   }
-  return(invisible(results))
+  return(invisible(round(results,digits=digits)))
 }
 
 #' @method summary wglmgee
 #' @export
-summary.wglmgee <- function(object,...,digits=4,corr.digits=3,corr=TRUE){
+summary.wglmgee <- function(object,...,digits=max(3, getOption("digits") - 2),corr.digits=3,corr=TRUE){
   .Theta <- function() return(.Theta)
   environment(.Theta) <- environment(object$family$variance)
   maxsize <- ncol(object$corr)
@@ -3412,16 +3442,27 @@ summary.wglmgee <- function(object,...,digits=4,corr.digits=3,corr=TRUE){
   cat("\nClusters by dropout time\n")
   print(ms[ms[,maxsize+2]!=0,], row.names=FALSE)
   cat("*************************************************************")
-  cat("\nCoefficients of missingness model\n")
+  cat("\nMissingness model\n")
+  cat("Coefficients\n")
   printCoefmat(object$missingm, P.values=TRUE, signif.stars=TRUE, has.Pvalue=TRUE, digits=digits, dig.tst=digits, signif.legend=FALSE, tst.ind=c(1,2,3), na.print="")
   cat("*************************************************************")
-  if(object$level=="observations") cat("\nObservation-specific Weighted GEE\n")
-  else cat("\nCluster-specific Weighted GEE\n")
+  if(object$level=="observations"){
+    cat("\nObservation-specific Weighted GEE\n")
+    ws <- do.call(rbind,object$arrangedata)
+    ws <- ws[ws[,object$dmm+1]==1,ncol(ws)]
+  }else{
+    cat("\nCluster-specific Weighted GEE\n")
+    ws <- do.call(rbind,lapply(object$arrangedata,function(x)min(x[,ncol(x)])))
+  }
+  out_ <- matrix(quantile(ws,probs=c(0,0.05,0.1,0.25,0.5,0.75,0.9,0.95,1)),1,9)
+  rownames(out_) <- " ";colnames(out_) <- c(" Min"," 5%"," 10%"," 25%"," 50%"," 75%"," 90%"," 95%"," Max")
+  cat("Weights\n")
+  print(out_,digits=3)
   if(object$family$family=="Negative Binomial") cat("\n        Variance function: ",paste0(object$family$family," (",.Theta(),")"))
   else cat("\n        Variance function: ",object$family$family)
   cat("\n            Link function: ",object$family$link)
   cat("\n    Correlation structure: ",ifelse(grepl("M-dependent",object$corstr),paste(object$corstr,"(",attr(object$corstr,"M"),")",sep=""),object$corstr))
-  cat("\n*************************************************************\n")
+  cat("\n*************************************************\n")
   cat("Coefficients\n")
   TAB	<- rbind(cbind(Estimate <- object$coefficients,
                      StdErr <- sqrt(diag(object$R)),
@@ -3432,10 +3473,12 @@ summary.wglmgee <- function(object,...,digits=4,corr.digits=3,corr=TRUE){
   colnames(TAB) <- c("Estimate", "Std.Error", "z-value", "Pr(>|z|)")
   rownames(TAB) <- c(rownames(object$coefficients),"","Dispersion")
   printCoefmat(TAB, P.values=TRUE, signif.stars=TRUE, has.Pvalue=TRUE, digits=digits, dig.tst=digits, signif.legend=FALSE, tst.ind=c(1,2,3), na.print="")
-  cat("*************************************************************\n")
+  cat("*************************************************\n")
   if(corr){
     cat("Working correlation\n")
     print(round(object$corr,digits=corr.digits))
   }
   return(invisible(round(TAB,digits=digits)))
 }
+
+

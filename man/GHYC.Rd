@@ -4,12 +4,14 @@
 \alias{GHYC}
 \title{Gosho-Hamada-Yoshimura's Criterion for Generalized Estimating Equations}
 \usage{
-GHYC(..., verbose = TRUE)
+GHYC(..., verbose = TRUE, digits = 3)
 }
 \arguments{
 \item{...}{one or several objects of the class \emph{glmgee}.}
 
 \item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+
+\item{digits}{an (optional) integer indicating the number of digits to print.}
 }
 \value{
 A \code{data.frame} with the values of the GHYC for each \emph{glmgee} object in the input.

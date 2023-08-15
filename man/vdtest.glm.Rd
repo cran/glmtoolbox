@@ -29,7 +29,7 @@ a list list with components including
 \description{
 Performs Rao's score test for varying dispersion parameter in
 weighted and unweighted generalized linear models in which the response
-distribution is assumed to be gaussian, Gamma or inverse gaussian.
+distribution is assumed to be Gaussian, Gamma, or inverse Gaussian.
 }
 \details{
 From the generalized lineal model with varying dispersion in which
@@ -41,9 +41,9 @@ where \eqn{\gamma=(\gamma_1,\ldots,\gamma_q)}.  The corresponding \emph{p}-value
 computed from the chi-squared distribution with \eqn{q} degrees of freedom,
 that is, \emph{p}-value = Prob\eqn{[\chi^2_{q} > S]}. If the object
 \code{model} corresponds to an unweighted generalized linear model then
-this test assess assumptions of constant variance and constant coefficient
-of variation on models in which the response distribution is assumed to be
-gaussian and Gamma, respectively.
+this test assesses assumptions of constant variance and constant
+coefficient of variation on models in which the response distribution
+is assumed to be Gaussian and Gamma, respectively.
 }
 \examples{
 ###### Example 1: Fuel consumption of automobiles
@@ -62,7 +62,7 @@ fit3 <- glm(BrainWt ~ log(BodyWt), family=Gamma("log"), data=brains)
 vdtest(fit3)
 }
 \references{
-Wei, B.-C. and Shi, J.-Q. and Fung, W.-K. and Hu, Y.-Q. (1998) Testing for Varying Dispersion in Exponential Family Nonlinear Models. \emph{Annals of the Institute of Statistical Mathematics} 50, 277–294.
+Wei B.-C., Shi, J.-Q., Fung W.-K., Hu Y.-Q. (1998) Testing for Varying Dispersion in Exponential Family Nonlinear Models. \emph{Annals of the Institute of Statistical Mathematics} 50, 277–294.
 }
 \seealso{
 \link{vdtest.lm}

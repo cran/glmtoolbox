@@ -18,11 +18,10 @@ https://sada2013.sciencesconf.org/16138/glmSession4_Cotonou.pdf
 data(dilution)
 }
 \description{
-These data are counts of virus
-particles at 5 different dilutions. There are 4
-replicate counts at each dilution except the last
-for which there are 5 counts. The aim is to
-estimate the number of virus particles per unit volume.
+These data are counts of virus particles at 5 different
+dilutions. There are 4 replicate counts at each dilution except the
+last for which there are 5 counts. The aim is to estimate the expected
+number of virus particles per unit volume.
 }
 \examples{
 data(dilution)

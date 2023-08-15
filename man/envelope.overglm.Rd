@@ -84,7 +84,7 @@ envelope(fit3, rep=30, conf=0.95, type="quantile", col="red", pch=20, col.lab="b
 \references{
 Atkinson A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
 
-Dunn P.K. and Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics} 5, 236-244.
+Dunn P.K., Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics} 5, 236-244.
 }
 \seealso{
 \link{envelope.lm}, \link{envelope.glm}, \link{envelope.zeroinflation}

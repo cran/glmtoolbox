@@ -88,7 +88,7 @@ stepCriterion(fit3, criterion="bic", direction="forward", test="score")
 
 }
 \references{
-James G., Witten D., Hastie T. and Tibshirani R. (2013, page 210) An Introduction to Statistical Learning
+James G., Witten D., Hastie T., Tibshirani R. (2013, page 210) An Introduction to Statistical Learning
 with Applications in R. Springer, New York.
 }
 \seealso{

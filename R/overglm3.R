@@ -1,6 +1,6 @@
 #'
 #' @title Test for zero-excess in Count Regression Models
-#' @description Allows to assess if the observed number of zeros is significantly higher than the expected according to the fitted count regression model (poisson or negative binomial).
+#' @description Allows to assess if the observed number of zeros is significantly higher than expected according to the fitted count regression model (poisson or negative binomial).
 #' @param object an object of the class \code{glm}, for poisson regression models, or an object of the class \code{overglm}, for negative binomial regression models.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
 #' @return A matrix with 1 row and the following columns:
@@ -20,10 +20,11 @@
 #' \eqn{P(0;\hat{\mu}_k,\hat{\phi})} for \eqn{k=1,\ldots,n}, where
 #' \eqn{\hat{\mu}_k} and \eqn{\hat{\phi}} represent the estimates of
 #' \eqn{\mu_k} and \eqn{\phi}, respectively, obtained from the fitted
-#' model. Thus, the statistical test reduces to the standardized
-#' difference between the observed and expected number of zeros,
-#' whose distribution, under the null hypothesis, tends to the standard
-#' normal when the sample size, \eqn{n}, tends to infinity.
+#' model. Thus, the test statistic reduces to the standardized
+#' difference between the observed and expected number of zeros. The
+#' distribution of that statistic, under the null hypothesis, tends
+#' to be the standard normal when the sample size, \eqn{n}, tends to
+#' infinity.
 #'
 #' @examples
 #' ####### Example 1: Self diagnozed ear infections in swimmers
@@ -83,17 +84,22 @@ zero.excess <- function(object,verbose=TRUE){
 }
 
 #' @title Alternatives to the Poisson and Binomial Regression Models under the presence of Overdispersion.
-#' @description Allows to fit regression models based on the negative binomial, beta-binomial, and random-clumped binomial
+#' @description Allows to fit regression models based on the negative binomial, beta-binomial, and random-clumped binomial.
 #' distributions, which are alternatives to the Poisson and binomial regression models under the presence of overdispersion.
 #' @param formula a \code{formula} expression of the form \code{response ~ x1 + x2 + ...}, which is a symbolic description
 #'        of the linear predictor of the model to be fitted to the data.
-#' @param family a character string which allows to specify the distribution to describe the response variable, as well as the link
-#'        function to be used in the model for \eqn{\mu}. The following distributions are supported: negative binomial I ("nb1"),
-#'        negative binomial II ("nb2"), negative binomial ("nbf"), zero-truncated negative binomial I ("ztnb1"),
-#'        zero-truncated negative binomial II ("ztnb2"), zero-truncated negative binomial ("ztnbf"), zero-truncated
-#'        poisson ("ztpoi"), beta-binomial ("bb") and random-clumped binomial ("rcb"). Link functions available for
-#'        these models are the same than those available
-#'        in Poisson and binomial models via \link{glm}. See \link{family} documentation.
+#' @param family A character string that allows you to specify the
+#'        distribution describing the response variable. In addition,
+#'        it allows you to specify the link function to be used in the
+#'        model for \eqn{\mu}. The following distributions are
+#'        supported: negative binomial I ("nb1"), negative binomial II
+#'        ("nb2"), negative binomial ("nbf"), zero-truncated negative
+#'        binomial I ("ztnb1"), zero-truncated negative binomial II
+#'        ("ztnb2"), zero-truncated negative binomial ("ztnbf"),
+#'        zero-truncated poisson ("ztpoi"), beta-binomial ("bb") and
+#'        random-clumped binomial ("rcb"). Link functions available for
+#'        these models are the same as those available for Poisson and
+#'        binomial models via \link{glm}. See \link{family} documentation.
 #' @param weights an (optional) vector of positive "prior weights" to be used in the fitting process. The length of
 #'        \code{weights} should be the same as the number of observations.
 #' @param data an (optional) \code{data frame} in which to look for variables involved in the \code{formula} expression,
@@ -164,31 +170,37 @@ zero.excess <- function(object,verbose=TRUE){
 #' E\eqn{(Y)=\mu} and Var\eqn{(Y)=\mu(1 +\phi\mu^{\tau+1})}.
 #'
 #' Therefore, the regression models based on the negative binomial and
-#' zero-truncated negative binomial distributions are alternatives under the presence of overdispersion
-#' to those based on the Poisson and zero-truncated Poisson distributions, respectively.
+#' zero-truncated negative binomial distributions are alternatives,
+#' under overdispersion, to those based on the Poisson and
+#' zero-truncated Poisson distributions, respectively.
 #'
-#' The beta-binomial distribution can be obtained as mixture of the binomial and beta distributions. If
+#' The beta-binomial distribution can be obtained as a mixture of the binomial and beta distributions. If
 #' \eqn{mY | \pi} ~ Binomial\eqn{(m,\pi)}, where E\eqn{(Y | \pi)=\pi} and Var\eqn{(Y | \pi)=m^{-1}\pi(1-\pi)},
 #' and \eqn{\pi} ~ Beta\eqn{(\mu,\phi)}, in which E\eqn{(\pi)=\mu} and Var\eqn{(\pi)=(\phi+1)^{-1}\mu(1-\mu)},
 #' with \eqn{\phi>0}, then \eqn{mY} ~ Beta-Binomial\eqn{(m,\mu,\phi)}, so that E\eqn{(Y)=\mu} and
 #' Var\eqn{(Y)=m^{-1}\mu(1-\mu)[1 + (\phi+1)^{-1}(m-1)]}. Therefore, the regression model based on the
-#' beta-binomial distribution is an alternative under the presence of overdispersion to the binomial regression model.
+#' beta-binomial distribution is an alternative, under overdispersion, to the binomial regression model.
 #'
-#' The random-clumped binomial distribution can be obtained as mixture of the binomial and Bernoulli distributions. If
+#' The random-clumped binomial distribution can be obtained as a mixture of the binomial and Bernoulli distributions. If
 #' \eqn{mY | \pi} ~ Binomial\eqn{(m,\pi)}, where E\eqn{(Y | \pi)=\pi} and Var\eqn{(Y | \pi)=m^{-1}\pi(1-\pi)},
 #' whereas \eqn{\pi=(1-\phi)\mu + \phi} with probability \eqn{\mu}, and \eqn{\pi=(1-\phi)\mu} with probability \eqn{1-\mu},
 #' in which E\eqn{(\pi)=\mu} and Var\eqn{(\pi)=\phi^{2}\mu(1-\mu)}, with \eqn{\phi \in (0,1)}, then \eqn{mY} ~ Random-clumped
 #' Binomial\eqn{(m,\mu,\phi)}, so that E\eqn{(Y)=\mu} and Var\eqn{(Y)=m^{-1}\mu(1-\mu)[1 + \phi^{2}(m-1)]}. Therefore,
-#' the regression model based on the random-clumped binomial distribution is an alternative under the presence of
-#' overdispersion to the binomial regression model.
+#' the regression model based on the random-clumped binomial distribution is an alternative, under
+#' overdispersion, to the binomial regression model.
 #'
-#' In all cases, even in those where the response variable is described using a zero-truncated distribution, the fitted
-#' model is aimed to describe the way in which \eqn{\mu} is dependent on some covariates. The parameter estimation is performed by using the
-#' maximum likelihood method. The model parameters are estimated by maximizing the log-likelihood
-#' function using the BFGS method available in the routine \link{optim}. The accuracy and speed of the BFGS
-#' method are increased because of the call to the routine \link{optim} is performed using the analytical instead of the numerical
-#' derivatives. The estimate of the variance-covariance matrix is obtained as being minus the inverse of the (analytical) hessian matrix
-#' evaluated at the parameter estimates and the observed data.
+#' In all cases, even where the response variable is described by a
+#' zero-truncated distribution, the fitted model describes the way in
+#' which \eqn{\mu} is dependent on some covariates. Parameter estimation
+#' is performed using the maximum likelihood method. The model
+#' parameters are estimated by maximizing the log-likelihood function
+#' through the BFGS method available in the routine \link{optim}. The
+#' accuracy and speed of the BFGS method are increased because the call
+#' to the routine \link{optim} is performed using analytical instead
+#' of the numerical  derivatives. The variance-covariance matrix
+#' estimate is obtained as being minus the inverse of the (analytical)
+#' hessian matrix evaluated at the parameter estimates and the observed
+#' data.
 #'
 #' A set of standard extractor functions for fitted model objects is available for objects of class  \emph{zeroinflation},
 #' including methods to the generic functions such as \code{print}, \code{summary},	\code{model.matrix}, \code{estequa},
@@ -238,13 +250,13 @@ zero.excess <- function(object,verbose=TRUE){
 #' fit7 <- overglm(model7, family="rcb(cloglog)", data=orobanche)
 #' summary(fit7)
 #'
-#' @references Crowder, M. (1978) Beta-binomial anova for proportions, \emph{Journal of the Royal Statistical
+#' @references Crowder M. (1978) Beta-binomial anova for proportions, \emph{Journal of the Royal Statistical
 #' Society Series C (Applied Statistics)} 27, 34-37.
-#' @references Lawless, J.F. (1987) Negative binomial and mixed poisson regression, \emph{The Canadian Journal
+#' @references Lawless J.F. (1987) Negative binomial and mixed poisson regression, \emph{The Canadian Journal
 #' of Statistics} 15, 209-225.
-#' @references Morel, J.G. and Neerchal, N.K. (1997) Clustered binary logistic regression in teratology data
+#' @references Morel J.G., Neerchal N.K. (1997) Clustered binary logistic regression in teratology data
 #' using a finite mixture distribution, \emph{Statistics in Medicine} 16, 2843-2853.
-#' @references Morel, J.G. and Nagaraj, N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc.,
+#' @references Morel J.G., Nagaraj N.K. (2012) \emph{Overdispersion Models in SAS}. SAS Institute Inc.,
 #' Cary, North Carolina, USA.
 #'
 
@@ -563,15 +575,19 @@ overglm <- function(formula, family="nb1(log)", weights, data, subset, na.action
 
 #' @title Zero-Altered Regression Models to deal with Zero-Excess in Count Data
 #' @description Allows to fit a zero-altered (Poisson or negative binomial) regression model to deal with zero-excess in count data.
-#' @param formula a \code{Formula} expression of the form \code{response ~ x1 + x2 + ...| z1 + z2 + ...}, which is a symbolic description
-#'        of the linear predictors of the models to be fitted to \eqn{\mu} and \eqn{\pi}, respectively.	See \link{Formula} documentation.  If a
-#'        formula of the form \code{response ~ x1 + x2 + ...} is supplied, then the same regressors are employed in both components. This is equivalent to
-#'        \code{response ~ x1 + x2 + ...| x1 + x2 + ...}.
-#' @param family an (optional) character string which allows to specify the distribution to describe the response variable, as well as the link
-#'        function to be used in the model for \eqn{\mu}. The following distributions are supported: (zero-altered) negative binomial I ("nb1"),
-#'        (zero-altered) negative binomial II ("nb2"), (zero-altered) negative binomial ("nbf"), and (zero-altered) poisson ("poi").
-#'        Link functions available are the same than those available in Poisson models via \link{glm}. See \link{family} documentation. By
-#'        default, \code{family} is set to be Poisson with log link.
+#' @param formula a \code{Formula} expression of the form \code{response ~ x1 + x2 + ...| z1 + z2 + ...},
+#'        which is a symbolic description of the linear predictors of the models to be fitted to
+#'        \eqn{\mu} and \eqn{\pi}, respectively.	See \link{Formula} documentation. If a formula
+#'        of the form \code{response ~ x1 + x2 + ...} is supplied, the same regressors are
+#'        employed in both components. This is equivalent to \code{response ~ x1 + x2 + ...| x1 + x2 + ...}.
+#' @param family an (optional) character string that allows you to specify the distribution
+#'        to describe the response variable, as well as the link function to be used in
+#'        the model for \eqn{\mu}. The following distributions are supported:
+#'        (zero-altered) negative binomial I ("nb1"), (zero-altered) negative binomial II
+#'        ("nb2"), (zero-altered) negative binomial ("nbf"), and (zero-altered) poisson
+#'        ("poi"). Link functions are the same as those available in Poisson models via
+#'        \link{glm}. See \link{family} documentation. By default, \code{family} is set to
+#'        be Poisson with log link.
 #' @param zero.link an (optional) character string which allows to specify the link function to be used in the model for \eqn{\pi}.
 #' 		  Link functions available are the same than those available in binomial models via \link{glm}. See \link{family} documentation.
 #' 		  By default, \code{zero.link} is set to be "logit".
@@ -655,18 +671,21 @@ overglm <- function(formula, family="nb1(log)", weights, data, subset, na.action
 #' The "counts" model may be expressed as \eqn{g(\mu_i)=x_i^{\top}\beta} for \eqn{i=1,\ldots,n}, where
 #' \eqn{g(\cdot)} is the link function specified at the argument \code{family}. Similarly, the "zeros" model may
 #' be expressed as \eqn{h(\pi_i)=z_i^{\top}\gamma} for \eqn{i=1,\ldots,n}, where \eqn{h(\cdot)} is the
-#' link function specified at the argument \code{zero.link}. The parameter estimation is performed by using the
-#' maximum likelihood method. The parameter vector \eqn{\gamma} is estimated by using the routine \link{glm.fit},
-#' where a binary-response model (\eqn{1} or "success" if \code{response}=0 and \eqn{0} or "fail" if \code{response}>0)
-#' is fitted. Then, the rest of the model parameters are estimated by maximizing the log-likelihood function
-#' based on the zero-truncated count distribution using the BFGS method available in the routine \link{optim}.
-#' The accuracy and speed of the BFGS
-#' method are increased because of the call to the routine \link{optim} is performed using the analytical instead of the numerical
-#' derivatives. The estimate of the variance-covariance matrix is obtained as being minus the inverse of the (analytical) hessian matrix
+#' link function specified at the argument \code{zero.link}. Parameter estimation is
+#' performed using the maximum likelihood method. The parameter vector \eqn{\gamma} is
+#' estimated by applying the routine \link{glm.fit}, where a binary-response model
+#' (\eqn{1} or "success" if \code{response}=0 and \eqn{0} or "fail" if \code{response}>0)
+#' is fitted. Then, the rest of the model parameters are estimated by maximizing the
+#' log-likelihood function based on the zero-truncated count distribution through the
+#' BFGS method available in the routine \link{optim}. The accuracy and speed of the BFGS
+#' method are increased because the call to the routine \link{optim} is performed using
+#' the analytical instead of the numerical derivatives. The variance-covariance matrix
+#' estimate is obtained as being minus the inverse of the (analytical) hessian matrix
 #' evaluated at the parameter estimates and the observed data.
-#'
-#' A set of standard extractor functions for fitted model objects is available for objects of class  \emph{zeroinflation},
-#' including methods to the generic functions such as \link{print}, \link{summary}, \link{model.matrix}, \link{estequa},
+
+#' A set of standard extractor functions for fitted model objects is available for objects
+#' of class  \emph{zeroinflation}, including methods to the generic functions such as
+#' \link{print}, \link{summary}, \link{model.matrix}, \link{estequa},
 #' \link{coef}, \link{vcov}, \link{logLik}, \link{fitted}, \link{confint}, \link{AIC}, \link{BIC} and
 #' \link{predict}. In addition, the model fitted to the	data may be assessed using functions such as
 #' \link{anova.zeroinflation}, \link{residuals.zeroinflation}, \link{dfbeta.zeroinflation},
@@ -690,9 +709,9 @@ overglm <- function(formula, family="nb1(log)", weights, data, subset, na.action
 #'
 #' @seealso \link{overglm}, \link{zeroinf}
 #' @export zeroalt
-#' @references Cameron, A.C. and Trivedi, P.K. 1998. \emph{Regression Analysis of Count Data}. New York:
+#' @references Cameron A.C., Trivedi P.K. (1998) \emph{Regression Analysis of Count Data}. New York:
 #'             Cambridge University Press.
-#' @references Mullahy, J. 1986. Specification and Testing of Some Modified Count Data Models. \emph{Journal of
+#' @references Mullahy J. (1986) Specification and Testing of Some Modified Count Data Models. \emph{Journal of
 #'             Econometrics} 33, 341–365.
 zeroalt <- function(formula, data, subset, na.action=na.omit(), weights, family="poi(log)",
                     zero.link=c("logit", "probit", "cloglog", "cauchit", "log"), reltol=1e-13,
@@ -910,11 +929,14 @@ zeroalt <- function(formula, data, subset, na.action=na.omit(), weights, family=
 #'        of the linear predictors of the models to be fitted to \eqn{\mu} and \eqn{\pi}, respectively.	See \link{Formula} documentation.  If a
 #'        formula of the form \code{response ~ x1 + x2 + ...} is supplied, then the same regressors are employed in both components. This is equivalent to
 #'        \code{response ~ x1 + x2 + ...| x1 + x2 + ...}.
-#' @param family an (optional) character string which allows to specify the distribution to describe the response variable, as well as the link
-#'        function to be used in the model for \eqn{\mu}. The following distributions are supported: (zero-inflated) negative binomial I ("nb1"),
-#'        (zero-inflated) negative binomial II ("nb2"), (zero-inflated) negative binomial ("nbf"), and (zero-inflated) poisson ("poi").
-#'        Link functions available are the same than those available in Poisson models via \link{glm}. See \link{family} documentation. By
-#'        default, \code{family} is set to be Poisson with log link.
+#' @param family an (optional) character string that allows you to specify the distribution
+#'        to describe the response variable, as well as the link function to be used in
+#'        the model for \eqn{\mu}. The following distributions are supported:
+#'        (zero-inflated) negative binomial I ("nb1"), (zero-inflated) negative binomial II
+#'        ("nb2"), (zero-inflated) negative binomial ("nbf"), and (zero-inflated) poisson
+#'        ("poi"). Link functions are the same as those available in Poisson models via
+#'        \link{glm}. See \link{family} documentation. By default, \code{family} is set to
+#'        be Poisson with log link.
 #' @param zero.link an (optional) character string which allows to specify the link function to be used in the model for \eqn{\pi}.
 #' 		  Link functions available are the same than those available in binomial models via \link{glm}. See \link{family} documentation.
 #' 		  By default, \code{zero.link} is set to be "logit".
@@ -999,15 +1021,17 @@ zeroalt <- function(formula, data, subset, na.action=na.omit(), weights, family=
 #' The "counts" model may be expressed as \eqn{g(\mu_i)=x_i^{\top}\beta} for \eqn{i=1,\ldots,n}, where
 #' \eqn{g(\cdot)} is the link function specified at the argument \code{family}. Similarly, the "zeros" model may
 #' be expressed as \eqn{h(\pi_i)=z_i^{\top}\gamma} for \eqn{i=1,\ldots,n}, where \eqn{h(\cdot)} is the
-#' link function specified at the argument \code{zero.link}. The parameter estimation is performed by using the
-#' maximum likelihood method. The model parameters are estimated by maximizing the log-likelihood
-#' function using the BFGS method available in the routine \link{optim}. The accuracy and speed of the BFGS
-#' method are increased because of the analytical instead of the numerical derivatives are used. The estimate
-#' of the variance-covariance matrix is obtained as being minus the inverse of the (analytical) hessian matrix
-#' evaluated at the parameter estimates and the observed data.
+#' link function specified at the argument \code{zero.link}. Parameter estimation is
+#' performed using the maximum likelihood method. The model parameters are estimated by
+#' maximizing the log-likelihood function through the BFGS method available in the routine
+#' \link{optim}. Analytical derivatives are used instead of numerical derivatives to
+#' increase BFGS method accuracy and speed. The variance-covariance matrix estimate is
+#' obtained as being minus the inverse of the (analytical) hessian matrix evaluated at the
+#' parameter estimates and the observed data.
 #'
-#' A set of standard extractor functions for fitted model objects is available for objects of class  \emph{zeroinflation},
-#' including methods to the generic functions such as \link{print}, \link{summary}, \link{model.matrix}, \link{estequa},
+#' A set of standard extractor functions for fitted model objects is available for objects
+#' of class \emph{zeroinflation}, including methods for generic functions such as
+#' \link{print}, \link{summary}, \link{model.matrix}, \link{estequa},
 #' \link{coef}, \link{vcov}, \link{logLik}, \link{fitted}, \link{confint}, \link{AIC}, \link{BIC} and
 #' \link{predict}. In addition, the model fitted to the	data may be assessed using functions such as
 #' \link{anova.zeroinflation}, \link{residuals.zeroinflation}, \link{dfbeta.zeroinflation},
@@ -1031,11 +1055,11 @@ zeroalt <- function(formula, data, subset, na.action=na.omit(), weights, family=
 #'
 #' @seealso \link{overglm}, \link{zeroalt}
 #' @export zeroinf
-#' @references Cameron, A.C. and Trivedi, P.K. 1998. \emph{Regression Analysis of Count Data}. New York:
+#' @references Cameron A.C., Trivedi P.K. 1998. \emph{Regression Analysis of Count Data}. New York:
 #'             Cambridge University Press.
-#' @references Lambert, D. 1992. Zero-Inflated Poisson Regression, with an Application to Defects in
+#' @references Lambert D. 1992. Zero-Inflated Poisson Regression, with an Application to Defects in
 #'             Manufacturing. \emph{Technometrics} 34, 1-14.
-#' @references Garay, A.M. and Hashimoto, E.M. and Ortega, E.M.M. and Lachos, V. 2011. On estimation and
+#' @references Garay A.M., Hashimoto E.M., Ortega E.M.M., Lachos V. (2011) On estimation and
 #'             influence diagnostics for zero-inflated negative binomial regression models. \emph{Computational
 #' 			   Statistics & Data Analysis} 55, 1304-1318.
 #'
@@ -1288,7 +1312,7 @@ coef.zeroinflation <- function(object, submodel=c("counts","zeros"), ...) {
   }
   else out_ <- object$coefficients[[submodel]]
   colnames(out_) <- "Estimates"
-  return(out_)
+  return(invisible(out_))
 }
 
 #' @method coef overglm
@@ -1298,7 +1322,7 @@ coef.overglm <- function(object, ...) {
   out_ <- as.matrix(object$coefficients[1:object$parms[1]])
   rownames(out_) <- rownames(object$coefficients)[1:object$parms[1]]
   colnames(out_) <- "Estimates"
-  return(out_)
+  return(invisible(out_))
 }
 
 #' @method vcov zeroinflation
@@ -1310,7 +1334,7 @@ vcov.zeroinflation <- function(object, submodel=c("counts","zeros"), ...) {
   if(submodel=="counts") out_ <- varcovar[1:object$parms[1],1:object$parms[1]]
   else out_ <- varcovar[-c(1:sum(object$parms[1:2])),-c(1:sum(object$parms[1:2]))]
   rownames(out_) <- colnames(out_) <- rownames(object$coefficients[[submodel]][1:ncol(out_)])
-  return(out_)
+  return(invisible(out_))
 }
 #' @method vcov overglm
 #' @export
@@ -1319,7 +1343,7 @@ vcov.overglm <- function(object, ...) {
   if(attr(object$R,"pd")) out_ <- chol2inv(object$R)[1:object$parms[1],1:object$parms[1]]
   else out_ <- object$R
   rownames(out_) <- colnames(out_) <- rownames(coef(object))
-  return(out_)
+  return(invisible(out_))
 }
 
 #' @method logLik zeroinflation
@@ -1667,7 +1691,7 @@ print.overglm <- function(x,...){
 #'
 #' @method residuals zeroinflation
 #' @export
-#' @references Dunn P.K. and Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics}, 5, 236-244.
+#' @references Dunn P.K., Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics}, 5, 236-244.
 #'
 residuals.zeroinflation <- function(object,type=c("quantile","standardized","response"),plot.it=FALSE,identify,...){
   type <- match.arg(type)
@@ -1758,7 +1782,7 @@ residuals.zeroinflation <- function(object,type=c("quantile","standardized","res
 #'
 #' @method residuals overglm
 #' @export
-#' @references Dunn P.K. and Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics}, 5, 236-244.
+#' @references Dunn P.K., Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics}, 5, 236-244.
 
 residuals.overglm <- function(object,type=c("quantile","standardized","response"), plot.it=FALSE, identify, ...){
   type <- match.arg(type)
@@ -1873,9 +1897,9 @@ residuals.overglm <- function(object,type=c("quantile","standardized","response"
 #' }
 #' @method anova overglm
 #' @export
-#' @references Buse, A. (1982) The Likelihood Ratio, Wald, and Lagrange Multiplier Tests: An Expository Note.
+#' @references Buse A. (1982) The Likelihood Ratio, Wald, and Lagrange Multiplier Tests: An Expository Note.
 #'                             \emph{The American Statistician} 36, 153-157.
-#' @references Terrell, G.R. (2002) The gradient statistic. \emph{Computing Science and Statistics} 34, 206–215.
+#' @references Terrell G.R. (2002) The gradient statistic. \emph{Computing Science and Statistics} 34, 206–215.
 #' @examples
 #' ## Example 1: Self diagnozed ear infections in swimmers
 #' data(swimmers)
@@ -1901,7 +1925,7 @@ residuals.overglm <- function(object,type=c("quantile","standardized","response"
 anova.overglm <- function(object,...,test=c("wald","lr","score","gradient"),verbose=TRUE){
   test <- match.arg(test)
   x <- list(object,...)
-  if(any(lapply(x,function(xx) class(xx)[1])!="overglm"))
+  if(any(unlist(lapply(x,function(xx) class(xx)[1])!="overglm")))
     stop("Only overglm-type objects are supported!!",call.=FALSE)
   if(length(x)==1){
     terminos <- attr(object$terms,"term.labels")
@@ -1990,9 +2014,9 @@ anova.overglm <- function(object,...,test=c("wald","lr","score","gradient"),verb
 #' }
 #' @method anova zeroinflation
 #' @export
-#' @references Buse, A. (1982) The Likelihood Ratio, Wald, and Lagrange Multiplier Tests: An Expository Note.
+#' @references Buse A. (1982) The Likelihood Ratio, Wald, and Lagrange Multiplier Tests: An Expository Note.
 #'                             \emph{The American Statistician} 36, 153-157.
-#' @references Terrell, G.R. (2002) The gradient statistic. \emph{Computing Science and Statistics} 34, 206–215.
+#' @references Terrell G.R. (2002) The gradient statistic. \emph{Computing Science and Statistics} 34, 206–215.
 #' @examples
 #' ####### Example 1: Article production by graduate students in biochemistry PhD programs
 #' bioChemists <- pscl::bioChemists
@@ -2012,7 +2036,7 @@ anova.zeroinflation <- function(object,...,test=c("wald","lr","score","gradient"
   test <- match.arg(test)
   submodel <- match.arg(submodel)
   x <- list(object,...)
-  if(any(lapply(x,function(xx) class(xx)[1])!="zeroinflation"))
+  if(any(unlist(lapply(x,function(xx) class(xx)[1])!="zeroinflation")))
     stop("Only zeroinflation-type objects are supported!!",call.=FALSE)
   if(length(x)==1){
     if(submodel=="counts"){
@@ -2115,7 +2139,7 @@ anova.zeroinflation <- function(object,...,test=c("wald","lr","score","gradient"
 #' predictor. The \eqn{i}-th row of that matrix corresponds to the difference between the estimates of the parameters
 #' in the linear predictor using all individuals and the \emph{one-step approximation} of those estimates when the
 #' \emph{i}-th individual is excluded from the dataset.
-#' @references Pregibon, D. (1981). Logistic regression diagnostics. \emph{The Annals of Statistics}, 9, 705-724.
+#' @references Pregibon D. (1981). Logistic regression diagnostics. \emph{The Annals of Statistics}, 9, 705-724.
 #' @method dfbeta overglm
 #' @export
 #' @examples
@@ -2225,7 +2249,7 @@ dfbeta.overglm <- function(model, coefs, identify, ...){
 #' predictor. The \eqn{i}-th row of that matrix corresponds to the difference between the estimates of the parameters
 #' in the linear predictor using all individuals and the \emph{one-step approximation} of those estimates when the
 #' \emph{i}-th individual is excluded from the dataset.
-#' @references Pregibon, D. (1981). Logistic regression diagnostics. \emph{The Annals of Statistics}, 9, 705-724.
+#' @references Pregibon D. (1981). Logistic regression diagnostics. \emph{The Annals of Statistics}, 9, 705-724.
 #' @method dfbeta zeroinflation
 #' @export
 #' @examples
@@ -2536,7 +2560,7 @@ cooks.distance.zeroinflation <- function(model, submodel=c("counts","zeros","ful
 #' envelope is composed of the quantiles (1 - \code{conf})/2 and (1 + \code{conf})/2 of the random sample of size \code{rep} of
 #' the \eqn{i}-th order statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n}.
 #' @references Atkinson A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
-#' @references Dunn P.K. and Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics} 5, 236-244.
+#' @references Dunn P.K., Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics} 5, 236-244.
 #' @seealso \link{envelope.lm}, \link{envelope.glm}, \link{envelope.overglm}
 #' @method envelope zeroinflation
 #' @export
@@ -2648,7 +2672,7 @@ envelope.zeroinflation <- function(object, rep=20, conf=0.95, type=c("quantile",
 #' envelope is composed of the quantiles (1 - \code{conf})/2 and (1 + \code{conf})/2 of the random sample of size \code{rep} of
 #' the \eqn{i}-th order statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n}.
 #' @references Atkinson A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
-#' @references Dunn P.K. and Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics} 5, 236-244.
+#' @references Dunn P.K., Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics} 5, 236-244.
 #' @seealso \link{envelope.lm}, \link{envelope.glm}, \link{envelope.zeroinflation}
 #' @method envelope overglm
 #' @export
@@ -2812,7 +2836,7 @@ envelope.overglm <- function(object, rep=25, conf=0.95, type=c("quantile","respo
 #'
 #' @method stepCriterion overglm
 #' @export
-#' @references James G., Witten D., Hastie T. and Tibshirani R. (2013, page 210) An Introduction to Statistical Learning
+#' @references James G., Witten D., Hastie T., Tibshirani R. (2013, page 210) An Introduction to Statistical Learning
 #' with Applications in R. Springer, New York.
 #'
 stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), test=c("wald","score","lr","gradient"), direction=c("forward","backward"), levels=c(0.05,0.05), trace=TRUE, scope, ...){
@@ -3317,7 +3341,7 @@ localInfluence.overglm <- function(object,type=c("total","local"),coefs,plot.it=
 #' fit3 <- overglm(cbind(cells,200-cells) ~ tnf + ifn, family="bb(logit)", data=cellular)
 #' gvif(fit3)
 #'
-#' @references Fox J. and Monette G. (1992) Generalized collinearity diagnostics, \emph{JASA} 87, 178–183.
+#' @references Fox J., Monette G. (1992) Generalized collinearity diagnostics, \emph{JASA} 87, 178–183.
 #' @seealso \link{gvif.lm}, \link{gvif.glm}
 #'
 gvif.overglm <- function(model,verbose=TRUE,...){
@@ -3340,4 +3364,57 @@ gvif.overglm <- function(model,verbose=TRUE,...){
   results <- results[order(-results[,3]),]
   if(verbose) print(results)
   return(invisible(results))
+}
+
+#' @method confint overglm
+#' @export
+confint.overglm <- function(object,parm,level=0.95,contrast,digits=max(3, getOption("digits") - 2),verbose=TRUE,...){
+  name.s <- rownames(object$coefficients)
+  if(missingArg(contrast)){
+    bs <- coef(object)
+    ee <- sqrt(diag(vcov(object)))
+  }else{
+    contrast <- as.matrix(contrast)
+    if(ncol(contrast)!=length(name.s)) stop(paste("Number of columns of contrast matrix must to be",length(name.s)),call.=FALSE)
+    bs <- contrast%*%coef(object)
+    ee <- sqrt(diag(contrast%*%vcov(object)%*%t(contrast)))
+    name.s <- apply(contrast,1,function(x) paste0(x[x!=0],"*",name.s[x!=0],collapse=" + "))
+  }
+  results <- matrix(0,length(ee),2)
+  results[,1] <- bs - qnorm((1+level)/2)*ee
+  results[,2] <- bs + qnorm((1+level)/2)*ee
+  rownames(results) <- name.s
+  colnames(results) <- c("Lower limit","Upper limit")
+  if(verbose){
+    cat("\n Approximate",round(100*level,digits=1),"percent confidence intervals based on the Wald test \n\n")
+    print(round(results,digits=digits))
+  }
+  return(invisible(round(results,digits=digits)))
+}
+
+#' @method confint zeroinflation
+#' @export
+confint.zeroinflation <- function(object,parm,level=0.95,contrast,submodel=c("counts","zeros"),digits=max(3, getOption("digits") - 2),verbose=TRUE,...){
+  coefs <- coef(object,submodel=submodel)
+  name.s <- rownames(coefs)
+  if(missingArg(contrast)){
+    bs <- coefs
+    ee <- sqrt(diag(vcov(object,submodel=submodel)))
+  }else{
+    contrast <- as.matrix(contrast)
+    if(ncol(contrast)!=length(name.s)) stop(paste("Number of columns of contrast matrix must to be",length(name.s)),call.=FALSE)
+    bs <- contrast%*%coefs
+    ee <- sqrt(diag(contrast%*%vcov(object,submodel=submodel)%*%t(contrast)))
+    name.s <- apply(contrast,1,function(x) paste0(x[x!=0],"*",name.s[x!=0],collapse=" + "))
+  }
+  results <- matrix(0,length(ee),2)
+  results[,1] <- bs - qnorm((1+level)/2)*ee
+  results[,2] <- bs + qnorm((1+level)/2)*ee
+  rownames(results) <- name.s
+  colnames(results) <- c("Lower limit","Upper limit")
+  if(verbose){
+    cat("\n Approximate",round(100*level,digits=1),"percent confidence intervals based on the Wald test \n\n")
+    print(round(results,digits=digits))
+  }
+  return(invisible(round(results,digits=digits)))
 }

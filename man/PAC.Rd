@@ -4,12 +4,14 @@
 \alias{PAC}
 \title{Pardo-Alonso's Criterion for Generalized Estimating Equations}
 \usage{
-PAC(..., verbose = TRUE)
+PAC(..., verbose = TRUE, digits = 4)
 }
 \arguments{
 \item{...}{one or several objects of the class \emph{glmgee}.}
 
 \item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+
+\item{digits}{an (optional) integer indicating the number of digits to print.}
 }
 \value{
 A \code{data.frame} with the values of the PAC for each \emph{glmgee} object in the input.
@@ -45,7 +47,7 @@ PAC(fit1, fit2, fit3)
 
 }
 \references{
-Pardo M.C. and Alonso R. (2019) Working correlation structure selection in GEE analysis.
+Pardo M.C., Alonso R. (2019) Working correlation structure selection in GEE analysis.
 \emph{Statistical Papers} 60:1447–1467.
 }
 \seealso{

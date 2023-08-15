@@ -17,11 +17,12 @@ A data frame with 35 rows and 4 variables:
 data(races)
 }
 \description{
-Each year the Scottish Hill Runners Association publishes a list of
-hill races in Scotland for the year. These data consist of record time,
-distance, and cumulative climb of 35 of those races. The aim of the statistical
-analysis of these data is to explain the differences between the record time of
-the races using their differences on distance and cumulative climb. See Agresti (2015, page 62).
+Each year the Scottish Hill Runners Association publishes
+a list of hill races in Scotland for the year. These data consist of
+the record time, distance, and cumulative climb of 35 of those races.
+The statistical analysis of these data aims to explain the differences
+between the record time of the races. This is done using their
+differences in distance and cumulative climb.
 }
 \examples{
 data(races)

@@ -20,14 +20,20 @@ A data frame with 315 rows and 7 variables:
 data(rinse)
 }
 \description{
-These data arose from a dental clinical study. In this trial, subjects were generally healthy adult
-male and female volunteers, ages 18–55, with pre-existing plaque but without advanced periodontal
-disease. Prior to entry, subjects were screened for a minimum of 20 sound, natural teeth and a minimum mean plaque index of 2.0. Subjects with gross oral pathology or on antibiotic, antibacterial,
-or anti-inflammatory therapy were excluded from the study. One hundred nine volunteers were randomized in a double-blinded way to one of two new mouth rinses (A and B) or to a control mouth
-rinse. Plaque was scored at baseline, at 3 months, and at 6 months by the Turesky modification of
-the Quigley-Hein index, a continuous measure. Four subjects had missing plaque scores. The main
-objective of the analysis is to measure the effectiveness of the three mouth rinses in inhibiting the
-development of dental plaque.
+These data arose from a study in dentistry. In this trial,
+subjects were generally healthy adult male and female volunteers, ages
+18–55, with pre-existing plaque but without advanced periodontal
+disease. Prior to entry, subjects were screened for a minimum of 20
+sound, natural teeth and a minimum mean plaque index of 2.0. Subjects
+with gross oral pathology or on antibiotic, antibacterial, or
+anti-inflammatory therapy were excluded from the study. One hundred
+nine volunteers were randomized in a double-blinded way to one of two
+novel mouth rinses (A and B) or to a control mouth rinse. Plaque was
+scored at baseline, at 3 months, and at 6 months by the Turesky
+modification of the Quigley-Hein index, a continuous measure. Four
+subjects had missing plaque scores. The main objective of the
+analysis is to measure the effectiveness of three mouth rinses at
+inhibiting dental plaque.
 }
 \examples{
 data(rinse)

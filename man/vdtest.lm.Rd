@@ -66,9 +66,9 @@ vdtest(fit3a)
 
 }
 \references{
-Breusch, T.S. and Pagan, A.R. (1979) A simple test for heteroscedasticity and random coefficient variation. \emph{Econometrica} 47, 1287–1294.
+Breusch T.S., Pagan A.R. (1979) A simple test for heteroscedasticity and random coefficient variation. \emph{Econometrica} 47, 1287–1294.
 
-Cook, R.D. and Weisberg, S. (1983) Diagnostics for heteroscedasticity in regression. \emph{Biometrika} 70, 1–10.
+Cook R.D., Weisberg S. (1983) Diagnostics for heteroscedasticity in regression. \emph{Biometrika} 70, 1–10.
 }
 \seealso{
 \link{vdtest.glm}

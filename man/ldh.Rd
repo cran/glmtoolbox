@@ -46,7 +46,7 @@ boxplot(LDH ~ Time, data=subset(ldh,CHCl3==opt[i]), ylim=c(0,0.8), main=paste("C
 
 }
 \references{
-Vonesh, E.F. (2012) Generalized Linear and Nonlinear Models
+Vonesh E.F. (2012) Generalized Linear and Nonlinear Models
 for Correlated Data: Theory and Applications Using SAS.
 \emph{Cary, NC: SAS Institute Inc}.
 }

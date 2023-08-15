@@ -15,10 +15,10 @@ A data frame with 40 rows and 2 variables:
 data(Steel)
 }
 \description{
-This dataset consists of the failure times for hardened steel
-specimens in a rolling contact fatigue test. Ten independent observations
-were taken at each of the four values of contact stress. The response is
-the length of the time until each specimen of the hardened steel failed.
+This dataset consists of failure times for hardened steel
+ specimens in a rolling contact fatigue test. Ten independent
+ observations were taken at each of the four contact stress values.
+ Response is the time that each specimen of hardened steel failed.
 }
 \examples{
 dev.new()

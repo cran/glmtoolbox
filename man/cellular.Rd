@@ -17,11 +17,13 @@ differentiation after exposure to the dose of the two agents}
 data(cellular)
 }
 \description{
-In a biomedical study of the immuno-activating ability of two agents, TNF (tumor necrosis factor)
-and IFN (interferon), to induce cell differentiation, the number of cells that exhibited markers of
-differentiation after exposure to TNF and IFN was recorded. At each of the 16 dose combinations of
-TNF/INF, 200 cells were examined. The main question is whether the two
-agents stimulate cell differentiation synergistically or independently.
+In a biomedical study of the immuno-activating ability of
+two agents, TNF (tumor necrosis factor) and IFN (interferon), to induce
+cell differentiation, the number of cells that exhibited markers of
+differentiation after exposure to TNF and IFN was recorded. At each of
+the 16 TNF/INF dose combinations, 200 cells were examined. The main
+question is whether the two agents stimulate cell differentiation
+synergistically or independently.
 }
 \examples{
 data(cellular)
@@ -35,7 +37,7 @@ legend("topleft", legend=c("0","4","20","100"), fill=terrain.colors(4),
 Piegorsch W.W., Weinberg C.R., Margolin B.H. (1988) Exploring
 simple independent action in multifactor tables of proportions. \emph{Biometrics} 44:595-603.
 
-Vanegas, L.H. and Rondon, L.M. (2020) A data transformation to deal with
+Vanegas L.H., Rondon L.M. (2020) A data transformation to deal with
 constant under/over-dispersion in binomial and poisson regression models. \emph{Journal
 of Statistical Computation and Simulation} 90:1811-1833.
 }

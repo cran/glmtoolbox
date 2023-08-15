@@ -18,8 +18,8 @@ data(shelflife)
 \description{
 These data arise from an experiment using accelerated
 life testing to determine the estimated shelf life of a photographic
-developer. The maximum density as well as the temperature seem to
-be good indicators of overall developer/film performance.
+developer. Maximum density and temperature seem to be reliable
+indicators of overall developer/film performance.
 }
 \examples{
 data(shelflife)
@@ -30,7 +30,7 @@ legend("topright", legend=c("72C","82C","92C"), col=c(1:3), pch=16,
 
 }
 \references{
-Chapman, R.E. (1997) Degradation study of a photographic developer to determine shelf life,
+Chapman R.E. (1997) Degradation study of a photographic developer to determine shelf life,
 \emph{Quality Engineering} 10:1, 137-140.
 }
 \keyword{datasets}
