@@ -1,3 +1,31 @@
+#' @title Age and Eye Lens Weight of Rabbits in Australia
+#'
+#' @description The dry weight of the eye lens was measured for 71 free-living wild rabbits of known age. Eye
+#' lens weight tends to vary much less with environmental conditions than does total body weight, and
+#' therefore may be a much better indicator of age.
+#'
+#' @docType data
+#'
+#' @usage data(rabbits)
+#'
+#' @format A data frame with 71 rows and 2 variables:
+#' \describe{
+#'   \item{age}{a numeric vector indicating the rabbit age, in days.}
+#'   \item{wlens}{a numeric vector indicating the dry weight of eye lens, in milligrams.}
+#' }
+#' @keywords datasets
+#' @references Dudzinski M.L., Mykytowycz R. (1961) The eye lens as an indicator of age in
+#'  the wild rabbit in Australia. \emph{CSIRO Wildlife Research}, 6, 156-159.
+#' @references Ratkowsky D.A. (1983). \emph{Nonlinear Regression Modelling}. Marcel Dekker, New York.
+#' @references Wei B.C. (1998). \emph{Exponential Family Nonlinear Models}. Springer, Singapore.
+#' @examples
+#' data(rabbits)
+#' dev.new()
+#' with(rabbits,plot(age,wlens,xlab="Age (in days)",pch=16,col="blue",
+#'                   ylab="Dry weight of eye lens (in milligrams)"))
+"rabbits"
+#'
+#'
 #' @title amenorrhea
 #'
 #' @description A total of 1151 women completed menstrual diaries. The
@@ -911,14 +939,15 @@
 #' \describe{
 #'   \item{cases}{a numeric vector giving the nonmelanoma skin cancer counts.}
 #'   \item{city}{a factor giving the city to which correspond the skin cancer counts: "St.Paul" and "Ft.Worth".}
-#'   \item{age}{a factor giving the age range to which correspond the skin cancer counts: "15-24", "25-34", "35-44", "45-54", "55-64", "65-74", "75-84" and "85+".}
+#'   \item{ageC}{a factor giving the age range to which correspond the skin cancer counts: "15-24", "25-34", "35-44", "45-54", "55-64", "65-74", "75-84" and "85+".}
 #'   \item{population}{a numeric vector giving the population of women.}
+#'   \item{age}{a numeric vector giving the midpoint of age range.}
 #' }
 #' @keywords datasets
 #' @examples
 #' data(skincancer)
 #' dev.new()
-#' barplot(1000*cases/population ~ city + age, beside=TRUE, col=c("yellow","blue"),
+#' barplot(1000*cases/population ~ city + ageC, beside=TRUE, col=c("yellow","blue"),
 #'         data=skincancer)
 #' legend("topleft", legend=c("St.Paul","Ft.Worth"), title="City",
 #'        fill=c("yellow","blue"), bty="n")

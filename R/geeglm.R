@@ -103,10 +103,11 @@
 #' }
 #' @seealso \link{gnmgee}, \link{wglmgee}
 #' @export glmgee
+#' @importFrom grDevices dev.new
 #' @importFrom MASS negative.binomial
 #' @importFrom statmod tweedie
 #' @importFrom splines bs ns
-#' @importFrom graphics abline par lines
+#' @importFrom graphics abline par lines legend segments
 #' @importFrom methods missingArg
 #' @importFrom stats as.formula coef gaussian get_all_vars rnorm update qt var
 #'             glm.fit model.extract model.frame model.matrix uniroot lm.fit lm.wfit

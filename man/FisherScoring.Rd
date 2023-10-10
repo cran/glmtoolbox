@@ -38,7 +38,7 @@ FisherScoring(fit1)
 
 ###### Example 2: Hill races in Scotland
 data(races)
-fit2 <- glm(rtime ~ log(distance) + log(cclimb), family=Gamma(log), data=races,
+fit2 <- glm(rtime ~ log(distance) + cclimb, family=Gamma(log), data=races,
             control=list(trace=TRUE))
 FisherScoring(fit2)
 

@@ -53,7 +53,7 @@ vdtest(fit1)
 
 ###### Example 2: Hill races in Scotland
 data(races)
-fit2 <- glm(rtime ~ log(distance) + log(cclimb), family=Gamma("log"), data=races)
+fit2 <- glm(rtime ~ log(distance) + cclimb, family=Gamma("log"), data=races)
 vdtest(fit2)
 
 ###### Example 3: Mammal brain and body weights

@@ -42,17 +42,17 @@ The comparisons are performed by using the Wald, score, gradient or likelihood r
 \examples{
 ####### Example 1: Article production by graduate students in biochemistry PhD programs
 bioChemists <- pscl::bioChemists
-#fit1 <- zeroinf(art ~ fem + kid5 + ment | ment, family="nb1(log)", data = bioChemists)
-#anova(fit1,test="wald")
-#anova(fit1,test="lr")
-#anova(fit1,test="score")
-#anova(fit1,test="gradient")
+fit1 <- zeroinf(art ~ fem + kid5 + ment | ment, family="nb1(log)", data = bioChemists)
+anova(fit1,test="wald")
+anova(fit1,test="lr")
+anova(fit1,test="score")
+anova(fit1,test="gradient")
 
-#fit1a <- zeroalt(art ~ fem + kid5 + ment, family="nb1(log)", data = bioChemists)
-#anova(fit1a,submodel="zeros",test="wald")
-#anova(fit1a,submodel="zeros",test="lr")
-#anova(fit1a,submodel="zeros",test="score")
-#anova(fit1a,submodel="zeros",test="gradient")
+fit2 <- zeroalt(art ~ fem + kid5 + ment, family="nb1(log)", data = bioChemists)
+anova(fit2,submodel="zeros",test="wald")
+anova(fit2,submodel="zeros",test="lr")
+anova(fit2,submodel="zeros",test="score")
+anova(fit2,submodel="zeros",test="gradient")
 
 }
 \references{

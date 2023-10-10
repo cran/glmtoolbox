@@ -1312,7 +1312,7 @@ coef.zeroinflation <- function(object, submodel=c("counts","zeros"), ...) {
   }
   else out_ <- object$coefficients[[submodel]]
   colnames(out_) <- "Estimates"
-  return(invisible(out_))
+  return(out_)
 }
 
 #' @method coef overglm
@@ -1322,7 +1322,7 @@ coef.overglm <- function(object, ...) {
   out_ <- as.matrix(object$coefficients[1:object$parms[1]])
   rownames(out_) <- rownames(object$coefficients)[1:object$parms[1]]
   colnames(out_) <- "Estimates"
-  return(invisible(out_))
+  return(out_)
 }
 
 #' @method vcov zeroinflation
@@ -1334,7 +1334,7 @@ vcov.zeroinflation <- function(object, submodel=c("counts","zeros"), ...) {
   if(submodel=="counts") out_ <- varcovar[1:object$parms[1],1:object$parms[1]]
   else out_ <- varcovar[-c(1:sum(object$parms[1:2])),-c(1:sum(object$parms[1:2]))]
   rownames(out_) <- colnames(out_) <- rownames(object$coefficients[[submodel]][1:ncol(out_)])
-  return(invisible(out_))
+  return(out_)
 }
 #' @method vcov overglm
 #' @export
@@ -1343,7 +1343,7 @@ vcov.overglm <- function(object, ...) {
   if(attr(object$R,"pd")) out_ <- chol2inv(object$R)[1:object$parms[1],1:object$parms[1]]
   else out_ <- object$R
   rownames(out_) <- colnames(out_) <- rownames(coef(object))
-  return(invisible(out_))
+  return(out_)
 }
 
 #' @method logLik zeroinflation
@@ -1903,24 +1903,19 @@ residuals.overglm <- function(object,type=c("quantile","standardized","response"
 #' @examples
 #' ## Example 1: Self diagnozed ear infections in swimmers
 #' data(swimmers)
-#' fit1 <- overglm(infections ~ frequency, family="nb1(log)", data=swimmers)
-#' fit2 <- update(fit1, . ~ . + location)
-#' fit3 <- update(fit2, . ~ . + age)
-#' fit4 <- update(fit3, . ~ . + gender)
-#' anova(fit1, fit2, fit3, fit4, test="wald")
-#' anova(fit1, fit2, fit3, fit4, test="score")
-#' anova(fit1, fit2, fit3, fit4, test="lr")
-#' anova(fit1, fit2, fit3, fit4, test="gradient")
+#' fit1 <- overglm(infections ~ frequency + location + age + gender, family="nb1(log)", data=swimmers)
+#' anova(fit1, test="wald")
+#' anova(fit1, test="score")
+#' anova(fit1, test="lr")
+#' anova(fit1, test="gradient")
 #'
 #' ## Example 2: Agents to stimulate cellular differentiation
 #' data(cellular)
-#' fit1 <- overglm(cbind(cells,200-cells) ~ tnf, family="bb(logit)", data=cellular)
-#' fit2 <- update(fit1, . ~ . + ifn)
-#' fit3 <- update(fit2, . ~ . + tnf:ifn)
-#' anova(fit1, fit2, fit3, test="wald")
-#' anova(fit1, fit2, fit3, test="score")
-#' anova(fit1, fit2, fit3, test="lr")
-#' anova(fit1, fit2, fit3, test="gradient")
+#' fit2 <- overglm(cbind(cells,200-cells) ~ tnf*ifn, family="bb(logit)", data=cellular)
+#' anova(fit2, test="wald")
+#' anova(fit2, test="score")
+#' anova(fit2, test="lr")
+#' anova(fit2, test="gradient")
 #'
 anova.overglm <- function(object,...,test=c("wald","lr","score","gradient"),verbose=TRUE){
   test <- match.arg(test)
@@ -2020,17 +2015,17 @@ anova.overglm <- function(object,...,test=c("wald","lr","score","gradient"),verb
 #' @examples
 #' ####### Example 1: Article production by graduate students in biochemistry PhD programs
 #' bioChemists <- pscl::bioChemists
-#' #fit1 <- zeroinf(art ~ fem + kid5 + ment | ment, family="nb1(log)", data = bioChemists)
-#' #anova(fit1,test="wald")
-#' #anova(fit1,test="lr")
-#' #anova(fit1,test="score")
-#' #anova(fit1,test="gradient")
+#' fit1 <- zeroinf(art ~ fem + kid5 + ment | ment, family="nb1(log)", data = bioChemists)
+#' anova(fit1,test="wald")
+#' anova(fit1,test="lr")
+#' anova(fit1,test="score")
+#' anova(fit1,test="gradient")
 #'
-#' #fit1a <- zeroalt(art ~ fem + kid5 + ment, family="nb1(log)", data = bioChemists)
-#' #anova(fit1a,submodel="zeros",test="wald")
-#' #anova(fit1a,submodel="zeros",test="lr")
-#' #anova(fit1a,submodel="zeros",test="score")
-#' #anova(fit1a,submodel="zeros",test="gradient")
+#' fit2 <- zeroalt(art ~ fem + kid5 + ment, family="nb1(log)", data = bioChemists)
+#' anova(fit2,submodel="zeros",test="wald")
+#' anova(fit2,submodel="zeros",test="lr")
+#' anova(fit2,submodel="zeros",test="score")
+#' anova(fit2,submodel="zeros",test="gradient")
 #'
 anova.zeroinflation <- function(object,...,test=c("wald","lr","score","gradient"),verbose=TRUE,submodel=c("counts","zeros")){
   test <- match.arg(test)
@@ -2225,7 +2220,7 @@ dfbeta.overglm <- function(model, coefs, identify, ...){
       }
     }
   }
-  return(invisible(dfbetas))
+  return(dfbetas)
 }
 
 #' @title Dfbeta statistic for Regression Models to deal with Zero-Excess in Count Data
@@ -3303,7 +3298,7 @@ localInfluence.overglm <- function(object,type=c("total","local"),coefs,plot.it=
     if(!missingArg(identify)) identify(nano$x,nano$y,n=max(1,floor(abs(identify))),labels=labels)
   }
   if(!is.null(subst)) message("The coefficients included in the measures of local influence are: ",paste(subst,sep=""),"\n")
-  return(invisible(out_))
+  return(out_)
 }
 
 #' @title Generalized Variance Inflation Factor for alternatives to the Poisson and Binomial Regression Models under the presence of Overdispersion
@@ -3363,7 +3358,7 @@ gvif.overglm <- function(model,verbose=TRUE,...){
   colnames(results) <- c("GVIF", "df", "GVIF^(1/(2*df))")
   results <- results[order(-results[,3]),]
   if(verbose) print(results)
-  return(invisible(results))
+  return(results)
 }
 
 #' @method confint overglm
@@ -3389,7 +3384,7 @@ confint.overglm <- function(object,parm,level=0.95,contrast,digits=max(3, getOpt
     cat("\n Approximate",round(100*level,digits=1),"percent confidence intervals based on the Wald test \n\n")
     print(round(results,digits=digits))
   }
-  return(invisible(round(results,digits=digits)))
+  return((round(results,digits=digits)))
 }
 
 #' @method confint zeroinflation
@@ -3416,5 +3411,5 @@ confint.zeroinflation <- function(object,parm,level=0.95,contrast,submodel=c("co
     cat("\n Approximate",round(100*level,digits=1),"percent confidence intervals based on the Wald test \n\n")
     print(round(results,digits=digits))
   }
-  return(invisible(round(results,digits=digits)))
+  return((round(results,digits=digits)))
 }

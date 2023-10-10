@@ -47,7 +47,7 @@ gvif(fit2)
 
 ###### Example 3: Hill races in Scotland
 data(races)
-fit3 <- glm(rtime ~ log(distance) + log(cclimb), family=Gamma("log"), data=races)
+fit3 <- glm(rtime ~ log(distance) + cclimb, family=Gamma(log), data=races)
 gvif(fit3)
 
 }

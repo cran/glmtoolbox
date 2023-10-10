@@ -24,7 +24,7 @@
 #'
 #' ###### Example 2: Hill races in Scotland
 #' data(races)
-#' fit2 <- glm(rtime ~ log(distance) + log(cclimb), family=Gamma(log), data=races,
+#' fit2 <- glm(rtime ~ log(distance) + cclimb, family=Gamma(log), data=races,
 #'             control=list(trace=TRUE))
 #' FisherScoring(fit2)
 #'
@@ -102,7 +102,7 @@ FisherScoring <- function(object,verbose=TRUE,digits=10){
     mu <- object$family$linkinv(eta)
     devnew <- sum(object$family$dev.resids(y,mu,omega))
     if(i==1) tol <- epsilon + 1
-    else tol <- abs(devnew - devold)/(devold + 0.1)
+    else tol <- abs(devnew - devold)/(abs(devold) + 0.1)
     atras <- rbind(atras,c(i,devnew,tol,t(betanew)))
     i <- i + 1
   }
@@ -435,7 +435,7 @@ vdtest.lm <- function(model,varformula,verbose=TRUE,...){
 #'
 #' ###### Example 2: Hill races in Scotland
 #' data(races)
-#' fit2 <- glm(rtime ~ log(distance) + log(cclimb), family=Gamma("log"), data=races)
+#' fit2 <- glm(rtime ~ log(distance) + cclimb, family=Gamma("log"), data=races)
 #' vdtest(fit2)
 #'
 #' ###### Example 3: Mammal brain and body weights
@@ -1311,7 +1311,7 @@ ROCc <- function(object,plot.it=TRUE,verbose=TRUE,...){
   }
   temp2 <- aggregate(cbind(m=size,events=ys)~mus,data=temp,sum)
   mus <- temp2[,1]
-  if(nrow(temp2) > 1000) mus <- quantile(rep(temp2[,1],temp2[,2]), probs=0:1001/1001)
+  if(nrow(temp2) > 10000) mus <- quantile(rep(temp2[,1],temp2[,2]), probs=c(0:9999)/10000)
   results <- matrix(0,length(mus),3)
   d1 <- sum(temp2[,3])
   d3 <- sum(temp2[,2])
@@ -1329,7 +1329,6 @@ ROCc <- function(object,plot.it=TRUE,verbose=TRUE,...){
     nano$y <- results[,2]
     nano$type <- "l"
     limits <- range(1-results[,3],results[,2])
-    print(limits)
     if(is.null(nano$col)) nano$col <- "blue"
     if(is.null(nano$xlab)) nano$xlab <- "1-Specificity"
     if(is.null(nano$ylab)) nano$ylab <- "Sensitivity"
@@ -1338,6 +1337,14 @@ ROCc <- function(object,plot.it=TRUE,verbose=TRUE,...){
     if(is.null(nano$main)) nano$main <- "Receiver Operating Characteristic Curve"
     do.call("plot",nano)
     abline(0,1,lty=3)
+    dev.new()
+    kss <- cbind(results[,1],rbind(cbind(1-results[,2],results[,3])[-1,],c(1,1)))
+    idks <- max(abs(kss[,2]-kss[,3]))==abs(kss[,2]-kss[,3])
+    plot(kss[,1],kss[,2],type="s",ylim=c(0,1),col="blue",main="Kolmogorov-Smirnov Statistic",xlab=expression(hat(mu)),ylab="Empirical Cumulative Distribution Function")
+    par(new=TRUE)
+    plot(kss[,1],kss[,3],type="s",ylim=c(0,1),col="red",xlab="",ylab="")
+    legend("bottomright",legend=c("Zeros","Ones"),col=c("red","blue"),lty=1,bty="n")
+    segments(kss[idks,1],kss[idks,2],kss[idks,1],kss[idks,3])
   }
   ks <- max(abs(1-results[,3]-results[,2]))
   if(verbose){
@@ -1582,7 +1589,7 @@ gvif.lm <- function(model,verbose=TRUE,...){
 #'
 #' ###### Example 3: Hill races in Scotland
 #' data(races)
-#' fit3 <- glm(rtime ~ log(distance) + log(cclimb), family=Gamma("log"), data=races)
+#' fit3 <- glm(rtime ~ log(distance) + cclimb, family=Gamma(log), data=races)
 #' gvif(fit3)
 #'
 #' @references Fox J., Monette G. (1992) Generalized collinearity diagnostics, \emph{JASA} 87, 178–183.
@@ -2377,4 +2384,244 @@ localInfluence.glm <- function(object,type=c("total","local"),perturbation=c("ca
   if(!is.null(subst))
     message("The coefficients included in the measures of local influence are: ",paste(subst,sep=""),"\n")
   return(invisible(out_))
+}
+
+#' @title Box-Tidwell transformations
+#' @description Computes the Box-Tidwell power transformations of the predictors in a regression model.
+#' @param object a model fit object.
+#' @param transf an one-sided formula giving the predictors that are candidates for transformation.
+#' @param epsilon an (optional) numerical value. If the maximum relative change in coefficients is less than
+#'                \emph{epsilon}, then convergence is declared. By default, \emph{epsilon} is set to be 0.0001.
+#' @param maxiter an (optional) positive integer value indicating the maximum number of iterations. By default,
+#'                \emph{maxiter} is set to be 30.
+#' @param trace an (optional) logical indicating if should the record of iterations be printed. By default,
+#'                \emph{trace} is set to be FALSE.
+#' @param digits an (optional) integer value indicating the number of decimal places to be used.
+#' @param ...	further arguments passed to or from other methods.
+#' @return Two matrices with the values of marginal and omnibus tests.
+#' @export BoxTidwell
+BoxTidwell <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,digits=getOption("digits") - 2,...){
+  UseMethod("BoxTidwell")
+}
+
+
+#' @title Box-Tidwell transformations in Normal Linear Models
+#' @description Computes the Box-Tidwell power transformations of the predictors in a normal linear model.
+#' @param object an object of the class \emph{lm}.
+#' @param transf an one-sided formula giving the quantitative predictors that are candidates for transformation.
+#' @param epsilon an (optional) numerical value. If the maximum relative change in coefficients is less than
+#'                \emph{epsilon}, then convergence is declared. By default, \emph{epsilon} is set to be 0.0001.
+#' @param maxiter an (optional) positive integer value indicating the maximum number of iterations. By default,
+#'                \emph{maxiter} is set to be 30.
+#' @param trace an (optional) logical indicating if should the record of iterations be printed. By default,
+#'              \emph{trace} is set to be FALSE.
+#' @param digits an (optional) integer value indicating the number of decimal places to be used.
+#' @param ...	further arguments passed to or from other methods.
+#' @return a list list with components including
+#' \tabular{ll}{
+#' \code{marginal} \tab a matrix with estimates and standard errors of the estimated powers, as well as the statistic
+#'                       and the p-value of the Wald test to assess the hypothesis \eqn{H_0:\tau=1} versus \eqn{H_1:\tau\neq 1},\cr
+#' \tab \cr
+#' \code{omnibus} \tab a matrix with the statistic and the p-value of the Wald test for null hypothesis that all powers
+#'                      are 1,\cr
+#' }
+#' @references Box G.E.P., Tidwell P.W. (1962) Transformation of the independent variables. \emph{Technometrics} 4, 531-550.
+#' @references Fox J. (2016) \emph{Applied Regression Analysis and Generalized Linear Models}, Third Edition. Sage.
+#' @seealso \link{BoxTidwell.glm}
+#' @method BoxTidwell lm
+#' @export
+#' @examples
+#' ###### Example 1: Hill races in Scotland
+#' data(races)
+#' fit1 <- lm(rtime ~ distance + cclimb, data=races)
+#' AIC(fit1)
+#' BoxTidwell(fit1, transf= ~ distance + cclimb)
+#' fit1 <- update(fit1,formula=rtime ~ distance + I(cclimb^2))
+#' AIC(fit1)
+#'
+#' ###### Example 2: Gasoline yield
+#' fit2 <- lm(mpg ~ hp + wt + am, data=mtcars)
+#' AIC(fit2)
+#' BoxTidwell(fit2, transf= ~ hp + wt)
+#' fit2 <- update(fit2,formula=mpg ~ log(hp) + log(wt) + am)
+#' AIC(fit2)
+#'
+#' ###### Example 3: New York Air Quality Measurements
+#' fit3 <- lm(log(Ozone) ~ Solar.R + Wind + Temp, data=airquality)
+#' AIC(fit3)
+#' BoxTidwell(fit3, transf= ~ Solar.R + Wind + Temp)
+#' fit3 <- update(fit3,formula=log(Ozone) ~ log(Solar.R) + Wind + Temp)
+#' AIC(fit3)
+#'
+#' ###### Example 4: Heat capacity of hydrobromic acid
+#' data(heatcap,package="GLMsData")
+#' fit4 <- lm(Cp ~ Temp, data=heatcap)
+#' AIC(fit4)
+#' BoxTidwell(fit4, transf= ~ Temp)
+#' fit4 <- update(fit4,formula=Cp ~ I(Temp^5))
+#' AIC(fit4)
+#'
+#' ###### Example 5: Age and Eye Lens Weight of Rabbits in Australia
+#' data(rabbits)
+#' fit5 <- lm(log(wlens) ~ age, data=rabbits)
+#' AIC(fit5)
+#' BoxTidwell(fit5, transf= ~ age)
+#' fit5 <- update(fit5,formula=log(wlens) ~ I(age^(-1/3)))
+#' AIC(fit5)
+#'
+BoxTidwell.lm <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,digits=getOption("digits") - 2,...){
+  X <- model.matrix(object)
+  n <- nrow(X)
+  transf.terms <- attr(terms(transf),"term.labels")
+  transf.terms <- !is.na(match(colnames(X),transf.terms))
+  if(sum(transf.terms)==0) stop("The variables to be transformed were not found in the fitted model",call.=FALSE)
+  X1 <- as.matrix(X[,!transf.terms],nrow=n)
+  X2 <- as.matrix(X[,transf.terms],nrow=n)
+  nv <- ncol(X2)
+  if(any(X2 <= 0)) stop("The variables to be transformed must have only positive values",call.=FALSE)
+  if(colnames(X)[1]!="(Intercept)") stop("Models without Intercept are not supported",call.=FALSE)
+  if(is.null(object$offset)) offset <- rep(0,n) else offset <- object$offset
+  if(is.null(object$weights)) weights <- rep(1,n) else weights <- object$weights
+  y <- object$residuals + object$fitted.values
+  epsilon <- 0.0001
+  tol <- epsilon + 1
+  new.powers <- rep(1,nv)
+  iter <- 1
+  while(tol > epsilon & iter < maxiter){
+    old.powers <- new.powers
+    X22 <- X2^matrix(old.powers,nrow=n,ncol=nv,byrow=TRUE)
+    X2.log <- X22*log(X22)
+    mod.1 <- lm.wfit(x=cbind(X22,X1),y=y,w=weights,offset=offset)
+    mod.2 <- lm.wfit(x=cbind(X2.log,X22,X1),y=y,w=weights,offset=offset)
+    new.powers <- old.powers*(1 + coef(mod.2)[1:nv]/coef(mod.1)[1:nv])
+    tol <- max(abs(new.powers-old.powers)/abs(new.powers))
+    if(trace) cat("Iteration=",iter,"   taus=",new.powers,"\n")
+    iter <- iter + 1
+  }
+  if(iter==maxiter) warning("Iteration limit exceeded!!\n",call.=FALSE)
+  X22 <- X2^matrix(new.powers,nrow=n,ncol=nv,byrow=TRUE)
+  X2.log <- X22*log(X2)
+  mod <- lm(y ~ 0 + cbind(X22,X1),weights=weights,offset=offset)
+  XX <- cbind(X2.log*matrix(coef(mod)[1:nv],nrow=n,ncol=nv,byrow=TRUE),X22,X1)
+  XX <- XX*matrix(sqrt(weights),nrow=n,ncol=ncol(XX))
+  vc <- summary(mod)$sigma^2*chol2inv(chol(crossprod(XX)))[1:nv,1:nv]
+  TAB	<- cbind(Estimate <- new.powers,
+               StdErr <- sqrt(diag(if(nv==1) matrix(vc) else vc)),
+               zval <- (Estimate-1)/StdErr,
+               p.value <- 1-pchisq(zval^2,df=1))
+  TAB <- matrix(TAB,nrow=nv,ncol=4)
+  colnames(TAB) <- c("Estimate", "Std.Error", "z-value", "Pr(>|z|)")
+  rownames(TAB) <- colnames(X)[transf.terms]
+  cat("\n")
+  printCoefmat(TAB, P.values=TRUE, signif.stars=FALSE, has.Pvalue=TRUE, digits=digits, dig.tst=digits, signif.legend=FALSE, tst.ind=c(1,2,3), na.print="")
+  chi <- t(new.powers-1)%*%chol2inv(chol(vc))%*%(new.powers-1)
+  omnibus <- cbind(chi,nv,1-pchisq(chi,df=nv))
+  colnames(omnibus) <- c("Chi","df","Pr(>Chi)"); rownames(omnibus) <- ""
+  cat("\nWald test for null hypothesis that all taus are 1:\n")
+  cat("chi = ",format(omnibus[1],digits=digits),", df = ",omnibus[2],", Pr(>chi) = ",format.pval(omnibus[3],digits=digits),"\n")
+  return(invisible(list(marginal=TAB,omnibus=omnibus)))
+}
+
+#' @title Box-Tidwell transformations in Generalized Linear Models
+#' @description Computes the Box-Tidwell power transformations of the predictors in a generalized linear model.
+#' @param object an object of the class \emph{glm}.
+#' @param transf an one-sided formula giving the quantitative predictors that are candidates for transformation.
+#' @param epsilon an (optional) numerical value. If the maximum relative change in coefficients is less than
+#'                \emph{epsilon}, then convergence is declared. By default, \emph{epsilon} is set to be 0.0001.
+#' @param maxiter an (optional) positive integer value indicating the maximum number of iterations. By default,
+#'                \emph{maxiter} is set to be 30.
+#' @param trace an (optional) logical indicating if should the record of iterations be printed. By default,
+#'              \emph{trace} is set to be FALSE.
+#' @param digits an (optional) integer value indicating the number of decimal places to be used.
+#' @param ...	further arguments passed to or from other methods.
+#' @return a list list with components including
+#' \tabular{ll}{
+#' \code{marginal} \tab a matrix with estimates and standard errors of the estimated powers, as well as the statistic
+#'                       and the p-value of the Wald test to assess the hypothesis \eqn{H_0:\tau=1} versus \eqn{H_1:\tau\neq 1},\cr
+#' \tab \cr
+#' \code{omnibus} \tab a matrix with the statistic and the p-value of the Wald test for null hypothesis that all powers
+#'                      are 1,\cr
+#' }
+#' @seealso \link{BoxTidwell.lm}
+#' @method BoxTidwell glm
+#' @export
+#' @references Box G.E.P., Tidwell P.W. (1962) Transformation of the independent variables. \emph{Technometrics} 4, 531-550.
+#' @references Fox J. (2016) \emph{Applied Regression Analysis and Generalized Linear Models}, Third Edition. Sage.
+#' @examples
+#' ###### Example 1: Skin cancer in women
+#' data(skincancer)
+#' fit1 <- glm(cases ~ age + city, offset=log(population), family=poisson(log), data=skincancer)
+#' AIC(fit1)
+#' BoxTidwell(fit1, transf= ~ age)
+#' fit1 <- update(fit1,formula=cases ~ I(age^(-1/2)) + city)
+#' AIC(fit1)
+#'
+#' ###### Example 3: Gas mileage
+#' data(Auto, package="ISLR")
+#' fit3 <- glm(mpg ~ horsepower + weight, family=inverse.gaussian(log), data=Auto)
+#' AIC(fit3)
+#' BoxTidwell(fit3, transf= ~ horsepower + weight)
+#' fit3 <- update(fit3,formula=mpg ~ I(horsepower^(-1/3)) + weight)
+#' AIC(fit3)
+#'
+#' ###### Example 4: Advertising
+#' data(advertising)
+#' fit4 <- glm(sales ~ TV + radio, family=gaussian(log), data=advertising)
+#' AIC(fit4)
+#' BoxTidwell(fit4, transf= ~ TV)
+#' fit4 <- update(fit4,formula=sales ~ I(TV^(1/10)) + radio)
+#' AIC(fit4)
+#' fit4 <- update(fit4,formula=sales ~ I(TV^(1/10))*radio)
+#' AIC(fit4)
+#'
+
+BoxTidwell.glm <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,digits=getOption("digits") - 2,...){
+  X <- model.matrix(object)
+  n <- nrow(X)
+  transf.terms <- attr(terms(transf),"term.labels")
+  transf.terms <- !is.na(match(colnames(X),transf.terms))
+  if(sum(transf.terms)==0) stop("The variables to be transformed were not found in the fitted model",call.=FALSE)
+  X1 <- as.matrix(X[,!transf.terms],nrow=n)
+  X2 <- as.matrix(X[,transf.terms],nrow=n)
+  nv <- ncol(X2)
+  if(any(X2 <= 0)) stop("The variables to be transformed must have only positive values",call.=FALSE)
+  if(colnames(X)[1]!="(Intercept)") stop("Models without Intercept are not supported",call.=FALSE)
+  if(is.null(object$offset)) offset <- rep(0,n) else offset <- object$offset
+  epsilon <- 0.0001
+  tol <- epsilon + 1
+  new.powers <- rep(1,nv)
+  iter <- 1
+  while(tol > epsilon & iter < maxiter){
+    old.powers <- new.powers
+    X22 <- X2^matrix(old.powers,nrow=n,ncol=nv,byrow=TRUE)
+    X2.log <- X22*log(X22)
+    mod.1 <- glm.fit(x=cbind(X22,X1),y=object$y,family=object$family,weights=object$prior.weights,offset=offset,intercept=FALSE)
+    mod.2 <- glm.fit(x=cbind(X2.log,X22,X1),y=object$y,family=object$family,weights=object$prior.weights,offset=offset,intercept=FALSE)
+    new.powers <- old.powers*(1 + coef(mod.2)[1:nv]/coef(mod.1)[1:nv])
+    tol <- max(abs(new.powers-old.powers)/abs(new.powers))
+    if(trace) cat("Iteration=",iter,"   taus=",new.powers,"\n")
+    iter <- iter + 1
+  }
+  if(iter==maxiter) warning("Iteration limit exceeded!!\n",call.=FALSE)
+  X22 <- X2^matrix(new.powers,nrow=n,ncol=nv,byrow=TRUE)
+  X2.log <- X22*log(X2)
+  mod <- glm(object$y ~ 0 + cbind(X22,X1),family=object$family,weights=object$prior.weights,offset=offset)
+  XX <- cbind(X2.log*matrix(coef(mod)[1:nv],nrow=n,ncol=nv,byrow=TRUE),X22,X1)
+  XX <- XX*matrix(sqrt(mod$weights),nrow=n,ncol=ncol(XX))
+  vc <- summary(mod)$dispersion*chol2inv(chol(crossprod(XX)))[1:nv,1:nv]
+  TAB	<- cbind(Estimate <- new.powers,
+               StdErr <- sqrt(diag(if(nv==1) matrix(vc) else vc)),
+               zval <- (Estimate-1)/StdErr,
+               p.value <- 1-pchisq(zval^2,df=1))
+  TAB <- matrix(TAB,nrow=nv,ncol=4)
+  colnames(TAB) <- c("Estimate", "Std.Error", "z-value", "Pr(>|z|)")
+  rownames(TAB) <- colnames(X)[transf.terms]
+  cat("\n")
+  printCoefmat(TAB, P.values=TRUE, signif.stars=FALSE, has.Pvalue=TRUE, digits=digits, dig.tst=digits, signif.legend=FALSE, tst.ind=c(1,2,3), na.print="")
+  chi <- t(new.powers-1)%*%chol2inv(chol(vc))%*%(new.powers-1)
+  omnibus <- cbind(chi,nv,1-pchisq(chi,df=nv))
+  colnames(omnibus) <- c("Chi","df","Pr(>Chi)"); rownames(omnibus) <- ""
+  cat("\nWald test for null hypothesis that all taus are 1:\n")
+  cat("chi = ",format(omnibus[1],digits=digits),", df = ",omnibus[2],", Pr(>chi) = ",format.pval(omnibus[3],digits=digits),"\n")
+  return(invisible(list(marginal=TAB,omnibus=omnibus)))
 }

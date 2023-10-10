@@ -1,7 +1,7 @@
 Package: glmtoolbox
 Type: Package
 Title: Set of Tools to Data Analysis using Generalized Linear Models
-Version: 0.1.8
+Version: 0.1.9
 Authors@R: c(person("Luis Hernando","Vanegas",role=c("aut","cre"),email="lhvanegasp@unal.edu.co"),
              person("Luz Marina","Rondón",role="aut",email="lmrondonp@unal.edu.co"),
              person("Gilberto A.","Paula",role="aut",email="giapaula@ime.usp.br"))
@@ -9,15 +9,15 @@ Description: Set of tools to the statistical analysis of data using: (1) normal 
 License: GPL-2 | GPL-3
 Imports: methods, stats, utils, graphics, numDeriv, Rfast, splines,
         Formula, MASS, statmod
-Suggests: aplore3, ISLR, pscl
+Suggests: aplore3, ISLR, pscl, GLMsData
 Encoding: UTF-8
 LazyData: false
 RoxygenNote: 7.2.3
 NeedsCompilation: no
-Packaged: 2023-08-15 18:05:51 UTC; Luis Hernando
+Packaged: 2023-10-10 01:38:51 UTC; Luis Hernando
 Author: Luis Hernando Vanegas [aut, cre],
   Luz Marina Rondón [aut],
   Gilberto A. Paula [aut]
 Maintainer: Luis Hernando Vanegas <lhvanegasp@unal.edu.co>
 Repository: CRAN
-Date/Publication: 2023-08-15 18:40:02 UTC
+Date/Publication: 2023-10-10 02:50:03 UTC
