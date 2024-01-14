@@ -13,9 +13,6 @@ A data frame with 270 rows and 4 variables:
   \item{bap}{a numeric vector indicating the concentrations of the cytokinin 6-benzylaminopurine: 2.2, 4.4, 8.8 or 17.6.}
 }
 }
-\source{
-\url{https://support.sas.com/rnd/app/stat/examples/GENMODZIP/sas.html}
-}
 \usage{
 data(Trajan)
 }

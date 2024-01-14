@@ -10,7 +10,7 @@
 \item{model}{an object of class \emph{zeroinflation}.}
 
 \item{submodel}{an (optional) character string which allows to specify the model: "counts" or "zeros". By default,
-\code{submodel} is set to be "counts".}
+\code{submodel} is set to "counts".}
 
 \item{coefs}{an (optional) character string which (partially) match with the names of some model parameters.}
 

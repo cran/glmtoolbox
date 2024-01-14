@@ -20,29 +20,29 @@
 
 \item{criterion}{an (optional) character string which allows to specify the criterion which should be used to compare the
 candidate models. The available options are: AIC ("aic"), BIC ("bic"), and \emph{p}-value of the \code{test}-type test
-("p-value"). By default, \code{criterion} is set to be "bic".}
+("p-value"). As default, \code{criterion} is set to "bic".}
 
 \item{test}{an (optional) character string which allows to specify the statistical test which should be used to compare nested
 models. The available options are: Wald ("wald"), Rao's score ("score"), likelihood-ratio ("lr") and gradient
-("gradient") tests. By default, \code{test} is set to be "wald".}
+("gradient") tests. As default, \code{test} is set to "wald".}
 
 \item{direction}{an (optional) character string which allows to specify the type of procedure which should be used. The available
-options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). By default, \code{direction}
-is set to be "forward".}
+options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). As default, \code{direction}
+is set to "forward".}
 
 \item{levels}{an (optional) two-dimensional vector of values in the interval \eqn{(0,1)} indicating the levels at which
 the variables should in and out from the model. This is only appropiate if \code{criterion}="p-value". By default,
-\code{levels} is set to be \code{c(0.05,0.05)}.}
+\code{levels} is set to \code{c(0.05,0.05)}.}
 
 \item{trace}{an (optional) logical switch indicating if should the stepwise reports be printed. By default,
-\code{trace} is set to be TRUE.}
+\code{trace} is set to TRUE.}
 
 \item{scope}{an (optional) list, containing components \code{lower} and \code{upper}, both formula-type objects,
-indicating the range of models which should be examined in the stepwise search. By default, \code{lower} is a model
+indicating the range of models which should be examined in the stepwise search. As default, \code{lower} is a model
 with no predictors and \code{upper} is the linear predictor of the model in \code{model}.}
 
 \item{...}{further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the
-penalty in the AIC, which by default is set to be 2.}
+penalty in the AIC, which by default is set to 2.}
 }
 \value{
 A list which contains the following objects:

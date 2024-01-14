@@ -16,16 +16,16 @@ anova2(
 
 \item{...}{another objects of the class glm which are obtained from the fit of generalized linear models.}
 
-\item{test}{an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lr") tests. By default, \code{test} is set to be "wald".}
+\item{test}{an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lr") tests. As default, \code{test} is set to "wald".}
 
-\item{verbose}{an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+\item{verbose}{an (optional) logical indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.}
 }
 \value{
 A matrix with three columns which contains the following:
-\itemize{
-\item \code{Chi:}{ The value of the statistic of the test.}
-\item \code{Df:}{ The number of degrees of freedom.}
-\item \code{Pr(>Chi):}{ The \emph{p}-value of the test computed using the Chi-square distribution.}
+\describe{
+\item{\code{Chi}}{ The value of the statistic of the test.}
+\item{\code{Df}}{ The number of degrees of freedom.}
+\item{\code{Pr(>Chi)}}{ The \emph{p}-value of the test computed using the Chi-square distribution.}
 }
 }
 \description{

@@ -9,19 +9,19 @@ ROCc(object, plot.it = TRUE, verbose = TRUE, ...)
 \arguments{
 \item{object}{a matrix with two columns: the first one is a numeric vector of 1's and 0's indicating whether each row is a "success" or a "failure"; the second one is a numeric vector of values indicating the probability (or propensity score) of each row to be a "success". Optionally, \code{object} can be an object of the class glm which is obtained from the fit of a generalized linear model where the distribution of the response variable is assumed to be binomial.}
 
-\item{plot.it}{an (optional) logical switch indicating if the plot of the ROC curve is required or just the data matrix in which it is based. By default, \code{plot.it} is set to be TRUE.}
+\item{plot.it}{an (optional) logical switch indicating if the plot of the ROC curve is required or just the data matrix in which it is based. As default, \code{plot.it} is set to TRUE.}
 
-\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.}
 
 \item{...}{further arguments passed to or from other methods. For example, if \code{plot.it=TRUE} then \code{...} may to include graphical parameters as \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.}
 }
 \value{
 A list which contains the following objects:
-\itemize{
-\item{\code{roc:}}{ A matrix with the Cutoffs and the associated estimates of Sensitivity and Specificity.}
-\item{\code{auroc:}}{ The exact area under the ROC curve.}
-\item{\code{gini:}}{ The value of the Gini coefficient computed as 2(\code{auroc}-0.5).}
-\item{\code{ks:}}{ The value of the Kolmogorov-Smirnov statistic computed as the maximum value of |1-Sensitivity-Specificity|.}
+\describe{
+\item{\code{roc}}{ A matrix with the Cutoffs and the associated estimates of Sensitivity and Specificity.}
+\item{\code{auroc}}{ The exact area under the ROC curve.}
+\item{\code{gini}}{ The value of the Gini coefficient computed as 2(\code{auroc}-0.5).}
+\item{\code{ks}}{ The value of the Kolmogorov-Smirnov statistic computed as the maximum value of |1-Sensitivity-Specificity|.}
 }
 }
 \description{

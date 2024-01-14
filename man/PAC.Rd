@@ -4,14 +4,14 @@
 \alias{PAC}
 \title{Pardo-Alonso's Criterion for Generalized Estimating Equations}
 \usage{
-PAC(..., verbose = TRUE, digits = 4)
+PAC(..., verbose = TRUE, digits = max(3, getOption("digits") - 2))
 }
 \arguments{
 \item{...}{one or several objects of the class \emph{glmgee}.}
 
-\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.}
 
-\item{digits}{an (optional) integer indicating the number of digits to print.}
+\item{digits}{an (optional) integer indicating the number of digits to print. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.}
 }
 \value{
 A \code{data.frame} with the values of the PAC for each \emph{glmgee} object in the input.
@@ -49,6 +49,9 @@ PAC(fit1, fit2, fit3)
 \references{
 Pardo M.C., Alonso R. (2019) Working correlation structure selection in GEE analysis.
 \emph{Statistical Papers} 60:1447–1467.
+
+\href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+\emph{The R Journal} 15:105-133.}
 }
 \seealso{
 \link{QIC}, \link{CIC}, \link{RJC}, \link{AGPC}, \link{SGPC}, \link{GHYC}

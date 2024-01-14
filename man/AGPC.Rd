@@ -4,16 +4,16 @@
 \alias{AGPC}
 \title{AGPC for Generalized Estimating Equations}
 \usage{
-AGPC(..., k = 2, verbose = TRUE, digits = 2)
+AGPC(..., k = 2, verbose = TRUE, digits = max(3, getOption("digits") - 2))
 }
 \arguments{
 \item{...}{one or several objects of the class \emph{glmgee}.}
 
-\item{k}{an (optional) non-negative value giving the magnitude of the penalty. By default, \code{k} is set to be 2.}
+\item{k}{an (optional) non-negative value giving the magnitude of the penalty. As default, \code{k} is set to 2.}
 
-\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.}
 
-\item{digits}{an (optional) integer indicating the number of digits to print.}
+\item{digits}{an (optional) integer indicating the number of digits to print. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.}
 }
 \value{
 A \code{data.frame} with the values of the gaussian pseudo-likelihood, the number of parameters in the linear predictor plus the number of parameters in the correlation matrix, and the value of AGPC for each \emph{glmgee} object in the input.
@@ -22,7 +22,7 @@ A \code{data.frame} with the values of the gaussian pseudo-likelihood, the numbe
 Computes the Akaike-type penalized Gaussian pseudo-likelihood criterion (AGPC) for one or more objects of the class glmgee.
 }
 \details{
-If \code{k} is set to be 0 then the AGPC reduces to the Gaussian pseudo-likelihood criterion (GPC), proposed by Carey and Wang (2011), which corresponds to the logarithm of the multivariate normal density function.
+If \code{k} is set to 0 then the AGPC reduces to the Gaussian pseudo-likelihood criterion (GPC), proposed by Carey and Wang (2011), which corresponds to the logarithm of the multivariate normal density function.
 }
 \examples{
 ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
@@ -61,6 +61,9 @@ and Statistics} 29:515-530.
 
 Fu L., Hao Y., Wang Y.-G. (2018) Working correlation structure
 selection in generalized estimating equations. \emph{Computational Statistics} 33:983-996.
+
+\href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+\emph{The R Journal} 15:105-133.}
 }
 \seealso{
 \link{QIC}, \link{CIC}, \link{RJC}, \link{GHYC}, \link{SGPC}

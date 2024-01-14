@@ -18,21 +18,21 @@
 \item{...}{another objects of the class \emph{zeroinflation}.}
 
 \item{test}{an (optional) character string which allows to specify the required test. The available options are: Wald ("wald"),
-Rao's score ("score"), likelihood ratio ("lr") and Terrell's gradient ("gradient") tests. By default, \code{test} is
-set to be "wald".}
+Rao's score ("score"), likelihood ratio ("lr") and Terrell's gradient ("gradient") tests. As default, \code{test} is
+set to "wald".}
 
-\item{verbose}{an (optional) logical indicating if should the report of results be printed. By default, \code{verbose}
-is set to be TRUE.}
+\item{verbose}{an (optional) logical indicating if should the report of results be printed. As default, \code{verbose}
+is set to TRUE.}
 
 \item{submodel}{an (optional) character string which allows to specify the model: "counts" or "zeros". By default,
-\code{submodel} is set to be "counts".}
+\code{submodel} is set to "counts".}
 }
 \value{
 A matrix with the following three columns:
-\itemize{
-\item \code{Chi:}{ The value of the statistic of the test,}
-\item \code{Df:}{ The number of degrees of freedom,}
-\item \code{Pr(>Chi):}{ The \emph{p}-value of the test \emph{test} computed using the Chi-square distribution.}
+\describe{
+\item{\code{Chi}}{ The value of the statistic of the test,}
+\item{\code{Df}}{ The number of degrees of freedom,}
+\item{\code{Pr(>Chi)}}{ The \emph{p}-value of the test \emph{test} computed using the Chi-square distribution.}
 }
 }
 \description{

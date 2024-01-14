@@ -9,9 +9,9 @@
 \arguments{
 \item{model}{an object of the class \emph{lm}.}
 
-\item{varformula}{an (optional) \code{formula} expression of the form \code{~ z1 + z2 + ... + zq} indicating the potential explanatory variables for the dispersion parameter. By default, the same explanatory variables are taken as in the model for the mean.}
+\item{varformula}{an (optional) \code{formula} expression of the form \code{~ z1 + z2 + ... + zq} indicating the potential explanatory variables for the dispersion parameter. As default, the same explanatory variables are taken as in the model for the mean.}
 
-\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
@@ -23,13 +23,15 @@ a list list with components including
 \code{df}        \tab number of degrees of freedom (\eqn{q}),\cr
 \tab \cr
 \code{p.value}   \tab \emph{p}-value of the test,\cr
+\tab \cr
+\code{vars}   \tab names of explanatory variables for the dispersion parameter,\cr
 }
 }
 \description{
 Performs Rao's score test for varying dispersion parameter in weighted and unweighted normal linear models.
 }
 \details{
-From the heteroskedastic normal lineal model in which
+From the heteroskedastic normal linear model in which
 \eqn{\log(\sigma^2)=\gamma_0 + \gamma_1z_1 + \gamma_2z_2 + ...+ \gamma_qz_q}, where
 \eqn{\sigma^2} is the dispersion parameter of the distribution of the
 random errors, the Rao's score test (denoted here as \eqn{S}) to assess the
@@ -45,6 +47,8 @@ non-studentized Breusch-Pagan test against heteroskedasticity.
 ###### Example 1: Fuel consumption of automobiles
 fit1 <- lm(mpg ~ log(hp) + log(wt), data=mtcars)
 vdtest(fit1)
+vdtest(fit1,varformula = ~ hp + wt)
+vdtest(fit1,varformula = ~ hp + wt + hp*wt)
 
 ###### Example 2: Species richness in plots
 data(richness)

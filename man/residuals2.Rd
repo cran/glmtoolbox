@@ -4,16 +4,16 @@
 \alias{residuals2}
 \title{Residuals for Linear and Generalized Linear Models}
 \usage{
-residuals2(object, type, standardized = FALSE, plot.it = TRUE, identify, ...)
+residuals2(object, type, standardized = FALSE, plot.it = FALSE, identify, ...)
 }
 \arguments{
 \item{object}{a object of the class \emph{lm} or \emph{glm}.}
 
 \item{type}{an (optional) character string giving the type of residuals which should be returned. The available options for LMs are: (1) externally studentized ("external"); (2) internally studentized ("internal") (default). The available options for GLMs are: (1) "pearson"; (2) "deviance" (default);  (3) "quantile".}
 
-\item{standardized}{an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. By default, \code{standardized} is set to be FALSE.}
+\item{standardized}{an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. As default, \code{standardized} is set to FALSE.}
 
-\item{plot.it}{an (optional) logical switch indicating if a plot of the residuals versus the fitted values is required. By default, \code{plot.it} is set to be FALSE.}
+\item{plot.it}{an (optional) logical switch indicating if a plot of the residuals versus the fitted values is required. As default, \code{plot.it} is set to FALSE.}
 
 \item{identify}{an (optional) integer value indicating the number of individuals to identify on the plot of residuals. This is only appropriate when \code{plot.it=TRUE}.}
 
@@ -29,12 +29,21 @@ Computes residuals for a fitted linear or generalized linear model.
 ###### Example 1: Species richness in plots
 data(richness)
 fit1 <- lm(Species ~ Biomass + pH, data=richness)
-residuals2(fit1, type="external", col="red", pch=20, col.lab="blue", plot.it=TRUE,
+residuals2(fit1, type="external", plot.it=TRUE, col="red", pch=20, col.lab="blue",
            col.axis="blue", col.main="black", family="mono", cex=0.8)
 
 ###### Example 2: Lesions of Aucuba mosaic virus
 data(aucuba)
 fit2 <- glm(lesions ~ time, family=poisson, data=aucuba)
-residuals2(fit2, type="quantile", col="red", pch=20, col.lab="blue", plot.it=TRUE,
+residuals2(fit2, type="quantile", plot.it=TRUE, col="red", pch=20, col.lab="blue",
            col.axis="blue",col.main="black",family="mono",cex=0.8)
+}
+\references{
+Atkinson A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
+
+Davison A.C., Gigli A. (1989) Deviance Residuals and Normal Scores Plots. \emph{Biometrika} 76, 211-221.
+
+Dunn P.K., Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics} 5, 236-244.
+
+Pierce D.A., Schafer D.W. (1986) Residuals in Generalized Linear Models. \emph{Journal of the American Statistical Association} 81, 977-986.
 }

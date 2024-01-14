@@ -9,7 +9,7 @@ hltest(model, verbose = TRUE, ...)
 \arguments{
 \item{model}{an object of the class \emph{glm}, which is obtained from the fit of a generalized linear model where the distribution for the response variable is assumed to be binomial.}
 
-\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.}
 
 \item{...}{further arguments passed to or from other methods.}
 }

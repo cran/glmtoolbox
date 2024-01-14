@@ -4,18 +4,24 @@
 \alias{QIC}
 \title{QIC for Generalized Estimating Equations}
 \usage{
-QIC(..., k = 2, u = FALSE, verbose = TRUE, digits = 2)
+QIC(
+  ...,
+  k = 2,
+  u = FALSE,
+  verbose = TRUE,
+  digits = max(3, getOption("digits") - 2)
+)
 }
 \arguments{
 \item{...}{one or several objects of the class \emph{glmgee}.}
 
-\item{k}{an (optional) non-negative value giving the magnitude of the penalty. By default, \code{k} is set to be 2.}
+\item{k}{an (optional) non-negative value giving the magnitude of the penalty. As default, \code{k} is set to 2.}
 
-\item{u}{an (optional) logical switch indicating if QIC should be replaced by QICu. By default, \code{u} is set to be FALSE.}
+\item{u}{an (optional) logical switch indicating if QIC should be replaced by QICu. As default, \code{u} is set to FALSE.}
 
-\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.}
 
-\item{digits}{an (optional) integer indicating the number of digits to print.}
+\item{digits}{an (optional) integer indicating the number of digits to print. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.}
 }
 \value{
 A \code{data.frame} with the values of -2*quasi-likelihood, the number of parameters in the linear predictor, and the value of QIC (or QICu if \code{u}=TRUE) for each \emph{glmgee} object in the input.
@@ -55,6 +61,9 @@ Pan W. (2001) Akaike's information criterion in generalized estimating equations
 
 Hin L.-Y., Carey V.J., Wang Y.-G. (2007) Criteria for Working–Correlation–Structure Selection in GEE:
 Assessment via Simulation. \emph{The American Statistician} 61:360–364.
+
+\href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+\emph{The R Journal} 15:105-133.}
 }
 \seealso{
 \link{CIC}, \link{GHYC}, \link{RJC}, \link{AGPC}, \link{SGPC}

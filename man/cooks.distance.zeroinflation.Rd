@@ -17,10 +17,10 @@
 \item{model}{an object of class \emph{zeroinflation}.}
 
 \item{submodel}{an (optional) character string which allows to specify the model: "counts", "zeros" or "full". By default,
-\code{submodel} is set to be "counts".}
+\code{submodel} is set to "counts".}
 
 \item{plot.it}{an (optional) logical indicating if the plot is required or just the data matrix in which that
-plot is based. By default, \code{plot.it} is set to be FALSE.}
+plot is based. As default, \code{plot.it} is set to FALSE.}
 
 \item{coefs}{an (optional) character string which (partially) match with the names of some model parameters.}
 

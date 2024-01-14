@@ -17,13 +17,13 @@
 \arguments{
 \item{object}{an object of class \emph{glmgee}.}
 
-\item{type}{an (optional) character string indicating the type of approach to study the local influence. The options are: the absolute value of the elements of the eigenvector which corresponds to the maximum absolute eigenvalue ("local"); and the elements of the main diagonal ("total"). By default, \code{type} is set to be "total".}
+\item{type}{an (optional) character string indicating the type of approach to study the local influence. The options are: the absolute value of the elements of the eigenvector which corresponds to the maximum absolute eigenvalue ("local"); and the elements of the main diagonal ("total"). As default, \code{type} is set to "total".}
 
-\item{perturbation}{an (optional) character string indicating the perturbation scheme to apply. The options are: case weight perturbation of clusters ("cw-clusters"); Case weight perturbation of observations ("cw-observations"); and perturbation of response ("response"). By default, \code{perturbation} is set to be "cw-clusters".}
+\item{perturbation}{an (optional) character string indicating the perturbation scheme to apply. The options are: case weight perturbation of clusters ("cw-clusters"); Case weight perturbation of observations ("cw-observations"); and perturbation of response ("response"). As default, \code{perturbation} is set to "cw-clusters".}
 
 \item{coefs}{an (optional) character string which (partially) match with the names of some of the parameters in the linear predictor.}
 
-\item{plot.it}{an (optional) logical indicating if the plot of the measures of local influence is required or just the data matrix in which that plot is based. By default, \code{plot.it} is set to be FALSE.}
+\item{plot.it}{an (optional) logical indicating if the plot of the measures of local influence is required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to FALSE.}
 
 \item{identify}{an (optional) integer indicating the number of clusters/observations to identify on the plot of the measures of local influence. This is only appropriate if \code{plot.it=TRUE}.}
 
@@ -58,4 +58,7 @@ localInfluence(fit3,type="total",perturbation="cw-clusters",coefs="visit:group",
 Cook D. (1986) Assessment of Local Influence. \emph{Journal of the Royal Statistical Society: Series B (Methodological)} 48:133-155.
 
 Jung K.-M. (2008) Local Influence in Generalized Estimating Equations. \emph{Scandinavian Journal of Statistics} 35:286-294.
+
+\href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+\emph{The R Journal} 15:105-133.}
 }

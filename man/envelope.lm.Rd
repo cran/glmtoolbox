@@ -17,13 +17,13 @@
 \arguments{
 \item{object}{an object of the class \emph{lm}.}
 
-\item{rep}{an (optional) positive integer indicating the number of replicates which should be used to build the simulated envelope. By default, \code{rep} is set to be 100.}
+\item{rep}{an (optional) positive integer indicating the number of replicates which should be used to build the simulated envelope. As default, \code{rep} is set to 100.}
 
-\item{conf}{an (optional) value in the interval (0,1) indicating the confidence level which should be used to build the pointwise confidence intervals, which form the envelope. By default, \code{conf} is set to be 0.95.}
+\item{conf}{an (optional) value in the interval (0,1) indicating the confidence level which should be used to build the pointwise confidence intervals, which form the envelope. As default, \code{conf} is set to 0.95.}
 
 \item{type}{a character string indicating the type of residuals which should be used. The available options are: internally Studentized ("internal") and externally Studentized ("external") residuals. See Cook and Weisberg (1982, pages 18-20).}
 
-\item{plot.it}{an (optional) logical switch indicating if the normal QQ-plot with simulated envelope of residuals is required or just the data matrix in which it is based. By default, \code{plot.it} is set to be TRUE.}
+\item{plot.it}{an (optional) logical switch indicating if the normal QQ-plot with simulated envelope of residuals is required or just the data matrix in which it is based. As default, \code{plot.it} is set to TRUE.}
 
 \item{identify}{an (optional) positive integer value indicating the number of individuals to identify on the QQ-plot with simulated envelope of residuals. This is only appropriate if \code{plot.it=TRUE}.}
 

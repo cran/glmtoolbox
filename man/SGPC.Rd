@@ -4,14 +4,14 @@
 \alias{SGPC}
 \title{SGPC for Generalized Estimating Equations}
 \usage{
-SGPC(..., verbose = TRUE, digits = 2)
+SGPC(..., verbose = TRUE, digits = max(3, getOption("digits") - 2))
 }
 \arguments{
 \item{...}{one or several objects of the class \emph{glmgee}.}
 
-\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.}
 
-\item{digits}{an (optional) integer indicating the number of digits to print.}
+\item{digits}{an (optional) integer indicating the number of digits to print. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.}
 }
 \value{
 A \code{data.frame} with the values of the gaussian pseudo-likelihood, the number of parameters in the linear predictor plus the number of parameters in the correlation matrix, and the value of SGPC for each \emph{glmgee} object in the input.
@@ -56,6 +56,9 @@ and Statistics} 29:515-530.
 
 Fu L., Hao Y., Wang Y.-G. (2018) Working correlation structure
 selection in generalized estimating equations. \emph{Computational Statistics} 33:983-996.
+
+\href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+\emph{The R Journal} 15:105-133.}
 }
 \seealso{
 \link{QIC}, \link{CIC}, \link{RJC}, \link{GHYC}, \link{AGPC}

@@ -17,17 +17,17 @@
 \arguments{
 \item{model}{an object of the class \emph{lm}.}
 
-\item{criterion}{an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted R-squared ("adjr2"), predicted R-squared ("prdr2"), Mallows' CP ("cp") and \emph{p}-value of the F test ("p-value"). By default, \code{criterion} is set to be "bic".}
+\item{criterion}{an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted R-squared ("adjr2"), predicted R-squared ("prdr2"), Mallows' CP ("cp") and \emph{p}-value of the F test ("p-value"). As default, \code{criterion} is set to "bic".}
 
-\item{direction}{an (optional) character string indicating the type of procedure which should be used. The available options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). By default, \code{direction} is set to be "forward".}
+\item{direction}{an (optional) character string indicating the type of procedure which should be used. The available options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). As default, \code{direction} is set to "forward".}
 
-\item{levels}{an (optional) two-dimensional vector of values in the interval \eqn{(0,1)} indicating the levels at which the variables should in and out from the model. This is only appropiate if \code{criterion}="p-value". By default, \code{levels} is set to be \code{c(0.05,0.05)}.}
+\item{levels}{an (optional) two-dimensional vector of values in the interval \eqn{(0,1)} indicating the levels at which the variables should in and out from the model. This is only appropiate if \code{criterion}="p-value". As default, \code{levels} is set to \code{c(0.05,0.05)}.}
 
-\item{trace}{an (optional) logical switch indicating if should the stepwise reports be printed. By default, \code{trace} is set to be TRUE.}
+\item{trace}{an (optional) logical switch indicating if should the stepwise reports be printed. As default, \code{trace} is set to TRUE.}
 
-\item{scope}{an (optional) list containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. By default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.}
+\item{scope}{an (optional) list containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. As default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.}
 
-\item{...}{further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC/QICu, which by default is set to be 2.}
+\item{...}{further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC/QICu, which by default is set to 2.}
 }
 \value{
 a list list with components including
@@ -47,8 +47,8 @@ Performs variable selection in normal linear models using a hybrid versions of f
 \details{
 The "hybrid forward stepwise" algorithm starts with the
 simplest model (which may be chosen at the argument \code{scope}, and
-by default, is a model whose parameters in the linear predictor,
-except the intercept, if any, are set to be 0), and then the candidate
+As default, is a model whose parameters in the linear predictor,
+except the intercept, if any, are set to 0), and then the candidate
 models are built by hierarchically including effects in the linear
 predictor, whose "relevance" and/or "importance" in the model fit is
 assessed by comparing nested models (that is, by comparing the models

@@ -6,6 +6,7 @@
 \usage{
 overglm(
   formula,
+  offset,
   family = "nb1(log)",
   weights,
   data,
@@ -19,6 +20,8 @@ overglm(
 \arguments{
 \item{formula}{a \code{formula} expression of the form \code{response ~ x1 + x2 + ...}, which is a symbolic description
 of the linear predictor of the model to be fitted to the data.}
+
+\item{offset}{this can be used to specify an \emph{a priori} known component to be included in the linear predictor during fitting. This should be \code{NULL} or a numeric vector of length equal to the number of cases.}
 
 \item{family}{A character string that allows you to specify the
 distribution describing the response variable. In addition,
@@ -42,10 +45,10 @@ as well as for variables specified in the arguments \code{weights} and \code{sub
 \item{subset}{an (optional) vector specifying a subset of individuals to be used in the fitting process.}
 
 \item{na.action}{a function which indicates what should happen when the data contain NAs. By default \code{na.action}
-is set to be \code{na.omit()}.}
+is set to \code{na.omit()}.}
 
 \item{reltol}{an (optional) positive value which represents the \emph{relative convergence tolerance} for the BFGS method in \link{optim}.
-By default, \code{reltol} is set to be 1e-13.}
+As default, \code{reltol} is set to 1e-13.}
 
 \item{start}{an (optional) vector of starting values for the parameters in the linear predictor.}
 

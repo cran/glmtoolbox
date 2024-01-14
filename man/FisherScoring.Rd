@@ -4,14 +4,14 @@
 \alias{FisherScoring}
 \title{Fisher Scoring algorithm in Generalized Linear Models}
 \usage{
-FisherScoring(object, verbose = TRUE, digits = 10)
+FisherScoring(object, verbose = TRUE, digits = max(3, getOption("digits") - 2))
 }
 \arguments{
 \item{object}{one object of the class \emph{glm}.}
 
-\item{verbose}{an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+\item{verbose}{an (optional) logical indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.}
 
-\item{digits}{an (optional) integer value indicating the number of decimal places to be used. By default, \code{digits} is set to be 10.}
+\item{digits}{an (optional) integer value indicating the number of decimal places to be used. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.}
 }
 \value{
 a matrix whose first three columns are the following

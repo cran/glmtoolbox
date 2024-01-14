@@ -10,7 +10,7 @@
   epsilon = 1e-04,
   maxiter = 30,
   trace = FALSE,
-  digits = getOption("digits") - 2,
+  digits = max(3, getOption("digits") - 2),
   ...
 )
 }
@@ -20,13 +20,13 @@
 \item{transf}{an one-sided formula giving the quantitative predictors that are candidates for transformation.}
 
 \item{epsilon}{an (optional) numerical value. If the maximum relative change in coefficients is less than
-\emph{epsilon}, then convergence is declared. By default, \emph{epsilon} is set to be 0.0001.}
+\emph{epsilon}, then convergence is declared. As default, \emph{epsilon} is set to 0.0001.}
 
 \item{maxiter}{an (optional) positive integer value indicating the maximum number of iterations. By default,
-\emph{maxiter} is set to be 30.}
+\emph{maxiter} is set to 30.}
 
 \item{trace}{an (optional) logical indicating if should the record of iterations be printed. By default,
-\emph{trace} is set to be FALSE.}
+\emph{trace} is set to FALSE.}
 
 \item{digits}{an (optional) integer value indicating the number of decimal places to be used.}
 

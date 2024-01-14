@@ -15,7 +15,7 @@
 
 \item{...}{further arguments passed to or from other methods.}
 
-\item{type}{an (optional) character string indicating the type of estimator which should be used. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). By default, \code{type} is set to be "robust".}
+\item{type}{an (optional) character string indicating the type of estimator which should be used. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). As default, \code{type} is set to "robust".}
 }
 \value{
 A \code{matrix} with the type-\code{type} estimate of the variance-covariance matrix.
@@ -47,4 +47,7 @@ vcov(fit2,type="bias-corrected")
 }
 \references{
 Mancl L.A., DeRouen T.A. (2001) A Covariance Estimator for GEE with Improved Small-Sample Properties. \emph{Biometrics} 57:126-134.
+
+\href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+\emph{The R Journal} 15:105-133.}
 }

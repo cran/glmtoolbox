@@ -19,11 +19,11 @@
 \item{type}{an (optional) character string which allows to specify the local influence approach:
 the absolute value of the elements of the main diagonal of the normal curvature matrix ("total") or
 the eigenvector which corresponds to the maximum absolute eigenvalue of the normal curvature matrix ("local").
-By default, \code{type} is set to be "total".}
+As default, \code{type} is set to "total".}
 
 \item{coefs}{an (optional) character string which (partially) match with the names of some model parameters.}
 
-\item{plot.it}{an (optional) logical indicating if the plot is required or just the data matrix in which that plot is based. By default, \code{plot.it} is set to be FALSE.}
+\item{plot.it}{an (optional) logical indicating if the plot is required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to FALSE.}
 
 \item{identify}{an (optional) integer indicating the number of individuals to identify on the plot. This is only appropriate if \code{plot.it=TRUE}.}
 

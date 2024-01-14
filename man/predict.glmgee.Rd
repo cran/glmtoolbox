@@ -20,11 +20,11 @@
 
 \item{newdata}{an (optional) \code{data frame} in which to look for variables with which to predict. If omitted, the fitted linear predictors are used.}
 
-\item{se.fit}{an (optional) logical switch indicating if standard errors are required. By default, \code{se.fit} is set to be FALSE.}
+\item{se.fit}{an (optional) logical switch indicating if standard errors are required. As default, \code{se.fit} is set to FALSE.}
 
 \item{type}{an (optional) character string giving the type of prediction required. The default, "link", is on the scale of the linear predictors, and the alternative, "response", is on the scale of the response variable.}
 
-\item{varest}{an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). By default, \code{varest} is set to be "robust".}
+\item{varest}{an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). As default, \code{varest} is set to "robust".}
 }
 \value{
 A matrix with so many rows as \code{newdata} and one column with the predictions. If \code{se.fit=}TRUE then a second column with estimates standard errors is included.

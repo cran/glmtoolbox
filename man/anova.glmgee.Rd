@@ -17,18 +17,18 @@
 
 \item{...}{another objects of the class glmgee which are obtained from the fit of generalized estimating equations.}
 
-\item{test}{an (optional) character string indicating the required test. The available options are: Wald ("wald") and generalized score ("score") tests. By default, \code{test} is set to be "wald".}
+\item{test}{an (optional) character string indicating the required test. The available options are: Wald ("wald") and generalized score ("score") tests. As default, \code{test} is set to "wald".}
 
-\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.}
 
-\item{varest}{an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters in the Wald test. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). By default, \code{varest} is set to be "robust". See \link{vcov.glmgee}.}
+\item{varest}{an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters in the Wald test. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). As default, \code{varest} is set to "robust". See \link{vcov.glmgee}.}
 }
 \value{
 A matrix with three columns which contains the following:
-\itemize{
-\item \code{Chi:}{ The value of the statistic of the test.}
-\item \code{df:}{ The number of degrees of freedom.}
-\item \code{Pr(>Chi):}{ The \emph{p}-value of the test computed using the Chi-square distribution.}
+\describe{
+\item{\code{Chi}}{ The value of the statistic of the test.}
+\item{\code{df}}{ The number of degrees of freedom.}
+\item{\code{Pr(>Chi)}}{ The \emph{p}-value of the test computed using the Chi-square distribution.}
 }
 }
 \description{
@@ -59,6 +59,9 @@ Rotnitzky A., Jewell P. (1990) Hypothesis Testing of Regression Parameters
 in Semiparametric Generalized Linear Models for Cluster Correlated Data. \emph{Biometrika} 77:485-497.
 
 Boos D.D. (1992) On Generalized Score Tests. \emph{The American Statistician} 46:327-333.
+
+\href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+\emph{The R Journal} 15:105-133.}
 
 Boos D. (1992) On Generalized Score Tests. \emph{American Statistician} 46:327–33.
 

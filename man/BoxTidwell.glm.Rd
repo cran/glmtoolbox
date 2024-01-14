@@ -10,7 +10,7 @@
   epsilon = 1e-04,
   maxiter = 30,
   trace = FALSE,
-  digits = getOption("digits") - 2,
+  digits = max(3, getOption("digits") - 2),
   ...
 )
 }
@@ -20,13 +20,13 @@
 \item{transf}{an one-sided formula giving the quantitative predictors that are candidates for transformation.}
 
 \item{epsilon}{an (optional) numerical value. If the maximum relative change in coefficients is less than
-\emph{epsilon}, then convergence is declared. By default, \emph{epsilon} is set to be 0.0001.}
+\emph{epsilon}, then convergence is declared. As default, \emph{epsilon} is set to 0.0001.}
 
 \item{maxiter}{an (optional) positive integer value indicating the maximum number of iterations. By default,
-\emph{maxiter} is set to be 30.}
+\emph{maxiter} is set to 30.}
 
 \item{trace}{an (optional) logical indicating if should the record of iterations be printed. By default,
-\emph{trace} is set to be FALSE.}
+\emph{trace} is set to FALSE.}
 
 \item{digits}{an (optional) integer value indicating the number of decimal places to be used.}
 
@@ -51,7 +51,7 @@ data(skincancer)
 fit1 <- glm(cases ~ age + city, offset=log(population), family=poisson(log), data=skincancer)
 AIC(fit1)
 BoxTidwell(fit1, transf= ~ age)
-fit1 <- update(fit1,formula=cases ~ I(age^(-1/2)) + city)
+fit1 <- update(fit1,formula=. ~ I(age^(-1/2)) + city)
 AIC(fit1)
 
 ###### Example 3: Gas mileage
@@ -59,7 +59,7 @@ data(Auto, package="ISLR")
 fit3 <- glm(mpg ~ horsepower + weight, family=inverse.gaussian(log), data=Auto)
 AIC(fit3)
 BoxTidwell(fit3, transf= ~ horsepower + weight)
-fit3 <- update(fit3,formula=mpg ~ I(horsepower^(-1/3)) + weight)
+fit3 <- update(fit3,formula=. ~ I(horsepower^(-1/3)) + weight)
 AIC(fit3)
 
 ###### Example 4: Advertising
@@ -67,10 +67,16 @@ data(advertising)
 fit4 <- glm(sales ~ TV + radio, family=gaussian(log), data=advertising)
 AIC(fit4)
 BoxTidwell(fit4, transf= ~ TV)
-fit4 <- update(fit4,formula=sales ~ I(TV^(1/10)) + radio)
+fit4 <- update(fit4,formula=. ~ I(TV^(1/10)) + radio)
 AIC(fit4)
-fit4 <- update(fit4,formula=sales ~ I(TV^(1/10))*radio)
-AIC(fit4)
+
+###### Example 5: Leukaemia Patients
+data(leuk, package="MASS")
+fit5 <- glm(ifelse(time>=52,1,0) ~ ag + wbc, family=binomial, data=leuk)
+AIC(fit5)
+BoxTidwell(fit5, transf= ~ wbc)
+fit5 <- update(fit5,formula=. ~ ag + I(wbc^(-0.18)))
+AIC(fit5)
 
 }
 \references{

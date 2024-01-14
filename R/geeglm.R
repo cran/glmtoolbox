@@ -2,20 +2,20 @@
 #' @description Produces an object of the class \code{glmgee} in which the main results of a Generalized Estimating Equation (GEE) fitted to the data are stored.
 #' @param formula a \code{formula} expression of the form \code{response ~ x1 + x2 + ...}, which is a symbolic description of the linear predictor of the model to be fitted to the data.
 #' @param family an (optional) \code{family} object, that is, a list of functions and expressions for defining link and variance functions. Families (and links) supported are the same supported by \link{glm} using its \link{family} argument, that is,
-#' \code{gaussian}, \code{binomial}, \code{poisson}, \code{Gamma}, \code{inverse.gaussian}, and \code{quasi}. The family \code{negative.binomial} in the library \pkg{MASS} are also available. By default, the argument \code{family} is set to be \code{gaussian(identity)}.
+#' \code{gaussian}, \code{binomial}, \code{poisson}, \code{Gamma}, \code{inverse.gaussian}, and \code{quasi}. The family \code{negative.binomial} in the library \pkg{MASS} are also available. As default, the argument \code{family} is set to \code{gaussian(identity)}.
 #' @param id a vector which identifies the subjects or clusters. The length of \code{id} should be the same as the number of observations.
 #' @param weights an (optional) vector of positive "prior weights" to be used in the fitting process. The length of \code{weights} should be the same as the total number of observations.
 #' @param data an (optional) \code{data frame} in which to look for variables involved in the \code{formula} expression, as well as for variables specified in the arguments \code{id} and \code{weights}. The data are assumed to be sorted by \code{id} and time.
 #' @param subset an (optional) vector specifying a subset of observations to be used in the fitting process.
-#' @param corstr an (optional) character string which allows to specify the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(\emph{m})", "Non-Stationary-M-dependent(\emph{m})", "AR-M-dependent(\emph{m})", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. By default, \code{corstr} is set to be "Independence".
+#' @param corstr an (optional) character string which allows to specify the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(\emph{m})", "Non-Stationary-M-dependent(\emph{m})", "AR-M-dependent(\emph{m})", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. As default, \code{corstr} is set to "Independence".
 #' @param corr an (optional) square matrix of the same dimension of the maximum cluster size containing the user specified correlation. This is only appropriate if \code{corstr} is specified to be "User-defined".
 #' @param start an (optional) vector of starting values for the parameters in the linear predictor.
-#' @param maxit an (optional) integer value which represents the maximum number of iterations allowed for the fitting algorithm. By default, \code{maxit} is set to be 50.
-#' @param toler an (optional) positive value which represents the \emph{convergence tolerance}. The convergence is reached when the maximum of the absolute relative differences between the values of the parameters in the linear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. By default, \code{toler} is set to be 0.00001.
+#' @param maxit an (optional) integer value which represents the maximum number of iterations allowed for the fitting algorithm. As default, \code{maxit} is set to 50.
+#' @param toler an (optional) positive value which represents the \emph{convergence tolerance}. The convergence is reached when the maximum of the absolute relative differences between the values of the parameters in the linear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. As default, \code{toler} is set to 0.00001.
 #' @param trace an (optional) logical variable. If TRUE, output is produced for each iteration of the estimating algorithm.
-#' @param scale.fix an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. By default, \code{scale.fix} is set to be FALSE.
-#' @param scale.value an (optional) numeric value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. By default, \code{scale.value} is set to be 1.
-#' @param waves an (optional) positive integer-valued variable that is used to identify the order and spacing of observations within clusters. This argument is crucial when there are missing values and gaps in the data. By default, \code{waves} is equal to the integers from 1 to the size of each cluster.
+#' @param scale.fix an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. As default, \code{scale.fix} is set to FALSE.
+#' @param scale.value an (optional) numeric value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. As default, \code{scale.value} is set to 1.
+#' @param waves an (optional) positive integer-valued variable that is used to identify the order and spacing of observations within clusters. This argument is crucial when there are missing values and gaps in the data. As default, \code{waves} is equal to the integers from 1 to the size of each cluster.
 #' @param ...	further arguments passed to or from other methods.
 #' @details The values of the multivariate response variable measured on \eqn{n} subjects or clusters,
 #' denoted by \eqn{y_{i}=(y_{i1},\ldots,y_{in_i})^{\top}} for \eqn{i=1,\ldots,n}, are assumed to be
@@ -34,7 +34,7 @@
 #' solving the estimating equations described by Liang and Zeger (1986).
 #'
 #' If the maximum cluster size is 6 and for a cluster of size 4 the value
-#' of \code{waves} is set to be 2, 4, 5, 6, then it means that the data at
+#' of \code{waves} is set to 2, 4, 5, 6, then it means that the data at
 #' times 1 and 3 are missing, which should be taken into account by
 #' \code{glmgee} when the structure of the correlation matrix is assumed
 #' to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent"
@@ -171,7 +171,8 @@
 #' \emph{Biometrika} 73:13-22.
 #' @references Zeger S.L., Liang K.Y. (1986) Longitudinal data analysis for discrete and continuous outcomes.
 #' \emph{Biometrics} 42:121-130.
-#' @references Hardin J.W., Hilbe J.M. (2013) \emph{Generalized Estimating Equations}. Chapman & Hall, London.
+#' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+#' \emph{The R Journal} 15:105-133.}
 #'
 glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr,corr,start=NULL,scale.fix=FALSE,scale.value=1,toler=0.00001,maxit=50,trace=FALSE,...){
   if(missingArg(data)) data <- environment(eval(formula))
@@ -365,7 +366,7 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
     beta_old <- beta_new
     resume <- 0
     for(i in 1:nclus) resume <- resume + Rhat(datas[[i]],beta=beta_old)
-    phi <- sum(diag(resume[1:maxsize,1:maxsize]))/(sum(sizes)-p)
+    phi <- sum(diag(matrix(resume[1:maxsize,1:maxsize],maxsize,maxsize)))/(sum(sizes)-p)
     if(corstr!="User-defined" & corstr!="Independence") R <- Rout(resume,corstr)
     else R <- as.matrix(corr)
     resume2 <- 0
@@ -382,7 +383,7 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
   if(niter==maxit) warning("Iteration limit exceeded!!\n",call.=FALSE)
   eta <- tcrossprod(X,t(beta_new)) + offs
   mu <- family$linkinv(eta)
-  phi <- sum(diag(resume[1:maxsize,1:maxsize]))/(sum(sizes)-p)
+  phi <- sum(diag(matrix(resume[1:maxsize,1:maxsize],maxsize,maxsize)))/(sum(sizes)-p)
   sera <- try(chol(R),silent=TRUE)
   if(!is.matrix(sera)) warning("Estimate of correlation matrix is not positive definite",call.=FALSE)
     I0 <- try(chol(resume2[1:p,2:(p+1)]),silent=TRUE)
@@ -451,8 +452,7 @@ summary.glmgee <- function(object, ...,digits=max(3, getOption("digits") - 2),co
   }else cat("             Cluster size: ",object$sizes[1],"\n")
   cat("*************************************************************")
   cat("\nModel")
-  if(object$family$family=="Negative Binomial") cat("\n        Variance function: ",paste0(object$family$family," (",.Theta(),")"))
-  else cat("\n        Variance function: ",object$family$family)
+  cat("\n        Variance function: ",object$family$family)
   cat("\n            Link function: ",object$family$link)
   cat("\n    Correlation structure: ",ifelse(grepl("M-dependent",object$corstr),paste(object$corstr,"(",attr(object$corstr,"M"),")",sep=""),object$corstr))
   cat("\n*************************************************************\n")
@@ -471,7 +471,7 @@ summary.glmgee <- function(object, ...,digits=max(3, getOption("digits") - 2),co
     cat("Working correlation\n")
     print(round(object$corr,digits=corr.digits))
   }
-  return(invisible(round(TAB,digits=digits)))
+  return(invisible(list(coefficients=round(TAB,digits=digits),dispersion=object$phi,corr=round(object$corr,digits=corr.digits))))
 }
 
 #' @method confint glmgee
@@ -506,8 +506,8 @@ return(invisible(round(results,digits=digits)))
 #' an index plot of the Dfbeta Statistic for some parameters via the argument \code{coefs}.
 #' @param model an object of class \emph{glmgee}.
 #' @param coefs	an (optional) character string which (partially) match with the names of some parameters in the linear predictor.
-#' @param method an (optional) character string indicating the method of calculation for the \emph{one-step approximation}. The options are: the \emph{one-step approximation} described by Preisser and Qaqish (1996) in which the working-correlation matrix is assumed to be known ("Preisser-Qaqish"); and the "authentic" \emph{one-step approximation} ("full"). By default, \code{method} is set to be "Preisser-Qaqish".
-#' @param level an (optional) character string indicating the level for which the Dfbeta statistic is required. The options are: cluster-level ("clusters") and observation-level ("observations"). By default, \code{level} is set to be "clusters".
+#' @param method an (optional) character string indicating the method of calculation for the \emph{one-step approximation}. The options are: the \emph{one-step approximation} described by Preisser and Qaqish (1996) in which the working-correlation matrix is assumed to be known ("Preisser-Qaqish"); and the "authentic" \emph{one-step approximation} ("full"). As default, \code{method} is set to "Preisser-Qaqish".
+#' @param level an (optional) character string indicating the level for which the Dfbeta statistic is required. The options are: cluster-level ("clusters") and observation-level ("observations"). As default, \code{level} is set to "clusters".
 #' @param identify an (optional) integer indicating the number of clusters/observations to identify on the plot of the Dfbeta statistic. This is only appropriate if \code{coefs} is specified.
 #' @param ... further arguments passed to or from other methods. If \code{coefs} is specified then \code{...} may be used to include graphical parameters to customize the plot. For example,  \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
 #' @return A matrix with so many rows as clusters/observations in the sample and so many
@@ -523,6 +523,8 @@ return(invisible(round(results,digits=digits)))
 #' \emph{Biometrika} 83:551–562.
 #' @references Hammill B.G., Preisser J.S. (2006) A SAS/IML software program for GEE and regression diagnostics.
 #' \emph{Computational Statistics & Data Analysis} 51:1197-1212.
+#' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+#' \emph{The R Journal} 15:105-133.}
 #' @method dfbeta glmgee
 #' @export
 #' @examples
@@ -575,6 +577,7 @@ dfbeta.glmgee <- function(model, level=c("clusters","observations"), method=c("P
   method <- match.arg(method)
   level <- match.arg(level)
   if(level=="observations" & method=="full") stop("Dfbeta statistic at observation-level is only available for the 'Preisser-Qaqish' method!!",call.=FALSE)
+  if(model$corstr %in% c("User-defined","Independence") & level=="clusters") method <- "Preisser-Qaqish"
   p <- length(model$coefficients)
   if(method=="full"){
     dfbetas <- matrix(0,length(model$ids),p)
@@ -613,9 +616,7 @@ dfbeta.glmgee <- function(model, level=c("clusters","observations"), method=c("P
       envir$R <- R
       datas2 <- datax
       datas2[[i]] <- NULL
-      if(!model$linear){
-        envir$Ders <- model.matrix(model)
-      }
+      if(!model$linear) envir$Ders <- model.matrix(model)
       resume <- Reduce('+',lapply(datas2,model$score,beta=model$coefficients,out=TRUE))
       kchol <- try(chol(resume[,-1]),silent=TRUE)
       if(is.matrix(kchol)) kchol <- chol2inv(kchol) else kchol <- solve(resume[,-1])
@@ -640,7 +641,7 @@ dfbeta.glmgee <- function(model, level=c("clusters","observations"), method=c("P
       Vi <- t(model$corr[D[,p+4],D[,p+4]]*matrix(wi,ni,ni))*matrix(wi,ni,ni)
       Xiw <- Xi*matrix(model$family$mu.eta(etai),nrow(Xi),p)
       if(level=="clusters" | ni==1){
-        if(model$corstr=="Independence") Vi2 <- diag(1/wi[D[,p+4]]^2)
+        if(model$corstr=="Independence") Vi2 <- diag(as.vector(1/wi[D[,p+4]]^2),ni,ni)
         else{Vi2 <- try(chol(Vi),silent=TRUE)
         if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)}
         Xiw2 <- crossprod(Vi2,Xiw)
@@ -697,7 +698,7 @@ dfbeta.glmgee <- function(model, level=c("clusters","observations"), method=c("P
           identify(nano$x,nano$y,n=max(1,floor(abs(identify))),labels=rownames(dfbetas))
         }
       }
-    }
+    }else stop(paste("There are no variables with the name",coefs,collapse=""),call.=FALSE)
   }
   return(dfbetas)
 }
@@ -708,12 +709,12 @@ dfbeta.glmgee <- function(model, level=c("clusters","observations"), method=c("P
 #' of deleting each cluster/observation in turn. This function also can produce a cluster/observation-index plot of the
 #' Cook's distance for all parameters in the linear predictor or for some subset of them (via the argument \code{coefs}).
 #' @param model an object of class \emph{glmgee}.
-#' @param method an (optional) character string indicating the method of calculation for the \emph{one-step approximation}. The options are: the \emph{one-step approximation} described by Preisser and Qaqish (1996) in which the working-correlation matrix is assumed to be known ("Preisser-Qaqish"); and the "authentic" \emph{one-step approximation} ("full"). By default, \code{method} is set to be "Preisser-Qaqish".
-#' @param level an (optional) character string indicating the level for which the Cook's distance is required. The options are: cluster-level ("clusters") and observation-level ("observations"). By default, \code{level} is set to be "clusters".
-#' @param plot.it an (optional) logical indicating if the plot of Cook's distance is required or just the data matrix in which that plot is based. By default, \code{plot.it} is set to be FALSE.
+#' @param method an (optional) character string indicating the method of calculation for the \emph{one-step approximation}. The options are: the \emph{one-step approximation} described by Preisser and Qaqish (1996) in which the working-correlation matrix is assumed to be known ("Preisser-Qaqish"); and the "authentic" \emph{one-step approximation} ("full"). As default, \code{method} is set to "Preisser-Qaqish".
+#' @param level an (optional) character string indicating the level for which the Cook's distance is required. The options are: cluster-level ("clusters") and observation-level ("observations"). As default, \code{level} is set to "clusters".
+#' @param plot.it an (optional) logical indicating if the plot of Cook's distance is required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to FALSE.
 #' @param coefs	an (optional) character string which (partially) match with the names of some of the parameters in the linear predictor.
 #' @param identify an (optional) integer indicating the number of clusters to identify on the plot of Cook's distance. This is only appropriate if \code{plot.it=TRUE}.
-#' @param varest an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). By default, \code{varest} is set to be "robust".
+#' @param varest an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). As default, \code{varest} is set to "robust".
 #' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example,  \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
 #' @return A matrix as many rows as clusters/observations in the sample and one column with the values of the Cook's distance.
 #' @details The Cook's distance consists of the \emph{distance} between two estimates of the
@@ -753,6 +754,8 @@ dfbeta.glmgee <- function(model, level=c("clusters","observations"), method=c("P
 #' \emph{Biometrika} 83:551–562.
 #' @references Hammill B.G., Preisser J.S. (2006) A SAS/IML software program for GEE and regression diagnostics.
 #' \emph{Computational Statistics & Data Analysis} 51:1197-1212.
+#' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+#' \emph{The R Journal} 15:105-133.}
 cooks.distance.glmgee <- function(model, method=c("Preisser-Qaqish","full"), level=c("clusters","observations"), plot.it=FALSE, coefs, identify, varest=c("robust","df-adjusted","model","bias-corrected"),...){
   method <- match.arg(method)
   level <- match.arg(level)
@@ -766,9 +769,8 @@ cooks.distance.glmgee <- function(model, method=c("Preisser-Qaqish","full"), lev
       subst <- colnames(dfbetas)[ids]
       dfbetas <- as.matrix(dfbetas[,ids])
       met <- as.matrix(met[ids,ids])
-    }
+    }else stop(paste("There are no variables with the name",coefs,collapse=""),call.=FALSE)
   }
-
   met2 <- try(chol(met),silent=TRUE)
   if(is.matrix(met2)) met2 <- chol2inv(met2) else met2 <- solve(met)
   CD <- as.matrix(apply((dfbetas%*%met2)*dfbetas,1,sum))/ncol(met2)
@@ -784,7 +786,7 @@ cooks.distance.glmgee <- function(model, method=c("Preisser-Qaqish","full"), lev
     nano$y <- CD
     if(is.null(nano$xlab)) nano$xlab <- ifelse(level=="clusters","Cluster Index","Observation Index")
     if(is.null(nano$type)) nano$type <- "h"
-    if(is.null(nano$ylab)) nano$ylab <- ifelse(level=="clusters",expression((hat(beta)-hat(beta)[{(-~~i)}])^{T}~(Var(hat(beta)))^{-1}~(hat(beta)-hat(beta)[{(-~~i)}])),expression((hat(beta)-hat(beta)[{(-~~ij)}])^{T}~(Var(hat(beta)))^{-1}~(hat(beta)-hat(beta)[{(-~~ij)}])))
+    if(is.null(nano$ylab)) nano$ylab <- ifelse(level=="clusters",expression((hat(beta)-hat(beta)[{(-~~i)}])^{T}~(Var(hat(beta)))^{-1}~(hat(beta)-hat(beta)[{(-~~i)}])),expression(frac(1,p)(hat(beta)-hat(beta)[{(-~~ij)}])^{T}~(Var(hat(beta)))^{-1}~(hat(beta)-hat(beta)[{(-~~ij)}])))
     do.call("plot",nano)
     abline(h=3*mean(CD),lty=3)
     if(!missingArg(identify)) identify(nano$x,nano$y,n=max(1,floor(abs(identify))),labels=labels)
@@ -844,8 +846,7 @@ fitted.glmgee <- function(object,...) return(object$fitted.values)
 print.glmgee <- function(x, ...){
   .Theta <- function() return(.Theta)
   environment(.Theta) <- environment(x$family$variance)
-  if(x$family$family=="Negative Binomial") cat("\n        Variance function: ",paste0(x$family$family," (",.Theta(),")"))
-  else cat("\n        Variance function: ",x$family$family)
+  cat("\n        Variance function: ",x$family$family)
   cat("\n                     Link: ",x$family$link)
   cat("\n    Correlation structure: ",ifelse(grepl("M-dependent",x$corstr),paste(x$corstr,"(",attr(x$corstr,"M"),")",sep=""),x$corstr),"\n")
 }
@@ -855,8 +856,8 @@ print.glmgee <- function(x, ...){
 #' @param object an object of the class \emph{glmgee}.
 #' @param newdata	an (optional) \code{data frame} in which to look for variables with which to predict. If omitted, the fitted linear predictors are used.
 #' @param type an (optional) character string giving the type of prediction required. The default, "link", is on the scale of the linear predictors, and the alternative, "response", is on the scale of the response variable.
-#' @param se.fit	an (optional) logical switch indicating if standard errors are required. By default, \code{se.fit} is set to be FALSE.
-#' @param varest an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). By default, \code{varest} is set to be "robust".
+#' @param se.fit	an (optional) logical switch indicating if standard errors are required. As default, \code{se.fit} is set to FALSE.
+#' @param varest an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). As default, \code{varest} is set to "robust".
 #' @param ... further arguments passed to or from other methods.
 #' @return A matrix with so many rows as \code{newdata} and one column with the predictions. If \code{se.fit=}TRUE then a second column with estimates standard errors is included.
 #' @examples
@@ -921,8 +922,8 @@ predict.glmgee <- function(object, ...,newdata, se.fit=FALSE, type=c("link","res
 #' @title Residuals for Generalized Estimating Equations
 #' @description Calculates residuals for a fitted generalized estimating equation.
 #' @param object a object of the class \emph{glmgee}.
-#' @param type an (optional) character string giving the type of residuals which should be returned. The available options are: (1) "pearson"; (2) "deviance";  (3) the distance between the observed response vector and the fitted mean vector using a metric based on the product between the cluster size and fitted variance-covariance matrix ("mahalanobis"). By default, \code{type} is set to be "mahalanobis".
-#' @param plot.it an (optional) logical switch indicating if a plot of the residuals is required. By default, \code{plot.it} is set to be FALSE.
+#' @param type an (optional) character string giving the type of residuals which should be returned. The available options are: (1) "pearson"; (2) "deviance";  (3) the distance between the observed response vector and the fitted mean vector using a metric based on the product between the cluster size and fitted variance-covariance matrix ("mahalanobis"). As default, \code{type} is set to "mahalanobis".
+#' @param plot.it an (optional) logical switch indicating if a plot of the residuals is required. As default, \code{plot.it} is set to FALSE.
 #' @param identify an (optional) integer value indicating the number of individuals/clusters to identify on the plot of residuals. This is only appropriate when \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods
 #' @return A vector with the observed residuals type \code{type}.
@@ -972,7 +973,7 @@ residuals.glmgee <- function(object,..., type=c("mahalanobis","pearson","devianc
     mui <- object$family$linkinv(etai)
     wi <- sqrt(object$family$variance(mui)/D[,p+3])
     Vi <- t(object$corr[D[,p+4],D[,p+4]]*matrix(wi,ni,ni))*matrix(wi,ni,ni)
-    if(object$corstr=="Independence") Vi2 <- diag(1/wi[D[,p+4]]^2)
+    if(object$corstr=="Independence") Vi2 <- diag(as.vector(1/wi[D[,p+4]]^2),ni,ni)
     else{Vi2 <- try(chol(Vi),silent=TRUE)
     if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)}
     crossprod(yi-mui,Vi2%*%(yi-mui))/ni
@@ -1082,18 +1083,20 @@ estequa.glmgee <- function(object,...){
 #' @description Allows to compare nested generalized estimating equations using the Wald and generalized score tests.
 #' @param object an object of the class \emph{glmgee}.
 #' @param ... another objects of the class glmgee which are obtained from the fit of generalized estimating equations.
-#' @param test an (optional) character string indicating the required test. The available options are: Wald ("wald") and generalized score ("score") tests. By default, \code{test} is set to be "wald".
-#' @param varest an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters in the Wald test. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). By default, \code{varest} is set to be "robust". See \link{vcov.glmgee}.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param test an (optional) character string indicating the required test. The available options are: Wald ("wald") and generalized score ("score") tests. As default, \code{test} is set to "wald".
+#' @param varest an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters in the Wald test. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). As default, \code{varest} is set to "robust". See \link{vcov.glmgee}.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
 #' @return A matrix with three columns which contains the following:
-#' \itemize{
-#' \item \code{Chi:}{ The value of the statistic of the test.}
-#' \item \code{df:}{ The number of degrees of freedom.}
-#' \item \code{Pr(>Chi):}{ The \emph{p}-value of the test computed using the Chi-square distribution.}
+#' \describe{
+#' \item{\code{Chi}}{ The value of the statistic of the test.}
+#' \item{\code{df}}{ The number of degrees of freedom.}
+#' \item{\code{Pr(>Chi)}}{ The \emph{p}-value of the test computed using the Chi-square distribution.}
 #' }
 #' @references Rotnitzky A., Jewell P. (1990) Hypothesis Testing of Regression Parameters
 #' in Semiparametric Generalized Linear Models for Cluster Correlated Data. \emph{Biometrika} 77:485-497.
 #' @references Boos D.D. (1992) On Generalized Score Tests. \emph{The American Statistician} 46:327-333.
+#' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+#' \emph{The R Journal} 15:105-133.}
 #' @method anova glmgee
 #' @export
 #' @examples
@@ -1177,10 +1180,10 @@ anova.glmgee <- function(object,...,test=c("wald","score"),verbose=TRUE,varest=c
 #' @title QIC for Generalized Estimating Equations
 #' @description Computes the quasi-likelihood under the independence model criterion (QIC) for one or more objects of the class glmgee.
 #' @param ...	one or several objects of the class \emph{glmgee}.
-#' @param k an (optional) non-negative value giving the magnitude of the penalty. By default, \code{k} is set to be 2.
-#' @param u an (optional) logical switch indicating if QIC should be replaced by QICu. By default, \code{u} is set to be FALSE.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @param digits an (optional) integer indicating the number of digits to print.
+#' @param k an (optional) non-negative value giving the magnitude of the penalty. As default, \code{k} is set to 2.
+#' @param u an (optional) logical switch indicating if QIC should be replaced by QICu. As default, \code{u} is set to FALSE.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
+#' @param digits an (optional) integer indicating the number of digits to print. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.
 #' @return A \code{data.frame} with the values of -2*quasi-likelihood, the number of parameters in the linear predictor, and the value of QIC (or QICu if \code{u}=TRUE) for each \emph{glmgee} object in the input.
 #' @seealso \link{CIC}, \link{GHYC}, \link{RJC}, \link{AGPC}, \link{SGPC}
 #' @export QIC
@@ -1213,8 +1216,9 @@ anova.glmgee <- function(object,...,test=c("wald","score"),verbose=TRUE,varest=c
 #' @references Pan W. (2001) Akaike's information criterion in generalized estimating equations, \emph{Biometrics} 57:120-125.
 #' @references Hin L.-Y., Carey V.J., Wang Y.-G. (2007) Criteria for Working–Correlation–Structure Selection in GEE:
 #' Assessment via Simulation. \emph{The American Statistician} 61:360–364.
-#'
-QIC <- function(...,k=2,u=FALSE,verbose=TRUE,digits=2){
+#' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+#' \emph{The R Journal} 15:105-133.}
+QIC <- function(...,k=2,u=FALSE,verbose=TRUE,digits=max(3, getOption("digits") - 2)){
   .Theta <- function() return(.Theta)
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -1228,10 +1232,7 @@ QIC <- function(...,k=2,u=FALSE,verbose=TRUE,digits=2){
     results[i,2] <- length(coef(x[[i]]))
     results[i,3] <- round(-2*x[[i]]$logLik+ifelse(u,k*length(x[[i]]$coefficients),k*x[[i]]$CIC),digits=3)
     results2[i,1] <- as.character(call.[i+1])
-    if(x[[i]]$family$family=="Negative Binomial"){
-      environment(.Theta) <- environment(x[[i]]$family$variance)
-      results2[i,2] <- paste0(x[[i]]$family$family," (",.Theta(),")")
-    }else results2[i,2] <- x[[i]]$family$family
+    results2[i,2] <- x[[i]]$family$family
     results2[i,3] <- x[[i]]$family$link
     if(x[[i]]$linear) results2[i,4] <- paste(c(attr(x[[i]]$terms,"intercept"),attr(x[[i]]$terms,"term.labels")),collapse=" + ")
     else results2[i,4] <- paste(deparse(x[[i]]$formula[[3]]),collapse="")
@@ -1259,8 +1260,8 @@ QIC <- function(...,k=2,u=FALSE,verbose=TRUE,digits=2){
 #' @title Correlation Information Criterion for Generalized Estimating Equations
 #' @description Computes the Correlation Information Criterion (CIC) for one or more objects of the class glmgee.
 #' @param ...	one or several objects of the class \emph{glmgee}.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @param digits an (optional) integer indicating the number of digits to print.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
+#' @param digits an (optional) integer indicating the number of digits to print. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.
 #' @return A \code{data.frame} with the values of the CIC for each \emph{glmgee} object in the input.
 #' @export CIC
 #' @seealso \link{QIC}, \link{GHYC}, \link{RJC}, \link{AGPC}, \link{SGPC}
@@ -1293,8 +1294,9 @@ QIC <- function(...,k=2,u=FALSE,verbose=TRUE,digits=2){
 #' @references Hin L.-Y., Wang Y.-G. (2009) Working-Correlation-Structure Identification in Generalized Estimating Equations. \emph{Statistics in Medicine}, 28:642-658.
 #' @references Hin L.-Y., Carey V.J., Wang Y.-G. (2007) Criteria for Working–Correlation–Structure Selection in GEE:
 #' Assessment via Simulation. \emph{The American Statistician} 61:360–364.
-#'
-CIC <- function(...,verbose=TRUE,digits=3){
+#' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+#' \emph{The R Journal} 15:105-133.}
+CIC <- function(...,verbose=TRUE,digits=max(3, getOption("digits") - 2)){
   .Theta <- function() return(.Theta)
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -1306,10 +1308,7 @@ CIC <- function(...,verbose=TRUE,digits=3){
   for(i in 1:length(x)){
     results[i,1] <- round(x[[i]]$CIC,digits=digits)
     results2[i,1] <- as.character(call.[i+1])
-    if(x[[i]]$family$family=="Negative Binomial"){
-      environment(.Theta) <- environment(x[[i]]$family$variance)
-      results2[i,2] <- paste0(x[[i]]$family$family," (",.Theta(),")")
-    }else results2[i,2] <- x[[i]]$family$family
+    results2[i,2] <- x[[i]]$family$family
     results2[i,3] <- x[[i]]$family$link
     if(x[[i]]$linear) results2[i,4] <- paste(c(attr(x[[i]]$terms,"intercept"),attr(x[[i]]$terms,"term.labels")),collapse=" + ")
     else results2[i,4] <- paste(deparse(x[[i]]$formula[[3]]),collapse="")
@@ -1336,12 +1335,14 @@ CIC <- function(...,verbose=TRUE,digits=3){
 #' @title Pardo-Alonso's Criterion for Generalized Estimating Equations
 #' @description Computes the Pardo-Alonso's criterion (PAC) for one or more objects of the class glmgee.
 #' @param ...	one or several objects of the class \emph{glmgee}.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @param digits an (optional) integer indicating the number of digits to print.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
+#' @param digits an (optional) integer indicating the number of digits to print. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.
 #' @return A \code{data.frame} with the values of the PAC for each \emph{glmgee} object in the input.
 #' @export PAC
 #' @references Pardo M.C., Alonso R. (2019) Working correlation structure selection in GEE analysis.
 #' \emph{Statistical Papers} 60:1447–1467.
+#' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+#' \emph{The R Journal} 15:105-133.}
 #' @seealso \link{QIC}, \link{CIC}, \link{RJC}, \link{AGPC}, \link{SGPC}, \link{GHYC}
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
@@ -1369,7 +1370,7 @@ CIC <- function(...,verbose=TRUE,digits=3){
 #' fit3 <- update(fit1, corstr="Exchangeable")
 #' PAC(fit1, fit2, fit3)
 #'
-PAC <- function(...,verbose=TRUE,digits=4){
+PAC <- function(...,verbose=TRUE,digits=max(3, getOption("digits") - 2)){
   .Theta <- function() return(.Theta)
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -1408,10 +1409,7 @@ PAC <- function(...,verbose=TRUE,digits=4){
   for(i in 1:length(x)){
     results[i,1] <- round(Gosho(x[[i]]),digits=digits)
     results2[i,1] <- as.character(call.[i+1])
-    if(x[[i]]$family$family=="Negative Binomial"){
-      environment(.Theta) <- environment(x[[i]]$family$variance)
-      results2[i,2] <- paste0(x[[i]]$family$family," (",.Theta(),")")
-    }else results2[i,2] <- x[[i]]$family$family
+    results2[i,2] <- x[[i]]$family$family
     results2[i,3] <- x[[i]]$family$link
     if(x[[i]]$linear) results2[i,4] <- paste(c(attr(x[[i]]$terms,"intercept"),attr(x[[i]]$terms,"term.labels")),collapse=" + ")
     else results2[i,4] <- paste(deparse(x[[i]]$formula[[3]]),collapse="")
@@ -1441,15 +1439,16 @@ PAC <- function(...,verbose=TRUE,digits=4){
 #' @title Gosho-Hamada-Yoshimura's Criterion for Generalized Estimating Equations
 #' @description Computes the Gosho-Hamada-Yoshimura's criterion (GHYC) for one or more objects of the class glmgee.
 #' @param ...	one or several objects of the class \emph{glmgee}.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @param digits an (optional) integer indicating the number of digits to print.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
+#' @param digits an (optional) integer indicating the number of digits to print. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.
 #' @return A \code{data.frame} with the values of the GHYC for each \emph{glmgee} object in the input.
 #' @export GHYC
 #' @references Gosho M., Hamada C., Yoshimura I. (2011) Criterion for the Selection
 #' of a Working Correlation Structure in the Generalized Estimating Equation Approach for
 #' Longitudinal Balanced Data. \emph{Communications in Statistics — Theory and Methods} 40:3839-3856.
 #' @references Gosho M. (2014) Criteria to Select a Working Correlation Structure in SAS.
-#' \emph{Journal of Statistical Software, Code Snippets} 57:1548-7660.
+#' \emph{Journal of Statistical Software, Code Snippets} 57:1548-7660.#' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+#' \emph{The R Journal} 15:105-133.}
 #' @seealso \link{QIC}, \link{CIC}, \link{RJC}, \link{AGPC}, \link{SGPC}
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
@@ -1477,7 +1476,7 @@ PAC <- function(...,verbose=TRUE,digits=4){
 #' fit3 <- update(fit1, corstr="Exchangeable")
 #' GHYC(fit1, fit2, fit3)
 #'
-GHYC <- function(...,verbose=TRUE,digits=3){
+GHYC <- function(...,verbose=TRUE,digits=max(3, getOption("digits") - 2)){
   .Theta <- function() return(.Theta)
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -1516,10 +1515,7 @@ GHYC <- function(...,verbose=TRUE,digits=3){
   for(i in 1:length(x)){
     results[i,1] <- round(Gosho(x[[i]]),digits=digits)
     results2[i,1] <- as.character(call.[i+1])
-    if(x[[i]]$family$family=="Negative Binomial"){
-      environment(.Theta) <- environment(x[[i]]$family$variance)
-      results2[i,2] <- paste0(x[[i]]$family$family," (",.Theta(),")")
-    }else results2[i,2] <- x[[i]]$family$family
+    results2[i,2] <- x[[i]]$family$family
     results2[i,3] <- x[[i]]$family$link
     if(x[[i]]$linear) results2[i,4] <- paste(c(attr(x[[i]]$terms,"intercept"),attr(x[[i]]$terms,"term.labels")),collapse=" + ")
     else results2[i,4] <- paste(deparse(x[[i]]$formula[[3]]),collapse="")
@@ -1547,13 +1543,15 @@ GHYC <- function(...,verbose=TRUE,digits=3){
 #' @title Rotnitzky–Jewell's Criterion for Generalized Estimating Equations
 #' @description Computes the Rotnitzky–Jewell's criterion (RJC) for one or more objects of the class glmgee.
 #' @param ...	one or several objects of the class \emph{glmgee}.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @param digits an (optional) integer indicating the number of digits to print.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
+#' @param digits an (optional) integer indicating the number of digits to print. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.
 #' @return A \code{data.frame} with the values of the RJC for each \emph{glmgee} object in the input.
 #' @export RJC
 #' @seealso \link{QIC}, \link{CIC}, \link{GHYC}, \link{AGPC}, \link{SGPC}
 #' @references Hin L.-Y., Carey V.J., Wang Y.-G. (2007) Criteria for Working–Correlation–Structure
 #' Selection in GEE: Assessment via Simulation. \emph{The American Statistician} 61:360-364.
+#' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+#' \emph{The R Journal} 15:105-133.}
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 #' data(spruces)
@@ -1580,7 +1578,7 @@ GHYC <- function(...,verbose=TRUE,digits=3){
 #' fit3 <- update(fit1, corstr="Exchangeable")
 #' RJC(fit1, fit2, fit3)
 #'
-RJC <- function(...,verbose=TRUE,digits=3){
+RJC <- function(...,verbose=TRUE,digits=max(3, getOption("digits") - 2)){
   .Theta <- function() return(.Theta)
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -1592,10 +1590,7 @@ RJC <- function(...,verbose=TRUE,digits=3){
   for(i in 1:length(x)){
     results[i,1] <- round(x[[i]]$RJC,digits=digits)
     results2[i,1] <- as.character(call.[i+1])
-    if(x[[i]]$family$family=="Negative Binomial"){
-      environment(.Theta) <- environment(x[[i]]$family$variance)
-      results2[i,2] <- paste0(x[[i]]$family$family," (",.Theta(),")")
-    }else results2[i,2] <- x[[i]]$family$family
+    results2[i,2] <- x[[i]]$family$family
     results2[i,3] <- x[[i]]$family$link
     if(x[[i]]$linear) results2[i,4] <- paste(c(attr(x[[i]]$terms,"intercept"),attr(x[[i]]$terms,"term.labels")),collapse=" + ")
     else results2[i,4] <- paste(deparse(x[[i]]$formula[[3]]),collapse="")
@@ -1626,34 +1621,34 @@ RJC <- function(...,verbose=TRUE,digits=3){
 #' and backward stepwise.
 #' @param model an object of the class glmgee which is obtained from the fit of a generalized estimating equation.
 #' @param direction an (optional) character string indicating the type of procedure which should be used. The available
-#' options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). By default, \code{direction}
-#' is set to be "forward".
+#' options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). As default, \code{direction}
+#' is set to "forward".
 #' @param levels an (optional) two-dimensional vector of values in the interval \eqn{(0,1)} indicating the levels at which
 #' the variables should in and out from the model. This is only appropiate if \code{criterion}="p-value". By default,
-#' \code{levels} is set to be \code{c(0.05,0.05)}.
+#' \code{levels} is set to \code{c(0.05,0.05)}.
 #' @param test an (optional) character string indicating the statistical test which should be used to compare nested
-#' models. The available options are: Wald ("wald") and generalized score ("score") tests. By default, \code{test} is
-#' set to be "wald".
+#' models. The available options are: Wald ("wald") and generalized score ("score") tests. As default, \code{test} is
+#' set to "wald".
 #' @param criterion an (optional) character string indicating the criterion which should be used to compare the candidate
 #' models. The available options are: QIC ("qic"), QICu ("qicu"), Akaike-type penalized gaussian pseudo-likelihood criterion ("agpc"),
 #' Schwarz-type penalized gaussian pseudo-likelihood criterion ("sgpc") and \emph{p}-value of the \code{test} test ("p-value"). By
-#' default, \code{criterion} is set to be "p-value".
+#' default, \code{criterion} is set to "p-value".
 #' @param ...	further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the
-#' penalty in the AGPC, which by default is set to be 2.
+#' penalty in the AGPC, which by default is set to 2.
 #' @param trace an (optional) logical switch indicating if should the stepwise reports be printed. By default,
-#' \code{trace} is set to be TRUE.
+#' \code{trace} is set to TRUE.
 #' @param digits an (optional) integer indicating the number of digits which should be used to print the most of the
-#' criteria to compare the candidate models. By default, \code{digits} is set to be 5.
-#' @param varest an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters in the Wald-type test. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). By default, \code{varest} is set to be "robust".
+#' criteria to compare the candidate models. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.
+#' @param varest an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters in the Wald-type test. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). As default, \code{varest} is set to "robust".
 #' @param scope an (optional) list, containing components \code{lower} and \code{upper}, both formula-type objects,
-#' indicating the range of models which should be examined in the stepwise search. By default, \code{lower} is a model
+#' indicating the range of models which should be examined in the stepwise search. As default, \code{lower} is a model
 #' with no predictors and \code{upper} is the linear predictor of the model in \code{model}.
 #' @return A list which contains the following objects:
-#' \itemize{
-#' \item{\code{initial}:}{ a character string indicating the linear predictor of the "initial model".}
-#' \item{\code{direction}:}{ a character string indicating the type of procedure which was used.}
-#' \item{\code{criterion}:}{ a character string indicating the criterion used to compare the candidate models.}
-#' \item{\code{final}:}{ a character string indicating the linear predictor of the "final model".}
+#' \describe{
+#' \item{\code{initial}}{ a character string indicating the linear predictor of the "initial model".}
+#' \item{\code{direction}}{ a character string indicating the type of procedure which was used.}
+#' \item{\code{criterion}}{ a character string indicating the criterion used to compare the candidate models.}
+#' \item{\code{final}}{ a character string indicating the linear predictor of the "final model".}
 #' }
 #' @seealso \link{stepCriterion.lm}, \link{stepCriterion.glm}, \link{stepCriterion.overglm}
 #' @examples
@@ -1680,7 +1675,9 @@ RJC <- function(...,verbose=TRUE,digits=3){
 #' with Applications in R}. Springer, New York.
 #' @references Jianwen X., Jiamao Z., Liya F. (2019) Variable selection in generalized estimating equations via empirical
 #' likelihood and Gaussian pseudo-likelihood. \emph{Communications in Statistics - Simulation and Computation} 48:1239-1250.
-stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","agpc","sgpc"), test=c("wald","score"), direction=c("forward","backward"), levels=c(0.05,0.05), trace=TRUE, scope, digits=5,varest=c("robust","df-adjusted","model","bias-corrected"),...){
+#' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+#' \emph{The R Journal} 15:105-133.}
+stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","agpc","sgpc"), test=c("wald","score"), direction=c("forward","backward"), levels=c(0.05,0.05), trace=TRUE, scope, digits=max(3, getOption("digits") - 2),varest=c("robust","df-adjusted","model","bias-corrected"),...){
   .Theta <- function() return(.Theta)
   if(!model$linear)
     stop("Objects generated by the function gnmgee() are not supported!!",call.=FALSE)
@@ -1719,8 +1716,7 @@ stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","agpc
   paso <- 1
   tol <- TRUE
   if(trace){
-    if(model$family$family=="Negative Binomial") cat("\n        Variance function: ",paste0(model$family$family," (",.Theta(),")"))
-    else cat("\n    Variance function: ",model$family$family)
+    cat("\n    Variance function: ",model$family$family)
     cat("\n        Link function: ",model$family$link,"\n")
     cat("Correlation structure: ",corstr,"\n")
     cat(" Comparison criterion: ",criters2[ids])
@@ -1977,7 +1973,7 @@ stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","agpc
       cat("\n Effects are added when their p-values are lower than",levels[1])
       cat("\n Effects are excluded when their p-values are higher than",levels[2])
     }
-    if(!is.null(xxx$k)) cat("The magnitude of the penalty in the AGPC was set to be ",xxx$k)
+    if(!is.null(xxx$k)) cat("The magnitude of the penalty in the AGPC was set to ",xxx$k)
     cat("\n")
   }
   out_$final <- paste("~",as.character(oldformula)[length(oldformula)],sep=" ")
@@ -1989,11 +1985,11 @@ stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","agpc
 #' @title AGPC for Generalized Estimating Equations
 #' @description Computes the Akaike-type penalized Gaussian pseudo-likelihood criterion (AGPC) for one or more objects of the class glmgee.
 #' @param ...	one or several objects of the class \emph{glmgee}.
-#' @param k an (optional) non-negative value giving the magnitude of the penalty. By default, \code{k} is set to be 2.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @param digits an (optional) integer indicating the number of digits to print.
+#' @param k an (optional) non-negative value giving the magnitude of the penalty. As default, \code{k} is set to 2.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
+#' @param digits an (optional) integer indicating the number of digits to print. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.
 #' @return A \code{data.frame} with the values of the gaussian pseudo-likelihood, the number of parameters in the linear predictor plus the number of parameters in the correlation matrix, and the value of AGPC for each \emph{glmgee} object in the input.
-#' @details If \code{k} is set to be 0 then the AGPC reduces to the Gaussian pseudo-likelihood criterion (GPC), proposed by Carey and Wang (2011), which corresponds to the logarithm of the multivariate normal density function.
+#' @details If \code{k} is set to 0 then the AGPC reduces to the Gaussian pseudo-likelihood criterion (GPC), proposed by Carey and Wang (2011), which corresponds to the logarithm of the multivariate normal density function.
 #' @export AGPC
 #' @seealso \link{QIC}, \link{CIC}, \link{RJC}, \link{GHYC}, \link{SGPC}
 #' @references Carey V.J., Wang Y.-G. (2011) Working covariance model selection for
@@ -2003,6 +1999,8 @@ stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","agpc
 #' and Statistics} 29:515-530.
 #' @references Fu L., Hao Y., Wang Y.-G. (2018) Working correlation structure
 #' selection in generalized estimating equations. \emph{Computational Statistics} 33:983-996.
+#' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+#' \emph{The R Journal} 15:105-133.}
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 #' data(spruces)
@@ -2029,7 +2027,7 @@ stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","agpc
 #' fit3 <- update(fit1, corstr="Exchangeable")
 #' AGPC(fit1, fit2, fit3)
 #'
-AGPC <- function(...,k=2,verbose=TRUE,digits=2){
+AGPC <- function(...,k=2,verbose=TRUE,digits=max(3, getOption("digits") - 2)){
   .Theta <- function() return(.Theta)
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -2075,10 +2073,7 @@ AGPC <- function(...,k=2,verbose=TRUE,digits=2){
     results[i,2] <- temporal$cr2
     results[i,3] <- round(temporal$cr1,digits=digits)
     results2[i,1] <- as.character(call.[i+1])
-    if(x[[i]]$family$family=="Negative Binomial"){
-      environment(.Theta) <- environment(x[[i]]$family$variance)
-      results2[i,2] <- paste0(x[[i]]$family$family," (",.Theta(),")")
-    }else results2[i,2] <- x[[i]]$family$family
+    results2[i,2] <- x[[i]]$family$family
     results2[i,3] <- x[[i]]$family$link
     if(x[[i]]$linear) results2[i,4] <- paste(c(attr(x[[i]]$terms,"intercept"),attr(x[[i]]$terms,"term.labels")),collapse=" + ")
     else results2[i,4] <- paste(deparse(x[[i]]$formula[[3]]),collapse="")
@@ -2106,8 +2101,8 @@ AGPC <- function(...,k=2,verbose=TRUE,digits=2){
 #' @title SGPC for Generalized Estimating Equations
 #' @description Computes the Schwarz-type penalized Gaussian pseudo-likelihood criterion (SGPC) for one or more objects of the class glmgee.
 #' @param ...	one or several objects of the class \emph{glmgee}.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @param digits an (optional) integer indicating the number of digits to print.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
+#' @param digits an (optional) integer indicating the number of digits to print. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.
 #' @return A \code{data.frame} with the values of the gaussian pseudo-likelihood, the number of parameters in the linear predictor plus the number of parameters in the correlation matrix, and the value of SGPC for each \emph{glmgee} object in the input.
 #' @export SGPC
 #' @seealso \link{QIC}, \link{CIC}, \link{RJC}, \link{GHYC}, \link{AGPC}
@@ -2118,6 +2113,8 @@ AGPC <- function(...,k=2,verbose=TRUE,digits=2){
 #' and Statistics} 29:515-530.
 #' @references Fu L., Hao Y., Wang Y.-G. (2018) Working correlation structure
 #' selection in generalized estimating equations. \emph{Computational Statistics} 33:983-996.
+#' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+#' \emph{The R Journal} 15:105-133.}
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 #' data(spruces)
@@ -2144,7 +2141,7 @@ AGPC <- function(...,k=2,verbose=TRUE,digits=2){
 #' fit3 <- update(fit1, corstr="Exchangeable")
 #' SGPC(fit1, fit2, fit3)
 #'
-SGPC <- function(...,verbose=TRUE,digits=2){
+SGPC <- function(...,verbose=TRUE,digits=max(3, getOption("digits") - 2)){
   .Theta <- function() return(.Theta)
   x <- list(...)
   if(any(lapply(x,function(xx) class(xx)[1])!="glmgee"))
@@ -2190,10 +2187,7 @@ SGPC <- function(...,verbose=TRUE,digits=2){
     results[i,2] <- temporal$cr2
     results[i,3] <- round(temporal$cr1,digits=digits)
     results2[i,1] <- as.character(call.[i+1])
-    if(x[[i]]$family$family=="Negative Binomial"){
-      environment(.Theta) <- environment(x[[i]]$family$variance)
-      results2[i,2] <- paste0(x[[i]]$family$family," (",.Theta(),")")
-    }else results2[i,2] <- x[[i]]$family$family
+    results2[i,2] <- x[[i]]$family$family
     results2[i,3] <- x[[i]]$family$link
     if(x[[i]]$linear) results2[i,4] <- paste(c(attr(x[[i]]$terms,"intercept"),attr(x[[i]]$terms,"term.labels")),collapse=" + ")
     else results2[i,4] <- paste(deparse(x[[i]]$formula[[3]]),collapse="")
@@ -2221,7 +2215,7 @@ SGPC <- function(...,verbose=TRUE,digits=2){
 #' @title Estimate of the variance-covariance matrix in GEEs
 #' @description Computes the type-\code{type} estimate of the variance-covariance matrix from an object of the class glmgee.
 #' @param object An object of the class \emph{glmgee}.
-#' @param type an (optional) character string indicating the type of estimator which should be used. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). By default, \code{type} is set to be "robust".
+#' @param type an (optional) character string indicating the type of estimator which should be used. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). As default, \code{type} is set to "robust".
 #' @param ...	further arguments passed to or from other methods.
 #' @return A \code{matrix} with the type-\code{type} estimate of the variance-covariance matrix.
 #' @method vcov glmgee
@@ -2248,6 +2242,8 @@ SGPC <- function(...,verbose=TRUE,digits=2){
 #' vcov(fit2,type="bias-corrected")
 #'
 #' @references Mancl L.A., DeRouen T.A. (2001) A Covariance Estimator for GEE with Improved Small-Sample Properties. \emph{Biometrics} 57:126-134.
+#' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+#' \emph{The R Journal} 15:105-133.}
 vcov.glmgee <- function(object,...,type=c("robust","df-adjusted","model","bias-corrected","jackknife")){
   type <- match.arg(type)
   if(type=="robust") out_ <- object$R
@@ -2264,13 +2260,15 @@ vcov.glmgee <- function(object,...,type=c("robust","df-adjusted","model","bias-c
 #' @title Leverage for Generalized Estimating Equations
 #' @description Computes and, optionally, displays a graph of the leverage measures at the cluster- and observation-level.
 #' @param object an object of class \emph{glmgee}.
-#' @param level an (optional) character string indicating the level for which the leverage measures are required. The options are: cluster-level ("clusters") and observation-level ("observations"). By default, \code{level} is set to be "clusters".
-#' @param plot.it an (optional) logical indicating if the plot of the measures of leverage are required or just the data matrix in which that plot is based. By default, \code{plot.it} is set to be FALSE.
+#' @param level an (optional) character string indicating the level for which the leverage measures are required. The options are: cluster-level ("clusters") and observation-level ("observations"). As default, \code{level} is set to "clusters".
+#' @param plot.it an (optional) logical indicating if the plot of the measures of leverage are required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to FALSE.
 #' @param identify an (optional) integer indicating the number of (\code{level=``clusters''}) or observations (\code{level=``observations''}) to identify on the plot of the leverage measures. This is only appropriate if \code{plot.it} is specified to be \code{TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it} is specified to be \code{TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example,  \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
 #' @return A vector with the values of the leverage measures with so many rows as clusters (\code{level=``clusters''}) or observations (\code{level=``observations''}) in the sample.
 #' @references Preisser J.S., Qaqish B.F. (1996). Deletion diagnostics for generalised estimating equations. \emph{Biometrika}, 83:551-562.
 #' @references Hammill B.G., Preisser J.S. (2006). A SAS/IML software program for GEE and regression diagnostics. \emph{Computational Statistics & Data Analysis}, 51:1197-1212.
+#' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+#' \emph{The R Journal} 15:105-133.}
 #' @method leverage glmgee
 #' @export
 #' @examples
@@ -2301,7 +2299,7 @@ leverage.glmgee <- function(object,level=c("clusters","observations"),plot.it=FA
     wi <- sqrt(object$family$variance(mui)/D[,p+3])
     Vi <- t(object$corr[D[,p+4],D[,p+4]]*matrix(wi,ni,ni))*matrix(wi,ni,ni)
     Xiw <- Xi*matrix(object$family$mu.eta(etai),nrow(Xi),p)
-    if(object$corstr=="Independence") Vi2 <- diag(1/wi[D[,p+4]]^2)
+    if(object$corstr=="Independence") Vi2 <- diag(as.vector(1/wi[D[,p+4]]^2),ni,ni)
     else{Vi2 <- try(chol(Vi),silent=TRUE)
          if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)}
     hi <- diag(Xiw%*%object$naive%*%t(Xiw)%*%Vi2)
@@ -2342,9 +2340,9 @@ leverage.glmgee <- function(object,level=c("clusters","observations"),plot.it=FA
 #' @title Local Influence for Generalized Estimating Equations
 #' @description Computes some measures and, optionally, display	graphs of them to perform influence analysis based on the approaches described in Cook (1986) and Jung (2008).
 #' @param object an object of class \emph{glmgee}.
-#' @param type an (optional) character string indicating the type of approach to study the local influence. The options are: the absolute value of the elements of the eigenvector which corresponds to the maximum absolute eigenvalue ("local"); and the elements of the main diagonal ("total"). By default, \code{type} is set to be "total".
-#' @param perturbation an (optional) character string indicating the perturbation scheme to apply. The options are: case weight perturbation of clusters ("cw-clusters"); Case weight perturbation of observations ("cw-observations"); and perturbation of response ("response"). By default, \code{perturbation} is set to be "cw-clusters".
-#' @param plot.it an (optional) logical indicating if the plot of the measures of local influence is required or just the data matrix in which that plot is based. By default, \code{plot.it} is set to be FALSE.
+#' @param type an (optional) character string indicating the type of approach to study the local influence. The options are: the absolute value of the elements of the eigenvector which corresponds to the maximum absolute eigenvalue ("local"); and the elements of the main diagonal ("total"). As default, \code{type} is set to "total".
+#' @param perturbation an (optional) character string indicating the perturbation scheme to apply. The options are: case weight perturbation of clusters ("cw-clusters"); Case weight perturbation of observations ("cw-observations"); and perturbation of response ("response"). As default, \code{perturbation} is set to "cw-clusters".
+#' @param plot.it an (optional) logical indicating if the plot of the measures of local influence is required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to FALSE.
 #' @param coefs	an (optional) character string which (partially) match with the names of some of the parameters in the linear predictor.
 #' @param identify an (optional) integer indicating the number of clusters/observations to identify on the plot of the measures of local influence. This is only appropriate if \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example, \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
@@ -2353,6 +2351,8 @@ leverage.glmgee <- function(object,level=c("clusters","observations"),plot.it=FA
 #' @export
 #' @references Cook D. (1986) Assessment of Local Influence. \emph{Journal of the Royal Statistical Society: Series B (Methodological)} 48:133-155.
 #' @references Jung K.-M. (2008) Local Influence in Generalized Estimating Equations. \emph{Scandinavian Journal of Statistics} 35:286-294.
+#' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+#' \emph{The R Journal} 15:105-133.}
 #' @examples
 #' ###### Example 1: Effect of ozone-enriched atmosphere on growth of sitka spruces
 #' data(spruces)
@@ -2398,7 +2398,7 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
     kpii <- grad(object$family$mu.eta,etai)
     vpi <- grad(object$family$variance,mui)
     Xiw <- Xi*matrix(kpi,nrow(Xi),p)
-    if(object$corstr=="Independence") Vi2 <- diag(1/wi[D[,p+4]]^2)
+    if(object$corstr=="Independence") Vi2 <- diag(as.vector(1/wi[D[,p+4]]^2),ni,ni)
     else{Vi2 <- try(chol(Vi),silent=TRUE)
     if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)}
     zi <- Vi2%*%(yi-mui)
@@ -2467,21 +2467,22 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
 #' @description Produces an object of the class \code{glmgee} in which the main results of a Nonlinear Generalized Estimating Equation (GEE) fitted to the data are stored.
 #' @param formula a nonlinear model \code{formula} including variables and parameters, which is a symbolic description of the nonlinear predictor of the model to be fitted to the data.
 #' @param family an (optional) \code{family} object, that is, a list of functions and expressions for defining link and variance functions. Families (and links) supported are the same supported by \link{glm} using its \link{family} argument, that is,
-#' \code{gaussian}, \code{binomial}, \code{poisson}, \code{Gamma}, \code{inverse.gaussian}, and \code{quasi}. The family \code{negative.binomial} in the library \pkg{MASS} are also available. By default, the argument \code{family} is set to be \code{gaussian(identity)}.
+#' \code{gaussian}, \code{binomial}, \code{poisson}, \code{Gamma}, \code{inverse.gaussian}, and \code{quasi}. The family \code{negative.binomial} in the library \pkg{MASS} are also available. As default, the argument \code{family} is set to \code{gaussian(identity)}.
 #' @param id a vector which identifies the subjects or clusters. The length of \code{id} should be the same as the number of observations.
+#' @param offset an (optional) numeric vector of length equal to the number of cases, which can be used to specify an a priori known component to be included in the linear predictor during fitting.
 #' @param weights an (optional) vector of positive "prior weights" to be used in the fitting process. The length of \code{weights} should be the same as the total number of observations.
 #' @param data an (optional) \code{data frame} in which to look for variables involved in the \code{formula} expression, as well as for variables specified in the arguments \code{id} and \code{weights}. The data are assumed to be sorted by \code{id} and time.
 #' @param subset an (optional) vector specifying a subset of observations to be used in the fitting process.
-#' @param corstr an (optional) character string which allows to specify the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(\emph{m})", "Non-Stationary-M-dependent(\emph{m})", "AR-M-dependent(\emph{m})", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. By default, \code{corstr} is set to be "Independence".
+#' @param corstr an (optional) character string which allows to specify the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(\emph{m})", "Non-Stationary-M-dependent(\emph{m})", "AR-M-dependent(\emph{m})", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. As default, \code{corstr} is set to "Independence".
 #' @param corr an (optional) square matrix of the same dimension of the maximum cluster size containing the user specified correlation. This is only appropriate if \code{corstr} is specified to be "User-defined".
 #' @param start an (optional) vector of starting values for the parameters in the nonlinear predictor. When \code{start} is
 #' missing (and \code{formula} is not a self-starting model, see \link{nls} and \link{selfStart}), a very cheap guess for \code{start} is tried.
-#' @param maxit an (optional) integer value which represents the maximum number of iterations allowed for the fitting algorithm. By default, \code{maxit} is set to be 50.
-#' @param toler an (optional) positive value which represents the \emph{convergence tolerance}. The convergence is reached when the maximum of the absolute relative differences between the values of the parameters in the nonlinear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. By default, \code{toler} is set to be 0.00001.
+#' @param maxit an (optional) integer value which represents the maximum number of iterations allowed for the fitting algorithm. As default, \code{maxit} is set to 50.
+#' @param toler an (optional) positive value which represents the \emph{convergence tolerance}. The convergence is reached when the maximum of the absolute relative differences between the values of the parameters in the nonlinear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. As default, \code{toler} is set to 0.00001.
 #' @param trace an (optional) logical variable. If TRUE, output is produced for each iteration of the estimating algorithm.
-#' @param scale.fix an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. By default, \code{scale.fix} is set to be FALSE.
-#' @param scale.value an (optional) numeric value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. By default, \code{scale.value} is set to be 1.
-#' @param waves an (optional) positive integer-valued variable that is used to identify the order and spacing of observations within clusters. This argument is crucial when there are missing values and gaps in the data. By default, \code{waves} is equal to the integers from 1 to the size of each cluster.
+#' @param scale.fix an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. As default, \code{scale.fix} is set to FALSE.
+#' @param scale.value an (optional) numeric value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. As default, \code{scale.value} is set to 1.
+#' @param waves an (optional) positive integer-valued variable that is used to identify the order and spacing of observations within clusters. This argument is crucial when there are missing values and gaps in the data. As default, \code{waves} is equal to the integers from 1 to the size of each cluster.
 #' @param ...	further arguments passed to or from other methods.
 #' @details The values of the multivariate response variable measured on \eqn{n} subjects or clusters,
 #' denoted by \eqn{y_{i}=(y_{i1},\ldots,y_{in_i})^{\top}} for \eqn{i=1,\ldots,n}, are assumed to be
@@ -2501,7 +2502,7 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
 #' solving the estimating equations described by Liang and Zeger (1986).
 #'
 #' If the maximum cluster size is 6 and for a cluster of size 4 the value
-#' of \code{waves} is set to be 2, 4, 5, 6, then it means that the data at
+#' of \code{waves} is set to 2, 4, 5, 6, then it means that the data at
 #' times 1 and 3 are missing, which should be taken into account by
 #' \code{gnmgee} when the structure of the correlation matrix is assumed
 #' to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent"
@@ -2586,8 +2587,9 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
 #' @references Zeger S.L., Liang K.Y. (1986) Longitudinal data analysis for discrete and continuous outcomes.
 #' \emph{Biometrics} 42:121-130.
 #' @references Hardin J.W., Hilbe J.M. (2013) \emph{Generalized Estimating Equations}. Chapman & Hall, London.
-#'
-gnmgee <- function(formula,family=gaussian(),weights=NULL,id,waves,data,subset=NULL,corstr,corr,start=NULL,scale.fix=FALSE,scale.value=1,toler=0.00001,maxit=50,trace=FALSE,...){
+#' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+#' \emph{The R Journal} 15:105-133.}
+gnmgee <- function(formula,family=gaussian(),offset=NULL,weights=NULL,id,waves,data,subset=NULL,corstr,corr,start=NULL,scale.fix=FALSE,scale.value=1,toler=0.00001,maxit=50,trace=FALSE,...){
   if(missingArg(data)) data <- environment(eval(formula))
   if(missingArg(corstr)) corstr <- "Independence"
   if(is(family,"function")) family <- family()
@@ -2602,8 +2604,9 @@ gnmgee <- function(formula,family=gaussian(),weights=NULL,id,waves,data,subset=N
     if(family$family=="poisson") form <- paste0("y2 <- family$linkfun(ifelse(",formula[[2]],"==0,0.01,",formula[[2]],"))")
     eval(parse(text=paste0("data <- within(data,",form,")")))
     mmf <- match.call(expand.dots = FALSE)
-    m <- match(c("subset", "weights"), names(mmf), 0)
-    mmf <- mmf[c(1,m)]
+    m <- match(c("subset", "weights", "offset"), names(mmf), 0)
+    mmf <- mmf[c(1L,m)]
+    if(!is.null(mmf$offset)) eval(parse(text=paste0("data <- within(data,y2 <- y2 - ",deparse(mmf$offset),")") ))
     conls <- do.call(nls,list(formula=as.formula(paste0("y2 ~ ",as.character(formula[3]))),data=data,subset=mmf$subset,weights=mmf$weights))
     options(warn = defaultW)
     if(is.list(conls)) start <- coef(conls)
@@ -2616,7 +2619,7 @@ gnmgee <- function(formula,family=gaussian(),weights=NULL,id,waves,data,subset=N
   formula <- paste(formula[2],"~ -1 + ",paste(vnames,collapse="+"))
   formula <- as.formula(formula)
   mf <- match.call(expand.dots = FALSE)
-  m <- match(c("formula", "weights", "waves", "data", "subset", "id"), names(mf), 0L)
+  m <- match(c("formula", "offset", "weights", "waves", "data", "subset", "id"), names(mf), 0L)
   mf <- mf[c(1L, m)]
   mf$drop.unused.levels <- TRUE
   mf$na.action <- na.omit
@@ -2808,7 +2811,7 @@ gnmgee <- function(formula,family=gaussian(),weights=NULL,id,waves,data,subset=N
   eta <- etas
   X <- Ders
   mu <- family$linkinv(eta)
-  phi <- sum(diag(resume[1:maxsize,1:maxsize]))/(sum(sizes)-p)
+  phi <- sum(diag(matrix(resume[1:maxsize,1:maxsize],maxsize,maxsize)))/(sum(sizes)-p)
   sera <- try(chol(R),silent=TRUE)
   if(!is.matrix(sera)) warning("Estimate of correlation matrix is not positive definite",call.=FALSE)
   I0 <- try(chol(resume2[1:p,2:(p+1)]),silent=TRUE)
@@ -2865,20 +2868,20 @@ gnmgee <- function(formula,family=gaussian(),weights=NULL,id,waves,data,subset=N
 #' @description Produces an object of the class \code{wglmgee} in which the main results of a Weighted Generalized Estimating Equation (WGEE) fitted to the data are stored.
 #' @param formula an \code{Formula} expression of the form \code{response ~ x1 + x2 + ... | z1 + z2 + ...}, whose first part is a symbolic description of the linear predictor of the GEE model to be fitted to the data, whereas the second part is a symbolic description of the linear predictor of the logistic model to be used to calculate the missingness probabilities under the MAR assumption. Then, those probabilities are used to computed the weights to be included in the parameter estimation algorithm.
 #' @param family an (optional) \code{family} object, that is, a list of functions and expressions for defining link and variance functions. Families (and links) supported are the same supported by \link{glm} using its \link{family} argument, that is,
-#' \code{gaussian}, \code{binomial}, \code{poisson}, \code{Gamma}, \code{inverse.gaussian}, and \code{quasi}. The family \code{negative.binomial} in the library \pkg{MASS} are also available. By default, the argument \code{family} is set to be \code{gaussian(identity)}.
+#' \code{gaussian}, \code{binomial}, \code{poisson}, \code{Gamma}, \code{inverse.gaussian}, and \code{quasi}. The family \code{negative.binomial} in the library \pkg{MASS} are also available. As default, the argument \code{family} is set to \code{gaussian(identity)}.
 #' @param id a vector which identifies the subjects or clusters. The length of \code{id} should be the same as the number of observations.
-#' @param level an (optional) character string which allows to specify the weighted GEE method. The available options are: "observations" and "clusters" for Observation- and Cluster-specified Weighted GEE, respectively. By default, \emph{level} is set to be "observations".
+#' @param level an (optional) character string which allows to specify the weighted GEE method. The available options are: "observations" and "clusters" for Observation- and Cluster-specified Weighted GEE, respectively. As default, \emph{level} is set to "observations".
 #' @param weights an (optional) vector of positive "prior weights" to be used in the fitting process. The length of \code{weights} should be the same as the total number of observations.
 #' @param data an (optional) \code{data frame} in which to look for variables involved in the \code{formula} expression, as well as for variables specified in the arguments \code{id} and \code{weights}. The data are assumed to be sorted by \code{id} and time.
 #' @param subset an (optional) vector specifying a subset of observations to be used in the fitting process.
-#' @param corstr an (optional) character string which allows to specify the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(\emph{m})", "Non-Stationary-M-dependent(\emph{m})", "AR-M-dependent(\emph{m})", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. By default, \code{corstr} is set to be "Independence".
+#' @param corstr an (optional) character string which allows to specify the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(\emph{m})", "Non-Stationary-M-dependent(\emph{m})", "AR-M-dependent(\emph{m})", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. As default, \code{corstr} is set to "Independence".
 #' @param corr an (optional) square matrix of the same dimension of the maximum cluster size containing the user specified correlation. This is only appropriate if \code{corstr} is specified to be "User-defined".
 #' @param start an (optional) vector of starting values for the parameters in the linear predictor.
-#' @param maxit an (optional) integer value which represents the maximum number of iterations allowed for the fitting algorithm. By default, \code{maxit} is set to be 50.
-#' @param toler an (optional) positive value which represents the \emph{convergence tolerance}. The convergence is reached when the maximum of the absolute relative differences between the values of the parameters in the linear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. By default, \code{toler} is set to be 0.00001.
+#' @param maxit an (optional) integer value which represents the maximum number of iterations allowed for the fitting algorithm. As default, \code{maxit} is set to 50.
+#' @param toler an (optional) positive value which represents the \emph{convergence tolerance}. The convergence is reached when the maximum of the absolute relative differences between the values of the parameters in the linear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. As default, \code{toler} is set to 0.00001.
 #' @param trace an (optional) logical variable. If TRUE, output is produced for each iteration of the estimating algorithm.
-#' @param scale.fix an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. By default, \code{scale.fix} is set to be FALSE.
-#' @param scale.value an (optional) numeric value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. By default, \code{scale.value} is set to be 1.
+#' @param scale.fix an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. As default, \code{scale.fix} is set to FALSE.
+#' @param scale.value an (optional) numeric value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. As default, \code{scale.value} is set to 1.
 #' @param ...	further arguments passed to or from other methods.
 #' @details The values of the multivariate response variable measured on \eqn{n} subjects or clusters,
 #' denoted by \eqn{y_{i}=(y_{i1},\ldots,y_{in_i})^{\top}} for \eqn{i=1,\ldots,n}, are assumed to be
@@ -2959,6 +2962,8 @@ gnmgee <- function(formula,family=gaussian(),weights=NULL,id,waves,data,subset=N
 #' Longitudinal Binary Data with Drop-Outs Missing at Random. \emph{Statistics in Medicine} 21:3035–3054.
 #' @references Robins J.M., Rotnitzky A., Zhao L.P. (1995) Analysis of Semiparametric Regression Models for Repeated
 #' Outcomes in the Presence of Missing Data. \emph{Journal of the American Statistical Association} 90:122–129.
+#' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+#' \emph{The R Journal} 15:105-133.}
 #' @examples
 #' ###### Example: Amenorrhea rates over time
 #' data(amenorrhea)
@@ -3347,8 +3352,7 @@ print.wglmgee <- function(x, ...){
   cat("*************************************************************")
   if(x$level=="observations") cat("\nObservation-specific Weighted GEE\n")
   else cat("\nCluster-specific Weighted GEE\n")
-  if(x$family$family=="Negative Binomial") cat("\n        Variance function: ",paste0(x$family$family," (",.Theta(),")"))
-  else cat("\n        Variance function: ",x$family$family)
+  cat("\n        Variance function: ",x$family$family)
   cat("\n            Link function: ",x$family$link)
   cat("\n    Correlation structure: ",ifelse(grepl("M-dependent",x$corstr),paste(x$corstr,"(",attr(x$corstr,"M"),")",sep=""),x$corstr),"\n")
 }
@@ -3459,8 +3463,7 @@ summary.wglmgee <- function(object,...,digits=max(3, getOption("digits") - 2),co
   rownames(out_) <- " ";colnames(out_) <- c(" Min"," 5%"," 10%"," 25%"," 50%"," 75%"," 90%"," 95%"," Max")
   cat("Weights\n")
   print(out_,digits=3)
-  if(object$family$family=="Negative Binomial") cat("\n        Variance function: ",paste0(object$family$family," (",.Theta(),")"))
-  else cat("\n        Variance function: ",object$family$family)
+  cat("\n        Variance function: ",object$family$family)
   cat("\n            Link function: ",object$family$link)
   cat("\n    Correlation structure: ",ifelse(grepl("M-dependent",object$corstr),paste(object$corstr,"(",attr(object$corstr,"M"),")",sep=""),object$corstr))
   cat("\n*************************************************\n")
@@ -3479,7 +3482,7 @@ summary.wglmgee <- function(object,...,digits=max(3, getOption("digits") - 2),co
     cat("Working correlation\n")
     print(round(object$corr,digits=corr.digits))
   }
-  return(invisible(round(TAB,digits=digits)))
+  return(invisible(list(coefficients=round(TAB,digits=digits),dispersion=object$phi,corr=round(object$corr,digits=corr.digits))))
 }
 
 

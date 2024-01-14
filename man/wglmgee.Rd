@@ -26,10 +26,10 @@ wglmgee(
 \arguments{
 \item{formula}{an \code{Formula} expression of the form \code{response ~ x1 + x2 + ... | z1 + z2 + ...}, whose first part is a symbolic description of the linear predictor of the GEE model to be fitted to the data, whereas the second part is a symbolic description of the linear predictor of the logistic model to be used to calculate the missingness probabilities under the MAR assumption. Then, those probabilities are used to computed the weights to be included in the parameter estimation algorithm.}
 
-\item{level}{an (optional) character string which allows to specify the weighted GEE method. The available options are: "observations" and "clusters" for Observation- and Cluster-specified Weighted GEE, respectively. By default, \emph{level} is set to be "observations".}
+\item{level}{an (optional) character string which allows to specify the weighted GEE method. The available options are: "observations" and "clusters" for Observation- and Cluster-specified Weighted GEE, respectively. As default, \emph{level} is set to "observations".}
 
 \item{family}{an (optional) \code{family} object, that is, a list of functions and expressions for defining link and variance functions. Families (and links) supported are the same supported by \link{glm} using its \link{family} argument, that is,
-\code{gaussian}, \code{binomial}, \code{poisson}, \code{Gamma}, \code{inverse.gaussian}, and \code{quasi}. The family \code{negative.binomial} in the library \pkg{MASS} are also available. By default, the argument \code{family} is set to be \code{gaussian(identity)}.}
+\code{gaussian}, \code{binomial}, \code{poisson}, \code{Gamma}, \code{inverse.gaussian}, and \code{quasi}. The family \code{negative.binomial} in the library \pkg{MASS} are also available. As default, the argument \code{family} is set to \code{gaussian(identity)}.}
 
 \item{weights}{an (optional) vector of positive "prior weights" to be used in the fitting process. The length of \code{weights} should be the same as the total number of observations.}
 
@@ -39,19 +39,19 @@ wglmgee(
 
 \item{subset}{an (optional) vector specifying a subset of observations to be used in the fitting process.}
 
-\item{corstr}{an (optional) character string which allows to specify the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(\emph{m})", "Non-Stationary-M-dependent(\emph{m})", "AR-M-dependent(\emph{m})", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. By default, \code{corstr} is set to be "Independence".}
+\item{corstr}{an (optional) character string which allows to specify the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(\emph{m})", "Non-Stationary-M-dependent(\emph{m})", "AR-M-dependent(\emph{m})", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. As default, \code{corstr} is set to "Independence".}
 
 \item{corr}{an (optional) square matrix of the same dimension of the maximum cluster size containing the user specified correlation. This is only appropriate if \code{corstr} is specified to be "User-defined".}
 
 \item{start}{an (optional) vector of starting values for the parameters in the linear predictor.}
 
-\item{scale.fix}{an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. By default, \code{scale.fix} is set to be FALSE.}
+\item{scale.fix}{an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. As default, \code{scale.fix} is set to FALSE.}
 
-\item{scale.value}{an (optional) numeric value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. By default, \code{scale.value} is set to be 1.}
+\item{scale.value}{an (optional) numeric value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. As default, \code{scale.value} is set to 1.}
 
-\item{toler}{an (optional) positive value which represents the \emph{convergence tolerance}. The convergence is reached when the maximum of the absolute relative differences between the values of the parameters in the linear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. By default, \code{toler} is set to be 0.00001.}
+\item{toler}{an (optional) positive value which represents the \emph{convergence tolerance}. The convergence is reached when the maximum of the absolute relative differences between the values of the parameters in the linear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. As default, \code{toler} is set to 0.00001.}
 
-\item{maxit}{an (optional) integer value which represents the maximum number of iterations allowed for the fitting algorithm. By default, \code{maxit} is set to be 50.}
+\item{maxit}{an (optional) integer value which represents the maximum number of iterations allowed for the fitting algorithm. As default, \code{maxit} is set to 50.}
 
 \item{trace}{an (optional) logical variable. If TRUE, output is produced for each iteration of the estimating algorithm.}
 
@@ -165,6 +165,9 @@ Longitudinal Binary Data with Drop-Outs Missing at Random. \emph{Statistics in M
 
 Robins J.M., Rotnitzky A., Zhao L.P. (1995) Analysis of Semiparametric Regression Models for Repeated
 Outcomes in the Presence of Missing Data. \emph{Journal of the American Statistical Association} 90:122–129.
+
+\href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+\emph{The R Journal} 15:105-133.}
 }
 \seealso{
 \link{glmgee}, \link{gnmgee}

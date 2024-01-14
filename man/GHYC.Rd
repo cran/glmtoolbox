@@ -4,14 +4,14 @@
 \alias{GHYC}
 \title{Gosho-Hamada-Yoshimura's Criterion for Generalized Estimating Equations}
 \usage{
-GHYC(..., verbose = TRUE, digits = 3)
+GHYC(..., verbose = TRUE, digits = max(3, getOption("digits") - 2))
 }
 \arguments{
 \item{...}{one or several objects of the class \emph{glmgee}.}
 
-\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.}
 
-\item{digits}{an (optional) integer indicating the number of digits to print.}
+\item{digits}{an (optional) integer indicating the number of digits to print. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.}
 }
 \value{
 A \code{data.frame} with the values of the GHYC for each \emph{glmgee} object in the input.
@@ -52,7 +52,8 @@ of a Working Correlation Structure in the Generalized Estimating Equation Approa
 Longitudinal Balanced Data. \emph{Communications in Statistics — Theory and Methods} 40:3839-3856.
 
 Gosho M. (2014) Criteria to Select a Working Correlation Structure in SAS.
-\emph{Journal of Statistical Software, Code Snippets} 57:1548-7660.
+\emph{Journal of Statistical Software, Code Snippets} 57:1548-7660.#' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+\emph{The R Journal} 15:105-133.}
 }
 \seealso{
 \link{QIC}, \link{CIC}, \link{RJC}, \link{AGPC}, \link{SGPC}

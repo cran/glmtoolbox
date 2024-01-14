@@ -9,7 +9,7 @@
 \arguments{
 \item{model}{an object of the class \emph{lm}.}
 
-\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.}
 
 \item{...}{further arguments passed to or from other methods.}
 }

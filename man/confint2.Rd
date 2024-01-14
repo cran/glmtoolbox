@@ -8,20 +8,20 @@ confint2(
   model,
   level = 0.95,
   test = c("wald", "lr", "score", "gradient"),
-  digits = 5,
+  digits = max(3, getOption("digits") - 2),
   verbose = TRUE
 )
 }
 \arguments{
 \item{model}{an object of the class \emph{glm}.}
 
-\item{level}{an (optional) value indicating the required confidence level. By default, \code{level} is set to be 0.95.}
+\item{level}{an (optional) value indicating the required confidence level. As default, \code{level} is set to 0.95.}
 
-\item{test}{an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lr") tests. By default, \code{test} is set to be "wald".}
+\item{test}{an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lr") tests. As default, \code{test} is set to "wald".}
 
-\item{digits}{an (optional) integer value indicating the number of decimal places to be used. By default, \code{digits} is set to be 5.}
+\item{digits}{an (optional) integer value indicating the number of decimal places to be used. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.}
 
-\item{verbose}{an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+\item{verbose}{an (optional) logical indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.}
 }
 \value{
 A matrix with so many rows as parameters in the linear predictor and two columns: "Lower limit" and "Upper limit".

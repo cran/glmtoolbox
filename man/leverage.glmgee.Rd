@@ -15,9 +15,9 @@
 \arguments{
 \item{object}{an object of class \emph{glmgee}.}
 
-\item{level}{an (optional) character string indicating the level for which the leverage measures are required. The options are: cluster-level ("clusters") and observation-level ("observations"). By default, \code{level} is set to be "clusters".}
+\item{level}{an (optional) character string indicating the level for which the leverage measures are required. The options are: cluster-level ("clusters") and observation-level ("observations"). As default, \code{level} is set to "clusters".}
 
-\item{plot.it}{an (optional) logical indicating if the plot of the measures of leverage are required or just the data matrix in which that plot is based. By default, \code{plot.it} is set to be FALSE.}
+\item{plot.it}{an (optional) logical indicating if the plot of the measures of leverage are required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to FALSE.}
 
 \item{identify}{an (optional) integer indicating the number of (\code{level=``clusters''}) or observations (\code{level=``observations''}) to identify on the plot of the leverage measures. This is only appropriate if \code{plot.it} is specified to be \code{TRUE}.}
 
@@ -49,4 +49,7 @@ leverage(fit2,level="observations",plot.it=TRUE)
 Preisser J.S., Qaqish B.F. (1996). Deletion diagnostics for generalised estimating equations. \emph{Biometrika}, 83:551-562.
 
 Hammill B.G., Preisser J.S. (2006). A SAS/IML software program for GEE and regression diagnostics. \emph{Computational Statistics & Data Analysis}, 51:1197-1212.
+
+\href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+\emph{The R Journal} 15:105-133.}
 }

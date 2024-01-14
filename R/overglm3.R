@@ -1,88 +1,4 @@
 #'
-#' @title Test for zero-excess in Count Regression Models
-#' @description Allows to assess if the observed number of zeros is significantly higher than expected according to the fitted count regression model (poisson or negative binomial).
-#' @param object an object of the class \code{glm}, for poisson regression models, or an object of the class \code{overglm}, for negative binomial regression models.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @return A matrix with 1 row and the following columns:
-#' \tabular{ll}{
-#' \code{Observed} \tab the observed number of zeros,\cr
-#' \tab \cr
-#' \code{Expected}\tab the expected number of zeros,\cr
-#' \tab \cr
-#' \code{z-value}\tab the value of the statistical test,\cr
-#' \tab \cr
-#' \code{Pr(>z)}\tab the p-value of the statistical test.\cr
-#' }
-#' @details
-#' According to the formulated count regression model, we have that
-#' \eqn{Y_k\sim P(y;\mu_k,\phi)} for \eqn{k=1,\ldots,n} are independent
-#' random variables. Then, the expected number of zeros is the sum of
-#' \eqn{P(0;\hat{\mu}_k,\hat{\phi})} for \eqn{k=1,\ldots,n}, where
-#' \eqn{\hat{\mu}_k} and \eqn{\hat{\phi}} represent the estimates of
-#' \eqn{\mu_k} and \eqn{\phi}, respectively, obtained from the fitted
-#' model. Thus, the test statistic reduces to the standardized
-#' difference between the observed and expected number of zeros. The
-#' distribution of that statistic, under the null hypothesis, tends
-#' to be the standard normal when the sample size, \eqn{n}, tends to
-#' infinity.
-#'
-#' @examples
-#' ####### Example 1: Self diagnozed ear infections in swimmers
-#' data(swimmers)
-#' fit1 <- glm(infections ~ frequency + location, family=poisson, data=swimmers)
-#' zero.excess(fit1)
-#' fit2 <- overglm(infections ~ frequency + location, family="nb1", data=swimmers)
-#' zero.excess(fit2)
-#'
-#' ####### Example 2: Article production by graduate students in biochemistry PhD programs
-#' bioChemists <- pscl::bioChemists
-#' fit1 <- glm(art ~ fem + kid5 + ment, family=poisson, data = bioChemists)
-#' zero.excess(fit1)
-#' fit2 <- overglm(art ~ fem + kid5 + ment, family="nb1", data = bioChemists)
-#' zero.excess(fit2)
-
-#' ####### Example 3: Roots Produced by the Columnar Apple Cultivar Trajan
-#' data(Trajan)
-#' fit1 <- glm(roots ~ photoperiod, family=poisson, data=Trajan)
-#' zero.excess(fit1)
-#' fit2 <- overglm(roots ~ photoperiod, family="nbf", data=Trajan)
-#' zero.excess(fit2)
-#'
-#' @seealso \link{overglm}, \link{zeroinf}
-#' @export zero.excess
-zero.excess <- function(object,verbose=TRUE){
-  if(is(object,"overglm")){
-    if(!(object$family$family %in% c("nbf","nb1","nb2"))) stop("Only 'nb1', 'nb2' and 'nbf' families of overglm-type objects are supported!!",call.=FALSE)
-  }else{
-    if(is(object,"glm")){
-      if(object$family$family!="poisson") stop("Only 'poisson' family of glm-type objects are supported!!",call.=FALSE)
-    }else{
-      stop("Only 'nb1', 'nb2' and 'nbf' families of overglm-type objects and 'poisson' family of glm-type objects are supported!!",call.=FALSE)
-    }
-  }
-  if(object$family$family=="poisson"){
-    p0 <- exp(-fitted(object))
-  }else{
-    if(object$family$family=="nbf") tau <- object$coefficients[object$parms[1]+2]
-    if(object$family$family=="nb1") tau <- 0
-    if(object$family$family=="nb2") tau <- -1
-    mus <- object$fitted.values
-    phi <- exp(object$coefficients[object$parms[1]+1])
-    a <- 1/(phi*mus^tau)
-    p0 <- (a/(mus + a))^a
-  }
-  o <- sum(object$y==0)
-  z <- (o - sum(p0))/sqrt(sum(p0*(1-p0)))
-  out_ <- matrix(cbind(o,sum(p0),z,1-pnorm(z)),1,4)
-  colnames(out_) <- c("Observed","Expected","z-value","Pr(>z)")
-  rownames(out_) <- ""
-  if(verbose){
-    cat("  Number of Zeros\n")
-    printCoefmat(out_, P.values=TRUE, has.Pvalue=TRUE, digits=5, signif.legend=FALSE, cs.ind=2)
-  }
-  return(invisible(out_))
-}
-
 #' @title Alternatives to the Poisson and Binomial Regression Models under the presence of Overdispersion.
 #' @description Allows to fit regression models based on the negative binomial, beta-binomial, and random-clumped binomial.
 #' distributions, which are alternatives to the Poisson and binomial regression models under the presence of overdispersion.
@@ -100,6 +16,7 @@ zero.excess <- function(object,verbose=TRUE){
 #'        random-clumped binomial ("rcb"). Link functions available for
 #'        these models are the same as those available for Poisson and
 #'        binomial models via \link{glm}. See \link{family} documentation.
+#' @param offset this can be used to specify an \emph{a priori} known component to be included in the linear predictor during fitting. This should be \code{NULL} or a numeric vector of length equal to the number of cases.
 #' @param weights an (optional) vector of positive "prior weights" to be used in the fitting process. The length of
 #'        \code{weights} should be the same as the number of observations.
 #' @param data an (optional) \code{data frame} in which to look for variables involved in the \code{formula} expression,
@@ -107,9 +24,9 @@ zero.excess <- function(object,verbose=TRUE){
 #' @param subset an (optional) vector specifying a subset of individuals to be used in the fitting process.
 #' @param start an (optional) vector of starting values for the parameters in the linear predictor.
 #' @param reltol an (optional) positive value which represents the \emph{relative convergence tolerance} for the BFGS method in \link{optim}.
-#'        By default, \code{reltol} is set to be 1e-13.
+#'        As default, \code{reltol} is set to 1e-13.
 #' @param na.action a function which indicates what should happen when the data contain NAs. By default \code{na.action}
-#'        is set to be \code{na.omit()}.
+#'        is set to \code{na.omit()}.
 #' @param ... further arguments passed to or from other methods.
 #'
 #' @return an object of class \emph{overglm} in which the main results of the model fitted to the data are stored, i.e., a
@@ -260,10 +177,10 @@ zero.excess <- function(object,verbose=TRUE){
 #' Cary, North Carolina, USA.
 #'
 
-overglm <- function(formula, family="nb1(log)", weights, data, subset, na.action=na.omit(), reltol=1e-13, start=NULL, ...){
+overglm <- function(formula, offset, family="nb1(log)", weights, data, subset, na.action=na.omit(), reltol=1e-13, start=NULL, ...){
   if(missingArg(data)) data <- environment(formula)
   mmf <- match.call(expand.dots = FALSE)
-  m <- match(c("formula", "data", "subset", "na.action", "weights"), names(mmf), 0)
+  m <- match(c("formula", "data", "subset", "na.action", "offset", "weights"), names(mmf), 0)
   mmf <- mmf[c(1,m)]
   mmf$drop.unused.levels <- TRUE
   mmf[[1]] <- as.name("model.frame")
@@ -479,11 +396,11 @@ overglm <- function(formula, family="nb1(log)", weights, data, subset, na.action
       else betas <- suppressWarnings(glm.fit(y=y,x=X,offset=offs,weights=weights,family=familyf)$coefficients)
       mus <- familyf$linkinv(tcrossprod(X,t(betas)) + offs)
       if(family=="nbf"){
-        fik <- lm((y - mus)^2 ~ -1 + I(mus^2) + offset(mus))
+        fik <- lm((y - mus)^2 ~ -1 + I(mus^2),offset=mus)
         betas <- c(betas,log(abs(coef(fik))),0)
       }
       if(family=="nb1"){
-        fik <- lm((y - mus)^2 ~ -1 + I(mus^2) + offset(mus))
+        fik <- lm((y - mus)^2 ~ -1 + I(mus^2),offset=mus)
         betas <- c(betas,log(abs(coef(fik))))
       }
       if(family=="nb2"){
@@ -586,13 +503,14 @@ overglm <- function(formula, family="nb1(log)", weights, data, subset, na.action
 #'        (zero-altered) negative binomial I ("nb1"), (zero-altered) negative binomial II
 #'        ("nb2"), (zero-altered) negative binomial ("nbf"), and (zero-altered) poisson
 #'        ("poi"). Link functions are the same as those available in Poisson models via
-#'        \link{glm}. See \link{family} documentation. By default, \code{family} is set to
+#'        \link{glm}. See \link{family} documentation. As default, \code{family} is set to
 #'        be Poisson with log link.
 #' @param zero.link an (optional) character string which allows to specify the link function to be used in the model for \eqn{\pi}.
 #' 		  Link functions available are the same than those available in binomial models via \link{glm}. See \link{family} documentation.
-#' 		  By default, \code{zero.link} is set to be "logit".
+#' 		  As default, \code{zero.link} is set to "logit".
+#' @param offset this can be used to specify an \emph{a priori} known component to be included in the linear predictor during fitting. This should be \code{NULL} or a numeric vector of length equal to the number of cases.
 #' @param weights an (optional) vector of positive "prior weights" to be used in the fitting process. The length of
-#'        \code{weights} should be the same as the number of observations. By default, \code{weights} is set to be a vector of 1s.
+#'        \code{weights} should be the same as the number of observations. As default, \code{weights} is set to a vector of 1s.
 #' @param data an (optional) \code{data frame} in which to look for variables involved in the \code{formula} expression,
 #'        as well as for variables specified in the arguments \code{weights} and \code{subset}.
 #' @param subset an (optional) vector specifying a subset of observations to be used in the fitting process.
@@ -600,8 +518,8 @@ overglm <- function(formula, family="nb1(log)", weights, data, subset, na.action
 #'        iterative process to obtain the estimates of the parameters in the linear predictors of the models for \eqn{\mu}
 #'        and \eqn{\pi}, respectively.
 #' @param reltol an (optional) positive value which represents the \emph{relative convergence tolerance} for the BFGS method in \link{optim}.
-#'        By default, \code{reltol} is set to be 1e-13.
-#' @param na.action a function which indicates what should happen when the data contain NAs. By default \code{na.action} is set to be \code{na.omit()}.
+#'        As default, \code{reltol} is set to 1e-13.
+#' @param na.action a function which indicates what should happen when the data contain NAs. By default \code{na.action} is set to \code{na.omit()}.
 #' @param ... further arguments passed to or from other methods.
 #'
 #' @return
@@ -713,13 +631,13 @@ overglm <- function(formula, family="nb1(log)", weights, data, subset, na.action
 #'             Cambridge University Press.
 #' @references Mullahy J. (1986) Specification and Testing of Some Modified Count Data Models. \emph{Journal of
 #'             Econometrics} 33, 341–365.
-zeroalt <- function(formula, data, subset, na.action=na.omit(), weights, family="poi(log)",
+zeroalt <- function(formula, data, offset, subset, na.action=na.omit(), weights, family="poi(log)",
                     zero.link=c("logit", "probit", "cloglog", "cauchit", "log"), reltol=1e-13,
                     start=list(counts=NULL,zeros=NULL),...){
   if(missing(data)) data <- environment(formula)
   zero.link <- match.arg(zero.link)
   mmf <- match.call(expand.dots = FALSE)
-  m <- match(c("formula", "data", "subset", "na.action", "weights"), names(mmf), 0)
+  m <- match(c("formula", "data", "offset", "subset", "na.action", "weights"), names(mmf), 0)
   mmf <- mmf[c(1,m)]
   mmf$drop.unused.levels <- TRUE
   mmf[[1]] <- as.name("model.frame")
@@ -836,11 +754,11 @@ zeroalt <- function(formula, data, subset, na.action=na.omit(), weights, family=
       else betas <- suppressWarnings(glm.fit(y=y[!zeros],x=X[!zeros,],offset=offsx[!zeros],weights=weights[!zeros],family=familyx)$coefficients)
       mus <- familyx$linkinv(tcrossprod(X,t(betas)) + offsx)
       if(family=="nbf"){
-        fik <- lm((y - mus)^2 ~ -1 + I(mus^2) + offset(mus))
+        fik <- lm((y - mus)^2 ~ -1 + I(mus^2),offset=mus)
         betas <- c(betas,log(abs(coef(fik))),0)
       }
       if(family=="nb1"){
-        fik <- lm((y - mus)^2 ~ -1 + I(mus^2) + offset(mus))
+        fik <- lm((y - mus)^2 ~ -1 + I(mus^2),offset=mus)
         betas <- c(betas,log(abs(coef(fik))))
       }
       if(family=="nb2"){
@@ -935,13 +853,14 @@ zeroalt <- function(formula, data, subset, na.action=na.omit(), weights, family=
 #'        (zero-inflated) negative binomial I ("nb1"), (zero-inflated) negative binomial II
 #'        ("nb2"), (zero-inflated) negative binomial ("nbf"), and (zero-inflated) poisson
 #'        ("poi"). Link functions are the same as those available in Poisson models via
-#'        \link{glm}. See \link{family} documentation. By default, \code{family} is set to
+#'        \link{glm}. See \link{family} documentation. As default, \code{family} is set to
 #'        be Poisson with log link.
+#' @param offset this can be used to specify an \emph{a priori} known component to be included in the linear predictor during fitting. This should be \code{NULL} or a numeric vector of length equal to the number of cases.
 #' @param zero.link an (optional) character string which allows to specify the link function to be used in the model for \eqn{\pi}.
 #' 		  Link functions available are the same than those available in binomial models via \link{glm}. See \link{family} documentation.
-#' 		  By default, \code{zero.link} is set to be "logit".
+#' 		  As default, \code{zero.link} is set to "logit".
 #' @param weights an (optional) vector of positive "prior weights" to be used in the fitting process. The length of
-#'        \code{weights} should be the same as the number of observations. By default, \code{weights} is set to be a vector of 1s.
+#'        \code{weights} should be the same as the number of observations. As default, \code{weights} is set to a vector of 1s.
 #' @param data an (optional) \code{data frame} in which to look for variables involved in the \code{formula} expression,
 #'        as well as for variables specified in the arguments \code{weights} and \code{subset}.
 #' @param subset an (optional) vector specifying a subset of observations to be used in the fitting process.
@@ -949,8 +868,8 @@ zeroalt <- function(formula, data, subset, na.action=na.omit(), weights, family=
 #'        iterative process to obtain the estimates of the parameters in the linear predictors to the models for \eqn{\mu}
 #'        and \eqn{\pi}, respectively.
 #' @param reltol an (optional) positive value which represents the \emph{relative convergence tolerance} for the BFGS method in \link{optim}.
-#'        By default, \code{reltol} is set to be 1e-13.
-#' @param na.action a function which indicates what should happen when the data contain NAs. By default \code{na.action} is set to be \code{na.omit()}.
+#'        As default, \code{reltol} is set to 1e-13.
+#' @param na.action a function which indicates what should happen when the data contain NAs. By default \code{na.action} is set to \code{na.omit()}.
 #' @param ... further arguments passed to or from other methods.
 #'
 #' @return
@@ -1063,13 +982,13 @@ zeroalt <- function(formula, data, subset, na.action=na.omit(), weights, family=
 #'             influence diagnostics for zero-inflated negative binomial regression models. \emph{Computational
 #' 			   Statistics & Data Analysis} 55, 1304-1318.
 #'
-zeroinf <- function(formula, data, subset, na.action=na.omit(), weights, family="poi(log)",
+zeroinf <- function(formula, data, offset, subset, na.action=na.omit(), weights, family="poi(log)",
                     zero.link=c("logit", "probit", "cloglog", "cauchit", "log"), reltol=1e-13,
                     start=list(counts=NULL,zeros=NULL),...){
   if(missing(data)) data <- environment(formula)
   zero.link <- match.arg(zero.link)
   mmf <- match.call(expand.dots = FALSE)
-  m <- match(c("formula", "data", "subset", "na.action", "weights"), names(mmf), 0)
+  m <- match(c("formula", "data", "offset", "subset", "na.action", "weights"), names(mmf), 0)
   mmf <- mmf[c(1,m)]
   mmf$drop.unused.levels <- TRUE
   mmf[[1]] <- as.name("model.frame")
@@ -1182,11 +1101,11 @@ zeroinf <- function(formula, data, subset, na.action=na.omit(), weights, family=
       else betas <- suppressWarnings(glm.fit(y=y[!zeros],x=X[!zeros,],offset=offsx[!zeros],weights=weights[!zeros],family=familyx)$coefficients)
       mus <- familyx$linkinv(tcrossprod(X,t(betas)) + offsx)
       if(family=="nbf"){
-        fik <- lm((y - mus)^2 ~ -1 + I(mus^2) + offset(mus))
+        fik <- lm((y - mus)^2 ~ -1 + I(mus^2),offset=mus)
         betas <- c(betas,log(abs(coef(fik))),0)
       }
       if(family=="nb1"){
-        fik <- lm((y - mus)^2 ~ -1 + I(mus^2) + offset(mus))
+        fik <- lm((y - mus)^2 ~ -1 + I(mus^2),offset=mus)
         betas <- c(betas,log(abs(coef(fik))))
       }
       if(family=="nb2"){
@@ -1507,7 +1426,7 @@ estequa.overglm <- function(object, ...){
 #' @description Computes the estimating equations evaluated at the parameter estimates and the observed data for regression models to deal with zero-excess in count data.
 #' @param object an object of the class \emph{zeroinflation}.
 #' @param submodel an (optional) character string which allows to specify the model: "counts" or "zeros". By default,
-#' \code{submodel} is set to be "counts".
+#' \code{submodel} is set to "counts".
 #' @param ... further arguments passed to or from other methods.
 #' @return A vector with the values of the estimating equations evaluated at the parameter estimates and the observed data.
 #' @examples
@@ -1580,6 +1499,7 @@ summary.overglm <- function(object,digits=max(3, getOption("digits") - 2),signif
   cat("                 -2*log-likelihood: ",round(-2*object$logLik,digits=3),"\n")
   cat("                               AIC: ",round(-2*object$logLik + 2*sum(object$parms),digits=3),"\n")
   cat("                               BIC: ",round(-2*object$logLik + log(nrow(object$y))*sum(object$parms),digits=3),"\n")
+  return(invisible(list(coefficients=round(TAB,digits=digits))))
 }
 
 #' @method summary zeroinflation
@@ -1614,6 +1534,7 @@ summary.zeroinflation <- function(object,digits=max(3, getOption("digits") - 2),
     rownames(TAB)[object$parms[1] + 2] <- "phi"
   }
   printCoefmat(TAB, P.values=TRUE, signif.stars=FALSE, has.Pvalue=TRUE, digits=digits, dig.tst=digits, tst.ind=c(1,2,3), na.print = " ")
+  out_ <- list(coefficients_count=round(TAB,digits=digits))
   cat("\n")
   cat(paste0(object$type," model coefficients (Bernoulli with ",object$family$zeros$link," link):"),"\n")
   TAB	<- cbind(Estimate <- object$coefficients$zeros,
@@ -1623,10 +1544,12 @@ summary.zeroinflation <- function(object,digits=max(3, getOption("digits") - 2),
   colnames(TAB) <- c("Estimate", "Std.Error", "z-value", "Pr(>|z|)")
   rownames(TAB) <- rownapi
   printCoefmat(TAB, P.values=TRUE, signif.stars=FALSE, has.Pvalue=TRUE, digits=digits, dig.tst=digits, tst.ind=c(1,2,3))
+  out_$coefficients_zero=round(TAB,digits=digits)
   cat("*************************************************************\n")
   cat("                 -2*log-likelihood: ",round(-2*object$logLik,digits=3),"\n")
   cat("                               AIC: ",round(-2*object$logLik + 2*sum(object$parms),digits=3),"\n")
   cat("                               BIC: ",round(-2*object$logLik + log(nrow(object$y))*sum(object$parms),digits=3),"\n")
+  return(invisible(out_))
 }
 
 #' @method print zeroinflation
@@ -1671,8 +1594,8 @@ print.overglm <- function(x,...){
 #' @param type an (optional) character string which allows to specify the required type of residuals. The available options are: (1)
 #' the difference between the observed response and the fitted mean ("response"); (2) the standardized difference between
 #' the observed response and the fitted mean ("standardized"); (3) the randomized quantile residual ("quantile"). By
-#' default, \code{type} is set to be "quantile".
-#' @param plot.it an (optional) logical switch indicating if the plot of residuals versus the fitted values is required. By default, \code{plot.it} is set to be FALSE.
+#' default, \code{type} is set to "quantile".
+#' @param plot.it an (optional) logical switch indicating if the plot of residuals versus the fitted values is required. As default, \code{plot.it} is set to FALSE.
 #' @param identify an (optional) positive integer value indicating the number of individuals to identify on the plot of residuals versus the fitted values. This is only appropriate if \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example, \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
 #' @return A vector with the observed residuals type \code{type}.
@@ -1680,13 +1603,13 @@ print.overglm <- function(x,...){
 #' ####### Example 1: Self diagnozed ear infections in swimmers
 #' data(swimmers)
 #' fit1 <- zeroalt(infections ~ frequency | location, family="nb1(log)", data=swimmers)
-#' residuals(fit1, type="quantile", col="red", pch=20, col.lab="blue", plot.it=TRUE,
+#' residuals(fit1, type="quantile", plot.it=TRUE, col="red", pch=20, col.lab="blue",
 #'           col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
 #' ####### Example 2: Article production by graduate students in biochemistry PhD programs
 #' bioChemists <- pscl::bioChemists
 #' fit2 <- zeroinf(art ~ fem + kid5 + ment | ment, family="nb1(log)", data = bioChemists)
-#' residuals(fit2, type="quantile", col="red", pch=20, col.lab="blue", plot.it=TRUE,
+#' residuals(fit2, type="quantile", plot.it=TRUE, col="red", pch=20, col.lab="blue",
 #'           col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
 #' @method residuals zeroinflation
@@ -1756,8 +1679,8 @@ residuals.zeroinflation <- function(object,type=c("quantile","standardized","res
 #' @param type an (optional) character string which allows to specify the required type of residuals. The available options are: (1)
 #' the difference between the observed response and the fitted mean ("response"); (2) the standardized difference between
 #' the observed response and the fitted mean ("standardized"); and (3) the randomized quantile residual ("quantile"). By
-#' default, \code{type} is set to be "quantile".
-#' @param plot.it an (optional) logical switch indicating if the plot of residuals versus the fitted values is required. By default, \code{plot.it} is set to be FALSE.
+#' default, \code{type} is set to "quantile".
+#' @param plot.it an (optional) logical switch indicating if the plot of residuals versus the fitted values is required. As default, \code{plot.it} is set to FALSE.
 #' @param identify an (optional) positive integer value indicating the number of individuals to identify on the plot of residuals versus the fitted values. This is only appropriate if \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example, \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
 #' @return A vector with the observed \code{type}-type residuals.
@@ -1883,10 +1806,10 @@ residuals.overglm <- function(object,type=c("quantile","standardized","response"
 #' @param object an object of the class \emph{overglm}.
 #' @param ... another objects of the class \emph{overglm}.
 #' @param test an (optional) character string which allows to specify the required test. The available options are: Wald ("wald"),
-#' Rao's score ("score"), likelihood ratio ("lr") and Terrell's gradient ("gradient") tests. By default, \code{test} is
-#' set to be "wald".
-#' @param verbose an (optional) logical indicating if should the report of results be printed. By default, \code{verbose}
-#' is set to be TRUE.
+#' Rao's score ("score"), likelihood ratio ("lr") and Terrell's gradient ("gradient") tests. As default, \code{test} is
+#' set to "wald".
+#' @param verbose an (optional) logical indicating if should the report of results be printed. As default, \code{verbose}
+#' is set to TRUE.
 #' @return A matrix with the following three columns:
 #' \tabular{ll}{
 #' \code{Chi} \tab The value of the statistic of the test,\cr
@@ -1994,18 +1917,18 @@ anova.overglm <- function(object,...,test=c("wald","lr","score","gradient"),verb
 #' The comparisons are performed by using the Wald, score, gradient or likelihood ratio tests.
 #' @param object an object of the class \emph{zeroinflation}.
 #' @param submodel an (optional) character string which allows to specify the model: "counts" or "zeros". By default,
-#' \code{submodel} is set to be "counts".
+#' \code{submodel} is set to "counts".
 #' @param ... another objects of the class \emph{zeroinflation}.
 #' @param test an (optional) character string which allows to specify the required test. The available options are: Wald ("wald"),
-#' Rao's score ("score"), likelihood ratio ("lr") and Terrell's gradient ("gradient") tests. By default, \code{test} is
-#' set to be "wald".
-#' @param verbose an (optional) logical indicating if should the report of results be printed. By default, \code{verbose}
-#' is set to be TRUE.
+#' Rao's score ("score"), likelihood ratio ("lr") and Terrell's gradient ("gradient") tests. As default, \code{test} is
+#' set to "wald".
+#' @param verbose an (optional) logical indicating if should the report of results be printed. As default, \code{verbose}
+#' is set to TRUE.
 #' @return A matrix with the following three columns:
-#' \itemize{
-#' \item \code{Chi:}{ The value of the statistic of the test,}
-#' \item \code{Df:}{ The number of degrees of freedom,}
-#' \item \code{Pr(>Chi):}{ The \emph{p}-value of the test \emph{test} computed using the Chi-square distribution.}
+#' \describe{
+#' \item{\code{Chi}}{ The value of the statistic of the test,}
+#' \item{\code{Df}}{ The number of degrees of freedom,}
+#' \item{\code{Pr(>Chi)}}{ The \emph{p}-value of the test \emph{test} computed using the Chi-square distribution.}
 #' }
 #' @method anova zeroinflation
 #' @export
@@ -2187,7 +2110,7 @@ dfbeta.overglm <- function(model, coefs, identify, ...){
     else{
       envir$weights <- weights
       envir$weights[temp2$ids[i]] <- 0
-      dfbetas[i,] <- chol2inv(chol(-model$hess(model$coefficients)))%*%model$score(model$coefficients)
+      dfbetas[i,] <- -chol2inv(chol(-model$hess(model$coefficients)))%*%model$score(model$coefficients)
     }
   }
   dfbetas <- dfbetas[order(temp2$ids),]
@@ -2218,7 +2141,7 @@ dfbeta.overglm <- function(model, coefs, identify, ...){
         if(!missingArg(identify)) identify(nano$x,nano$y,n=max(1,floor(abs(identify))),labels=labels)
 
       }
-    }
+    }else stop(paste("There are no variables with the name",coefs,collapse=""),call.=FALSE)
   }
   return(dfbetas)
 }
@@ -2229,7 +2152,7 @@ dfbeta.overglm <- function(model, coefs, identify, ...){
 #' of the Dfbeta statistic for some parameter chosen via the argument \code{coefs}.
 #' @param model an object of class \emph{zeroinflation}.
 #' @param submodel an (optional) character string which allows to specify the model: "counts" or "zeros". By default,
-#' \code{submodel} is set to be "counts".
+#' \code{submodel} is set to "counts".
 #' @param coefs	an (optional) character string which (partially) match with the names of some model parameters.
 #' @param identify an (optional) integer indicating the number of individuals to identify on the plot of the Dfbeta statistic. This
 #' is only appropriate if \code{coefs} is specified.
@@ -2330,7 +2253,7 @@ dfbeta.zeroinflation <- function(model,submodel=c("counts","zeros"),coefs,identi
         if(any(nano$y < 0)) abline(h=3*mean(nano$y[nano$y < 0]),lty=3)
         if(!missingArg(identify)) identify(nano$x,nano$y,n=max(1,floor(abs(identify))),labels=labels)
       }
-    }
+    }else stop(paste("There are no variables with the name",coefs,collapse=""),call.=FALSE)
   }
   return(out_)
 }
@@ -2342,7 +2265,7 @@ dfbeta.zeroinflation <- function(model,submodel=c("counts","zeros"),coefs,identi
 #' the linear predictor or for some subset of them (via the argument \code{coefs}).
 #' @param model an object of class \emph{overglm}.
 #' @param plot.it an (optional) logical indicating if the plot is required or just the data matrix in which that
-#' plot is based. By default, \code{plot.it} is set to be FALSE.
+#' plot is based. As default, \code{plot.it} is set to FALSE.
 #' @param coefs	an (optional) character string which (partially) match with the names of some model parameters.
 #' @param identify an (optional) integer indicating the number of individuals to identify on the plot of the Cook's
 #' distance. This is only appropriate if \code{plot.it=TRUE}.
@@ -2408,7 +2331,9 @@ cooks.distance.overglm <- function(model, plot.it=FALSE, coefs, identify,...){
       met <- as.matrix(met[ids,ids])
     }
   }
-  CD <- as.matrix(apply((dfbetas%*%solve(met))*dfbetas,1,sum))
+  met2 <- try(chol(met),silent=TRUE)
+  if(is.matrix(met2)) met2 <- chol2inv(met2) else met2 <- solve(met)
+  CD <- as.matrix(apply((dfbetas%*%met2)*dfbetas,1,mean))
   colnames(CD) <- "Cook's distance"
   if(plot.it){
     nano <- list(...)
@@ -2421,7 +2346,7 @@ cooks.distance.overglm <- function(model, plot.it=FALSE, coefs, identify,...){
     nano$y <- CD
     if(is.null(nano$xlab)) nano$xlab <- "Observation (i)"
     if(is.null(nano$type)) nano$type <- "h"
-    if(is.null(nano$ylab)) nano$ylab <- expression((hat(beta)-hat(beta)[{(-~~i)}])^{T}~(Var(hat(beta)))^{-1}~(hat(beta)-hat(beta)[{(-~~i)}]))
+    if(is.null(nano$ylab)) nano$ylab <- expression(frac(1,p)(hat(beta)-hat(beta)[{(-~~i)}])^{T}~(Var(hat(beta)))^{-1}~(hat(beta)-hat(beta)[{(-~~i)}]))
     do.call("plot",nano)
     abline(h=3*mean(CD),lty=3)
     if(!missingArg(identify)) identify(nano$x,nano$y,n=max(1,floor(abs(identify))),labels=labels)
@@ -2440,9 +2365,9 @@ cooks.distance.overglm <- function(model, plot.it=FALSE, coefs, identify,...){
 #' the linear predictor or for some subset of them (via the argument \code{coefs}).
 #' @param model an object of class \emph{zeroinflation}.
 #' @param submodel an (optional) character string which allows to specify the model: "counts", "zeros" or "full". By default,
-#' \code{submodel} is set to be "counts".
+#' \code{submodel} is set to "counts".
 #' @param plot.it an (optional) logical indicating if the plot is required or just the data matrix in which that
-#' plot is based. By default, \code{plot.it} is set to be FALSE.
+#' plot is based. As default, \code{plot.it} is set to FALSE.
 #' @param coefs	an (optional) character string which (partially) match with the names of some model parameters.
 #' @param identify an (optional) integer indicating the number of individuals to identify on the plot of the Cook's
 #' distance. This is only appropriate if \code{plot.it=TRUE}.
@@ -2495,7 +2420,7 @@ cooks.distance.zeroinflation <- function(model, submodel=c("counts","zeros","ful
       met <- as.matrix(met[ids,ids])
     }
   }
-  CD <- as.matrix(apply((dfbetas%*%chol2inv(chol(met)))*dfbetas,1,sum))
+  CD <- as.matrix(apply((dfbetas%*%chol2inv(chol(met)))*dfbetas,1,mean))
   colnames(CD) <- "Cook's distance"
   if(plot.it){
     nano <- list(...)
@@ -2508,7 +2433,7 @@ cooks.distance.zeroinflation <- function(model, submodel=c("counts","zeros","ful
     nano$y <- CD
     if(is.null(nano$xlab)) nano$xlab <- "Index (i)"
     if(is.null(nano$type)) nano$type <- "h"
-    if(is.null(nano$ylab)) nano$ylab <- expression((hat(beta)-hat(beta)[{(-~~i)}])^{T}~(Var(hat(beta)))^{-1}~(hat(beta)-hat(beta)[{(-~~i)}]))
+    if(is.null(nano$ylab)) nano$ylab <- expression(frac(1,p)(hat(beta)-hat(beta)[{(-~~i)}])^{T}~(Var(hat(beta)))^{-1}~(hat(beta)-hat(beta)[{(-~~i)}]))
     do.call("plot",nano)
     abline(h=3*mean(CD),lty=3)
     if(!missingArg(identify)) identify(nano$x,nano$y,n=max(1,floor(abs(identify))),labels=labels)
@@ -2524,12 +2449,12 @@ cooks.distance.zeroinflation <- function(model, submodel=c("counts","zeros","ful
 #' @description Produces a normal QQ-plot with simulated envelope of residuals for regression models used to deal with
 #' zero-excess in count data.
 #' @param object an object of the class \emph{zeroinflation}.
-#' @param rep an (optional) positive integer which allows to specify the number of replicates which should be used to build the simulated envelope. By default, \code{rep} is set to be 25.
-#' @param conf an (optional) value in the interval \eqn{(0,1)} indicating the confidence level which should be used to build the pointwise confidence intervals, which conform the simulated envelope. By default, \code{conf} is set to be 0.95.
+#' @param rep an (optional) positive integer which allows to specify the number of replicates which should be used to build the simulated envelope. As default, \code{rep} is set to 25.
+#' @param conf an (optional) value in the interval \eqn{(0,1)} indicating the confidence level which should be used to build the pointwise confidence intervals, which conform the simulated envelope. As default, \code{conf} is set to 0.95.
 #' @param type an (optional) character string which allows to specify the required type of residuals. The available options are: (1) the difference between the observed response
 #' and the fitted mean ("response"); (2) the standardized difference between the observed response and the fitted mean ("standardized"); (3) the randomized quantile
-#' residual ("quantile"). By default, \code{type} is set to be "quantile".
-#' @param plot.it an (optional) logical switch indicating if the normal QQ-plot with simulated envelope of residuals is required or just the data matrix in which it is based. By default, \code{plot.it} is set to be TRUE.
+#' residual ("quantile"). As default, \code{type} is set to "quantile".
+#' @param plot.it an (optional) logical switch indicating if the normal QQ-plot with simulated envelope of residuals is required or just the data matrix in which it is based. As default, \code{plot.it} is set to TRUE.
 #' @param identify an (optional) positive integer value indicating the number of individuals to identify on the QQ-plot with simulated envelope of residuals. This is only appropriate if \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example, \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
 #' @return A matrix with the following four columns:
@@ -2636,12 +2561,12 @@ envelope.zeroinflation <- function(object, rep=20, conf=0.95, type=c("quantile",
 #' @description Produces a normal QQ-plot with simulated envelope of residuals for regression models based on the negative binomial, beta-binomial, and random-clumped binomial
 #' distributions, which are alternatives to the Poisson and binomial regression models under the presence of overdispersion.
 #' @param object an object of class \emph{overglm}.
-#' @param rep an (optional) positive integer which allows to specify the number of replicates which should be used to build the simulated envelope. By default, \code{rep} is set to be 25.
-#' @param conf an (optional) value in the interval \eqn{(0,1)} indicating the confidence level which should be used to build the pointwise confidence intervals, which conform the simulated envelope. By default, \code{conf} is set to be 0.95.
+#' @param rep an (optional) positive integer which allows to specify the number of replicates which should be used to build the simulated envelope. As default, \code{rep} is set to 25.
+#' @param conf an (optional) value in the interval \eqn{(0,1)} indicating the confidence level which should be used to build the pointwise confidence intervals, which conform the simulated envelope. As default, \code{conf} is set to 0.95.
 #' @param type an (optional) character string which allows to specify the required type of residuals. The available options are: (1) the difference between the observed response
 #' and the fitted mean ("response"); (2) the standardized difference between the observed response and the fitted mean ("standardized"); and (3) the randomized quantile
-#' residual ("quantile"). By default, \code{type} is set to be "quantile".
-#' @param plot.it an (optional) logical switch indicating if the normal QQ-plot with simulated envelope of residuals is required or just the data matrix in which it is based. By default, \code{plot.it} is set to be TRUE.
+#' residual ("quantile"). As default, \code{type} is set to "quantile".
+#' @param plot.it an (optional) logical switch indicating if the normal QQ-plot with simulated envelope of residuals is required or just the data matrix in which it is based. As default, \code{plot.it} is set to TRUE.
 #' @param identify an (optional) positive integer value indicating the number of individuals to identify on the QQ-plot with simulated envelope of residuals. This is only appropriate if \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example, \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
 #' @return A matrix with the following four columns:
@@ -2775,23 +2700,23 @@ envelope.overglm <- function(object, rep=25, conf=0.95, type=c("quantile","respo
 #' significance tests.
 #' @param model an object of the class \emph{overglm}.
 #' @param direction an (optional) character string which allows to specify the type of procedure which should be used. The available
-#' options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). By default, \code{direction}
-#' is set to be "forward".
+#' options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). As default, \code{direction}
+#' is set to "forward".
 #' @param levels an (optional) two-dimensional vector of values in the interval \eqn{(0,1)} indicating the levels at which
 #' the variables should in and out from the model. This is only appropiate if \code{criterion}="p-value". By default,
-#' \code{levels} is set to be \code{c(0.05,0.05)}.
+#' \code{levels} is set to \code{c(0.05,0.05)}.
 #' @param test an (optional) character string which allows to specify the statistical test which should be used to compare nested
 #' models. The available options are: Wald ("wald"), Rao's score ("score"), likelihood-ratio ("lr") and gradient
-#' ("gradient") tests. By default, \code{test} is set to be "wald".
+#' ("gradient") tests. As default, \code{test} is set to "wald".
 #' @param criterion an (optional) character string which allows to specify the criterion which should be used to compare the
 #' candidate models. The available options are: AIC ("aic"), BIC ("bic"), and \emph{p}-value of the \code{test}-type test
-#' ("p-value"). By default, \code{criterion} is set to be "bic".
+#' ("p-value"). As default, \code{criterion} is set to "bic".
 #' @param ...	further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the
-#' penalty in the AIC, which by default is set to be 2.
+#' penalty in the AIC, which by default is set to 2.
 #' @param trace an (optional) logical switch indicating if should the stepwise reports be printed. By default,
-#' \code{trace} is set to be TRUE.
+#' \code{trace} is set to TRUE.
 #' @param scope an (optional) list, containing components \code{lower} and \code{upper}, both formula-type objects,
-#' indicating the range of models which should be examined in the stepwise search. By default, \code{lower} is a model
+#' indicating the range of models which should be examined in the stepwise search. As default, \code{lower} is a model
 #' with no predictors and \code{upper} is the linear predictor of the model in \code{model}.
 #' @return A list which contains the following objects:
 #' \tabular{ll}{
@@ -2875,6 +2800,7 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), tes
   if(trace){
     cat("\n       Family: ",familia,"\n")
     cat("Link function: ",model$family$link,"\n")
+    cat("    Criterion: ",criters2[criters==criterion])
   }
   if(direction=="forward"){
     oldformula <- lower
@@ -3143,7 +3069,7 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), tes
       cat("\n Effects are included when their p-values are lower than",levels[1])
       cat("\n Effects are dropped when their p-values are higher than",levels[2])
     }
-    if(!is.null(xxx$k)) cat("The magnitude of the penalty in the AIC was set to be ",xxx$k)
+    if(!is.null(xxx$k)) cat("The magnitude of the penalty in the AIC was set to ",xxx$k)
     cat("\n")
   }
   out_$final <- paste("~",as.character(oldformula)[length(oldformula)],sep=" ")
@@ -3158,8 +3084,8 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), tes
 #' @param type an (optional) character string which allows to specify the local influence approach:
 #' the absolute value of the elements of the main diagonal of the normal curvature matrix ("total") or
 #' the eigenvector which corresponds to the maximum absolute eigenvalue of the normal curvature matrix ("local").
-#' By default, \code{type} is set to be "total".
-#' @param plot.it an (optional) logical indicating if the plot is required or just the data matrix in which that plot is based. By default, \code{plot.it} is set to be FALSE.
+#' As default, \code{type} is set to "total".
+#' @param plot.it an (optional) logical indicating if the plot is required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to FALSE.
 #' @param coefs	an (optional) character string which (partially) match with the names of some model parameters.
 #' @param identify an (optional) integer indicating the number of individuals to identify on the plot. This is only appropriate if \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used
@@ -3306,7 +3232,7 @@ localInfluence.overglm <- function(object,type=c("total","local"),coefs,plot.it=
 #' random-clumped binomial distributions, which are alternatives to the Poisson and binomial regression models under the presence of overdispersion.
 #' The GVIF is aimed to identify collinearity problems.
 #' @param model an object of class \emph{overglm}.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
 #' @param ... further arguments passed to or from other methods.
 #' @details If the number of degrees of freedom is 1 then the GVIF reduces to the Variance
 #' Inflation Factor (VIF).

@@ -16,9 +16,9 @@
 \arguments{
 \item{model}{an object of class \emph{glmgee}.}
 
-\item{level}{an (optional) character string indicating the level for which the Dfbeta statistic is required. The options are: cluster-level ("clusters") and observation-level ("observations"). By default, \code{level} is set to be "clusters".}
+\item{level}{an (optional) character string indicating the level for which the Dfbeta statistic is required. The options are: cluster-level ("clusters") and observation-level ("observations"). As default, \code{level} is set to "clusters".}
 
-\item{method}{an (optional) character string indicating the method of calculation for the \emph{one-step approximation}. The options are: the \emph{one-step approximation} described by Preisser and Qaqish (1996) in which the working-correlation matrix is assumed to be known ("Preisser-Qaqish"); and the "authentic" \emph{one-step approximation} ("full"). By default, \code{method} is set to be "Preisser-Qaqish".}
+\item{method}{an (optional) character string indicating the method of calculation for the \emph{one-step approximation}. The options are: the \emph{one-step approximation} described by Preisser and Qaqish (1996) in which the working-correlation matrix is assumed to be known ("Preisser-Qaqish"); and the "authentic" \emph{one-step approximation} ("full"). As default, \code{method} is set to "Preisser-Qaqish".}
 
 \item{coefs}{an (optional) character string which (partially) match with the names of some parameters in the linear predictor.}
 
@@ -98,4 +98,7 @@ Preisser J.S., Qaqish B.F. (1996) Deletion diagnostics for generalised estimatin
 
 Hammill B.G., Preisser J.S. (2006) A SAS/IML software program for GEE and regression diagnostics.
 \emph{Computational Statistics & Data Analysis} 51:1197-1212.
+
+\href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+\emph{The R Journal} 15:105-133.}
 }

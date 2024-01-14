@@ -4,14 +4,14 @@
 \alias{RJC}
 \title{Rotnitzky–Jewell's Criterion for Generalized Estimating Equations}
 \usage{
-RJC(..., verbose = TRUE, digits = 3)
+RJC(..., verbose = TRUE, digits = max(3, getOption("digits") - 2))
 }
 \arguments{
 \item{...}{one or several objects of the class \emph{glmgee}.}
 
-\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+\item{verbose}{an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.}
 
-\item{digits}{an (optional) integer indicating the number of digits to print.}
+\item{digits}{an (optional) integer indicating the number of digits to print. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.}
 }
 \value{
 A \code{data.frame} with the values of the RJC for each \emph{glmgee} object in the input.
@@ -49,6 +49,9 @@ RJC(fit1, fit2, fit3)
 \references{
 Hin L.-Y., Carey V.J., Wang Y.-G. (2007) Criteria for Working–Correlation–Structure
 Selection in GEE: Assessment via Simulation. \emph{The American Statistician} 61:360-364.
+
+\href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+\emph{The R Journal} 15:105-133.}
 }
 \seealso{
 \link{QIC}, \link{CIC}, \link{GHYC}, \link{AGPC}, \link{SGPC}

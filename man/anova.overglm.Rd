@@ -12,11 +12,11 @@
 \item{...}{another objects of the class \emph{overglm}.}
 
 \item{test}{an (optional) character string which allows to specify the required test. The available options are: Wald ("wald"),
-Rao's score ("score"), likelihood ratio ("lr") and Terrell's gradient ("gradient") tests. By default, \code{test} is
-set to be "wald".}
+Rao's score ("score"), likelihood ratio ("lr") and Terrell's gradient ("gradient") tests. As default, \code{test} is
+set to "wald".}
 
-\item{verbose}{an (optional) logical indicating if should the report of results be printed. By default, \code{verbose}
-is set to be TRUE.}
+\item{verbose}{an (optional) logical indicating if should the report of results be printed. As default, \code{verbose}
+is set to TRUE.}
 }
 \value{
 A matrix with the following three columns:

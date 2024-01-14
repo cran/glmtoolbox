@@ -19,10 +19,10 @@
 \item{object}{an object of class \emph{glm}.}
 
 \item{type}{an (optional) character string indicating the type of approach to study the
-local influence. The options are: the absolute value of the elements of the eigenvector which corresponds to the maximum absolute eigenvalue ("local"); and the absolute value of the elements of the main diagonal ("total"). By default, \code{type} is set to be "total".}
+local influence. The options are: the absolute value of the elements of the eigenvector which corresponds to the maximum absolute eigenvalue ("local"); and the absolute value of the elements of the main diagonal ("total"). As default, \code{type} is set to "total".}
 
 \item{perturbation}{an (optional) character string indicating the perturbation scheme
-to apply. The options are: case weight perturbation of observations ("case-weight"); perturbation of covariates ("covariate"); and perturbation of response ("response"). By default, \code{perturbation} is set to be "case-weight".}
+to apply. The options are: case weight perturbation of observations ("case-weight"); perturbation of covariates ("covariate"); and perturbation of response ("response"). As default, \code{perturbation} is set to "case-weight".}
 
 \item{covariate}{an character string which (partially) match with the names of one of
 the parameters in the linear predictor. This is only appropriate if \code{perturbation="covariate"}.}
@@ -32,7 +32,7 @@ some of the parameters in the linear predictor.}
 
 \item{plot.it}{an (optional) logical indicating if the plot of the measures of local
 influence is required or just the data matrix in which that plot is based. By default,
-\code{plot.it} is set to be FALSE.}
+\code{plot.it} is set to FALSE.}
 
 \item{identify}{an (optional) integer indicating the number of observations to identify
 on the plot of the measures of local influence. This is only appropriate if
@@ -46,7 +46,7 @@ A matrix as many rows as observations in the sample and one column with the valu
 }
 \description{
 Computes some measures and, optionally, display	graphs of them to perform
-influence analysis based on the approaches described in Cook (1986).
+influence analysis based on the approaches described by Cook (1986).
 }
 \references{
 Cook D. (1986) Assessment of Local Influence. \emph{Journal of the Royal Statistical Society: Series B (Methodological)} 48, 133-155.

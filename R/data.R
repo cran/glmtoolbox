@@ -1,3 +1,29 @@
+#'
+#' @title Calls to a technical support help line
+#'
+#' @description Data on technical support calls after a product release. Using
+#' this information, new products could be allocated technical support
+#' resources.
+#'
+#' @docType data
+#'
+#' @usage data(calls)
+#'
+#' @format A data frame with 16 rows and 2 variables:
+#' \describe{
+#'   \item{week}{a numeric vector indicating number of weeks that have elapsed since the product’s release.}
+#'   \item{calls}{a numeric vector indicating the number of technical support calls.}
+#' }
+#' @keywords datasets
+#' @source \url{https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.3/statug/statug_mcmc_examples12.htm}
+#' @examples
+#' data(calls)
+#' dev.new()
+#' with(calls,plot(week,calls,xlab="The number of weeks since the release of the product",
+#'      pch=16,col="blue",ylab="Technical support calls"))
+"calls"
+#'
+#'
 #' @title Age and Eye Lens Weight of Rabbits in Australia
 #'
 #' @description The dry weight of the eye lens was measured for 71 free-living wild rabbits of known age. Eye
@@ -425,7 +451,6 @@
 #'   \item{photoperiod}{a factor indicating the photoperiod, in hours: 8 or 16.}
 #'   \item{bap}{a numeric vector indicating the concentrations of the cytokinin 6-benzylaminopurine: 2.2, 4.4, 8.8 or 17.6.}
 #' }
-#' @source \url{https://support.sas.com/rnd/app/stat/examples/GENMODZIP/sas.html}
 #' @keywords datasets
 #' @examples
 #' data(Trajan)
@@ -1049,3 +1074,1753 @@
 #' @references Chapman R.E. (1997) Degradation study of a photographic developer to determine shelf life,
 #' \emph{Quality Engineering} 10:1, 137-140.
 "shelflife"
+#'
+#' @title The effects of fertilizers on coastal Bermuda grass
+#'
+#' @description These data arose from a \eqn{4^3} factorial experiment with the three major plant nutrients, nitrogen (N), phosphorus (P), and potassium (K), on the
+#' yield of coastal Bermuda grass. The experiment was performed to produce a response surface for the effects of the three nutrients, so that an optimal
+#' dressing could be predicted. The grass was cut about every five weeks and oven-dried.
+#'
+#' @docType data
+#'
+#' @usage data(Grass)
+#'
+#' @format A data frame with 64 rows and 4 variables:
+#' \describe{
+#'   \item{Nitrogen}{a numeric vector indicating the Nitrogen level, in lb/acre.}
+#'   \item{Phosphorus}{a numeric vector indicating the Phosphorus level, in lb/acre.}
+#'   \item{Potassium}{a numeric vector indicating the Potassium level, in lb/acre.}
+#'   \item{Yield}{a numeric vector indicating the yields, in tons/acre.}
+#' }
+#' @keywords datasets
+#' @references Welch L.F., Adams W.E., Carmon J.L. (1963) Yield Response Surfaces, Isoquants, and Economic Fertilizer Optima for Coastal Bermuda grass.
+#'             \emph{Agronomy Journal}, 55, 63-67.
+#' @references McCullagh P., Nelder J.A. (1989). \emph{Generalized Linear Models. 2nd Edition}. Chapman and Hall, London.
+#' @references Wei B.C. (1998). \emph{Exponential Family Nonlinear Models}. Springer, Singapore.
+"Grass"
+#'
+#'
+#' @title Assay of an Insecticide with a Synergist
+#'
+#' @description These data are concerned with the estimation of the lowest-cost mixtures of insecticides and synergists. They
+#' relate to assays on a grasshopper \emph{Melanopus sanguinipes} with carbofuran and piperonyl butoxide, which enhances
+#' carbofuran's toxicity.
+#'
+#' @docType data
+#'
+#' @usage data(Melanopus)
+#'
+#' @format A data frame with 15 rows and 4 variables:
+#' \describe{
+#'   \item{Killed}{a numeric vector indicating how many grasshoppers were killed.}
+#'   \item{Exposed}{a numeric vector indicating how many grasshoppers were exposed.}
+#'   \item{Insecticide}{a numeric vector indicating the dose of insecticide.}
+#'   \item{Synergist}{a numeric vector indicating the dose of synergist.}
+#' }
+#' @keywords datasets
+#' @references McCullagh P., Nelder J.A. (1989). \emph{Generalized Linear Models. 2nd Edition}. Chapman and Hall, London.
+#' @references Wei B.C. (1998). \emph{Exponential Family Nonlinear Models}. Springer, Singapore.
+"Melanopus"
+#'
+#'
+#' @title Developmental rate of Drosophila melanogaster
+#'
+#' @description \emph{Drosophila melanogaster} developmental stages were monitored as part of an experiment to determine the effect of temperature
+#' on their duration. The eggs were laid at approximately 25 degrees Celsius and remained at that temperature for 20-30 minutes. The eggs were then
+#' brought to the experimental temperature, which remained constant throughout the experiment.
+#'
+#' @docType data
+#'
+#' @usage data(Drosophila)
+#'
+#' @format A data frame with 23 rows and 3 variables:
+#' \describe{
+#'   \item{Temp}{a numeric vector indicating the temperature, in degrees Celsius.}
+#'   \item{Duration}{a numeric vector indicating the average duration of the embryonic period, in hours, measured from the time at which the eggs were laid.}
+#'   \item{Size}{a numeric vector indicating how many eggs each batch contained.}
+#' }
+#' @keywords datasets
+#' @references Powsner L. (1935) The effects of temperature on the durations of the developmental stages of \emph{Drosophila melanogaster}.
+#'             \emph{Physiological Zoology}, 8, 474-520.
+#' @references McCullagh P., Nelder J.A. (1989). \emph{Generalized Linear Models. 2nd Edition}. Chapman and Hall, London.
+#' @references Wei B.C. (1998). \emph{Exponential Family Nonlinear Models}. Springer, Singapore.
+#' @examples
+#' data(Drosophila)
+#' dev.new()
+#' with(Drosophila, plot(Temp,Duration,xlab="Temperature, in degrees Celsius",pch=16,col="blue",
+#'                       ylab="Average duration of the embryonic period"))
+"Drosophila"
+#'
+#'
+#' @title Radioimmunological Assay of Cortisol
+#'
+#' @description The amount of hormone contained in a preparation
+#' cannot be measured directly, so estimating an unknown dose of
+#' hormone involves a two-step process. A calibration curve must
+#' first be established, then the curve must be inverted to
+#' determine the hormone dose. The calibration curve is estimated
+#' using a radioimmunological assay.
+#'
+#' @docType data
+#'
+#' @usage data(Cortisol)
+#'
+#' @format A data frame with 64 rows and 2 variables:
+#' \describe{
+#'   \item{lDose}{a numeric vector indicating the logarithm in base 10 of the dose.}
+#'   \item{Y}{a numeric vector indicating the response, in counts per minute.}
+#' }
+#' @keywords datasets
+#' @references Huet S., Bouvier A., Poursat M.-A., Jolivet E. (2004). \emph{Statistical tools for nonlinear regression : a practical guide with S-PLUS and R
+#' examples. 2nd Edition}. Springer,  New York.
+#' @examples
+#' data(Cortisol)
+#' dev.new()
+#' with(Cortisol, plot(lDose,Y,xlab="Log10(Dose, in ng/0.1 ml)",pch=16,col="blue",
+#'                     ylab="Response, in counts per minute"))
+"Cortisol"
+#'
+
+#'
+#' @title Generalized Nonlinear Models.
+#' @description \code{gnm} is used to fit generalized nonlinear models, specified by giving a symbolic description of the "linear" predictor
+#'              and a description of the error distribution.
+#' @param formula a \code{formula} expression which is a symbolic description of the "linear" predictor of the model to be fitted to the data.
+#' @param family a description of the error distribution and link function to be used in the model. For \code{gnm} this can be a character string naming a family function,
+#'        a family function or the result of a call to a family function. As default, \code{family} is set to \code{gaussian(identity)}.
+#' @param weights an (optional) vector of "prior weights" to be used in the fitting process. The length of \code{weights} should be the same as the number of observations.
+#' @param offset this can be used to specify an \emph{a priori} known component to be included in the linear predictor during fitting. This should be \code{NULL} or a numeric vector of length equal to the number of cases.
+#' @param data an (optional) data frame, list or environment (or object coercible by \link{as.data.frame} to a data frame) containing the variables in the model.
+#'        If not found in data, the variables are taken from \code{environment(formula)}, typically the environment from which \code{gnm} is called.
+#' @param subset an (optional) vector specifying a subset of observations to be used in the fitting process.
+#' @param start an (optional) vector of starting values for the parameters in the "linear" predictor.
+#' @param toler an (optional) positive value which represents the \emph{convergence tolerance}. The convergence is reached when the maximum of the absolute relative
+#'        differences between the values of the parameters in the "linear" predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. As
+#'        default, \code{toler} is set to 0.00001.
+#' @param maxit an (optional) integer value which represents the maximum number of iterations allowed for the fitting algorithm. As default, \code{maxit} is set to 50.
+#' @param trace an (optional) logical variable. If \code{TRUE}, output is produced for each iteration of the estimating algorithm.
+#' @param ... further arguments passed to or from other methods.
+#'
+#' @return an object of class \emph{gnm} in which the main results of the model fitted to the data are stored, i.e., a
+#' list with components including
+#' \tabular{ll}{
+#' \code{coefficients} \tab a vector containing the parameter estimates,\cr
+#' \tab \cr
+#' \code{fitted.values}\tab a vector containing the estimates of \eqn{\mu_1,\ldots,\mu_n},\cr
+#' \tab \cr
+#' \code{start}        \tab a vector containing the starting values used,\cr
+#' \tab \cr
+#' \code{prior.weights}\tab a vector containing the case weights used,\cr
+#' \tab \cr
+#' \code{offset}       \tab a vector containing the offset used, \cr
+#' \tab \cr
+#' \code{terms}        \tab an object containing the terms objects,\cr
+#' \tab \cr
+#' \code{loglik}       \tab the value of the log-likelihood function avaliated at the parameter estimates,\cr
+#' \tab \cr
+#' \code{estfun}       \tab a vector containing the estimating functions evaluated at the parameter estimates\cr
+#'                     \tab and the observed data,\cr
+#' \tab \cr
+#' \code{formula}      \tab the formula,\cr
+#' \tab \cr
+#' \code{converged}    \tab a logical indicating successful convergence,\cr
+#' \tab \cr
+#' \code{model}        \tab the full model frame,\cr
+#' \tab \cr
+#' \code{y}            \tab the response vector,\cr
+#' \tab \cr
+#' \code{family}       \tab an object containing the \link{family} object used,\cr
+#' \tab \cr
+#' \code{linear.predictors} \tab a vector containing the estimates of \eqn{g(\mu_1),\ldots,g(\mu_n)},\cr
+#' \tab \cr
+#' \code{R}            \tab a matrix with unscaled estimate of the variance-covariance\cr
+#'                     \tab matrix of model parameters,\cr
+#' \tab \cr
+#' \code{call}         \tab the original function call.\cr
+#' }
+#' @seealso \link{glm}, \link{glmgee}, \link{gnmgee}
+#' @details
+#' A set of standard extractor functions for fitted model objects is available for objects of class \emph{gnm},
+#' including methods to the generic functions such as \code{summary}, \code{model.matrix}, \code{estequa},
+#' \code{coef}, \code{vcov}, \code{logLik}, \code{fitted}, \code{confint}, \code{AIC}, \code{BIC} and \code{predict}.
+#' In addition, the model fitted to the	data may be assessed using functions such as \code{adjR2.gnm}, \link{anova.gnm},
+#' \link{residuals.gnm}, \link{dfbeta.gnm}, \link{cooks.distance.gnm} and \link{envelope.gnm}.
+#' @export gnm
+#' @examples
+#' ###### Example 1: The effects of fertilizers on coastal Bermuda grass
+#' data(Grass)
+#' fit1 <- gnm(Yield ~ b0 + b1/(Nitrogen + a1) + b2/(Phosphorus + a2) + b3/(Potassium + a3),
+#'             family=gaussian(inverse), start=c(b0=0.1,b1=13,b2=1,b3=1,a1=45,a2=15,a3=30), data=Grass)
+#' summary(fit1)
+#'
+#' ###### Example 2: Assay of an Insecticide with a Synergist
+#' data(Melanopus)
+#' fit2 <- gnm(Killed/Exposed ~ b0 + b1*log(Insecticide-a1) + b2*Synergist/(a2 + Synergist),
+#'             family=binomial(logit), weights=Exposed, start=c(b0=-3,b1=1.2,a1=1.7,b2=1.7,a2=2),
+#'			   data=Melanopus)
+#' summary(fit2)
+#'
+#' ###### Example 3: Developmental rate of Drosophila melanogaster
+#' data(Drosophila)
+#' fit3 <- gnm(Duration ~ b0 + b1*Temp + b2/(Temp-a), family=Gamma(log),
+#'             start=c(b0=3,b1=-0.25,b2=-210,a=55), weights=Size, data=Drosophila)
+#' summary(fit3)
+#'
+#' ###### Example 4: Radioimmunological Assay of Cortisol
+#' data(Cortisol)
+#' fit4 <- gnm(Y ~ b0 + (b1-b0)/(1 + exp(b2+ b3*lDose))^b4, family=Gamma(identity),
+#'             start=c(b0=130,b1=2800,b2=3,b3=3,b4=0.5), data=Cortisol)
+#' summary(fit4)
+#'
+#' ###### Example 5: Age and Eye Lens Weight of Rabbits in Australia
+#' data(rabbits)
+#' fit5 <- gnm(wlens ~ b1 - b2/(age + b3), family=Gamma(log),
+#'             start=c(b1=5.5,b2=130,b3=35), data=rabbits)
+#' summary(fit5)
+#'
+#' ###### Example 6: Calls to a technical support help line
+#' data(calls)
+#' fit6 <- gnm(calls ~ SSlogis(week, Asym, xmid, scal), family=poisson(identity), data=calls)
+#' summary(fit6)
+#'
+gnm <- function(formula,family=gaussian(),offset=NULL,weights=NULL,data,subset=NULL,start=NULL,toler=0.00001,maxit=50,trace=FALSE,...){
+  if(missingArg(data)) data <- environment(eval(formula))
+  if(is(family,"function")) family <- family()
+  .Theta <- function() return(.Theta)
+  environment(.Theta) <- environment(family$variance)
+  if(is.null(start)){
+    defaultW <- getOption("warn")
+    options(warn = -1)
+    form <- paste0("y2 <- family$linkfun(",formula[[2]],")")
+    if(family$family=="binomial"){
+      form <- paste0("ifelse(",formula[[2]],"*(1-",formula[[2]],")==0,abs(",formula[[2]],"-0.01),",formula[[2]],")")
+      form <- paste0("y2 <- family$linkfun(",form,")")
+    }
+    if(family$family=="poisson") form <- paste0("y2 <- family$linkfun(ifelse(",formula[[2]],"==0,0.01,",formula[[2]],"))")
+    eval(parse(text=paste0("data <- within(data,",form,")")))
+    mmf <- match.call(expand.dots = FALSE)
+    m <- match(c("subset", "weights", "offset"), names(mmf), 0)
+    mmf <- mmf[c(1L,m)]
+    if(!is.null(mmf$offset)) eval(parse(text=paste0("data <- within(data,y2 <- y2 - ",deparse(mmf$offset),")") ))
+    conls <- try(do.call(nls,list(formula=as.formula(paste0("y2 ~ ",as.character(formula[3]))),data=data,subset=mmf$subset,weights=mmf$weights)),silent=TRUE)
+    options(warn = defaultW)
+    if(is.list(conls)) start <- coef(conls)
+  }
+  if(is.null(start)) stop("Starting values are required. Please specify some!!",call.=FALSE)
+  formula2 <- formula
+  avs <- all.vars(formula)[-1]
+  if(is.null(names(start))) pars <- rownames(start) else pars <- names(start)
+  vnames <- avs[is.na(match(avs,pars))]
+  formula <- paste(formula[2],"~ 1 + ",paste(vnames,collapse="+"))
+  formula <- as.formula(formula)
+  mf <- match.call(expand.dots = FALSE)
+  m <- match(c("formula", "weights", "offset", "data", "subset"), names(mf), 0L)
+  mf <- mf[c(1L, m)]
+  mf$drop.unused.levels <- TRUE
+  mf$na.action <- na.omit
+  mf[[1L]] <- as.name("model.frame")
+  mf$formula <- formula
+  mf <- eval(mf, parent.frame())
+  mt <- attr(mf, "terms")
+  y <- as.matrix(model.response(mf, "any"))
+  offset <- as.vector(model.offset(mf))
+  weights <- as.vector(model.weights(mf))
+  if(ncol(y)==2 & family$family=="binomial"){
+    weights <- as.matrix(y[,1] + y[,2])
+    y <- as.matrix(y[,1]/weights)
+  }
+  y <- as.matrix(as.numeric(y))
+  X <- model.matrix(mt, mf)
+  p <- length(start)
+  n <- nrow(X)
+  if(is.null(weights)) weights <- matrix(1,n,1) else weights <- as.matrix(weights)
+  if(any(weights <= 0)) stop("Only positive weights are allowed!!",call.=FALSE)
+  if(is.null(offset)) offs <- matrix(0,n,1) else offs <- as.matrix(offset)
+  if(family$family=="poisson" & (any(abs(y - round(y)) > 0.001) | any(y<0)))
+    stop("negative or non-integer values are not allowed for the 'Poisson' family",call.=FALSE)
+  if(grepl("Negative Binomial",family$family) & (any(abs(y - round(y)) > 0.001) | any(y<0)))
+    stop("negative or non-integer values are not allowed for the 'Negative Binomial' family",call.=FALSE)
+  if(family$family=="binomial" & any(abs(weights - round(weights)) > 0.001))
+    stop("non-integer prior.weights are not allowed for the 'binomial' family",call.=FALSE)
+  if(family$family=="binomial" & (any(abs(y*weights - round(y*weights)) > 0.001) | any(y<0)))
+    stop("negative or non-integer values are not allowed for the 'binomial' family",call.=FALSE)
+  if(family$family %in% c("Gamma","inverse.gaussian") & any(y<=0))
+    stop(paste("non-positive values are not allowed for the",family$family,"family"),call.=FALSE)
+  etaf <- function(beta){
+    temp <- deparse(formula2[[3]])
+    for(i in 1:p) temp <- gsub(pars[i],beta[i],temp)
+    matrix(eval(parse(text=temp),envir=data.frame(X)),ncol=1)
+  }
+  Der <- function(beta) matrix(jacobian(etaf,beta),ncol=p)
+  beta_new <- start
+  tol <- 1
+  niter <- 0
+  if(trace) message("\nIteration  Convergence Criterion")
+  while(tol > toler & niter < maxit){
+    beta_old <- beta_new
+    etas <- etaf(beta_old) + offs
+    Ders <- Der(beta_old)
+    mus <- family$linkinv(etas)
+    w <- family$mu.eta(etas)*sqrt(weights/family$variance(mus))
+    Dersw <- Ders*matrix(w,n,p)
+    U <- crossprod(Dersw,sqrt(weights/family$variance(mus))*(y-mus))
+    I <- crossprod(Dersw,Dersw)
+    kchol <- try(chol(I),silent=TRUE)
+    if(is.matrix(kchol)) kchol <- chol2inv(kchol) else kchol <- solve(I)
+    beta_new <- beta_old + kchol%*%U
+    tol <- max(abs((beta_new-beta_old)/beta_old))
+    niter <- niter + 1
+    if(trace) message("    ",niter,"            ",signif(tol,digits=5))
+  }
+  if(niter >= maxit) warning("algorithm did not converge", call. = FALSE)
+  rownames(beta_new) <- pars
+  colnames(beta_new) <- ""
+  etas <- etaf(beta_new) + offs
+  mus <- family$linkinv(etas)
+  Ders <- Der(beta_new)
+  if(is.null(family$dispersion)){
+    if(family$family %in% c("poisson","binomial")) family$dispersion <- 1 else family$dispersion <- NA
+    if(grepl("Negative Binomial",family$family)) family$dispersion <- 1
+  }
+  phi <- ifelse(is.na(family$dispersion),sum((y-mus)^2*weights/family$variance(mus))/(n-p),family$dispersion)
+  w <- family$mu.eta(etas)*sqrt(weights/family$variance(mus))
+  Dersw <- Ders*matrix(w,n,p)
+  I <- crossprod(Dersw,Dersw)
+  kchol <- try(chol(I),silent=TRUE)
+  if(is.matrix(kchol)) vc <- chol2inv(kchol) else vc <- solve(kchol)
+  estfun <- matrix(crossprod(Dersw,sqrt(weights/family$variance(mus))*(y-mus))/phi,length(beta_new),1)
+  colnames(vc) <- rownames(vc) <- rownames(estfun) <- pars
+  colnames(estfun) <- ""
+  if(var(offs)==0) null.deviance <- sum(family$dev.resids(y,sum(y*weights)/sum(weights),weights))
+  else{
+    fit0 <- glm(y ~ 1, offset=offs, family=family, weights=weights)
+    null.deviance <- fit0$deviance
+  }
+  out_ <- list(coefficients=beta_new,fitted.values=mus,linear.predictors=etas,null.deviance=null.deviance,df.null=n-1,
+               prior.weights=weights,y=y,formula=formula2,call=match.call(),offset=offs,model=mf,data=data,
+               converged=ifelse(niter<maxit,TRUE,FALSE),estfun=estfun,R=vc,terms=mt,family=family,weights=w**2,
+               phi=phi,logLik=-family$aic(y,rep(1,n),mus,weights,sum(family$dev.resids(y,mus,weights)))/2 + is.na(family$dispersion),
+               deviance=sum(family$dev.resids(y,mus,weights)),df.residual=n-p,levels=.getXlevels(attr(mf,"terms"),mf),
+               contrasts=attr(X,"contrasts"),start=start,iter=niter,etaf=etaf,linear=FALSE)
+  class(out_) <- "gnm"
+  return(out_)
+}
+
+#' @method vcov gnm
+#' @export
+vcov.gnm <- function(object, ...,digits=max(3, getOption("digits") - 2), dispersion=NULL){
+  disp <- ifelse(is.null(dispersion),object$phi,dispersion)
+  return(object$R*disp)
+}
+#' @method coef gnm
+#' @export
+coef.gnm <- function(object, ...,digits=max(3, getOption("digits") - 2)){
+  out_ <- round(object$coefficients,digits=digits)
+  colnames(out_) <- "Estimates"
+  return(out_)
+}
+#' @method model.matrix gnm
+#' @export
+
+model.matrix.gnm <-	function(object,...){
+  X <- model.matrix(object$terms, object$model, contrasts=object$contrasts)
+  p <- length(object$coefficients)
+  pars <- rownames(object$coefficients)
+  etaf <- function(beta){
+    temp <- deparse(object$formula[[3]])
+    for(i in 1:p) temp <- gsub(pars[i],beta[i],temp)
+    matrix(eval(parse(text=temp),data.frame(X)),ncol=1)
+  }
+  Der <- function(beta) matrix(jacobian(etaf,beta),ncol=p)
+  out_ <- Der(object$coefficients)
+  colnames(out_) <- pars
+  return(out_)
+}
+#' @method logLik gnm
+#' @export
+logLik.gnm <- function(object, ...){
+  out_ <- object$logLik
+  attr(out_,"df") <- length(object$coefficients) + ifelse(is.null(object$family$dispersion),1,ifelse(is.na(object$family$dispersion),1,0))
+  attr(out_,"nobs") <- length(object$prior.weights)
+  class(out_) <- "logLik"
+  return(out_)
+}
+
+#' @method fitted gnm
+#' @export
+fitted.gnm <- function(object, ...){
+  out_ <- object$fitted.values
+  colnames(out_) <- "Fitted values"
+  return(out_)
+}
+
+#' @method estequa gnm
+#' @export
+estequa.gnm <- function(object, ...){
+  out_ <- object$estfun
+  colnames(out_) <- " "
+  return(out_)
+}
+#' @title Confidence Intervals for Generalized Nonlinear Models
+#' @description Computes confidence intervals based on Wald test for a generalized nonlinear model.
+#' @param object an object of the class \emph{gnm}.
+#' @param parm a specification of which parameters are to be given confidence intervals, either a vector of numbers or a vector of names. If missing, all parameters are considered.
+#' @param digits an (optional) integer value indicating the number of decimal places to be used. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.
+#' @param level an (optional) value indicating the required confidence level. As default, \code{level} is set to 0.95.
+#' @param contrast an (optional) matrix indicating the linear combinations of parameters for which confidence intervals are required. The number of rows in this matrix corresponds to the number of linear combinations required.
+#' @param verbose an (optional) logical indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
+#' @param dispersion an (optional) value indicating the estimate of the dispersion parameter. As default, \code{dispersion} is set to \code{summary(object)$dispersion}.
+#' @param ...	further arguments passed to or from other methods.
+#' @details The approximate 100(\code{level})\% confidence interval for \eqn{\beta} based on the Wald test.
+#' @return A matrix with so many rows as parameters in the "linear" predictor and two columns: "Lower limit" and "Upper limit".
+#' @examples
+#' ###### Example 1: The effects of fertilizers on coastal Bermuda grass
+#' data(Grass)
+#' fit1 <- gnm(Yield ~ b0 + b1/(Nitrogen + a1) + b2/(Phosphorus + a2) + b3/(Potassium + a3),
+#'             family=gaussian(inverse), start=c(b0=0.1,b1=13,b2=1,b3=1,a1=45,a2=15,a3=30), data=Grass)
+#'
+#' confint(fit1, level=0.95)
+#'
+#' ###### Example 2: Assay of an Insecticide with a Synergist
+#' data(Melanopus)
+#' fit2 <- gnm(Killed/Exposed ~ b0 + b1*log(Insecticide-a1) + b2*Synergist/(a2 + Synergist),
+#'             family=binomial(logit), weights=Exposed, start=c(b0=-3,b1=1.2,a1=1.7,b2=1.7,a2=2),
+#'			   data=Melanopus)
+#'
+#' confint(fit2, level=0.95)
+#'
+#' ###### Example 3: Developmental rate of Drosophila melanogaster
+#' data(Drosophila)
+#' fit3 <- gnm(Duration ~ b0 + b1*Temp + b2/(Temp-a), family=Gamma(log),
+#'             start=c(b0=3,b1=-0.25,b2=-210,a=55), weights=Size, data=Drosophila)
+#'
+#' confint(fit3, level=0.95)
+#'
+#' ###### Example 4: Radioimmunological Assay of Cortisol
+#' data(Cortisol)
+#' fit4 <- gnm(Y ~ b0 + (b1-b0)/(1 + exp(b2+ b3*lDose))^b4, family=Gamma(identity),
+#'             start=c(b0=130,b1=2800,b2=3,b3=3,b4=0.5), data=Cortisol)
+#'
+#' ### Confidence Interval for 'b1-b0'
+#' confint(fit4, level=0.95, contrast=matrix(c(-1,1,0,0,0),1,5))
+#'
+#' ### Confidence Intervals for 'b0', 'b1', 'b2', 'b3', 'b4'
+#' confint(fit4, level=0.95, contrast=diag(5))
+#'
+#' @method confint gnm
+#' @export
+confint.gnm <- function(object,parm,level=0.95,contrast,digits=max(3, getOption("digits") - 2),dispersion=NULL,verbose=TRUE,...){
+  name.s <- rownames(object$coefficients)
+  if(missingArg(contrast)){
+    bs <- coef(object)
+    ee <- sqrt(diag(vcov(object,dispersion=dispersion)))
+  }else{
+    contrast <- as.matrix(contrast)
+    if(ncol(contrast)!=length(name.s)) stop(paste("Number of columns of contrast matrix must to be",length(name.s)),call.=FALSE)
+    bs <- contrast%*%coef(object)
+    ee <- sqrt(diag(contrast%*%vcov(object,dispersion=dispersion)%*%t(contrast)))
+    name.s <- apply(contrast,1,function(x) paste0(x[x!=0],"*",name.s[x!=0],collapse=" + "))
+  }
+  results <- matrix(0,length(ee),2)
+  results[,1] <- bs - qnorm((1+level)/2)*ee
+  results[,2] <- bs + qnorm((1+level)/2)*ee
+  rownames(results) <- name.s
+  colnames(results) <- c("Lower limit","Upper limit")
+  if(verbose){
+    cat("\n Approximate",round(100*level,digits=1),"percent confidence intervals based on the Wald test \n\n")
+    print(round(results,digits=digits))
+  }
+  return(invisible((round(results,digits=digits))))
+}
+
+#' @method predict gnm
+#' @export
+predict.gnm <- function(object, ...,newdata, se.fit=FALSE, type=c("link","response"), dispersion=NULL){
+  type <- match.arg(type)
+  if(missingArg(newdata)) predicts <- object$linear.predictors
+  else{
+    newdata <- data.frame(newdata)
+    mf <- model.frame(delete.response(object$terms),newdata,xlev=object$levels)
+    X <- model.matrix(delete.response(object$terms),mf,contrasts=object$contrasts)
+    p <- length(object$coefficients)
+    pars <- rownames(object$coefficients)
+    etaf <- function(beta){
+      temp <- deparse(object$formula[[3]])
+      for(i in 1:p) temp <- gsub(pars[i],beta[i],temp)
+      matrix(eval(parse(text=temp),data.frame(X)),ncol=1)
+    }
+    predicts <- etaf(object$coefficients)
+    offs <- model.offset(mf)
+    if(!is.null(offs)) predicts <- predicts + offs
+  }
+  if(type=="response") predicts <- object$family$linkinv(predicts)
+  if(se.fit){
+    X <- matrix(jacobian(etaf,object$coefficients),nrow=nrow(X))
+    varhat <- vcov(object,dispersion=dispersion)
+    se <- matrix(sqrt(apply(tcrossprod(X,varhat)*X,1,sum)),ncol=1)
+    if(type=="response") se <- se*abs(object$family$mu.eta(object$family$linkfun(predicts)))
+    predicts <- cbind(predicts,se)
+    colnames(predicts) <- c("fit","se.fit")
+  }else colnames(predicts) <- c("fit")
+  return(predicts)
+}
+
+#' @method summary gnm
+#' @export
+summary.gnm <- function(object, ...,digits=max(3, getOption("digits") - 2),dispersion=NULL){
+  disp <- ifelse(is.null(dispersion),object$phi,dispersion)
+  aic <- round(object$family$aic(object$y,rep(1,length(object$y)),object$fitted.values,object$prior.weights,object$deviance) + 2*length(object$coefficients),digits=digits)
+  cat("\nSample size")
+  cat("\n   Number of observations: ",length(object$y))
+  cat("\n*************************************************************")
+  cat("\nModel")
+  cat("\n      Family distribution: ",object$family$family)
+  cat("\n            Link function: ",object$family$link)
+  cat("\n*************************************************************\n")
+  cat("Coefficients\n")
+  TAB	<- rbind(cbind(Estimate <- object$coefficients,
+                     StdErr <- sqrt(diag(vcov(object,dispersion=disp))),
+                     tval <- Estimate/StdErr,
+                     p.value <- 2*pnorm(-abs(tval))))
+  colnames(TAB) <- c("Estimate", "Std.Error", "z-value", "Pr(>|z|)")
+  rownames(TAB) <- rownames(object$coefficients)
+  printCoefmat(TAB, P.values=TRUE, signif.stars=FALSE, has.Pvalue=TRUE, digits=digits, dig.tst=digits, signif.legend=FALSE, tst.ind=c(1,2,3), na.print="")
+  cat("\n(Dispersion parameter for",object$family$family,"family taken to be",paste0(round(disp,digits=digits),")"),"\n")
+  cat("*************************************************************\n")
+  nd <-	round(object$null.deviance,digits=digits)
+  rd <- round(object$deviance,digits=digits)
+  r2 <- round(1 - rd/nd,digits=digits)
+  adjr2 <- round(1 - (object$deviance/object$df.residual)/(object$null.deviance/object$df.null),digits=digits)
+  if(is.na(aic)){
+    m <- max(nchar(nd),nchar(rd),nchar(r2),nchar(adjr2))
+    aic <- NA
+  }
+  else{m <- max(nchar(nd),nchar(rd),nchar(r2),nchar(adjr2),nchar(aic))
+  if(nchar(aic) < m) aic <- paste(paste(rep(" ",m-nchar(aic)-1),collapse=""),aic)
+  }
+  if(nchar(rd) < m) rd <- paste(paste(rep(" ",m-nchar(rd)-1),collapse=""),rd)
+  if(nchar(nd) < m) nd <- paste(paste(rep(" ",m-nchar(nd)-1),collapse=""),nd)
+  if(nchar(r2) < m) r2 <- paste(paste(rep(" ",m-nchar(r2)-1),collapse=""),r2)
+  if(nchar(adjr2) < m) adjr2 <- paste(paste(rep(" ",m-nchar(adjr2)-1),collapse=""),adjr2)
+  cat("     Null deviance:",as.character(nd)," on ",object$df.null,"degrees of freedom\n")
+  cat(" Residual deviance:",as.character(rd)," on ",object$df.residual,"degrees of freedom\n")
+  cat("         R-squared:",as.character(r2),"\n")
+  cat("Adjusted R-squared:",as.character(adjr2),"\n")
+  cat("               AIC:",as.character(aic),"\n\n")
+  cat("Number of Fisher Scoring iterations:",object$iter,"\n")
+  return(invisible(list(coefficients=round(TAB,digits=digits),r.squared=r2,adj.r.squared=adjr2,aic=aic,dispersion=disp)))
+}
+#'
+#' @title Residuals for Generalized Nonlinear Models
+#' @description Computes residuals for a fitted generalized nonlinear model.
+#' @param object a object of the class \emph{gnm}.
+#' @param type an (optional) character string giving the type of residuals which should be returned. The available options are: (1) "quantile", (2) "deviance", and (3) "pearson". As default, \code{type} is set to "quantile".
+#' @param standardized an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. As default, \code{standardized} is set to FALSE.
+#' @param plot.it an (optional) logical switch indicating if a plot of the residuals versus the fitted values is required. As default, \code{plot.it} is set to FALSE.
+#' @param identify an (optional) integer value indicating the number of individuals to identify on the plot of residuals. This is only appropriate when \code{plot.it=TRUE}.
+#' @param dispersion an (optional) value indicating the dispersion parameter estimate that must be used to calculate residuals.
+#' @param ... further arguments passed to or from other methods
+#' @return A vector with the observed residuals type \code{type}.
+#' @references Atkinson A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
+#' @references Davison A.C., Gigli A. (1989) Deviance Residuals and Normal Scores Plots. \emph{Biometrika} 76, 211-221.
+#' @references Dunn P.K., Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics} 5, 236-244.
+#' @references Pierce D.A., Schafer D.W. (1986) Residuals in Generalized Linear Models. \emph{Journal of the American Statistical Association} 81, 977-986.
+#' @examples
+#' ###### Example 1: The effects of fertilizers on coastal Bermuda grass
+#' data(Grass)
+#' fit1 <- gnm(Yield ~ b0 + b1/(Nitrogen + a1) + b2/(Phosphorus + a2) + b3/(Potassium + a3),
+#'             family=gaussian(inverse), start=c(b0=0.1,b1=13,b2=1,b3=1,a1=45,a2=15,a3=30), data=Grass)
+#' residuals(fit1, type="quantile", plot.it=TRUE, col="red", pch=20, col.lab="blue",
+#'                 col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 2: Assay of an Insecticide with a Synergist
+#' data(Melanopus)
+#' fit2 <- gnm(Killed/Exposed ~ b0 + b1*log(Insecticide-a1) + b2*Synergist/(a2 + Synergist),
+#'             family=binomial(logit), weights=Exposed, start=c(b0=-3,b1=1.2,a1=1.7,b2=1.7,a2=2),
+#'			   data=Melanopus)
+#' residuals(fit2, type="quantile", plot.it=TRUE, col="red", pch=20, col.lab="blue",
+#'                 col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 3: Developmental rate of Drosophila melanogaster
+#' data(Drosophila)
+#' fit3 <- gnm(Duration ~ b0 + b1*Temp + b2/(Temp-a), family=Gamma(log),
+#'             start=c(b0=3,b1=-0.25,b2=-210,a=55), weights=Size, data=Drosophila)
+#' residuals(fit3, type="quantile", plot.it=TRUE, col="red", pch=20, col.lab="blue",
+#'                 col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 4: Radioimmunological Assay of Cortisol
+#' data(Cortisol)
+#' fit4 <- gnm(Y ~ b0 + (b1-b0)/(1 + exp(b2+ b3*lDose))^b4, family=Gamma(identity),
+#'             start=c(b0=130,b1=2800,b2=3,b3=3,b4=0.5), data=Cortisol)
+#' residuals(fit4, type="quantile", plot.it=TRUE, col="red", pch=20, col.lab="blue",
+#'                 col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 5: Age and Eye Lens Weight of Rabbits in Australia
+#' data(rabbits)
+#' fit5 <- gnm(wlens ~ b1 - b2/(age + b3), family=Gamma(log),
+#'             start=c(b1=5.5,b2=130,b3=35), data=rabbits)
+#' residuals(fit5, type="quantile", plot.it=TRUE, col="red", pch=20, col.lab="blue",
+#'                 col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 6: Calls to a technical support help line
+#' data(calls)
+#' fit6 <- gnm(calls ~ SSlogis(week, Asym, xmid, scal), family=poisson(identity), data=calls)
+#' residuals(fit6, type="quantile", plot.it=TRUE, col="red", pch=20, col.lab="blue",
+#'                 col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' @method residuals gnm
+#' @export
+residuals.gnm <- function(object,type=c("quantile","deviance","pearson"),standardized=FALSE,plot.it=FALSE,identify,dispersion=NULL,...){
+  type <- match.arg(type)
+  .Theta <- function() return(.Theta)
+  environment(.Theta) <- environment(object$family$variance)
+  family <- object$family
+  if(grepl("Negative Binomial",family$family)) family$family <- "Negative.Binomial"
+  if(type=="quantile" & !(family$family %in% c("Gamma","inverse.gaussian","gaussian","poisson","binomial","Negative.Binomial")))
+    stop("Quantile-type residuals are not supported for this family of distributions !!",call.=FALSE)
+  if(any(object$prior.weights == 0)) stop("Only positive weights are supported!!",call.=FALSE)
+  quantileres <- function(family,y,mu,phi){
+    resi <- switch(family,
+                   Gamma = pgamma(y,shape=1/phi,scale=mu*phi),
+                   inverse.gaussian = pnorm((y/mu-1)/sqrt(phi*y)) + exp(2/(mu*phi))*pnorm(-(y/mu+1)/sqrt(y*phi)),
+                   gaussian = pnorm((y-mu)/sqrt(phi)),
+                   poisson = ppois(y-1,lambda=mu) + dpois(y,lambda=mu)*runif(length(mu)),
+                   binomial = pbinom(y/phi-1,size=1/phi,prob=mu) + dbinom(y/phi,size=1/phi,prob=mu)*runif(length(mu)),
+                   Negative.Binomial = pnbinom(y-1,size=.Theta(),mu=mu) + dnbinom(y-1,size=.Theta(),mu=mu)*runif(length(mu)))
+    resi2 <- ifelse(resi>=0.5,1-resi,resi)
+    return(qnorm(ifelse(.Machine$double.xmin>=resi2,.Machine$double.xmin,resi2))*ifelse(resi>0.5,-1,1))
+  }
+  phi <- ifelse(is.null(dispersion),object$phi,dispersion)
+  weights <- ifelse(!(family$family %in% c("poisson","Negative.Binomial")),object$prior.weights,1)
+  if(type=="quantile")
+    rd <- quantileres(family$family,object$y,object$fitted.values,phi/weights)
+  if(type=="pearson")
+    rd <- (object$y - object$fitted.values)/sqrt(phi*object$family$variance(object$fitted.values)/weights)
+  if(type=="deviance")
+    rd <- sqrt(family$dev.resids(object$y,object$fitted.values,weights)/phi)*ifelse(object$y>=object$fitted.values,1,-1)
+  if(standardized){
+    X <- model.matrix(object)
+    Xw <- X*matrix(sqrt(object$weights),nrow(X),ncol(X))
+    salida <- svd(Xw)
+    h <- apply(salida$u^2,1,sum)
+    rd <- rd/sqrt(1-h)
+  }
+  if(plot.it){
+    nano <- list(...)
+    nano$x <- object$fitted.values
+    nano$y <- rd
+    if(is.null(nano$ylim)) nano$ylim <- c(min(-3.5,min(rd)),max(+3.5,max(rd)))
+    if(is.null(nano$xlab)) nano$xlab <- "Fitted values"
+    if(is.null(nano$ylab)) nano$ylab <- paste(type," - type residuals",sep="")
+    if(is.null(nano$pch))  nano$pch  <- 20
+    if(is.null(nano$labels)) labels <- 1:length(rd)
+    else{
+      labels <- nano$labels
+      nano$labels <- NULL
+    }
+    do.call("plot",nano)
+    abline(h=-3,lty=3)
+    abline(h=+3,lty=3)
+    if(!missingArg(identify)) identify(nano$x,nano$y,n=max(1,floor(abs(identify))),labels=labels)
+  }
+  rd <- as.matrix(rd)
+  colnames(rd) <- type
+  return(invisible(rd))
+}
+
+#' @title Normal QQ-plot with simulated envelope of residuals in Generalized Nonlinear Models
+#' @description Produces a normal QQ-plot with simulated envelope of residuals for generalized nonlinear models.
+#' @param object an object of the class \emph{gnm}.
+#' @param rep an (optional) positive integer which allows to specify the number of replicates which should be used to build the simulated envelope. As default, \code{rep} is set to 25.
+#' @param conf an (optional) value in the interval (0,1) indicating the confidence level which should be used to build the pointwise confidence intervals, which form the envelope. As default, \code{conf} is set to 0.95.
+#' @param type a character string indicating the type of residuals which should be used. The available options are: randomized quantile ("quantile"), deviance ("deviance") and pearson ("pearson") residuals. As default, \code{type} is set to "quantile".
+#' @param standardized an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. As default, \code{standardized} is set to FALSE.
+#' @param plot.it an (optional) logical switch indicating if the normal QQ-plot with simulated envelope of residuals is required or just the data matrix in which it is based. As default, \code{plot.it} is set to TRUE.
+#' @param identify an (optional) positive integer indicating the number of individuals to identify on the QQ-plot with simulated envelope of residuals. This is only appropriate if \code{plot.it=TRUE}.
+#' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example,  \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
+#' @return A matrix with the following four columns:
+#' \tabular{ll}{
+#' \code{Lower limit} \tab the quantile (1 - \code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
+#'                    \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
+#' \tab \cr
+#' \code{Median} \tab the quantile 0.5 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
+#'               \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
+#' \tab \cr
+#' \code{Upper limit} \tab the quantile (1 + \code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
+#'                    \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
+#' \tab \cr
+#' \code{Residuals} \tab the observed \code{type}-type residuals,\cr
+#' }
+#' @details In order to construct the simulated envelope, \code{rep} independent realizations of the response variable for each individual are simulated, which is
+#' done by considering (1) the model assumption about the distribution of the response variable; (2) the estimation of the "linear" predictor parameters; and (3)
+#' the estimation of the dispersion parameter. Each time, the vector of observed responses is replaced with one of the simulated samples, re-fitting the interest
+#' model \code{rep} times. For each \eqn{i=1,2,...,n}, where \eqn{n} is the number of individuals in the sample, the \eqn{i}-th order statistic of the
+#' \code{type}-type residuals is computed and then sorted for each replicate, giving a random sample of size \code{rep} of the \eqn{i}-th order statistic. In
+#' other words, the simulated envelope is comprised of the quantiles (1 - \code{conf})/2 and (1 + \code{conf})/2 of the random sample of size \code{rep} of the
+#' \eqn{i}-th order statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n}.
+#' @references Atkinson A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
+#' @references Davison A.C., Gigli A. (1989) Deviance Residuals and Normal Scores Plots. \emph{Biometrika} 76, 211-221.
+#' @references Dunn P.K., Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics} 5, 236-244.
+#' @references Pierce D.A., Schafer D.W. (1986) Residuals in Generalized Linear Models. \emph{Journal of the American Statistical Association} 81, 977-986.
+#' @references Wei B.C. (1998). \emph{Exponential Family Nonlinear Models}. Springer, Singapore.
+#' @seealso \link{envelope.lm}, \link{envelope.overglm}
+#' @examples
+#' ###### Example 1: The effects of fertilizers on coastal Bermuda grass
+#' data(Grass)
+#' fit1 <- gnm(Yield ~ b0 + b1/(Nitrogen + a1) + b2/(Phosphorus + a2) + b3/(Potassium + a3),
+#'             family=gaussian(inverse), start=c(b0=0.1,b1=13,b2=1,b3=1,a1=45,a2=15,a3=30), data=Grass)
+#'
+#' #envelope(fit1, rep=50, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
+#' #         col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 2: Assay of an Insecticide with a Synergist
+#' data(Melanopus)
+#' fit2 <- gnm(Killed/Exposed ~ b0 + b1*log(Insecticide-a1) + b2*Synergist/(a2 + Synergist),
+#'             family=binomial(logit), weights=Exposed, start=c(b0=-3,b1=1.2,a1=1.7,b2=1.7,a2=2),
+#'			   data=Melanopus)
+#'
+#' #envelope(fit2, rep=50, conf=0.95, type="pearson", col="red", pch=20, col.lab="blue",
+#' #         col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 3: Developmental rate of Drosophila melanogaster
+#' data(Drosophila)
+#' fit3 <- gnm(Duration ~ b0 + b1*Temp + b2/(Temp-a), family=Gamma(log),
+#'             start=c(b0=3,b1=-0.25,b2=-210,a=55), weights=Size, data=Drosophila)
+#'
+#' #envelope(fit3, rep=50, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
+#' #         col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 4: Radioimmunological Assay of Cortisol
+#' data(Cortisol)
+#' fit4 <- gnm(Y ~ b0 + (b1-b0)/(1 + exp(b2+ b3*lDose))^b4, family=Gamma(identity),
+#'             start=c(b0=130,b1=2800,b2=3,b3=3,b4=0.5), data=Cortisol)
+#'
+#' #envelope(fit4, rep=50, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
+#' #         col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' @method envelope gnm
+#' @export
+envelope.gnm <- function(object, rep=25, conf=0.95, type=c("quantile","deviance","pearson"), standardized=FALSE, plot.it=TRUE, identify, ...){
+  no.offset <- function(x, preserve = NULL) {
+    k <- 0
+    proc <- function(x) {
+      if (length(x) == 1) return(x)
+      if (x[[1]] == as.name("offset") && !((k<<-k+1) %in% preserve)) return(x[[1]])
+      replace(x, -1, lapply(x[-1], proc))
+    }
+    update(proc(x), . ~ . - offset)
+  }
+  type <- match.arg(type)
+  .Theta <- function() return(.Theta)
+  defaultW <- getOption("warn")
+  options(warn = -1)
+  if(object$family$family=="gaussian")
+    object$family$simulate <- function(object,nsim){
+      mus <- fitted(object)
+      return(rnorm(length(mus),mean=mus,sd=sqrt(object$phi/weights)))
+    }
+  if(is.null(object$family$simulate)) stop(paste("family",object$family$family,"is not implemented!!"),call.=FALSE)
+  if(any(object$prior.weights == 0)) stop("Only positive weights are supported!!",call.=FALSE)
+  bar <- txtProgressBar(min=0, max=rep, initial=0, width=min(50,rep), char="+", style=3)
+  i <- 1
+  mu <- object$fitted.values
+  n <- length(mu)
+  formul <- no.offset(object$formula)
+  formula2 <- as.formula(paste("resp_ ~ ",paste(deparse(formul[[3]]),collapse="")))
+  e <- matrix(0,n,rep)
+  weights=object$prior.weights
+  offset=object$offset
+  object2 <- object
+  object2$model <- NULL
+  suppressMessages({
+    while(i <= rep){
+      resp <- object$family$simulate(object2,1)
+      fits <- try(gnm(formula2,weights=weights,offset=offset,start=object$coefficients,family=object$family,data=data.frame(object$model,resp_=resp)),silent=TRUE)
+      if(is.list(fits)){
+        if(fits$converged==TRUE){
+          rs <- residuals(fits,type=type,standardized=standardized)
+          e[,i] <- sort(rs)
+          setTxtProgressBar(bar,i)
+          i <- i + 1
+        }
+      }
+    }})
+  close(bar)
+  alpha <- 1 - max(0,min(1,abs(conf)))
+  e <- as.matrix(e[,1:(i-1)])
+  es <- apply(e,1,function(x) return(quantile(x,probs=c(alpha/2,0.5,1-alpha/2))))
+  rd <- residuals(object,type=type,standardized=standardized)
+  out_ <- as.matrix(cbind(t(es),sort(rd)))
+  colnames(out_) <- c("Lower limit","Median","Upper limit","Residuals")
+  if(plot.it){
+    nano <- list(...)
+    nano$y <- rd
+    nano$type <- "p"
+    if(is.null(nano$ylim)) nano$ylim <- 1.1*range(out_)
+    if(is.null(nano$pch)) nano$pch <- 20
+    if(is.null(nano$col)) nano$col <- "black"
+    if(is.null(nano$xlab)) nano$xlab <- "Expected quantiles"
+    if(is.null(nano$ylab)) nano$ylab <- "Observed quantiles"
+    if(is.null(nano$main)) nano$main <- paste0("Normal QQ plot with simulated envelope\n of ",type,"-type residuals")
+    if(is.null(nano$labels)) labels <- 1:length(rd)
+    else{
+      labels <- nano$labels
+      nano$labels <- NULL
+    }
+    outm <- do.call("qqnorm",nano)
+    lines(sort(outm$x),es[2,],xlab="",ylab="",main="", type="l",lty=3)
+    lines(sort(outm$x),es[1,],xlab="",ylab="",main="", type="l",lty=1)
+    lines(sort(outm$x),es[3,],xlab="",ylab="",main="", type="l",lty=1)
+    if(!missingArg(identify)) identify(outm$x,outm$y,n=max(1,floor(abs(identify))),labels=labels)
+  }
+  options(warn = defaultW)
+  return(invisible(out_))
+}
+
+#' @title Dfbeta statistic for Generalized Nonlinear Models
+#' @description Calculates an approximation of the parameter estimates that would be produced by deleting each case in turn,
+#' which is known as the \emph{one-step approximation}. Additionally, the function can produce an index plot of the Dfbeta statistic
+#' for some parameter specified by the argument \code{coefs}.
+#' @param model an object of class \emph{gnm}.
+#' @param coefs	an (optional) character string which (partially) match with the names of some model parameters.
+#' @param identify an (optional) integer indicating the number of individuals to identify on the plot of the Dfbeta statistic.
+#' This is only appropriate if \code{coefs} is specified.
+#' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used
+#' to include graphical parameters to customize the plot. For example, \code{col}, \code{pch}, \code{cex}, \code{main},
+#' \code{sub}, \code{xlab}, \code{ylab}.
+#' @details The \emph{one-step approximation} of the parameters estimates when the \eqn{i}-th case
+#' is excluded from the dataset consists of the vector obtained as a result of the first iteration of the Fisher Scoring
+#' algorithm when it is performed using: (1) a dataset in which the \eqn{i}-th case is excluded; and (2)
+#' a starting value that is the estimate of the same model but based on the dataset including all cases.
+#' @return A matrix with as many rows as cases in the sample and as many columns as parameters in the linear predictor. The
+#' \eqn{i}-th row in that matrix corresponds to the difference between the parameters estimates obtained using all cases
+#' and the \emph{one-step approximation} of those estimates when excluding the \eqn{i}-th case from the dataset.
+#' @references Pregibon D. (1981). Logistic regression diagnostics. \emph{The Annals of Statistics}, 9, 705-724.
+#' @references Wei B.C. (1998). \emph{Exponential Family Nonlinear Models}. Springer, Singapore.
+#' @method dfbeta gnm
+#' @export
+#' @examples
+#' ###### Example 1: The effects of fertilizers on coastal Bermuda grass
+#' data(Grass)
+#' fit1 <- gnm(Yield ~ b0 + b1/(Nitrogen + a1) + b2/(Phosphorus + a2) + b3/(Potassium + a3),
+#'             family=gaussian(inverse), start=c(b0=0.1,b1=13,b2=1,b3=1,a1=45,a2=15,a3=30), data=Grass)
+#'
+#' fit1a <- update(fit1, subset=-c(1), start=coef(fit1), maxit=1)
+#' coef(fit1) - coef(fit1a)
+#'
+#' dfbetas <- dfbeta(fit1)
+#' round(dfbetas[1,],5)
+#'
+#' ###### Example 2: Assay of an Insecticide with a Synergist
+#' data(Melanopus)
+#' fit2 <- gnm(Killed/Exposed ~ b0 + b1*log(Insecticide-a1) + b2*Synergist/(a2 + Synergist),
+#'             family=binomial(logit), weights=Exposed, start=c(b0=-3,b1=1.2,a1=1.7,b2=1.7,a2=2),
+#'			   data=Melanopus)
+#'
+#' fit2a <- update(fit2, subset=-c(2), start=coef(fit2), maxit=1)
+#' coef(fit2) - coef(fit2a)
+#'
+#' dfbetas <- dfbeta(fit2)
+#' round(dfbetas[2,],5)
+#'
+#' ###### Example 3: Developmental rate of Drosophila melanogaster
+#' data(Drosophila)
+#' fit3 <- gnm(Duration ~ b0 + b1*Temp + b2/(Temp-a), family=Gamma(log),
+#'             start=c(b0=3,b1=-0.25,b2=-210,a=55), weights=Size, data=Drosophila)
+#'
+#' fit3a <- update(fit3, subset=-c(3), start=coef(fit3), maxit=1)
+#' coef(fit3) - coef(fit3a)
+#'
+#' dfbetas <- dfbeta(fit3)
+#' round(dfbetas[3,],5)
+#'
+#' ###### Example 4: Radioimmunological Assay of Cortisol
+#' data(Cortisol)
+#' fit4 <- gnm(Y ~ b0 + (b1-b0)/(1 + exp(b2+ b3*lDose))^b4, family=Gamma(identity),
+#'             start=c(b0=130,b1=2800,b2=3,b3=3,b4=0.5), data=Cortisol)
+#'
+#' fit4a <- update(fit4, subset=-c(4), start=coef(fit4), maxit=1)
+#' coef(fit4) - coef(fit4a)
+#'
+#' dfbetas <- dfbeta(fit4)
+#' round(dfbetas[4,],5)
+#'
+dfbeta.gnm <- function(model, coefs, identify, ...){
+  X <- model.matrix(model)
+  n <- nrow(X)
+  p <- ncol(X)
+  y <- model$y
+  mus <- model$fitted.values
+  Xw <- X*matrix(sqrt(model$weights),nrow(X),ncol(X))
+  salida <- svd(Xw)
+  h <- apply(salida$u^2,1,sum)
+  dfbetas <- Xw%*%chol2inv(chol(crossprod(Xw)))*matrix((y-mus)*sqrt(model$prior.weights)/(sqrt(model$family$variance(mus))*(1-h)),n,p)
+  colnames(dfbetas) <- rownames(coef(model))
+  if(!missingArg(coefs)){
+    ids <- grep(coefs,colnames(dfbetas),ignore.case=TRUE)
+    if(length(ids) > 0){
+      nano <- list(...)
+      if(is.null(nano$labels)) labels <- 1:nrow(dfbetas)
+      else{
+        labels <- nano$labels
+        nano$labels <- NULL
+      }
+      nano$x <- 1:nrow(dfbetas)
+      if(is.null(nano$xlab)) nano$xlab <- "Observation (i)"
+      if(is.null(nano$type)) nano$type <- "h"
+      if(is.null(nano$ylab)) nano$ylab <- expression(hat(beta)-hat(beta)[("- i")])
+      oldpar <- par(no.readonly=TRUE)
+      on.exit(par(oldpar))
+      par(mfrow=c(1,length(ids)))
+      for(i in 1:length(ids)){
+        nano$y <- dfbetas[,ids[i]]
+        nano$main <- colnames(dfbetas)[ids[i]]
+        do.call("plot",nano)
+        if(any(nano$y > 0)) abline(h=3*mean(nano$y[nano$y > 0]),lty=3)
+        if(any(nano$y < 0)) abline(h=3*mean(nano$y[nano$y < 0]),lty=3)
+        if(!missingArg(identify)) identify(nano$x,nano$y,n=max(1,floor(abs(identify))),labels=labels)
+      }
+    }else stop(paste("There are no variables with the name",coefs,collapse=""),call.=FALSE)
+  }
+  return(dfbetas)
+}
+
+#' @title Cook's Distance for Generalized Nonlinear Models
+#' @description Produces an approximation of the Cook's distance, better known as the \emph{one-step approximation},
+#' for measuring the effect of deleting each observation in turn on the estimates of the parameters in a linear
+#' predictor. Additionally, this function can produce an index plot of Cook's distance for all or a subset of the
+#' parameters in the linear predictor (via the argument \code{coefs}).
+#' @param model an object of class \emph{gnm}.
+#' @param dispersion an (optional) value indicating the estimate of the dispersion parameter. As default, \code{dispersion} is set to \code{summary(object)$dispersion}.
+#' @param plot.it an (optional) logical indicating if the plot is required or just the data matrix in which that
+#' plot is based. As default, \code{plot.it} is set to FALSE.
+#' @param coefs	an (optional) character string that matches (partially) some of the model parameter names.
+#' @param identify an (optional) integer indicating the number of individuals to identify on the plot of the Cook's
+#' distance. This is only appropriate if \code{plot.it=TRUE}.
+#' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used
+#' to include graphical parameters to customize the plot. For example, \code{col}, \code{pch}, \code{cex}, \code{main},
+#' \code{sub}, \code{xlab}, \code{ylab}.
+#' @return A matrix as many rows as individuals in the sample and one column with the values of the Cook's distance.
+#' @details The Cook's distance consists of the \emph{distance} between two estimates of the parameters in the linear
+#' predictor using a metric based on the (estimate of the) variance-covariance matrix. The first one set of estimates
+#' is computed from a dataset including all individuals, and the second one is computed from a dataset in which the
+#' \emph{i}-th individual is excluded. To avoid computational burden, the second set of estimates is replaced by its
+#' \emph{one-step approximation}. See the \link{dfbeta.overglm} documentation.
+#' @examples
+#' ###### Example 1: The effects of fertilizers on coastal Bermuda grass
+#' data(Grass)
+#' fit1 <- gnm(Yield ~ b0 + b1/(Nitrogen + a1) + b2/(Phosphorus + a2) + b3/(Potassium + a3),
+#'             family=gaussian(inverse), start=c(b0=0.1,b1=13,b2=1,b3=1,a1=45,a2=15,a3=30), data=Grass)
+#'
+#' cooks.distance(fit1, plot.it=TRUE, col="red", lty=1, lwd=1,
+#'   col.lab="blue", col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 2: Assay of an Insecticide with a Synergist
+#' data(Melanopus)
+#' fit2 <- gnm(Killed/Exposed ~ b0 + b1*log(Insecticide-a1) + b2*Synergist/(a2 + Synergist),
+#'             family=binomial(logit), weights=Exposed, start=c(b0=-3,b1=1.2,a1=1.7,b2=1.7,a2=2),
+#'			   data=Melanopus)
+#'
+#' ### Cook's distance just for the parameter "b1"
+#' cooks.distance(fit2, plot.it=TRUE, coef="b1", col="red", lty=1, lwd=1,
+#'   col.lab="blue", col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 3: Developmental rate of Drosophila melanogaster
+#' data(Drosophila)
+#' fit3 <- gnm(Duration ~ b0 + b1*Temp + b2/(Temp-a), family=Gamma(log),
+#'             start=c(b0=3,b1=-0.25,b2=-210,a=55), weights=Size, data=Drosophila)
+#'
+#' cooks.distance(fit3, plot.it=TRUE, col="red", lty=1, lwd=1,
+#'   col.lab="blue", col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 4: Radioimmunological Assay of Cortisol
+#' data(Cortisol)
+#' fit4 <- gnm(Y ~ b0 + (b1-b0)/(1 + exp(b2+ b3*lDose))^b4, family=Gamma(identity),
+#'             start=c(b0=130,b1=2800,b2=3,b3=3,b4=0.5), data=Cortisol)
+#'
+#' cooks.distance(fit4, plot.it=TRUE, col="red", lty=1, lwd=1,
+#'   col.lab="blue", col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' @method cooks.distance gnm
+#' @export
+cooks.distance.gnm <- function(model, plot.it=FALSE, dispersion=NULL, coefs, identify,...){
+  dfbetas <- dfbeta(model)
+  met <- vcov(model, dispersion=dispersion)
+  subst <- NULL
+  if(!missingArg(coefs)){
+    ids <- grepl(coefs,colnames(dfbetas),ignore.case=TRUE)
+    if(sum(ids) > 0){
+      subst <- colnames(dfbetas)[ids]
+      dfbetas <- as.matrix(dfbetas[,ids])
+      met <- as.matrix(met[ids,ids])
+    }else stop(paste("There are no coefficients with the name",coefs,collapse=""),call.=FALSE)
+  }
+  met2 <- try(chol(met),silent=TRUE)
+  if(is.matrix(met2)) met2 <- chol2inv(met2) else met2 <- solve(met)
+  CD <- as.matrix(apply((dfbetas%*%met2)*dfbetas,1,mean))
+  colnames(CD) <- "Cook's distance"
+  if(plot.it){
+    nano <- list(...)
+    if(is.null(nano$labels)) labels <- 1:nrow(dfbetas)
+    else{
+      labels <- nano$labels
+      nano$labels <- NULL
+    }
+    nano$x <- 1:nrow(dfbetas)
+    nano$y <- CD
+    if(is.null(nano$xlab)) nano$xlab <- "Observation (i)"
+    if(is.null(nano$type)) nano$type <- "h"
+    if(is.null(nano$ylab)) nano$ylab <- expression((1/p)(hat(beta)-hat(beta)[{(-~~i)}])^{T}~(Var(hat(beta)))^{-1}~(hat(beta)-hat(beta)[{(-~~i)}]))
+    do.call("plot",nano)
+    abline(h=3*mean(CD),lty=3)
+    if(!missingArg(identify)) identify(nano$x,nano$y,n=max(1,floor(abs(identify))),labels=labels)
+  }
+  if(!is.null(subst)){
+    message("The coefficients included in the Cook's distance are:\n")
+    message(subst)
+  }
+  return(CD)
+}
+
+#' @title Adjusted R-squared in Generalized Nonlinear Models
+#' @description Computes the adjusted deviance-based R-squared in generalized nonlinear models.
+#' @param ... one or several objects of the class \emph{gnm}, which are obtained from the fit of generalized nonlinear models.
+#' @param verbose an (optional) logical indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
+#' @param digits an (optional) integer value indicating the number of decimal places to be used. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.
+#' @details The deviance-based R-squared is computed as \eqn{R^2=1 - Deviance/Null.Deviance}. Then,
+#' the adjusted deviance-based R-squared is computed as
+#' \eqn{1 - \frac{n-1}{n-p}(1-R^2)}, where \eqn{p} is the
+#' number of parameters in the "linear" predictor and \eqn{n} is the sample size.
+#' @return a matrix with the following columns
+#' \tabular{ll}{
+#' \code{Deviance} \tab value of the residual deviance,\cr
+#' \tab \cr
+#' \code{R-squared} \tab value of the deviance-based R-squared,\cr
+#' \tab \cr
+#' \code{df}       \tab number of parameters in the "linear" predictor,\cr
+#' \tab \cr
+#' \code{adj.R-squared} \tab value of the adjusted deviance-based R-squared,\cr
+#' }
+#' @method adjR2 gnm
+#' @export
+#' @examples
+#' ###### Example 1: The effects of fertilizers on coastal Bermuda grass
+#' data(Grass)
+#' fit1 <- gnm(Yield ~ b0 + b1/(Nitrogen + a1) + b2/(Phosphorus + a2) + b3/(Potassium + a3),
+#'             family=gaussian(inverse), start=c(b0=0.1,b1=13,b2=1,b3=1,a1=45,a2=15,a3=30), data=Grass)
+#' fit2 <- update(fit1, family=Gamma(inverse))
+#' adjR2(fit1,fit2)
+#'
+#' ###### Example 2: Developmental rate of Drosophila melanogaster
+#' data(Drosophila)
+#' fit1 <- gnm(Duration ~ b0 + b1*Temp + b2/(Temp-a), family=Gamma(log),
+#'             start=c(b0=3,b1=-0.25,b2=-210,a=55), weights=Size, data=Drosophila)
+#' fit2 <- update(fit1, family=inverse.gaussian(log))
+#' adjR2(fit1,fit2)
+#'
+#' ###### Example 3: Radioimmunological Assay of Cortisol
+#' data(Cortisol)
+#' fit1 <- gnm(Y ~ b0 + (b1-b0)/(1 + exp(b2+ b3*lDose))^b4, family=Gamma(identity),
+#'             start=c(b0=130,b1=2800,b2=3,b3=3,b4=0.5), data=Cortisol)
+#' fit2 <- update(fit1, family=gaussian(identity))
+#' adjR2(fit1,fit2)
+#'
+#' ###### Example 4: Age and Eye Lens Weight of Rabbits in Australia
+#' data(rabbits)
+#' fit1 <- gnm(wlens ~ b1 - b2/(age + b3), family=Gamma(log),
+#'             start=c(b1=5.5,b2=130,b3=35), data=rabbits)
+#' fit2 <- update(fit1, family=gaussian(log))
+#' adjR2(fit1,fit2)
+#'
+adjR2.gnm <- function(...,digits=max(3, getOption("digits") - 2),verbose=TRUE){
+  x <- list(...)
+  if(any(unlist(lapply(x,function(xx) !is(xx,"gnm")))))
+    stop("Only gnm-type objects are supported!!",call.=FALSE)
+  out_ <- matrix(NA,length(x),4)
+  call. <- match.call()
+  for(i in 1:length(x)){
+    out_[i,1] <- x[[i]]$deviance
+    out_[i,3] <- length(x[[i]]$coefficients)
+    out_[i,2] <- round(1 - x[[i]]$deviance/x[[i]]$null.deviance,digits=digits)
+    out_[i,4] <- round(1 - (x[[i]]$deviance/x[[i]]$df.residual)/(x[[i]]$null.deviance/x[[i]]$df.null),digits=digits)
+  }
+  rownames(out_) <- as.character(call.[2:(length(x) + 1)])
+  colnames(out_) <- c("Deviance","R-squared","df","adj.R-squared")
+  if(length(x)==1){
+    out_ <- as.numeric(out_[1,4])
+    return(out_)
+  }
+  if(verbose) print(out_)
+  return(invisible(out_))
+}
+
+#' @title Comparison of nested models in Generalized Nonlinear Models.
+#' @description Allows to use the likelihood-ratio test to compare nested models in generalized nonlinear models.
+#' @param object an object of the class \emph{gnm}.
+#' @param ... another objects of the class \emph{gnm}.
+#' @param verbose an (optional) logical indicating if should the report of results be printed. As default, \code{verbose}
+#' is set to TRUE.
+#' @return A matrix with the following three columns:
+#' \tabular{ll}{
+#' \code{Chi} \tab The value of the statistic of the test,\cr
+#' \tab \cr
+#' \code{Df}\tab The number of degrees of freedom,\cr
+#' \tab \cr
+#' \code{Pr(>Chi)} \tab The \emph{p}-value of the \code{test}-type test computed using the Chi-square distribution.\cr
+#' }
+#' @examples
+#' ###### Example: The effects of fertilizers on coastal Bermuda grass
+#' data(Grass)
+#' fit1 <- gnm(Yield ~ b0 + b1/(Nitrogen + a1) + b2/(Phosphorus + a2) + b3/(Potassium + a3),
+#'             family=gaussian(inverse), start=c(b0=0.1,b1=13,b2=1,b3=1,a1=45,a2=15,a3=30), data=Grass)
+#'
+#' fit2 <- update(fit1,Yield ~ I(b0 + b2/(Phosphorus + a2) + b3/(Potassium + a3)),
+#'                start=c(b0=0.1,b2=1,b3=1,a2=15,a3=30))
+#'
+#' anova(fit2,fit1)
+#'
+#' @method anova gnm
+#' @export
+anova.gnm <- function(object,...,verbose=TRUE){
+  x <- list(object,...)
+  hast <- length(x)
+  if(hast<=1) stop("At least two gnm-type objects are required!!",call.=FALSE)
+  out_ <- matrix(0,hast-1,3)
+  for(i in 2:hast){
+    vars0 <- rownames(coef(x[[i-1]]))
+    vars1 <- rownames(coef(x[[i]]))
+    ids <- is.na(match(vars1,vars0))
+    phi <- x[[i]]$phi
+    sc <- (x[[i-1]]$deviance - x[[i]]$deviance)/phi
+    df <- sum(ids)
+    out_[i-1,] <- cbind(sc,df,1-pchisq(sc,df))
+  }
+  colnames(out_) <- c(" Chi  ", " df", " Pr(Chisq>)")
+  rownames(out_) <- paste(1:(hast-1),"vs",2:hast)
+  if(verbose){
+    cat("\nLikelihood-ratio test\n\n")
+    for(i in 1:hast) cat(paste("Model", i,": ",x[[i]]$formula[2],x[[i]]$formula[1],x[[i]]$formula[3:length(x[[i]]$formula)],collapse=""),"\n")
+    cat("\n")
+    printCoefmat(out_, P.values=TRUE, has.Pvalue=TRUE, digits=5, signif.legend=TRUE, cs.ind=2)
+  }
+  return(invisible(out_))
+}
+
+#' @title Test for Varying Dispersion Parameter in Generalized Nonlinear Models
+#' @description Performs Rao's score test for varying dispersion parameter in
+#' weighted and unweighted generalized nonlinear models in which the response
+#' distribution is assumed to be Gaussian, Gamma, or inverse Gaussian.
+#' @param model an object of the class \emph{gnm} where the distribution of the response
+#' variable is assumed to be \code{gaussian}, \code{Gamma} or \code{inverse.gaussian}.
+#' @param varformula an (optional) \code{formula} expression of the form \code{~ z1 + z2 + ... + zq} describing only the potential explanatory variables for the dispersion. As default, the same explanatory variables are taken as in the model for the mean.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
+#' @param ...	further arguments passed to or from other methods.
+#' @details From the generalized nonlinear model with varying dispersion in which
+#' \eqn{\log(\phi)=\gamma_0 + \gamma_1z_1 + \gamma_2z_2 + ... + \gamma_qz_q}, where
+#' \eqn{\phi} is the dispersion parameter of the distribution used to describe the
+#' response variable, the Rao's score test (denoted here as \eqn{S}) to assess the
+#' hypothesis \eqn{H_0: \gamma=0} versus \eqn{H_1: \gamma\neq 0} is computed,
+#' where \eqn{\gamma=(\gamma_1,\ldots,\gamma_q)}.  The corresponding \emph{p}-value is
+#' computed from the chi-squared distribution with \eqn{q} degrees of freedom,
+#' that is, \emph{p}-value = Prob\eqn{[\chi^2_{q} > S]}. If the object \code{model}
+#' corresponds to an unweighted generalized linear model, this test assesses assumptions
+#' of constant variance and constant coefficient of variation on models in which the
+#' response distribution is assumed to be Gaussian and Gamma, respectively.
+#' @return a list list with components including
+#' \tabular{ll}{
+#' \code{statistic} \tab value of the Rao's score test (\eqn{S}),\cr
+#' \tab \cr
+#' \code{df}        \tab number of degrees of freedom (\eqn{q}),\cr
+#' \tab \cr
+#' \code{p.value}   \tab \emph{p}-value of the test,\cr
+#' \tab \cr
+#' \code{vars}   \tab names of explanatory variables for the dispersion parameter,\cr
+#' }
+#' @examples
+#' ###### Example 1: The effects of fertilizers on coastal Bermuda grass
+#' data(Grass)
+#' fit1 <- gnm(Yield ~ b0 + b1/(Nitrogen + a1) + b2/(Phosphorus + a2) + b3/(Potassium + a3),
+#'             family=gaussian(inverse), start=c(b0=0.1,b1=13,b2=1,b3=1,a1=45,a2=15,a3=30), data=Grass)
+#' vdtest(fit1)
+#' vdtest(fit1,varformula = ~ Nitrogen + Phosphorus + Potassium)
+#'
+#' ###### Example 2: Developmental rate of Drosophila melanogaster
+#' data(Drosophila)
+#' fit2 <- gnm(Duration ~ b0 + b1*Temp + b2/(Temp-a), family=Gamma(log),
+#'             start=c(b0=3,b1=-0.25,b2=-210,a=55), weights=Size, data=Drosophila)
+#' vdtest(fit2)
+#' vdtest(fit2,varformula = ~ Temp)
+#' vdtest(fit2,varformula = ~ log(Temp))
+#'
+#' ###### Example 3: Radioimmunological Assay of Cortisol
+#' data(Cortisol)
+#' fit3 <- gnm(Y ~ b0 + (b1-b0)/(1 + exp(b2+ b3*lDose))^b4, family=Gamma(identity),
+#'             start=c(b0=130,b1=2800,b2=3,b3=3,b4=0.5), data=Cortisol)
+#' vdtest(fit3)
+#' vdtest(fit3,varformula = ~ lDose)
+#' vdtest(fit3,varformula = ~ exp(lDose))
+#'
+#' ###### Example 4: Age and Eye Lens Weight of Rabbits in Australia
+#' data(rabbits)
+#' fit4 <- gnm(wlens ~ b1 - b2/(age + b3), family=Gamma(log),
+#'             start=c(b1=5.5,b2=130,b3=35), data=rabbits)
+#' vdtest(fit4)
+#' vdtest(fit4,varformula = ~ age)
+#' vdtest(fit4,varformula = ~ log(age))
+#' @method vdtest gnm
+#' @export
+#' @references Wei B.-C., Shi, J.-Q., Fung W.-K., Hu Y.-Q. (1998) Testing for Varying Dispersion in Exponential Family Nonlinear Models. \emph{Annals of the Institute of Statistical Mathematics} 50, 277–294.
+#'
+#' @seealso \link{vdtest.lm}, \link{vdtest.glm}
+
+vdtest.gnm <- function(model,varformula,verbose=TRUE,...){
+  if(!(model$family$family %in% c("gaussian","Gamma","inverse.gaussian")))
+    stop("Only gaussian, Gamma and inverse.gaussian families are supported!!",call.=FALSE)
+  if(missingArg(varformula)){
+    varformula <- model$formula
+    b <- c(as.character(model$formula[[2]]),rownames(model$coefficients))
+    a <- all.vars(varformula)
+    formula <- paste("~ 0 + ",paste(a[!(a %in% b)],collapse="+"))
+    formula <- as.formula(formula)
+  }else formula <- varformula
+  if(is.null(model$call$data)) Z <- model.frame(formula)
+  else Z <- model.frame(formula,eval(model$call$data))
+  if(colnames(Z)[1]=="(Intercept)") Z <- Z[,-1]
+  if(!is.null(model$call$subset)) Z <- Z[eval(model$call$subset,eval(model$call$data)),]
+  Z <- as.matrix(Z)
+  n <- nrow(Z)
+  p <- ncol(Z)
+  Z <- cbind(1,Z)
+  Z2 <- Z
+  y <- model$y
+  mus <- fitted(model)
+  w <- model$prior.weights
+  if(model$family$family=="gaussian"){
+    phies <- mean((y-mus)^2*w)
+    tau <- (y-mus)^2*w/phies - 1
+  }
+  if(model$family$family=="inverse.gaussian"){
+    phies <- mean((y-mus)^2*w/(mus^2*y))
+    tau <- (y-mus)^2*w/(mus^2*y*phies) - 1
+  }
+  if(model$family$family=="Gamma"){
+    phies <- model$phi
+    phies <- uniroot(function(x) sum((y/mus + log(mus*x/(w*y)) + psigamma(w/x) - 1)*w), lower=phies*(0.1), upper=phies*(1.9))$root
+    tau <- sqrt(2)*(y/mus + log(mus*phies/(w*y)) + psigamma(w/phies) - 1)*(w/phies)
+    Z2 <- Z*matrix(sqrt(psigamma(w/phies,1)*(w/phies)^2 - w/phies),n,p+1)
+  }
+  Zstar <- chol2inv(chol(t(Z2)%*%Z2))[-1,-1]
+  sc = as.numeric(0.5*(t(tau)%*%Z[,-1])%*%Zstar%*%(t(Z[,-1])%*%tau))
+  if(verbose){
+    cat("\n             Score test for varying dispersion parameter\n\n")
+    cat("          Statistic = ",round(sc,digits=5),"\n degrees of freedom = ",p,"\n            p-value = ",format.pval(1-pchisq(sc,p)),"\n\n")
+  }
+  return(invisible(list(statistic=sc,df=p,p.value=format.pval(1-pchisq(sc,p)),vars=colnames(Z)[-1])))
+}
+
+#' @title Test for Varying Dispersion Parameter in Generalized Linear Models
+#' @description Performs Rao's score test for varying dispersion parameter in
+#' weighted and unweighted generalized linear models in which the response
+#' distribution is assumed to be Gaussian, Gamma, or inverse Gaussian.
+#' @param model an object of the class \emph{glm} where the distribution of the response
+#' variable is assumed to be \code{gaussian}, \code{Gamma} or \code{inverse.gaussian}.
+#' @param varformula an (optional) \code{formula} expression of the form \code{~ z1 + z2 + ... + zq} describing only the potential explanatory variables for the dispersion. As default, the same explanatory variables are taken as in the model for the mean.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
+#' @param ...	further arguments passed to or from other methods.
+#' @details From the generalized linear model with varying dispersion in which
+#' \eqn{\log(\phi)=\gamma_0 + \gamma_1z_1 + \gamma_2z_2 + ... + \gamma_qz_q}, where
+#' \eqn{\phi} is the dispersion parameter of the distribution used to describe the
+#' response variable, the Rao's score test (denoted here as \eqn{S}) to assess the
+#' hypothesis \eqn{H_0: \gamma=0} versus \eqn{H_1: \gamma\neq 0} is computed,
+#' where \eqn{\gamma=(\gamma_1,\ldots,\gamma_q)}.  The corresponding \emph{p}-value is
+#' computed from the chi-squared distribution with \eqn{q} degrees of freedom,
+#' that is, \emph{p}-value = Prob\eqn{[\chi^2_{q} > S]}. If the object \code{model}
+#' corresponds to an unweighted generalized linear model, this test assesses assumptions
+#' of constant variance and constant coefficient of variation on models in which the
+#' response distribution is assumed to be Gaussian and Gamma, respectively.
+#' @return a list list with components including
+#' \tabular{ll}{
+#' \code{statistic} \tab value of the Rao's score test (\eqn{S}),\cr
+#' \tab \cr
+#' \code{df}        \tab number of degrees of freedom (\eqn{q}),\cr
+#' \tab \cr
+#' \code{p.value}   \tab \emph{p}-value of the test,\cr
+#' \tab \cr
+#' \code{vars}   \tab names of explanatory variables for the dispersion parameter,\cr
+#' }
+#' @examples
+#' ###### Example 1: Fuel consumption of automobiles
+#' Auto <- ISLR::Auto
+#' fit1 <- glm(mpg ~ weight*horsepower, family=inverse.gaussian("log"), data=Auto)
+#' vdtest(fit1)
+#' vdtest(fit1,varformula= ~ weight + horsepower)
+#' vdtest(fit1,varformula= ~ log(weight) + log(horsepower))
+#'
+#' ###### Example 2: Hill races in Scotland
+#' data(races)
+#' fit2 <- glm(rtime ~ log(distance) + cclimb, family=Gamma("log"), data=races)
+#' vdtest(fit2)
+#' vdtest(fit2,varformula= ~ distance + cclimb)
+#' vdtest(fit2,varformula= ~ log(distance) + log(cclimb))
+#'
+#' ###### Example 3: Mammal brain and body weights
+#' data(brains)
+#' fit3 <- glm(BrainWt ~ log(BodyWt), family=Gamma("log"), data=brains)
+#' vdtest(fit3)
+#' vdtest(fit3,varformula= ~ BodyWt)
+#' @method vdtest glm
+#' @export
+#' @references Wei B.-C., Shi, J.-Q., Fung W.-K., Hu Y.-Q. (1998) Testing for Varying Dispersion in Exponential Family Nonlinear Models. \emph{Annals of the Institute of Statistical Mathematics} 50, 277–294.
+#'
+#' @seealso \link{vdtest.lm}, \link{vdtest.gnm}
+
+
+
+
+vdtest.glm <- function(model,varformula,verbose=TRUE,...){
+  if(!(model$family$family %in% c("gaussian","Gamma","inverse.gaussian")))
+    stop("Only gaussian, Gamma and inverse.gaussian families are supported!!",call.=FALSE)
+  if(missingArg(varformula)) varformula <- model$formula
+  if(is.null(model$call$data)) Z <- model.matrix(varformula)
+  else Z <- model.matrix(varformula,eval(model$call$data))
+  if(!is.null(model$call$subset)) Z <- Z[eval(model$call$subset,eval(model$call$data)),]
+  n <- nrow(Z)
+  if(colnames(Z)[1]!="(Intercept)"){
+    out_ <- colnames(Z)
+    Z <- cbind(1,Z)
+  }else out_ <- colnames(Z)[-1]
+  p <- ncol(Z) - 1
+  Z2 <- Z
+  y <- model$y
+  mus <- fitted(model)
+  w <- model$prior.weights
+  if(model$family$family=="gaussian"){
+    phies <- mean((y-mus)^2*w)
+    tau <- (y-mus)^2*w/phies - 1
+  }
+  if(model$family$family=="inverse.gaussian"){
+    phies <- mean((y-mus)^2*w/(mus^2*y))
+    tau <- (y-mus)^2*w/(mus^2*y*phies) - 1
+  }
+  if(model$family$family=="Gamma"){
+    phies <- summary(model)$dispersion
+    phies <- uniroot(function(x) sum((y/mus + log(mus*x/(w*y)) + psigamma(w/x) - 1)*w), lower=phies*(0.1), upper=phies*(1.9))$root
+    tau <- sqrt(2)*(y/mus + log(mus*phies/(w*y)) + psigamma(w/phies) - 1)*(w/phies)
+    Z2 <- Z*matrix(sqrt(psigamma(w/phies,1)*(w/phies)^2 - w/phies),n,p+1)
+  }
+  Zstar <- chol2inv(chol(t(Z2)%*%Z2))[-1,-1]
+  sc = as.numeric(0.5*(t(tau)%*%Z[,-1])%*%Zstar%*%(t(Z[,-1])%*%tau))
+  if(verbose){
+    cat("\n             Score test for varying dispersion parameter\n\n")
+    cat("          Statistic = ",round(sc,digits=5),"\n degrees of freedom = ",p,"\n            p-value = ",format.pval(1-pchisq(sc,p)),"\n\n")
+  }
+  return(invisible(list(statistic=sc,df=p,p.value=format.pval(1-pchisq(sc,p)),vars=out_)))
+}
+
+#' @title Normal QQ-plot with simulated envelope of residuals in Generalized Linear Models
+#' @description Produces a normal QQ-plot with simulated envelope of residuals for generalized linear models.
+#' @param object an object of the class \emph{glm}.
+#' @param rep an (optional) positive integer which allows to specify the number of replicates which should be used to build the simulated envelope. As default, \code{rep} is set to 25.
+#' @param conf an (optional) value in the interval (0,1) indicating the confidence level which should be used to build the pointwise confidence intervals, which form the envelope. As default, \code{conf} is set to 0.95.
+#' @param type an (optional) character string indicating the type of residuals which should be used. The available options are: randomized quantile ("quantile"), deviance ("deviance") and pearson ("pearson") residuals. As default, \code{type} is set to "quantile".
+#' @param standardized an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. As default, \code{standardized} is set to FALSE.
+#' @param plot.it an (optional) logical switch indicating if the normal QQ-plot with simulated envelope of residuals is required or just the data matrix in which it is based. As default, \code{plot.it} is set to TRUE.
+#' @param identify an (optional) positive integer indicating the number of individuals to identify on the QQ-plot with simulated envelope of residuals. This is only appropriate if \code{plot.it=TRUE}.
+#' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example,  \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
+#' @return A matrix with the following four columns:
+#' \tabular{ll}{
+#' \code{Lower limit} \tab the quantile (1 - \code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
+#'                    \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
+#' \tab \cr
+#' \code{Median} \tab the quantile 0.5 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
+#'               \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
+#' \tab \cr
+#' \code{Upper limit} \tab the quantile (1 + \code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
+#'                    \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
+#' \tab \cr
+#' \code{Residuals} \tab the observed \code{type}-type residuals,\cr
+#' }
+#' @details In order to construct the simulated envelope, \code{rep} independent realizations of the response variable for each individual are simulated, which is
+#' done by considering (1) the model assumption about the distribution of the response variable; (2) the estimation of the linear predictor parameters; and (3)
+#' the estimation of the dispersion parameter. Each time, the vector of observed responses is replaced with one of the simulated samples, re-fitting the interest
+#' model \code{rep} times. For each \eqn{i=1,2,...,n}, where \eqn{n} is the number of individuals in the sample, the \eqn{i}-th order statistic of the
+#' \code{type}-type residuals is computed and then sorted for each replicate, giving a random sample of size \code{rep} of the \eqn{i}-th order statistic. In
+#' other words, the simulated envelope is comprised of the quantiles (1 - \code{conf})/2 and (1 + \code{conf})/2 of the random sample of size \code{rep} of the
+#' \eqn{i}-th order statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n}.
+#' @references Atkinson A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
+#' @references Davison A.C., Gigli A. (1989) Deviance Residuals and Normal Scores Plots. \emph{Biometrika} 76, 211-221.
+#' @references Dunn P.K., Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics} 5, 236-244.
+#' @references Pierce D.A., Schafer D.W. (1986) Residuals in Generalized Linear Models. \emph{Journal of the American Statistical Association} 81, 977-986.
+#' @references Wei B.C. (1998). \emph{Exponential Family Nonlinear Models}. Springer, Singapore.
+#' @seealso \link{envelope.lm}, \link{envelope.gnm}, \link{envelope.overglm}
+#' @examples
+#' ###### Example 1:
+#' burn1000 <- aplore3::burn1000
+#' burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
+#' fit1 <- glm(death ~ age*inh_inj + tbsa*inh_inj, family=binomial("logit"), data=burn1000)
+#' envelope(fit1, rep=50, conf=0.95, type="pearson", col="red", pch=20, col.lab="blue",
+#'          col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 2: Fuel consumption of automobiles
+#' Auto <- ISLR::Auto
+#' fit2 <- glm(mpg ~ horsepower*weight, family=inverse.gaussian("log"), data=Auto)
+#' envelope(fit2, rep=50, conf=0.95, type="pearson", col="red", pch=20, col.lab="blue",
+#'          col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 3: Skin cancer in women
+#' data(skincancer)
+#' fit3 <- glm(cases ~ city + ageC, offset=log(population), family=poisson, data=skincancer)
+#' envelope(fit3, rep=100, conf=0.95, type="quantile", col="red", pch=20,col.lab="blue",
+#'          col.axis="blue",col.main="black",family="mono",cex=0.8)
+#'
+#' ###### Example 4: Self diagnozed ear infections in swimmers
+#' data(swimmers)
+#' fit4 <- glm(infections ~ frequency + location, family=poisson(log), data=swimmers)
+#' envelope(fit4, rep=100, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
+#'          col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' ###### Example 5: Agents to stimulate cellular differentiation
+#' data(cellular)
+#' fit5 <- glm(cbind(cells,200-cells) ~ tnf + ifn, family=binomial(logit), data=cellular)
+#' envelope(fit5, rep=100, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
+#'          col.axis="blue", col.main="black", family="mono", cex=0.8)
+#'
+#' @method envelope glm
+#' @export
+envelope.glm <- function(object, rep=25, conf=0.95, type=c("quantile","deviance","pearson"), standardized=FALSE, plot.it=TRUE, identify, ...){
+  type <- match.arg(type)
+  .Theta <- function() return(.Theta)
+  defaultW <- getOption("warn")
+  options(warn = -1)
+  if(object$family$family=="gaussian")
+    object$family$simulate <- function(object,nsim){
+      mus <- fitted(object)
+      return(rnorm(length(mus),mean=mus,sd=sqrt(object$phi/weights)))
+    }
+  if(is.null(object$family$simulate)) stop(paste("family",object$family$family,"is not implemented!!"),call.=FALSE)
+  if(any(object$prior.weights == 0)) stop("Only positive weights are supported!!",call.=FALSE)
+  bar <- txtProgressBar(min=0, max=rep, initial=0, width=min(50,rep), char="+", style=3)
+  i <- 1
+  mu <- object$fitted.values
+  n <- length(mu)
+  e <- matrix(0,n,rep)
+  weights=object$prior.weights
+  offset=object$offset
+  X <- model.matrix(object)
+  object2 <- object
+  object2$model <- NULL
+  suppressMessages({
+    while(i <= rep){
+      resp <- object$family$simulate(object2,1)
+      fits <- try(glm(resp ~ 0+X,weights=weights,offset=offset,start=object$coefficients,family=object$family),silent=TRUE)
+      if(is.list(fits)){
+        if(fits$converged==TRUE){
+          rs <- residuals2(fits,type=type,standardized=standardized)
+          e[,i] <- sort(rs)
+          setTxtProgressBar(bar,i)
+          i <- i + 1
+        }
+      }
+    }})
+  close(bar)
+  alpha <- 1 - max(0,min(1,abs(conf)))
+  e <- as.matrix(e[,1:(i-1)])
+  es <- apply(e,1,function(x) return(quantile(x,probs=c(alpha/2,0.5,1-alpha/2))))
+  rd <- residuals2(object,type=type,standardized=standardized)
+  out_ <- as.matrix(cbind(t(es),sort(rd)))
+  colnames(out_) <- c("Lower limit","Median","Upper limit","Residuals")
+  if(plot.it){
+    nano <- list(...)
+    nano$y <- rd
+    nano$type <- "p"
+    if(is.null(nano$ylim)) nano$ylim <- 1.1*range(out_)
+    if(is.null(nano$pch)) nano$pch <- 20
+    if(is.null(nano$col)) nano$col <- "black"
+    if(is.null(nano$xlab)) nano$xlab <- "Expected quantiles"
+    if(is.null(nano$ylab)) nano$ylab <- "Observed quantiles"
+    if(is.null(nano$main)) nano$main <- paste0("Normal QQ plot with simulated envelope\n of ",type,"-type residuals")
+    if(is.null(nano$labels)) labels <- 1:length(rd)
+    else{
+      labels <- nano$labels
+      nano$labels <- NULL
+    }
+    outm <- do.call("qqnorm",nano)
+    lines(sort(outm$x),es[2,],xlab="",ylab="",main="", type="l",lty=3)
+    lines(sort(outm$x),es[1,],xlab="",ylab="",main="", type="l",lty=1)
+    lines(sort(outm$x),es[3,],xlab="",ylab="",main="", type="l",lty=1)
+    if(!missingArg(identify)) identify(outm$x,outm$y,n=max(1,floor(abs(identify))),labels=labels)
+  }
+  options(warn = defaultW)
+  return(invisible(out_))
+}
+
+#' @title Test for zero-excess in Count Regression Models
+#' @description Allows to assess if the observed number of zeros is significantly higher than expected according to the fitted count regression model (poisson or negative binomial).
+#' @param object an object of the class \code{glm}, for poisson regression models, or an object of the class \code{overglm}, for negative binomial regression models.
+#' @param alternative an (optional) character string indicating the alternative hypothesis. There are three options: excess of zeros ("excess"), lack of zeros ("lack"), and both ("both"). As a default, \code{type} is set to "excess".
+#' @param method an (optional) character string indicating the method to calculate the mean and variance of the difference between observed and estimated expected number of zeros. There are two options: parametric bootstrapping ("boot") and naive ("naive"). As a default, \code{type} is set to "boot".
+#' @param rep an (optional) positive integer which allows to specify the number of replicates which should be used by the parametric bootstrapping. As a default, \code{rep} is set to 100.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. As a default, \code{verbose} is set to TRUE.
+#' @return A matrix with 1 row and the following columns:
+#' \tabular{ll}{
+#' \code{Observed} \tab the observed number of zeros,\cr
+#' \tab \cr
+#' \code{Expected}\tab the expected number of zeros,\cr
+#' \tab \cr
+#' \code{z-value}\tab the value of the statistical test,\cr
+#' \tab \cr
+#' \code{p.value}\tab the p-value of the statistical test.\cr
+#' }
+#' @details
+#' According to the formulated count regression model, we have that \eqn{Y_i\sim P(y;\mu_i,\phi)}
+#' for \eqn{i=1,\ldots,n} are independent variables. Consequently, the expected number of zeros can
+#' be estimated by \eqn{P(0;\hat{\mu}_i,\hat{\phi})} for \eqn{i=1,\ldots,n}, where \eqn{\hat{\mu}_i}
+#' and \eqn{\hat{\phi}} represent the estimates of \eqn{\mu_i} and \eqn{\phi}, respectively, obtained
+#' from the fitted model. Thus, the statistical test can be defined as the standardized difference
+#' between the observed and (estimated) expected number of zeros. The standard normal distribution
+#' tends to be the distribution of that statistic when the sample size, \eqn{n}, tends to infinity.
+#' In He, Zhang, Ye, and Tang (2019), the above approach is called a naive test since it ignores the
+#' sampling variation associated with the estimated model parameters. To correct this, parametric
+#' bootstrapping is used to estimate the mean and variance of the difference between the (estimated)
+#' expected and observed number of zeros.
+#' @references He Hua, Zhang Hui, Ye Peng, Tang Wan (2019) A test of inflated zeros
+#' for Poisson regression models, \emph{Statistical Methods in Medical Research} 28,
+#' 1157-1169.
+#' @examples
+#' ####### Example 1: Self diagnozed ear infections in swimmers
+#' data(swimmers)
+#' fit1 <- glm(infections ~ frequency + location, family=poisson, data=swimmers)
+#' zero.excess(fit1,rep=50)
+#' fit2 <- overglm(infections ~ frequency + location, family="nb1", data=swimmers)
+#' zero.excess(fit2,rep=50)
+#'
+#' ####### Example 2: Article production by graduate students in biochemistry PhD programs
+#' bioChemists <- pscl::bioChemists
+#' fit1 <- glm(art ~ fem + kid5 + ment, family=poisson, data=bioChemists)
+#' zero.excess(fit1,rep=50)
+#' fit2 <- overglm(art ~ fem + kid5 + ment, family="nb1", data=bioChemists)
+#' zero.excess(fit2,rep=50)
+
+#' ####### Example 3: Roots Produced by the Columnar Apple Cultivar Trajan
+#' data(Trajan)
+#' fit1 <- glm(roots ~ photoperiod, family=poisson, data=Trajan)
+#' zero.excess(fit1,rep=50)
+#' fit2 <- overglm(roots ~ photoperiod, family="nbf", data=Trajan)
+#' zero.excess(fit2,rep=50)
+#'
+#' @seealso \link{overglm}, \link{zeroinf}
+#' @export zero.excess
+zero.excess <- function(object, alternative=c("excess","lack","both"), method=c("boot","naive"), rep=100, verbose=TRUE){
+  if(is(object,"overglm")){
+    if(!(object$family$family %in% c("nbf","nb1","nb2"))) stop("Only 'nb1', 'nb2' and 'nbf' families of overglm-type objects are supported!!",call.=FALSE)
+  }else{
+    if(is(object,"glm")){
+      if(object$family$family!="poisson") stop("Only 'poisson' family of glm-type objects are supported!!",call.=FALSE)
+    }else{
+      stop("Only 'nb1', 'nb2' and 'nbf' families of overglm-type objects and 'poisson' family of glm-type objects are supported!!",call.=FALSE)
+    }
+  }
+  alternative <- match.arg(alternative)
+  method <- match.arg(method)
+  defaultW <- getOption("warn")
+  options(warn = -1)
+  mu <- object$fitted.values
+  n <- length(mu)
+  X <- model.matrix(object)
+  p0 <- exp(-mu)
+  if(is.null(object$offset)) offs <- rep(0,n) else offs <- object$offset
+  if(object$family$family %in% c("nb1","nb2","nbf")){
+    phi <- exp(object$coefficients[object$parms[1] + 1])
+    tau <- switch(object$family$family,nb1=0,nb2=-1,nbf=object$coefficients[object$parms[1] + 2])
+    familia <- paste0(object$family$family,"(",object$family$link,")")
+    a <- 1/(phi*mu^tau)
+    p0 <- (a/(mu + a))^a
+  }
+  if(method=="boot"){
+    rep <- max(1,floor(abs(rep)))
+    e <- matrix(0,rep,1)
+    bar <- txtProgressBar(min=0, max=rep, initial=0, width=min(50,rep), char="+", style=3)
+    i <- 1
+    while(i <= rep){
+      if(object$family$family %in% c("nb1","nb2","nbf")){
+        resp. <- rnbinom(n=n,mu=mu,size=1/(phi*mu^tau))
+        fits <- try(overglm(resp. ~ -1 + X + offset(offs),start=coef(object),weights=object$prior.weights,family=familia),silent=TRUE)
+        if(is.list(fits)){
+          if(fits$converged==TRUE){
+            mus <- fitted(fits)
+            phis <- exp(fits$coefficients[object$parms[1] + 1])
+            taus <- switch(object$family$family,nb1=0,nb2=-1,nbf=fits$coefficients[object$parms[1] + 2])
+            as <- 1/(phis*mus^taus)
+            p0s <- (as/(mus + as))^as
+            e[i] <- sum(ifelse(fits$y==0,1,0) - p0s)
+            setTxtProgressBar(bar,i)
+            i <- i + 1
+          }
+        }
+      }
+      if(object$family$family=="poisson"){
+        resp. <- rpois(n=n,lambda=mu)
+        fits <- try(glm.fit(x=X,y=resp.,family=object$family,offset=offs,start=coef(object),weights=object$prior.weights),silent=TRUE)
+        if(is.list(fits)){
+          if(fits$converged==TRUE){
+            e[i] <- sum(ifelse(fits$y==0,1,0) - exp(-fitted(fits)))
+            setTxtProgressBar(bar,i)
+            i <- i + 1
+          }
+        }
+      }
+    }
+    options(warn = defaultW)
+    z <- (sum(object$y==0) - sum(p0) - mean(e))/sd(e)
+  }else z <- (sum(object$y==0)-sum(p0))/sqrt(sum(p0*(1-p0)))
+  pv <- 1-pnorm(z)
+  labp <- "Pr(>z)"
+  if(alternative=="lack"){
+    pv <- pnorm(z)
+    labp <- "Pr(<z)"
+  }
+  if(alternative=="both"){
+    pv <- 1-pchisq(z^2,1)
+    labp <- "Pr(>|z|)"
+  }
+  out_ <- matrix(cbind(sum(object$y==0),sum(p0),z,pv),1,4)
+  colnames(out_) <- c("Observed","Expected","z-value",labp)
+  rownames(out_) <- ""
+  if(verbose){
+    cat("\n  Number of Zeros\n")
+    printCoefmat(out_, P.values=TRUE, has.Pvalue=TRUE, digits=5, signif.legend=FALSE, cs.ind=2)
+  }
+  return(invisible(out_))
+}
+
+#' @title Local Influence for Generalized Nonlinear Models
+#' @description Computes some measures and, optionally, display	graphs of them to perform
+#' influence analysis based on the approaches described by Cook (1986).
+#' @param object an object of class \emph{gnm}.
+#' @param type an (optional) character string indicating the type of approach to study the
+#' local influence. The options are: the absolute value of the elements of the eigenvector which corresponds to the maximum absolute eigenvalue ("local"); and the absolute value of the elements of the main diagonal ("total"). As default, \code{type} is set to "total".
+#' @param perturbation an (optional) character string indicating the perturbation scheme
+#' to apply. The options are: case weight perturbation of observations ("case-weight") and perturbation of response ("response"). As default, \code{perturbation} is set to "case-weight".
+#' @param plot.it an (optional) logical indicating if the plot of the measures of local
+#' influence is required or just the data matrix in which that plot is based. As default,
+#' \code{plot.it} is set to FALSE.
+#' @param coefs	an (optional) character string which (partially) match with the names of
+#' some of the parameters in the 'linear' predictor.
+#' @param identify an (optional) integer indicating the number of observations to identify
+#' on the plot of the measures of local influence. This is only appropriate if
+#' \code{plot.it=TRUE}.
+#' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE}
+#' then \code{...} may be used to include graphical parameters to customize the plot. For example, \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
+#' @return A matrix as many rows as observations in the sample and one column with the values of the measures of local influence.
+#' @method localInfluence gnm
+#' @export
+#' @references Cook D. (1986) Assessment of Local Influence. \emph{Journal of the Royal Statistical Society: Series B (Methodological)} 48, 133-155.
+#' @references Thomas W., Cook D. (1989) Assessing Influence on Regression Coefficients in Generalized Linear Models. \emph{Biometrika} 76, 741-749.
+#' @examples
+#' ###### Example 1: The effects of fertilizers on coastal Bermuda grass
+#' data(Grass)
+#' fit1 <- gnm(Yield ~ b0 + b1/(Nitrogen + a1) + b2/(Phosphorus + a2) + b3/(Potassium + a3),
+#'             family=gaussian(inverse), start=c(b0=0.1,b1=13,b2=1,b3=1,a1=45,a2=15,a3=30), data=Grass)
+#'
+#' localInfluence(fit1, type="local", perturbation="case-weight", plot.it=TRUE, col="red",
+#'                lty=1, lwd=1, col.lab="blue", col.axis="blue", col.main="black", family="mono")
+#'
+#' ###### Example 2: Assay of an Insecticide with a Synergist
+#' data(Melanopus)
+#' fit2 <- gnm(Killed/Exposed ~ b0 + b1*log(Insecticide-a1) + b2*Synergist/(a2 + Synergist),
+#'             family=binomial(logit), weights=Exposed, start=c(b0=-3,b1=1.2,a1=1.7,b2=1.7,a2=2),
+#'			   data=Melanopus)
+#'
+#' ### Local Influence just for the parameter "b1"
+#' localInfluence(fit2, type="local", perturbation="case-weight", plot.it=TRUE, coefs="b1", col="red",
+#'                lty=1, lwd=1, col.lab="blue", col.axis="blue", col.main="black", family="mono")
+#'
+#' ###### Example 3: Developmental rate of Drosophila melanogaster
+#' data(Drosophila)
+#' fit3 <- gnm(Duration ~ b0 + b1*Temp + b2/(Temp-a), family=Gamma(log),
+#'             start=c(b0=3,b1=-0.25,b2=-210,a=55), weights=Size, data=Drosophila)
+#'
+#' localInfluence(fit3, type="total", perturbation="case-weight", plot.it=TRUE, col="red",
+#'                lty=1, lwd=1, col.lab="blue", col.axis="blue", col.main="black", family="mono")
+#'
+#' ###### Example 4: Radioimmunological Assay of Cortisol
+#' data(Cortisol)
+#' fit4 <- gnm(Y ~ b0 + (b1-b0)/(1 + exp(b2+ b3*lDose))^b4, family=Gamma(identity),
+#'             start=c(b0=130,b1=2800,b2=3,b3=3,b4=0.5), data=Cortisol)
+#'
+#' localInfluence(fit4, type="total", perturbation="case-weight", plot.it=TRUE, col="red",
+#'                lty=1, lwd=1, col.lab="blue", col.axis="blue", col.main="black", family="mono")
+#'
+localInfluence.gnm <- function(object,type=c("total","local"),perturbation=c("case-weight","response"),coefs,plot.it=FALSE,identify,...){
+  type <- match.arg(type)
+  perturbation <- match.arg(perturbation)
+  subst <- NULL
+  if(!missingArg(coefs)){
+    ids <- grepl(coefs,rownames(object$coefficients),ignore.case=TRUE)
+    if(sum(ids) > 0) subst <- rownames(object$coefficients)[ids]
+    else stop(paste("There are no coefficients with the name",coefs,collapse=""),call.=FALSE)
+  }
+  beta <- object$coefficients
+  p <- length(beta)
+  y <- object$y
+  X <- model.matrix(object$terms, object$model, contrasts=object$contrasts)
+  pars <- rownames(object$coefficients)
+  etaf <- function(beta){
+    temp <- deparse(object$formula[[3]])
+    for(i in 1:p) temp <- gsub(pars[i],beta[i],temp)
+    matrix(eval(parse(text=temp),data.frame(X)),ncol=1)
+  }
+  etas <- etaf(beta) + object$offset
+  mus <- object$family$linkinv(etas)
+  Der <- function(beta) matrix(jacobian(etaf,beta),ncol=p)
+  Ders <- Der(beta)
+  n <- nrow(Ders)
+  S <- function(b){
+    Ders <- Der(b)
+    etas <- etaf(b) + object$offset
+    mus <- object$family$linkinv(etas)
+    matrix(crossprod(Ders,object$prior.weights*(y-mus)*object$family$mu.eta(etas)/object$family$variance(mus)),p,1)
+  }
+  Qpp <- -jacobian(S,beta)
+  if(perturbation=="case-weight")
+    Delta <- matrix(object$prior.weights*(y-mus)*object$family$mu.eta(etas)/object$family$variance(mus),n,p)*Ders
+  else Delta <- matrix(object$family$mu.eta(etas)/sqrt(object$family$variance(mus)/object$prior.weights),n,p)*Ders
+  Qpp2 <- try(chol(Qpp),silent=TRUE)
+  if(is.matrix(Qpp2)) Qpp2 <- chol2inv(Qpp2) else Qpp2 <- solve(Qpp)
+  if(!is.null(subst)) Qpp2[-ids,-ids] <- Qpp2[-ids,-ids] - solve(Qpp[-ids,-ids])
+  li <- tcrossprod(Delta,t(Qpp2))
+  if(type=="local"){
+    tol <- 1
+    bnew <- matrix(rnorm(nrow(li)),nrow(li),1)
+    while(tol > 0.000001){
+      bold <- bnew
+      bnew <- tcrossprod(li,t(crossprod(Delta,bold)))
+      bnew <- bnew/sqrt(sum(bnew^2))
+      tol <- max(abs((bnew - bold)/bold))
+    }
+    out_ <- abs(bnew/sqrt(sum(bnew^2)))
+  }else out_ <- apply(li*Delta,1,sum)
+  out_ <- matrix(out_,nrow=length(out_))
+  rownames(out_) <- 1:n
+  colnames(out_) <- type
+  if(plot.it){
+    nano <- list(...)
+    nano$x <- 1:length(out_)
+    nano$y <- out_
+    if(is.null(nano$xlab)) nano$xlab <- "Observation (i)"
+    if(is.null(nano$type)) nano$type <- "h"
+    if(is.null(nano$ylab)) nano$ylab <- ifelse(type=="local",expression(d[max]),expression(diag[i]))
+    if(is.null(nano$labels)) labels <- 1:n
+    else{
+      labels <- nano$labels
+      nano$labels <- NULL
+    }
+    do.call("plot",nano)
+    if(any(out_>0)) abline(h=3*mean(out_[out_>0]),lty=3)
+    if(any(out_<0)) abline(h=3*mean(out_[out_<0]),lty=3)
+    if(!missingArg(identify)) identify(nano$x,nano$y,n=max(1,floor(abs(identify))),labels=labels)
+  }
+  if(!is.null(subst))
+    message("The coefficients included in the measures of local influence are: ",paste(subst,sep=""),"\n")
+  return(invisible(out_))
+}

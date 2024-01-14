@@ -7,6 +7,7 @@
 zeroinf(
   formula,
   data,
+  offset,
   subset,
   na.action = na.omit(),
   weights,
@@ -26,12 +27,14 @@ formula of the form \code{response ~ x1 + x2 + ...} is supplied, then the same r
 \item{data}{an (optional) \code{data frame} in which to look for variables involved in the \code{formula} expression,
 as well as for variables specified in the arguments \code{weights} and \code{subset}.}
 
+\item{offset}{this can be used to specify an \emph{a priori} known component to be included in the linear predictor during fitting. This should be \code{NULL} or a numeric vector of length equal to the number of cases.}
+
 \item{subset}{an (optional) vector specifying a subset of observations to be used in the fitting process.}
 
-\item{na.action}{a function which indicates what should happen when the data contain NAs. By default \code{na.action} is set to be \code{na.omit()}.}
+\item{na.action}{a function which indicates what should happen when the data contain NAs. By default \code{na.action} is set to \code{na.omit()}.}
 
 \item{weights}{an (optional) vector of positive "prior weights" to be used in the fitting process. The length of
-\code{weights} should be the same as the number of observations. By default, \code{weights} is set to be a vector of 1s.}
+\code{weights} should be the same as the number of observations. As default, \code{weights} is set to a vector of 1s.}
 
 \item{family}{an (optional) character string that allows you to specify the distribution
 to describe the response variable, as well as the link function to be used in
@@ -39,15 +42,15 @@ the model for \eqn{\mu}. The following distributions are supported:
 (zero-inflated) negative binomial I ("nb1"), (zero-inflated) negative binomial II
 ("nb2"), (zero-inflated) negative binomial ("nbf"), and (zero-inflated) poisson
 ("poi"). Link functions are the same as those available in Poisson models via
-\link{glm}. See \link{family} documentation. By default, \code{family} is set to
+\link{glm}. See \link{family} documentation. As default, \code{family} is set to
 be Poisson with log link.}
 
 \item{zero.link}{an (optional) character string which allows to specify the link function to be used in the model for \eqn{\pi}.
 Link functions available are the same than those available in binomial models via \link{glm}. See \link{family} documentation.
-By default, \code{zero.link} is set to be "logit".}
+As default, \code{zero.link} is set to "logit".}
 
 \item{reltol}{an (optional) positive value which represents the \emph{relative convergence tolerance} for the BFGS method in \link{optim}.
-By default, \code{reltol} is set to be 1e-13.}
+As default, \code{reltol} is set to 1e-13.}
 
 \item{start}{an (optional) list with two components named "counts" and "zeros", which allows to specify the starting values to be used in the
 iterative process to obtain the estimates of the parameters in the linear predictors to the models for \eqn{\mu}

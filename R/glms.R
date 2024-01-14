@@ -5,8 +5,8 @@
 #' Models. It starts with the starting value until convergence is achieved
 #' or the maximum number of iterations is exceeded.
 #' @param object one object of the class \emph{glm}.
-#' @param verbose an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @param digits an (optional) integer value indicating the number of decimal places to be used. By default, \code{digits} is set to be 10.
+#' @param verbose an (optional) logical indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
+#' @param digits an (optional) integer value indicating the number of decimal places to be used. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.
 #' @return a matrix whose first three columns are the following
 #' \tabular{ll}{
 #' \code{Iteration} \tab the iteration number,\cr
@@ -54,7 +54,7 @@
 #' FisherScoring(fit6)
 #'
 #' @export FisherScoring
-FisherScoring <- function(object,verbose=TRUE,digits=10){
+FisherScoring <- function(object,verbose=TRUE,digits=max(3, getOption("digits") - 2)){
   options(warn=-1)
   X <- model.matrix(object)
   y <- object$y
@@ -134,8 +134,8 @@ adjR2 <- function(...,digits,verbose){
 #' @title Adjusted R-squared in Generalized Linear Models
 #' @description Computes the adjusted deviance-based R-squared in generalized linear models.
 #' @param ... one or several objects of the class \emph{glm}, which are obtained from the fit of generalized linear models.
-#' @param verbose an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @param digits an (optional) integer value indicating the number of decimal places to be used. By default, \code{digits} is set to be 4.
+#' @param verbose an (optional) logical indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
+#' @param digits an (optional) integer value indicating the number of decimal places to be used. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.
 #' @details The deviance-based R-squared is computed as \eqn{R^2=1 - Deviance/Null.Deviance}. Then,
 #' the adjusted deviance-based R-squared is computed as
 #' \eqn{1 - \frac{n-1}{n-p}(1-R^2)}, where \eqn{p} is the
@@ -166,7 +166,7 @@ adjR2 <- function(...,digits,verbose){
 #' BIC(fit1,fit2,fit3,fit4,fit5,fit6)
 #' adjR2(fit1,fit2,fit3,fit4,fit5,fit6)
 #'
-adjR2.glm <- function(...,digits=4,verbose=TRUE){
+adjR2.glm <- function(...,digits=max(3, getOption("digits") - 2),verbose=TRUE){
   x <- list(...)
   if(any(unlist(lapply(x,function(xx) !is(xx,"glm")))))
     stop("Only glm-type objects are supported!!",call.=FALSE)
@@ -184,7 +184,7 @@ adjR2.glm <- function(...,digits=4,verbose=TRUE){
   colnames(out_) <- c("Deviance","R-squared","df","adj.R-squared")
   if(length(x)==1){
     out_ <- as.numeric(out_[1,4])
-    verbose <- FALSE
+    return(out_)
   }
   if(verbose) print(out_)
   return(invisible(out_))
@@ -193,8 +193,8 @@ adjR2.glm <- function(...,digits=4,verbose=TRUE){
 #' @title Adjusted R-squared in Normal Linear Models
 #' @description Extracts the adjusted R-squared in normal linear models.
 #' @param ... one or several objects of the class \emph{lm}, which are obtained from the fit of normal linear models.
-#' @param verbose an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @param digits an (optional) integer value indicating the number of decimal places to be used. By default, \code{digits} is set to be 4.
+#' @param verbose an (optional) logical indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
+#' @param digits an (optional) integer value indicating the number of decimal places to be used. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.
 #' @details The R-squared is computed as \eqn{R^2=1 - RSS/Null.RSS}. Then,
 #' the adjusted R-squared is computed as
 #' \eqn{1 - \frac{n-1}{n-p}(1-R^2)}, where \eqn{p} is the
@@ -221,7 +221,7 @@ adjR2.glm <- function(...,digits=4,verbose=TRUE){
 #' BIC(fit1,fit2,fit3)
 #' adjR2(fit1,fit2,fit3)
 #'
-adjR2.lm <- function(...,digits=4,verbose=TRUE){
+adjR2.lm <- function(...,digits=max(3, getOption("digits") - 2),verbose=TRUE){
   x <- list(...)
   if(any(unlist(lapply(x,function(xx) !is(xx,"lm")))))
     stop("Only lm-type objects are supported!!",call.=FALSE)
@@ -240,7 +240,7 @@ adjR2.lm <- function(...,digits=4,verbose=TRUE){
   colnames(out_) <- c("RSS","R-squared","df","adj.R-squared")
   if(length(x)==1){
     out_ <- as.numeric(out_[1,4])
-    verbose <- FALSE
+    return(out_)
   }
   if(verbose) print(out_)
   return(invisible(out_))
@@ -323,10 +323,10 @@ vdtest <- function(model,...) {
 #' @title Test for Varying Dispersion Parameter in Normal Linear Models
 #' @description Performs Rao's score test for varying dispersion parameter in weighted and unweighted normal linear models.
 #' @param model an object of the class \emph{lm}.
-#' @param varformula an (optional) \code{formula} expression of the form \code{~ z1 + z2 + ... + zq} indicating the potential explanatory variables for the dispersion parameter. By default, the same explanatory variables are taken as in the model for the mean.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param varformula an (optional) \code{formula} expression of the form \code{~ z1 + z2 + ... + zq} indicating the potential explanatory variables for the dispersion parameter. As default, the same explanatory variables are taken as in the model for the mean.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
 #' @param ...	further arguments passed to or from other methods.
-#' @details From the heteroskedastic normal lineal model in which
+#' @details From the heteroskedastic normal linear model in which
 #' \eqn{\log(\sigma^2)=\gamma_0 + \gamma_1z_1 + \gamma_2z_2 + ...+ \gamma_qz_q}, where
 #' \eqn{\sigma^2} is the dispersion parameter of the distribution of the
 #' random errors, the Rao's score test (denoted here as \eqn{S}) to assess the
@@ -344,6 +344,8 @@ vdtest <- function(model,...) {
 #' \code{df}        \tab number of degrees of freedom (\eqn{q}),\cr
 #' \tab \cr
 #' \code{p.value}   \tab \emph{p}-value of the test,\cr
+#' \tab \cr
+#' \code{vars}   \tab names of explanatory variables for the dispersion parameter,\cr
 #' }
 #' @method vdtest lm
 #' @export
@@ -351,6 +353,8 @@ vdtest <- function(model,...) {
 #' ###### Example 1: Fuel consumption of automobiles
 #' fit1 <- lm(mpg ~ log(hp) + log(wt), data=mtcars)
 #' vdtest(fit1)
+#' vdtest(fit1,varformula = ~ hp + wt)
+#' vdtest(fit1,varformula = ~ hp + wt + hp*wt)
 #'
 #' ###### Example 2: Species richness in plots
 #' data(richness)
@@ -374,109 +378,24 @@ vdtest <- function(model,...) {
 #' @references Cook R.D., Weisberg S. (1983) Diagnostics for heteroscedasticity in regression. \emph{Biometrika} 70, 1–10.
 #' @seealso \link{vdtest.glm}
 vdtest.lm <- function(model,varformula,verbose=TRUE,...){
-  if(!missingArg(varformula)){
-    if(is.null(model$call$data)) m <- get_all_vars(eval(varformula))
-    else m <- get_all_vars(eval(varformula),eval(model$call$data))
-    Z <- model.matrix(varformula,m)
-    if(!is.null(model$call$subset)) Z <- Z[eval(model$call$subset,eval(model$call$data)),]
-  }else Z <- model.matrix(model)
-  if(colnames(Z)[1]=="(Intercept)") Z <- as.matrix(Z[,-1])
+  if(missingArg(varformula)) varformula <- as.formula(model$call$formula)
+  if(is.null(model$call$data)) Z <- model.matrix(varformula)
+  else Z <- model.matrix(varformula,eval(model$call$data))
+  if(!is.null(model$call$subset)) Z <- Z[eval(model$call$subset,eval(model$call$data)),]
   n <- nrow(Z)
-  p <- ncol(Z)
+  if(colnames(Z)[1]!="(Intercept)"){
+    out_ <- colnames(Z)
+    Zstar <- cbind(1,Z)
+  }else{
+    out_ <- colnames(Z)[-1]
+    Zstar <- Z
+    Z <- Z[,-1]
+  }
+  p <- ncol(Zstar) - 1
   if(is.null(model$weights)) w <- matrix(1,n,1) else w <- model$weights
   phies <- mean(resid(model)^2*w)
   mus <- fitted(model)
   tau <- resid(model)^2*w/phies - 1
-  Zstar <- cbind(1,Z)
-  Zstar <- matrix(1,n,ncol(Zstar))*Zstar
-  Zstar2 <- (solve(t(Zstar)%*%Zstar))[-1,-1]
-  sc = 0.5*(t(tau)%*%Z)%*%Zstar2%*%(t(Z)%*%tau)
-  if(verbose){
-    cat("\n             Score test for varying dispersion parameter\n\n")
-    cat("          Statistic = ",round(sc,digits=5),"\n degrees of freedom = ",p,"\n            p-value = ",format.pval(1-pchisq(sc,p)),"\n\n")
-  }
-  return(invisible(list(statistic=sc,df=p,p.value=format.pval(1-pchisq(sc,p)))))
-}
-
-#' @title Test for Varying Dispersion Parameter in Generalized Linear Models
-#' @description Performs Rao's score test for varying dispersion parameter in
-#' weighted and unweighted generalized linear models in which the response
-#' distribution is assumed to be Gaussian, Gamma, or inverse Gaussian.
-#' @param model an object of the class \emph{glm} where the distribution of the response
-#' variable is assumed to be \code{gaussian}, \code{Gamma} or \code{inverse.gaussian}.
-#' @param varformula an (optional) \code{formula} expression of the form \code{~ z1 + z2 + ... + zq} describing only the potential explanatory variables for the dispersion. By default, the same explanatory variables are taken as in the model for the mean.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
-#' @param ...	further arguments passed to or from other methods.
-#' @details From the generalized lineal model with varying dispersion in which
-#' \eqn{\log(\phi)=\gamma_0 + \gamma_1z_1 + \gamma_2z_2 + ... + \gamma_qz_q}, where
-#' \eqn{\phi} is the dispersion parameter of the distribution used to describe the
-#' response variable, the Rao's score test (denoted here as \eqn{S}) to assess the
-#' hypothesis \eqn{H_0: \gamma=0} versus \eqn{H_1: \gamma\neq 0} is computed,
-#' where \eqn{\gamma=(\gamma_1,\ldots,\gamma_q)}.  The corresponding \emph{p}-value is
-#' computed from the chi-squared distribution with \eqn{q} degrees of freedom,
-#' that is, \emph{p}-value = Prob\eqn{[\chi^2_{q} > S]}. If the object
-#' \code{model} corresponds to an unweighted generalized linear model then
-#' this test assesses assumptions of constant variance and constant
-#' coefficient of variation on models in which the response distribution
-#' is assumed to be Gaussian and Gamma, respectively.
-#' @return a list list with components including
-#' \tabular{ll}{
-#' \code{statistic} \tab value of the Rao's score test (\eqn{S}),\cr
-#' \tab \cr
-#' \code{df}        \tab number of degrees of freedom (\eqn{q}),\cr
-#' \tab \cr
-#' \code{p.value}   \tab \emph{p}-value of the test,\cr
-#' }
-#' @examples
-#' ###### Example 1: Fuel consumption of automobiles
-#' Auto <- ISLR::Auto
-#' fit1 <- glm(mpg ~ weight*horsepower, family=inverse.gaussian("log"), data=Auto)
-#' vdtest(fit1)
-#'
-#' ###### Example 2: Hill races in Scotland
-#' data(races)
-#' fit2 <- glm(rtime ~ log(distance) + cclimb, family=Gamma("log"), data=races)
-#' vdtest(fit2)
-#'
-#' ###### Example 3: Mammal brain and body weights
-#' data(brains)
-#' fit3 <- glm(BrainWt ~ log(BodyWt), family=Gamma("log"), data=brains)
-#' vdtest(fit3)
-#' @method vdtest glm
-#' @export
-#' @references Wei B.-C., Shi, J.-Q., Fung W.-K., Hu Y.-Q. (1998) Testing for Varying Dispersion in Exponential Family Nonlinear Models. \emph{Annals of the Institute of Statistical Mathematics} 50, 277–294.
-#'
-#' @seealso \link{vdtest.lm}
-vdtest.glm <- function(model,varformula,verbose=TRUE,...){
-  if(model$family$family!="gaussian" & model$family$family!="Gamma" & model$family$family!="inverse.gaussian")
-    stop("Only gaussian, Gamma and inverse.gaussian families are supported!!",call.=FALSE)
-  if(!missingArg(varformula)){
-    if(is.null(model$call$data)) m <- get_all_vars(eval(varformula))
-    else m <- get_all_vars(eval(varformula),eval(model$call$data))
-    Z <- model.matrix(varformula,m)
-    if(!is.null(model$call$subset)) Z <- Z[eval(model$call$subset,eval(model$call$data)),]
-  }else Z <- model.matrix(model)
-  if(colnames(Z)[1]=="(Intercept)") Z <- as.matrix(Z[,-1])
-  n <- nrow(Z)
-  p <- ncol(Z)
-  y <- model$y
-  mus <- fitted(model)
-  w <- model$prior.weights
-  if(model$family$family=="gaussian"){
-    phies <- mean((y-mus)^2*w)
-    tau <- (y-mus)^2*w/phies - 1
-  }
-  if(model$family$family=="inverse.gaussian"){
-    phies <- mean((y-mus)^2*w/(mus^2*y))
-    tau <- (y-mus)^2*w/(mus^2*y*phies) - 1
-  }
-  if(model$family$family=="Gamma"){
-    phies <- sum(resid(model,type="pearson")^2)/model$df.residual
-    phies <- uniroot(function(x) sum((y/mus + log(mus*x/(w*y)) + psigamma(w/x) - 1)*w), lower=phies*(0.1), upper=phies*(1.9))$root
-    tau <- 2*(y/mus + log(mus*phies/(w*y)) + psigamma(w/phies) - 1)*(w/phies)
-    pes <- sqrt((w/phies)*(2*psigamma(w/phies,1)*(w/phies) - 2))
-  }
-  Zstar <- cbind(1,Z)
   Zstar <- matrix(1,n,ncol(Zstar))*Zstar
   Zstar2 <- chol2inv(chol(t(Zstar)%*%Zstar))[-1,-1]
   sc = 0.5*(t(tau)%*%Z)%*%Zstar2%*%(t(Z)%*%tau)
@@ -484,22 +403,22 @@ vdtest.glm <- function(model,varformula,verbose=TRUE,...){
     cat("\n             Score test for varying dispersion parameter\n\n")
     cat("          Statistic = ",round(sc,digits=5),"\n degrees of freedom = ",p,"\n            p-value = ",format.pval(1-pchisq(sc,p)),"\n\n")
   }
-  return(invisible(list(statistic=sc,df=p,p.value=format.pval(1-pchisq(sc,p)))))
+  return(invisible(list(statistic=sc,df=p,p.value=format.pval(1-pchisq(sc,p)),vars=out_)))
 }
 
 #' @title Variable Selection in Normal Linear Models
 #' @description Performs variable selection in normal linear models using a hybrid versions of forward stepwise and backward stepwise.
 #' @param model an object of the class \emph{lm}.
-#' @param direction an (optional) character string indicating the type of procedure which should be used. The available options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). By default, \code{direction} is set to be "forward".
-#' @param levels an (optional) two-dimensional vector of values in the interval \eqn{(0,1)} indicating the levels at which the variables should in and out from the model. This is only appropiate if \code{criterion}="p-value". By default, \code{levels} is set to be \code{c(0.05,0.05)}.
-#' @param criterion an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted R-squared ("adjr2"), predicted R-squared ("prdr2"), Mallows' CP ("cp") and \emph{p}-value of the F test ("p-value"). By default, \code{criterion} is set to be "bic".
-#' @param ...	further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC/QICu, which by default is set to be 2.
-#' @param trace an (optional) logical switch indicating if should the stepwise reports be printed. By default, \code{trace} is set to be TRUE.
-#' @param scope an (optional) list containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. By default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.
+#' @param direction an (optional) character string indicating the type of procedure which should be used. The available options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). As default, \code{direction} is set to "forward".
+#' @param levels an (optional) two-dimensional vector of values in the interval \eqn{(0,1)} indicating the levels at which the variables should in and out from the model. This is only appropiate if \code{criterion}="p-value". As default, \code{levels} is set to \code{c(0.05,0.05)}.
+#' @param criterion an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted R-squared ("adjr2"), predicted R-squared ("prdr2"), Mallows' CP ("cp") and \emph{p}-value of the F test ("p-value"). As default, \code{criterion} is set to "bic".
+#' @param ...	further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC/QICu, which by default is set to 2.
+#' @param trace an (optional) logical switch indicating if should the stepwise reports be printed. As default, \code{trace} is set to TRUE.
+#' @param scope an (optional) list containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. As default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.
 #' @details The "hybrid forward stepwise" algorithm starts with the
 #' simplest model (which may be chosen at the argument \code{scope}, and
-#' by default, is a model whose parameters in the linear predictor,
-#' except the intercept, if any, are set to be 0), and then the candidate
+#' As default, is a model whose parameters in the linear predictor,
+#' except the intercept, if any, are set to 0), and then the candidate
 #' models are built by hierarchically including effects in the linear
 #' predictor, whose "relevance" and/or "importance" in the model fit is
 #' assessed by comparing nested models (that is, by comparing the models
@@ -603,6 +522,7 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp"
   if(trace){
     cat("\n       Family: gaussian\n")
     cat("Link function: identity\n")
+    cat("    Criterion:",criters2[ids],"\n")
   }
   if(direction=="forward"){
     oldformula <- lower
@@ -873,209 +793,32 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp"
       cat("\n Effects are included when their p-values are lower than",levels[1])
       cat("\n Effects are dropped when their p-values are higher than",levels[2])
     }
-    if(!is.null(xxx$k)) cat("The magnitude of the penalty in the AIC was set to be ",k)
+    if(!is.null(xxx$k)) cat("The magnitude of the penalty in the AIC was set to ",k)
     cat("\n")
   }
   out_$final <- paste("~",as.character(oldformula)[length(oldformula)],sep=" ")
   return(invisible(out_))
 }
 
-
-#' @title Normal QQ-plot with simulated envelope of residuals in GLMs
-#' @description Produces a normal QQ-plot with simulated envelope of residuals
-#' for generalized linear models.
-#' @param object an object of the class \emph{glm}.
-#' @param rep an (optional) positive integer which allows to specify the number of replicates which should be used to build the simulated envelope. By default, \code{rep} is set to be 25.
-#' @param conf an (optional) value in the interval (0,1) indicating the confidence level which should be used to build the pointwise confidence intervals, which form the envelope. By default, \code{conf} is set to be 0.95.
-#' @param type a character string indicating the type of residuals which should be used. The available options are: randomized quantile ("quantile"), deviance ("deviance") and pearson ("pearson") residuals. By default, \code{type} is set to be "quantile".
-#' @param standardized an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. By default, \code{standardized} is set to be FALSE.
-#' @param plot.it an (optional) logical switch indicating if the normal QQ-plot with simulated envelope of residuals is required or just the data matrix in which it is based. By default, \code{plot.it} is set to be TRUE.
-#' @param identify an (optional) positive integer indicating the number of individuals to identify on the QQ-plot with simulated envelope of residuals. This is only appropriate if \code{plot.it=TRUE}.
-#' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example,  \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
-#' @return A matrix with the following four columns:
-#' \tabular{ll}{
-#' \code{Lower limit} \tab the quantile (1 - \code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
-#'                    \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
-#' \tab \cr
-#' \code{Median} \tab the quantile 0.5 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
-#'               \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
-#' \tab \cr
-#' \code{Upper limit} \tab the quantile (1 + \code{conf})/2 of the random sample of size \code{rep} of the \eqn{i}-th order\cr
-#'                    \tab  statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n},\cr
-#' \tab \cr
-#' \code{Residuals} \tab the observed \code{type}-type residuals,\cr
-#' }
-#' @details The simulated envelope is built by simulating \code{rep} independent realizations
-#' of the response variable for each individual, which is accomplished taking into account the
-#' following: (1) the model assumption about the distribution of the response variable; (2)
-#' the estimates of the parameters in the linear predictor; and (3) the estimate of the
-#' dispersion parameter. The interest model is re-fitted \code{rep} times, as each time the
-#' vector of observed responses is replaced by one of the simulated samples. The
-#' \code{type}-type residuals are computed and then sorted for each replicate, so that for
-#' each \eqn{i=1,2,...,n}, where \eqn{n} is the number of individuals in the sample, there is
-#' a random sample of size \code{rep} of the \eqn{i}-th order statistic of the
-#' \code{type}-type residuals. Therefore, the simulated envelope is composed of the quantiles
-#' (1 - \code{conf})/2 and (1 + \code{conf})/2 of the random sample of size \code{rep} of the
-#' \eqn{i}-th order statistic of the \code{type}-type residuals for \eqn{i=1,2,...,n}.
-#' @references Atkinson A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
-#' @references Davison A.C., Gigli A. (1989) Deviance Residuals and Normal Scores Plots. \emph{Biometrika} 76, 211-221.
-#' @references Dunn P.K., Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics} 5, 236-244.
-#' @references Pierce D.A., Schafer D.W. (1986) Residuals in Generalized Linear Models. \emph{Journal of the American Statistical Association} 81, 977-986.
-#' @seealso \link{envelope.lm}, \link{envelope.overglm}
-#' @examples
-#'
-#' ###### Example 1:
-#' burn1000 <- aplore3::burn1000
-#' burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
-#' fit1 <- glm(death ~ age*inh_inj + tbsa*inh_inj, family=binomial("logit"), data=burn1000)
-#' envelope(fit1, rep=50, conf=0.95, type="pearson", col="red", pch=20, col.lab="blue",
-#'          col.axis="blue", col.main="black", family="mono", cex=0.8)
-#'
-#' ###### Example 2: Fuel consumption of automobiles
-#' Auto <- ISLR::Auto
-#' fit2 <- glm(mpg ~ horsepower*weight, family=inverse.gaussian("log"), data=Auto)
-#' envelope(fit2, rep=50, conf=0.95, type="pearson", col="red", pch=20, col.lab="blue",
-#'          col.axis="blue", col.main="black", family="mono", cex=0.8)
-#'
-#' ###### Example 3: Skin cancer in women
-#' data(skincancer)
-#' fit3 <- glm(cases ~ offset(log(population)) + city + age, family=poisson, data=skincancer)
-#' envelope(fit3, rep=100, conf=0.95, type="quantile", col="red", pch=20,col.lab="blue",
-#'          col.axis="blue",col.main="black",family="mono",cex=0.8)
-#'
-#' ###### Example 4: Self diagnozed ear infections in swimmers
-#' data(swimmers)
-#' fit4 <- glm(infections ~ frequency + location, family=poisson(log), data=swimmers)
-#' envelope(fit4, rep=100, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
-#'          col.axis="blue", col.main="black", family="mono", cex=0.8)
-#'
-#' ###### Example 5: Agents to stimulate cellular differentiation
-#' data(cellular)
-#' fit5 <- glm(cbind(cells,200-cells) ~ tnf + ifn, family=binomial(logit), data=cellular)
-#' envelope(fit5, rep=100, conf=0.95, type="quantile", col="red", pch=20, col.lab="blue",
-#'          col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
 #' @importFrom stats dbinom delete.response dpois glm AIC BIC logLik fitted quantile
 #'             pbinom pgamma ppoints ppois qqplot rchisq binomial poisson resid runif
 #'              rgamma rpois rbinom  qqnorm dnbinom residuals pnbinom
-#'             qnbinom qpois rbeta rnbinom .getXlevels lm optim
+#'             qnbinom qpois rbeta rnbinom .getXlevels lm optim simulate
 #' @importFrom utils setTxtProgressBar txtProgressBar
 #' @importFrom numDeriv grad hessian jacobian
 #' @importFrom Rfast Digamma Lgamma
 #' @importFrom Formula Formula model.part
 #' @importFrom methods is
-#' @method envelope glm
-#' @export
-envelope.glm <- function(object, rep=25, conf=0.95, type=c("quantile","deviance","pearson"), standardized=FALSE, plot.it=TRUE, identify, ...){
-  defaultW <- getOption("warn")
-  options(warn = -1)
-  if(object$family$family=="quasi" | object$family$family=="quasipoisson" | object$family$family=="quasibinomial")
-    stop("Quasi-likelihood models are not supported!!",call.=FALSE)
-  if(any(object$prior.weights == 0)) stop("Only positive weights are supported!!",call.=FALSE)
-  type <- match.arg(type)
-  p <- length(coef(object))
-  X <- model.matrix(object)
-  mu <- fitted(object)
-  n <- length(mu)
-  weights <- object$prior.weights
-  if(is.null(object$offset)) offs <- rep(0,n) else offs <- object$offset
-  phi <- summary(object)$dispersion
-  rep <- max(1,floor(abs(rep)))
-  e <- matrix(0,n,rep)
-  quantileres <- function(family,y,mu,phi){
-    resi <- switch(family,
-                   Gamma = pgamma(y,shape=1/phi,scale=mu*phi),
-                   inverse.gaussian = pnorm((y/mu-1)/sqrt(y*phi)) + exp(2/(mu*phi))*pnorm(-(y/mu+1)/sqrt(y*phi)),
-                   gaussian = pnorm((y-mu)/sqrt(phi)),
-                   poisson = ppois(y-1,lambda=mu) + dpois(y,lambda=mu)*runif(length(mu)),
-                   binomial = pbinom(y/phi-1,size=1/phi,prob=mu) + dbinom(y/phi,size=1/phi,prob=mu)*runif(length(mu)))
-    return(qnorm(ifelse(ifelse(resi<1e-16,1e-16,resi)>1-(1e-16),1-(1e-16),resi)))
-  }
-  bar <- txtProgressBar(min=0, max=rep, initial=0, width=min(50,rep), char="+", style=3)
-  i <- 1
-  while(i <= rep){
-    if(object$family$family=="inverse.gaussian"){
-      w <- rchisq(n,df=1)
-      u <- mu + mu^2*w*phi/2 - (mu*phi/2)*sqrt(4*mu*w/phi + mu^2*w^2)
-    }
-    resp <- switch(object$family$family,
-                   Gamma = rgamma(n,shape=object$prior.weights/phi,scale=mu*phi/object$prior.weights),
-                   inverse.gaussian = ifelse(runif(n)<=mu/(mu+u),u,mu^2/u),
-                   gaussian = sqrt(phi/object$prior.weights)*rnorm(n) + mu,
-                   poisson = rpois(n,lambda=mu),
-                   binomial = rbinom(n,size=object$prior.weights,prob=mu)/object$prior.weights)
-    fits <- try(glm.fit(x=X,y=resp,family=object$family,offset=offs,start=coef(object),weights=weights),silent=TRUE)
-    if(is.list(fits)){
-      if(fits$converged==TRUE){
-        phis <- sum((resp-fits$fitted.values)^2*weights/object$family$variance(fits$fitted.values))/fits$df.residual
-        if(object$family$family=="binomial" | object$family$family=="poisson") phis <- 1
-        if(type=="quantile")
-          rs <- quantileres(object$family$family,resp,fits$fitted.values,phis/weights)
-        if(type=="deviance"){
-          rs <- sqrt(object$family$dev.resids(resp,fits$fitted.values,weights)/phis)
-          rs <- ifelse(resp >= fits$fitted.values,1,-1)*rs
-        }
-        if(type=="pearson")
-          rs <- (resp-fits$fitted.values)*sqrt(weights/(object$family$variance(fits$fitted.values)*phis))
-        if(standardized){
-          Xw <- X*matrix(sqrt(fits$weights),n,p)
-          salida <- svd(Xw)
-          h <- apply(salida$u^2,1,sum)
-          rs <- rs/sqrt(1-h)
-        }
-        e[,i] <- sort(rs)
-        setTxtProgressBar(bar,i)
-        i <- i + 1
-      }
-    }
-  }
-  close(bar)
-  alpha <- 1 - max(0,min(1,abs(conf)))
-  e <- as.matrix(e[,1:(i-1)])
-  es <- apply(e,1,function(x) return(quantile(x,probs=c(alpha/2,0.5,1-alpha/2))))
-  if(type=="quantile")
-    rd <- quantileres(object$family$family,object$y,mu,phi/object$prior.weights)
-  else rd <- residuals(object,type=type)/sqrt(phi)
-  if(standardized){
-    Xw <- X*matrix(sqrt(object$weights),n,p)
-    salida <- svd(Xw)
-    h <- apply(salida$u^2,1,sum)
-    rd <- rd/sqrt(1-h)
-  }
-  out_ <- as.matrix(cbind(t(es),sort(rd)))
-  colnames(out_) <- c("Lower limit","Median","Upper limit","Residuals")
-  if(plot.it){
-    nano <- list(...)
-    nano$y <- rd
-    nano$type <- "p"
-    if(is.null(nano$ylim)) nano$ylim <- 1.1*range(out_)
-    if(is.null(nano$pch)) nano$pch <- 20
-    if(is.null(nano$col)) nano$col <- "black"
-    if(is.null(nano$xlab)) nano$xlab <- "Expected quantiles"
-    if(is.null(nano$ylab)) nano$ylab <- "Observed quantiles"
-    if(is.null(nano$main)) nano$main <- paste0("Normal QQ plot with simulated envelope\n of ",type,"-type residuals")
-    if(is.null(nano$labels)) labels <- 1:length(rd)
-    else{
-      labels <- nano$labels
-      nano$labels <- NULL
-    }
-    outm <- do.call("qqnorm",nano)
-    lines(sort(outm$x),es[2,],xlab="",ylab="",main="", type="l",lty=3)
-    lines(sort(outm$x),es[1,],xlab="",ylab="",main="", type="l",lty=1)
-    lines(sort(outm$x),es[3,],xlab="",ylab="",main="", type="l",lty=1)
-    if(!missingArg(identify)) identify(outm$x,outm$y,n=max(1,floor(abs(identify))),labels=labels)
-  }
-  options(warn = defaultW)
-  return(invisible(out_))
-}
+#' @importFrom SuppDists rinvGauss
 
 #' @title Normal QQ-plot with simulated envelope of residuals for normal linear models
 #' @description Produces a normal QQ-plot with simulated envelope of residuals obtained from the fit of a normal linear model.
 #' @param object an object of the class \emph{lm}.
-#' @param rep an (optional) positive integer indicating the number of replicates which should be used to build the simulated envelope. By default, \code{rep} is set to be 100.
-#' @param conf an (optional) value in the interval (0,1) indicating the confidence level which should be used to build the pointwise confidence intervals, which form the envelope. By default, \code{conf} is set to be 0.95.
+#' @param rep an (optional) positive integer indicating the number of replicates which should be used to build the simulated envelope. As default, \code{rep} is set to 100.
+#' @param conf an (optional) value in the interval (0,1) indicating the confidence level which should be used to build the pointwise confidence intervals, which form the envelope. As default, \code{conf} is set to 0.95.
 #' @param type a character string indicating the type of residuals which should be used. The available options are: internally Studentized ("internal") and externally Studentized ("external") residuals. See Cook and Weisberg (1982, pages 18-20).
-#' @param plot.it an (optional) logical switch indicating if the normal QQ-plot with simulated envelope of residuals is required or just the data matrix in which it is based. By default, \code{plot.it} is set to be TRUE.
+#' @param plot.it an (optional) logical switch indicating if the normal QQ-plot with simulated envelope of residuals is required or just the data matrix in which it is based. As default, \code{plot.it} is set to TRUE.
 #' @param identify an (optional) positive integer value indicating the number of individuals to identify on the QQ-plot with simulated envelope of residuals. This is only appropriate if \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example, \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
 #' @return A matrix with the following four columns:
@@ -1144,7 +887,7 @@ envelope.lm <- function(object, rep=100, conf=0.95, type=c("external","internal"
   bar <- txtProgressBar(min=0, max=rep, initial=0, width=min(50,rep), char="+", style=3)
   i <- 1
   while(i <= rep){
-    resp <- sqrt(sigma2/weights)*rnorm(n) + mu - offset
+    resp <- sqrt(sigma2/weights)*rnorm(n) + mu
     fits <- try(lm.wfit(x=X,y=resp,w=weights,offset=offset),silent=TRUE)
     if(is.list(fits)){
       phis <- sum((resp-fits$fitted.values)^2*weights)/(n-p)
@@ -1190,7 +933,7 @@ envelope.lm <- function(object, rep=100, conf=0.95, type=c("external","internal"
 #'@title The Hosmer-Lemeshow Goodness-of-Fit Test
 #' @description Computes the Hosmer-Lemeshow goodness-of-fit test for a generalized linear model fitted to binary responses.
 #' @param model an object of the class \emph{glm}, which is obtained from the fit of a generalized linear model where the distribution for the response variable is assumed to be binomial.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
 #' @param ... further arguments passed to or from other methods.
 #' @return A matrix with the following four columns:
 #' \tabular{ll}{
@@ -1270,16 +1013,16 @@ hltest <- function(model,verbose=TRUE,...){
 #' @title The Receiver Operating Characteristic (ROC) Curve
 #' @description Computes the exact area under the ROC curve (AUROC), the Gini coefficient, and the Kolmogorov-Smirnov (KS) statistic for a binary classifier. Optionally, this function can plot the ROC curve, that is, the plot of the estimates of Sensitivity versus the estimates of 1-Specificity.
 #' @param object a matrix with two columns: the first one is a numeric vector of 1's and 0's indicating whether each row is a "success" or a "failure"; the second one is a numeric vector of values indicating the probability (or propensity score) of each row to be a "success". Optionally, \code{object} can be an object of the class glm which is obtained from the fit of a generalized linear model where the distribution of the response variable is assumed to be binomial.
-#' @param plot.it an (optional) logical switch indicating if the plot of the ROC curve is required or just the data matrix in which it is based. By default, \code{plot.it} is set to be TRUE.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param plot.it an (optional) logical switch indicating if the plot of the ROC curve is required or just the data matrix in which it is based. As default, \code{plot.it} is set to TRUE.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
 #' @param ... further arguments passed to or from other methods. For example, if \code{plot.it=TRUE} then \code{...} may to include graphical parameters as \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
 #' @references Hanley J.A., McNeil B.J. (1982) The Meaning and Use of the Area under a Receiver Operating Characteristic (ROC) Curve. \emph{Radiology} 143, 29–36.
 #' @return A list which contains the following objects:
-#' \itemize{
-#' \item{\code{roc:}}{ A matrix with the Cutoffs and the associated estimates of Sensitivity and Specificity.}
-#' \item{\code{auroc:}}{ The exact area under the ROC curve.}
-#' \item{\code{gini:}}{ The value of the Gini coefficient computed as 2(\code{auroc}-0.5).}
-#' \item{\code{ks:}}{ The value of the Kolmogorov-Smirnov statistic computed as the maximum value of |1-Sensitivity-Specificity|.}
+#' \describe{
+#' \item{\code{roc}}{ A matrix with the Cutoffs and the associated estimates of Sensitivity and Specificity.}
+#' \item{\code{auroc}}{ The exact area under the ROC curve.}
+#' \item{\code{gini}}{ The value of the Gini coefficient computed as 2(\code{auroc}-0.5).}
+#' \item{\code{ks}}{ The value of the Kolmogorov-Smirnov statistic computed as the maximum value of |1-Sensitivity-Specificity|.}
 #' }
 #' @examples
 #' ###### Example: Patients with burn injuries
@@ -1363,8 +1106,8 @@ ROCc <- function(object,plot.it=TRUE,verbose=TRUE,...){
 #' @description Allows to compare nested generalized linear models using Wald, score, gradient, and likelihood ratio tests.
 #' @param object an object of the class glm which is obtained from the fit of a generalized linear model.
 #' @param ... another objects of the class glm which are obtained from the fit of generalized linear models.
-#' @param test an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lr") tests. By default, \code{test} is set to be "wald".
-#' @param verbose an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param test an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lr") tests. As default, \code{test} is set to "wald".
+#' @param verbose an (optional) logical indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
 #' @details The Wald, Rao's score and Terrell's gradient tests are performed using the expected Fisher information matrix.
 #' @references Buse A. (1982) The Likelihood Ratio, Wald, and Lagrange Multiplier Tests: An Expository Note. \emph{The American Statistician} 36, 153-157.
 #' @references Terrell G.R. (2002) The gradient statistic. \emph{Computing Science and Statistics} 34, 206 – 215.
@@ -1397,10 +1140,10 @@ ROCc <- function(object,plot.it=TRUE,verbose=TRUE,...){
 #' anova2(fit, test="wald")
 #' anova2(fit, test="gradient")
 #' @return A matrix with three columns which contains the following:
-#' \itemize{
-#' \item \code{Chi:}{ The value of the statistic of the test.}
-#' \item \code{Df:}{ The number of degrees of freedom.}
-#' \item \code{Pr(>Chi):}{ The \emph{p}-value of the test computed using the Chi-square distribution.}
+#' \describe{
+#' \item{\code{Chi}}{ The value of the statistic of the test.}
+#' \item{\code{Df}}{ The number of degrees of freedom.}
+#' \item{\code{Pr(>Chi)}}{ The \emph{p}-value of the test computed using the Chi-square distribution.}
 #' }
 #' @export anova2
 
@@ -1488,7 +1231,7 @@ estequa.glm <- function(object,...){
   G <- object$family$mu.eta(eta)
   V <- object$family$variance(mu)
   z <- (y-mu)*omega*G/V
-  out_ <- t(X)%*%z
+  out_ <- t(X)%*%z/summary(object)$dispersion
   colnames(out_) <- " "
   rownames(out_) <- names(coef(object))
   print(out_)
@@ -1497,7 +1240,7 @@ estequa.glm <- function(object,...){
 #' @title Generalized Variance Inflation Factor
 #' @description Computes the generalized variance inflation factor (GVIF) for a weighted or unweighted normal linear model.
 #' @param model an object of the class \emph{lm}.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
 #' @param ...	further arguments passed to or from other methods.
 #' @details If the number of degrees of freedom is 1 then the GVIF reduces to the Variance
 #' Inflation Factor (VIF).
@@ -1530,9 +1273,7 @@ gvif.lm <- function(model,verbose=TRUE,...){
   X <- model.matrix(model)
   postos <- model$assign
   vars <- attr(model$terms,"term.labels")
-  if(!is.null(model$weights))
-    X <- matrix(sqrt(model$weights),nrow(X),ncol(X))*X
-  vcovar <- solve(t(X)%*%X)
+  vcovar <- vcov(model)
   if(names(coef(model))[1]=="(Intercept)"){
     vcovar <- vcovar[-1,-1]
     postos <- postos[-1]
@@ -1558,7 +1299,7 @@ gvif.lm <- function(model,verbose=TRUE,...){
 #' @title Generalized Variance Inflation Factor
 #' @description Computes the generalized variance inflation factor (GVIF) for a generalized linear model.
 #' @param model an object of the class \emph{glm}.
-#' @param verbose an (optional) logical switch indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param verbose an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
 #' @param ...	further arguments passed to or from other methods.
 #' @details If the number of degrees of freedom is 1 then the GVIF reduces to the Variance
 #' Inflation Factor (VIF).
@@ -1598,8 +1339,7 @@ gvif.glm <- function(model,verbose=TRUE,...){
   X <- model.matrix(model)
   postos <- attr(X,"assign")
   vars <- attr(model$terms,"term.labels")
-  X <- matrix(sqrt(model$weights),nrow(X),ncol(X))*X
-  vcovar <- solve(t(X)%*%X)
+  vcovar <- vcov(model)
   if(names(coef(model))[1]=="(Intercept)"){
     vcovar <- vcovar[-1,-1]
     postos <- postos[-1]
@@ -1625,10 +1365,10 @@ gvif.glm <- function(model,verbose=TRUE,...){
 #' @title Confidence Intervals for Generalized Linear Models
 #' @description Computes confidence intervals based on Wald, likelihood-ratio, Rao's score or Terrell's gradient tests for a generalized linear model.
 #' @param model an object of the class \emph{glm}.
-#' @param test an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lr") tests. By default, \code{test} is set to be "wald".
-#' @param digits an (optional) integer value indicating the number of decimal places to be used. By default, \code{digits} is set to be 5.
-#' @param level an (optional) value indicating the required confidence level. By default, \code{level} is set to be 0.95.
-#' @param verbose an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.
+#' @param test an (optional) character string indicating the required type of test. The available options are: Wald ("wald"), Rao's score ("score"), Terrell's gradient ("gradient"), and likelihood ratio ("lr") tests. As default, \code{test} is set to "wald".
+#' @param digits an (optional) integer value indicating the number of decimal places to be used. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.
+#' @param level an (optional) value indicating the required confidence level. As default, \code{level} is set to 0.95.
+#' @param verbose an (optional) logical indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
 #' @details The approximate 100(\code{level})\% confidence interval for \eqn{\beta} based on the \code{test} test is the set of values of \eqn{\beta_0} for which the hypothesis \eqn{H_0}: \eqn{\beta=\beta_0} versus \eqn{H_1}: \eqn{\beta!=\beta_0} is not rejected at the approximate significance level of 100(1-\code{level})\%. The Wald, Rao's score and Terrell's gradient tests are performed using the expected Fisher information matrix.
 #' @return A matrix with so many rows as parameters in the linear predictor and two columns: "Lower limit" and "Upper limit".
 #' @references Buse A. (1982) The Likelihood Ratio, Wald, and Lagrange Multiplier Tests: An Expository Note. \emph{The American Statistician} 36, 153-157.
@@ -1648,7 +1388,7 @@ gvif.glm <- function(model,verbose=TRUE,...){
 #' confint2(fit2, test="lr")
 #' confint2(fit2, test="gradient")
 #'
-confint2 <- function(model, level=0.95, test=c("wald","lr","score","gradient"), digits=5, verbose=TRUE){
+confint2 <- function(model, level=0.95, test=c("wald","lr","score","gradient"), digits=max(3, getOption("digits") - 2), verbose=TRUE){
   test <- match.arg(test)
   if(class(model)[1]!="glm")
     stop("Only glm-type objects are supported!!",call.=FALSE)
@@ -1716,25 +1456,29 @@ confint2 <- function(model, level=0.95, test=c("wald","lr","score","gradient"), 
 #' @description Computes residuals for a fitted linear or generalized linear model.
 #' @param object a object of the class \emph{lm} or \emph{glm}.
 #' @param type an (optional) character string giving the type of residuals which should be returned. The available options for LMs are: (1) externally studentized ("external"); (2) internally studentized ("internal") (default). The available options for GLMs are: (1) "pearson"; (2) "deviance" (default);  (3) "quantile".
-#' @param standardized an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. By default, \code{standardized} is set to be FALSE.
-#' @param plot.it an (optional) logical switch indicating if a plot of the residuals versus the fitted values is required. By default, \code{plot.it} is set to be FALSE.
+#' @param standardized an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. As default, \code{standardized} is set to FALSE.
+#' @param plot.it an (optional) logical switch indicating if a plot of the residuals versus the fitted values is required. As default, \code{plot.it} is set to FALSE.
 #' @param identify an (optional) integer value indicating the number of individuals to identify on the plot of residuals. This is only appropriate when \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods
 #' @return A vector with the observed residuals type \code{type}.
+#' @references Atkinson A.C. (1985) \emph{Plots, Transformations and Regression}. Oxford University Press, Oxford.
+#' @references Davison A.C., Gigli A. (1989) Deviance Residuals and Normal Scores Plots. \emph{Biometrika} 76, 211-221.
+#' @references Dunn P.K., Smyth G.K. (1996) Randomized Quantile Residuals. \emph{Journal of Computational and Graphical Statistics} 5, 236-244.
+#' @references Pierce D.A., Schafer D.W. (1986) Residuals in Generalized Linear Models. \emph{Journal of the American Statistical Association} 81, 977-986.
 #' @examples
 #' ###### Example 1: Species richness in plots
 #' data(richness)
 #' fit1 <- lm(Species ~ Biomass + pH, data=richness)
-#' residuals2(fit1, type="external", col="red", pch=20, col.lab="blue", plot.it=TRUE,
+#' residuals2(fit1, type="external", plot.it=TRUE, col="red", pch=20, col.lab="blue",
 #'            col.axis="blue", col.main="black", family="mono", cex=0.8)
 #'
 #' ###### Example 2: Lesions of Aucuba mosaic virus
 #' data(aucuba)
 #' fit2 <- glm(lesions ~ time, family=poisson, data=aucuba)
-#' residuals2(fit2, type="quantile", col="red", pch=20, col.lab="blue", plot.it=TRUE,
+#' residuals2(fit2, type="quantile", plot.it=TRUE, col="red", pch=20, col.lab="blue",
 #'            col.axis="blue",col.main="black",family="mono",cex=0.8)
 #' @export residuals2
-residuals2 <- function(object,type,standardized=FALSE,plot.it=TRUE,identify,...){
+residuals2 <- function(object,type,standardized=FALSE,plot.it=FALSE,identify,...){
   if(class(object)[1]!="glm" & class(object)[1]!="lm") stop("Only lm- and glm-type objects are supported!!",call.=FALSE)
   if(class(object)[1]=="glm" & missingArg(type)) type <- "deviance"
   if(class(object)[1]=="lm" & missingArg(type)) type <- "internal"
@@ -1804,16 +1548,16 @@ residuals2 <- function(object,type,standardized=FALSE,plot.it=TRUE,identify,...)
 #' @title Variable Selection in Generalized Linear Models
 #' @description Performs variable selection in generalized linear models using hybrid versions of forward stepwise and backward stepwise.
 #' @param model an object of the class \emph{glm}.
-#' @param direction an (optional) character string indicating the type of procedure which should be used. The available options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). By default, \code{direction} is set to be "forward".
-#' @param levels an (optional) two-dimensional vector of values in the interval \eqn{(0,1)} indicating the levels at which the variables should in and out from the model. This is only appropiate if \code{criterion}="p-value". By default, \code{levels} is set to be \code{c(0.05,0.05)}.
-#' @param test an (optional) character string indicating the statistical test which should be used to compare nested models. The available options are: Wald ("wald"), Rao's score ("score"), likelihood-ratio ("lr") and gradient ("gradient") tests. By default, \code{test} is set to be "wald".
-#' @param criterion an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted deviance-based R-squared ("adjr2"), and \emph{p}-value of the \code{test} test ("p-value"). By default, \code{criterion} is set to be "adjr2".
-#' @param ...	further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC/QICu, which by default is set to be 2.
-#' @param trace an (optional) logical switch indicating if should the stepwise reports be printed. By default, \code{trace} is set to be TRUE.
-#' @param scope an (optional) list, containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. By default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.
+#' @param direction an (optional) character string indicating the type of procedure which should be used. The available options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). As default, \code{direction} is set to "forward".
+#' @param levels an (optional) two-dimensional vector of values in the interval \eqn{(0,1)} indicating the levels at which the variables should in and out from the model. This is only appropiate if \code{criterion}="p-value". As default, \code{levels} is set to \code{c(0.05,0.05)}.
+#' @param test an (optional) character string indicating the statistical test which should be used to compare nested models. The available options are: Wald ("wald"), Rao's score ("score"), likelihood-ratio ("lr") and gradient ("gradient") tests. As default, \code{test} is set to "wald".
+#' @param criterion an (optional) character string indicating the criterion which should be used to compare the candidate models. The available options are: AIC ("aic"), BIC ("bic"), adjusted deviance-based R-squared ("adjr2"), and \emph{p}-value of the \code{test} test ("p-value"). As default, \code{criterion} is set to "adjr2".
+#' @param ...	further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC/QICu, which by default is set to 2.
+#' @param trace an (optional) logical switch indicating if should the stepwise reports be printed. As default, \code{trace} is set to TRUE.
+#' @param scope an (optional) list, containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. As default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.
 #' @details The "hybrid forward stepwise" algorithm starts with the simplest model (which may
-#' be chosen at the argument \code{scope}, and by default, is a model whose parameters in the
-#' linear predictor, except the intercept, if any, are set to be 0), and then the candidate
+#' be chosen at the argument \code{scope}, and As default, is a model whose parameters in the
+#' linear predictor, except the intercept, if any, are set to 0), and then the candidate
 #' models are built by hierarchically including effects in the linear predictor, whose
 #' "relevance" and/or "importance" in the model fit is assessed by comparing nested models
 #' (that is, by comparing the models with and without the added effect) using a criterion
@@ -1955,6 +1699,7 @@ stepCriterion.glm <- function(model, criterion=c("adjr2","bic","aic","p-value","
       else cat("     Variance: ",model$family$varfun,"\n")
     }else cat("\n       Family: ",model$family$family,"\n")
   cat("Link function: ",model$family$link,"\n")
+  cat("    Criterion: ",criters2[criters==criterion],"\n")
   }
 
   if(direction=="forward"){
@@ -2277,7 +2022,7 @@ stepCriterion.glm <- function(model, criterion=c("adjr2","bic","aic","p-value","
       cat("\n Effects are included when their p-values are lower than",levels[1])
       cat("\n Effects are dropped when their p-values are higher than",levels[2])
     }
-    if(!is.null(xxx$k)) cat("The magnitude of the penalty in the AIC/QICu was set to be ",xxx$k)
+    if(!is.null(xxx$k)) cat("The magnitude of the penalty in the AIC/QICu was set to ",xxx$k)
     cat("\n")
   }
   out_$final <- paste("~",as.character(oldformula)[length(oldformula)],sep=" ")
@@ -2285,15 +2030,15 @@ stepCriterion.glm <- function(model, criterion=c("adjr2","bic","aic","p-value","
 }
 #' @title Local Influence for Generalized Linear Models
 #' @description Computes some measures and, optionally, display	graphs of them to perform
-#' influence analysis based on the approaches described in Cook (1986).
+#' influence analysis based on the approaches described by Cook (1986).
 #' @param object an object of class \emph{glm}.
 #' @param type an (optional) character string indicating the type of approach to study the
-#' local influence. The options are: the absolute value of the elements of the eigenvector which corresponds to the maximum absolute eigenvalue ("local"); and the absolute value of the elements of the main diagonal ("total"). By default, \code{type} is set to be "total".
+#' local influence. The options are: the absolute value of the elements of the eigenvector which corresponds to the maximum absolute eigenvalue ("local"); and the absolute value of the elements of the main diagonal ("total"). As default, \code{type} is set to "total".
 #' @param perturbation an (optional) character string indicating the perturbation scheme
-#' to apply. The options are: case weight perturbation of observations ("case-weight"); perturbation of covariates ("covariate"); and perturbation of response ("response"). By default, \code{perturbation} is set to be "case-weight".
+#' to apply. The options are: case weight perturbation of observations ("case-weight"); perturbation of covariates ("covariate"); and perturbation of response ("response"). As default, \code{perturbation} is set to "case-weight".
 #' @param plot.it an (optional) logical indicating if the plot of the measures of local
 #' influence is required or just the data matrix in which that plot is based. By default,
-#' \code{plot.it} is set to be FALSE.
+#' \code{plot.it} is set to FALSE.
 #' @param covariate an character string which (partially) match with the names of one of
 #' the parameters in the linear predictor. This is only appropriate if \code{perturbation="covariate"}.
 #' @param coefs	an (optional) character string which (partially) match with the names of
@@ -2327,6 +2072,7 @@ localInfluence.glm <- function(object,type=c("total","local"),perturbation=c("ca
   if(!missingArg(coefs)){
     ids <- grepl(coefs,rownames(object$coefficients),ignore.case=TRUE)
     if(sum(ids) > 0) subst <- rownames(object$coefficients)[ids]
+    else stop(paste("There are no coefficients with the name",coefs,collapse=""),call.=FALSE)
   }
   if(perturbation=="covariate"){
     if(missingArg(covariate)) stop("Under this perturbation scheme a covariate should be specified!!",call.=FALSE)
@@ -2391,16 +2137,16 @@ localInfluence.glm <- function(object,type=c("total","local"),perturbation=c("ca
 #' @param object a model fit object.
 #' @param transf an one-sided formula giving the predictors that are candidates for transformation.
 #' @param epsilon an (optional) numerical value. If the maximum relative change in coefficients is less than
-#'                \emph{epsilon}, then convergence is declared. By default, \emph{epsilon} is set to be 0.0001.
+#'                \emph{epsilon}, then convergence is declared. As default, \emph{epsilon} is set to 0.0001.
 #' @param maxiter an (optional) positive integer value indicating the maximum number of iterations. By default,
-#'                \emph{maxiter} is set to be 30.
+#'                \emph{maxiter} is set to 30.
 #' @param trace an (optional) logical indicating if should the record of iterations be printed. By default,
-#'                \emph{trace} is set to be FALSE.
+#'                \emph{trace} is set to FALSE.
 #' @param digits an (optional) integer value indicating the number of decimal places to be used.
 #' @param ...	further arguments passed to or from other methods.
 #' @return Two matrices with the values of marginal and omnibus tests.
 #' @export BoxTidwell
-BoxTidwell <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,digits=getOption("digits") - 2,...){
+BoxTidwell <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,digits=max(3, getOption("digits") - 2),...){
   UseMethod("BoxTidwell")
 }
 
@@ -2410,11 +2156,11 @@ BoxTidwell <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,digit
 #' @param object an object of the class \emph{lm}.
 #' @param transf an one-sided formula giving the quantitative predictors that are candidates for transformation.
 #' @param epsilon an (optional) numerical value. If the maximum relative change in coefficients is less than
-#'                \emph{epsilon}, then convergence is declared. By default, \emph{epsilon} is set to be 0.0001.
+#'                \emph{epsilon}, then convergence is declared. As default, \emph{epsilon} is set to 0.0001.
 #' @param maxiter an (optional) positive integer value indicating the maximum number of iterations. By default,
-#'                \emph{maxiter} is set to be 30.
+#'                \emph{maxiter} is set to 30.
 #' @param trace an (optional) logical indicating if should the record of iterations be printed. By default,
-#'              \emph{trace} is set to be FALSE.
+#'              \emph{trace} is set to FALSE.
 #' @param digits an (optional) integer value indicating the number of decimal places to be used.
 #' @param ...	further arguments passed to or from other methods.
 #' @return a list list with components including
@@ -2469,7 +2215,7 @@ BoxTidwell <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,digit
 #' fit5 <- update(fit5,formula=log(wlens) ~ I(age^(-1/3)))
 #' AIC(fit5)
 #'
-BoxTidwell.lm <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,digits=getOption("digits") - 2,...){
+BoxTidwell.lm <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,digits=max(3, getOption("digits") - 2),...){
   X <- model.matrix(object)
   n <- nrow(X)
   transf.terms <- attr(terms(transf),"term.labels")
@@ -2527,11 +2273,11 @@ BoxTidwell.lm <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,di
 #' @param object an object of the class \emph{glm}.
 #' @param transf an one-sided formula giving the quantitative predictors that are candidates for transformation.
 #' @param epsilon an (optional) numerical value. If the maximum relative change in coefficients is less than
-#'                \emph{epsilon}, then convergence is declared. By default, \emph{epsilon} is set to be 0.0001.
+#'                \emph{epsilon}, then convergence is declared. As default, \emph{epsilon} is set to 0.0001.
 #' @param maxiter an (optional) positive integer value indicating the maximum number of iterations. By default,
-#'                \emph{maxiter} is set to be 30.
+#'                \emph{maxiter} is set to 30.
 #' @param trace an (optional) logical indicating if should the record of iterations be printed. By default,
-#'              \emph{trace} is set to be FALSE.
+#'              \emph{trace} is set to FALSE.
 #' @param digits an (optional) integer value indicating the number of decimal places to be used.
 #' @param ...	further arguments passed to or from other methods.
 #' @return a list list with components including
@@ -2553,7 +2299,7 @@ BoxTidwell.lm <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,di
 #' fit1 <- glm(cases ~ age + city, offset=log(population), family=poisson(log), data=skincancer)
 #' AIC(fit1)
 #' BoxTidwell(fit1, transf= ~ age)
-#' fit1 <- update(fit1,formula=cases ~ I(age^(-1/2)) + city)
+#' fit1 <- update(fit1,formula=. ~ I(age^(-1/2)) + city)
 #' AIC(fit1)
 #'
 #' ###### Example 3: Gas mileage
@@ -2561,7 +2307,7 @@ BoxTidwell.lm <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,di
 #' fit3 <- glm(mpg ~ horsepower + weight, family=inverse.gaussian(log), data=Auto)
 #' AIC(fit3)
 #' BoxTidwell(fit3, transf= ~ horsepower + weight)
-#' fit3 <- update(fit3,formula=mpg ~ I(horsepower^(-1/3)) + weight)
+#' fit3 <- update(fit3,formula=. ~ I(horsepower^(-1/3)) + weight)
 #' AIC(fit3)
 #'
 #' ###### Example 4: Advertising
@@ -2569,13 +2315,19 @@ BoxTidwell.lm <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,di
 #' fit4 <- glm(sales ~ TV + radio, family=gaussian(log), data=advertising)
 #' AIC(fit4)
 #' BoxTidwell(fit4, transf= ~ TV)
-#' fit4 <- update(fit4,formula=sales ~ I(TV^(1/10)) + radio)
-#' AIC(fit4)
-#' fit4 <- update(fit4,formula=sales ~ I(TV^(1/10))*radio)
+#' fit4 <- update(fit4,formula=. ~ I(TV^(1/10)) + radio)
 #' AIC(fit4)
 #'
+#' ###### Example 5: Leukaemia Patients
+#' data(leuk, package="MASS")
+#' fit5 <- glm(ifelse(time>=52,1,0) ~ ag + wbc, family=binomial, data=leuk)
+#' AIC(fit5)
+#' BoxTidwell(fit5, transf= ~ wbc)
+#' fit5 <- update(fit5,formula=. ~ ag + I(wbc^(-0.18)))
+#' AIC(fit5)
+#'
 
-BoxTidwell.glm <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,digits=getOption("digits") - 2,...){
+BoxTidwell.glm <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,digits=max(3, getOption("digits") - 2),...){
   X <- model.matrix(object)
   n <- nrow(X)
   transf.terms <- attr(terms(transf),"term.labels")
@@ -2595,8 +2347,8 @@ BoxTidwell.glm <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,d
     old.powers <- new.powers
     X22 <- X2^matrix(old.powers,nrow=n,ncol=nv,byrow=TRUE)
     X2.log <- X22*log(X22)
-    mod.1 <- glm.fit(x=cbind(X22,X1),y=object$y,family=object$family,weights=object$prior.weights,offset=offset,intercept=FALSE)
-    mod.2 <- glm.fit(x=cbind(X2.log,X22,X1),y=object$y,family=object$family,weights=object$prior.weights,offset=offset,intercept=FALSE)
+    mod.1 <- glm.fit(x=cbind(X22,X1),y=object$y,family=object$family,weights=object$prior.weights,offset=offset)
+    mod.2 <- glm.fit(x=cbind(X2.log,X22,X1),y=object$y,family=object$family,weights=object$prior.weights,offset=offset)
     new.powers <- old.powers*(1 + coef(mod.2)[1:nv]/coef(mod.1)[1:nv])
     tol <- max(abs(new.powers-old.powers)/abs(new.powers))
     if(trace) cat("Iteration=",iter,"   taus=",new.powers,"\n")
@@ -2625,3 +2377,6 @@ BoxTidwell.glm <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,d
   cat("chi = ",format(omnibus[1],digits=digits),", df = ",omnibus[2],", Pr(>chi) = ",format.pval(omnibus[3],digits=digits),"\n")
   return(invisible(list(marginal=TAB,omnibus=omnibus)))
 }
+
+
+

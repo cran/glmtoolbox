@@ -27,31 +27,31 @@ glmgee(
 \item{formula}{a \code{formula} expression of the form \code{response ~ x1 + x2 + ...}, which is a symbolic description of the linear predictor of the model to be fitted to the data.}
 
 \item{family}{an (optional) \code{family} object, that is, a list of functions and expressions for defining link and variance functions. Families (and links) supported are the same supported by \link{glm} using its \link{family} argument, that is,
-\code{gaussian}, \code{binomial}, \code{poisson}, \code{Gamma}, \code{inverse.gaussian}, and \code{quasi}. The family \code{negative.binomial} in the library \pkg{MASS} are also available. By default, the argument \code{family} is set to be \code{gaussian(identity)}.}
+\code{gaussian}, \code{binomial}, \code{poisson}, \code{Gamma}, \code{inverse.gaussian}, and \code{quasi}. The family \code{negative.binomial} in the library \pkg{MASS} are also available. As default, the argument \code{family} is set to \code{gaussian(identity)}.}
 
 \item{weights}{an (optional) vector of positive "prior weights" to be used in the fitting process. The length of \code{weights} should be the same as the total number of observations.}
 
 \item{id}{a vector which identifies the subjects or clusters. The length of \code{id} should be the same as the number of observations.}
 
-\item{waves}{an (optional) positive integer-valued variable that is used to identify the order and spacing of observations within clusters. This argument is crucial when there are missing values and gaps in the data. By default, \code{waves} is equal to the integers from 1 to the size of each cluster.}
+\item{waves}{an (optional) positive integer-valued variable that is used to identify the order and spacing of observations within clusters. This argument is crucial when there are missing values and gaps in the data. As default, \code{waves} is equal to the integers from 1 to the size of each cluster.}
 
 \item{data}{an (optional) \code{data frame} in which to look for variables involved in the \code{formula} expression, as well as for variables specified in the arguments \code{id} and \code{weights}. The data are assumed to be sorted by \code{id} and time.}
 
 \item{subset}{an (optional) vector specifying a subset of observations to be used in the fitting process.}
 
-\item{corstr}{an (optional) character string which allows to specify the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(\emph{m})", "Non-Stationary-M-dependent(\emph{m})", "AR-M-dependent(\emph{m})", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. By default, \code{corstr} is set to be "Independence".}
+\item{corstr}{an (optional) character string which allows to specify the working-correlation structure. The available options are: "Independence", "Unstructured", "Stationary-M-dependent(\emph{m})", "Non-Stationary-M-dependent(\emph{m})", "AR-M-dependent(\emph{m})", "Exchangeable" and "User-defined", where \emph{m} represents the lag of the dependence. As default, \code{corstr} is set to "Independence".}
 
 \item{corr}{an (optional) square matrix of the same dimension of the maximum cluster size containing the user specified correlation. This is only appropriate if \code{corstr} is specified to be "User-defined".}
 
 \item{start}{an (optional) vector of starting values for the parameters in the linear predictor.}
 
-\item{scale.fix}{an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. By default, \code{scale.fix} is set to be FALSE.}
+\item{scale.fix}{an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. As default, \code{scale.fix} is set to FALSE.}
 
-\item{scale.value}{an (optional) numeric value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. By default, \code{scale.value} is set to be 1.}
+\item{scale.value}{an (optional) numeric value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. As default, \code{scale.value} is set to 1.}
 
-\item{toler}{an (optional) positive value which represents the \emph{convergence tolerance}. The convergence is reached when the maximum of the absolute relative differences between the values of the parameters in the linear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. By default, \code{toler} is set to be 0.00001.}
+\item{toler}{an (optional) positive value which represents the \emph{convergence tolerance}. The convergence is reached when the maximum of the absolute relative differences between the values of the parameters in the linear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. As default, \code{toler} is set to 0.00001.}
 
-\item{maxit}{an (optional) integer value which represents the maximum number of iterations allowed for the fitting algorithm. By default, \code{maxit} is set to be 50.}
+\item{maxit}{an (optional) integer value which represents the maximum number of iterations allowed for the fitting algorithm. As default, \code{maxit} is set to 50.}
 
 \item{trace}{an (optional) logical variable. If TRUE, output is produced for each iteration of the estimating algorithm.}
 
@@ -131,7 +131,7 @@ a vector of regression parameters. The parameter estimates are obtained by itera
 solving the estimating equations described by Liang and Zeger (1986).
 
 If the maximum cluster size is 6 and for a cluster of size 4 the value
-of \code{waves} is set to be 2, 4, 5, 6, then it means that the data at
+of \code{waves} is set to 2, 4, 5, 6, then it means that the data at
 times 1 and 3 are missing, which should be taken into account by
 \code{glmgee} when the structure of the correlation matrix is assumed
 to be "Unstructured", "Stationary-M-dependent", "Non-Stationary-M-dependent"
@@ -206,7 +206,8 @@ Liang K.Y., Zeger S.L. (1986) Longitudinal data analysis using generalized linea
 Zeger S.L., Liang K.Y. (1986) Longitudinal data analysis for discrete and continuous outcomes.
 \emph{Biometrics} 42:121-130.
 
-Hardin J.W., Hilbe J.M. (2013) \emph{Generalized Estimating Equations}. Chapman & Hall, London.
+\href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
+\emph{The R Journal} 15:105-133.}
 }
 \seealso{
 \link{gnmgee}, \link{wglmgee}

@@ -4,14 +4,14 @@
 \alias{adjR2.glm}
 \title{Adjusted R-squared in Generalized Linear Models}
 \usage{
-\method{adjR2}{glm}(..., digits = 4, verbose = TRUE)
+\method{adjR2}{glm}(..., digits = max(3, getOption("digits") - 2), verbose = TRUE)
 }
 \arguments{
 \item{...}{one or several objects of the class \emph{glm}, which are obtained from the fit of generalized linear models.}
 
-\item{digits}{an (optional) integer value indicating the number of decimal places to be used. By default, \code{digits} is set to be 4.}
+\item{digits}{an (optional) integer value indicating the number of decimal places to be used. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.}
 
-\item{verbose}{an (optional) logical indicating if should the report of results be printed. By default, \code{verbose} is set to be TRUE.}
+\item{verbose}{an (optional) logical indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.}
 }
 \value{
 a matrix with the following columns
