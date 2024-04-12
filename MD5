@@ -1,9 +1,9 @@
-d747da7a0ce218f6970dc4928144fc46 *DESCRIPTION
-2c36d96d73149815d803bb1b2098251e *NAMESPACE
-e3abbcd8e0d6bdcb786953a990f8e577 *R/data.R
-0361995473cc0418ee6a7ea02043968f *R/geeglm.R
-59aaefb2e902be90f38a4c9e46b28091 *R/glms.R
-17138ba6f8ce9ae8f147b885705e56ae *R/overglm3.R
+fd36c3c82411eadc1f5bc048ee765af6 *DESCRIPTION
+1e086ac76e8f30bc34efb5bef7f1b73b *NAMESPACE
+0d68d3f658dae1c54e36c21be2aa7d6e *R/data.R
+a33f5defbfc56490cd5f4251ecea9142 *R/geeglm.R
+83283d7f3e3ff316b1cefe1c069074ce *R/glms.R
+775aa3a1901c21615d4e217235dbc68d *R/overglm3.R
 159fe92121482d55519c20525ca21a8a *data/Cortisol.rda
 ee639f76037c03ed61bc72fa8437abaf *data/Drosophila.rda
 619400afdc0d7e9d33642dc54b8b5f49 *data/GUIDE.rda
@@ -42,8 +42,8 @@ d5acfbc676bf8393e5a76fbef4f09754 *data/skincancer.rda
 7cec0263c4d1410a1a40da81e819ceb5 *data/uti.rda
 4479d6adde399a163f9fe19df33c3392 *man/AGPC.Rd
 29d95756483bac8f14c3c2bf9e303b53 *man/BoxTidwell.Rd
-616eed53095fa0b1814a61f80e766a21 *man/BoxTidwell.glm.Rd
-375d80f4e9433e6e0c213233f1a8cf81 *man/BoxTidwell.lm.Rd
+86672e9f18ab81389c466b6cad6cda49 *man/BoxTidwell.glm.Rd
+2fe331bc2551fa39e53f21a44e9952f0 *man/BoxTidwell.lm.Rd
 1a0841e5e3175fb34aa9e50a6bb0a3a3 *man/CIC.Rd
 f9cd50e3e09fa9e65f1abf52e59f0a29 *man/Cortisol.Rd
 6a9077aea71a27aa550a04dd74cd6002 *man/Drosophila.Rd
@@ -56,7 +56,7 @@ cd492bb1dde7aad75684693a22b5e6cc *man/Oranges.Rd
 062d1a937aa8f4d40e40036fd6119d4c *man/PAC.Rd
 b81018cd38533e680c9a12c3dd90d58d *man/QIC.Rd
 c73321e30b302ce9313bf639e0bce3b3 *man/RJC.Rd
-64421e0352cffcaf5674d008510bac51 *man/ROCc.Rd
+40714533a9d3f8f0fe8453b4b4319b33 *man/ROCc.Rd
 0de99ee0655628c26521aa7a115e988a *man/SGPC.Rd
 4520cd8f252ccd280ae8a21c3a879bd8 *man/Seizures.Rd
 27a97a7b1f90314f0a6b7d6132cfd7c0 *man/Steel.Rd
@@ -73,6 +73,7 @@ a45a49be33e9836bcd55721ec12b7f82 *man/anova.overglm.Rd
 94e5ce20df41dbe422d7c4d793585169 *man/anova.zeroinflation.Rd
 0bd6a83a6c587b4c7f99accbb76d39b3 *man/anova2.Rd
 a22ae52e661a6efc6c64a7a303752ba4 *man/aucuba.Rd
+8ff2cae5eefefde72447c3a835992498 *man/bestSubset.Rd
 f1206e6f00d6fc16800afbd4a838b498 *man/bladder.Rd
 60923562e680458af805b9547afe274e *man/brains.Rd
 6af2671dee428655e65da9ebe615fbb2 *man/calls.Rd
@@ -104,7 +105,7 @@ c037f765c463a78e8131d1635eb2457b *man/estequa.overglm.Rd
 101e784c102be82d5cec948023833eb6 *man/estequa.zeroinflation.Rd
 dbcc6b35e63d23ff5c1509fd7572ccb9 *man/fabric.Rd
 4f80efe939a0168042aadf7bd724676e *man/glmgee.Rd
-0500ede5d6763a4fae0b03ec361a5cfa *man/gnm.Rd
+b4b3cb0c9e746f2d09668135bd86842f *man/gnm.Rd
 cda94913b6986ecf708f90cae0955ffe *man/gnmgee.Rd
 2d3332f804391f0146fe611e74eff188 *man/gvif.Rd
 149ae0049a25aa33533672a77e60f457 *man/gvif.glm.Rd
@@ -139,10 +140,10 @@ cefba4eff069675279721f2d7f725166 *man/shelflife.Rd
 7d6cd775cd69d2f21f1e37c3271b9ec8 *man/skincancer.Rd
 f857a937cbd12713113dc60254c3de74 *man/spruces.Rd
 3ac5077e90ccb0700c5bc5bd66340256 *man/stepCriterion.Rd
-392463f8a6317974fc682cbf8049265f *man/stepCriterion.glm.Rd
-2b54756c9cd5a7832b60349f418907f7 *man/stepCriterion.glmgee.Rd
-fb945f875cbaa787b5ee156d85079238 *man/stepCriterion.lm.Rd
-8a5821befa55fd1da87eba15c4fc4633 *man/stepCriterion.overglm.Rd
+f170167b0736d2858ff9658358bdbb40 *man/stepCriterion.glm.Rd
+364905db3cfb77d7f55e30b357e2c16a *man/stepCriterion.glmgee.Rd
+bd1451066fe2ddaa20c5d4e11ec94b37 *man/stepCriterion.lm.Rd
+0dd7dda978e36ea418374cf523ace82a *man/stepCriterion.overglm.Rd
 1050674aa55161487511cb9cb3cc0e93 *man/swimmers.Rd
 c6bb0b426f682b363c242aecc33c1416 *man/uti.Rd
 997e0dfd458ba26ad9c0ad31e4f6b173 *man/vcov.glmgee.Rd

@@ -221,13 +221,13 @@ overglm <- function(formula, offset, family="nb1(log)", weights, data, subset, n
   if(family=="rcb"){
     ep <- 1
     objective <- function(theta){
-      mu <- familyf$linkinv(tcrossprod(X,t(theta[1:p])) + offs)
+      mu <- familyf$linkinv(X%*%theta[1:p] + offs)
       phi <- exp(theta[p + 1])/(1 + exp(theta[p + 1]))
       l <- log(mu*dbinom(y,m,(1 - phi)*mu + phi) + (1 - mu)*dbinom(y,m,(1 - phi)*mu))
       return(sum(weights*l))
     }
     score <- function(theta){
-      eta <- tcrossprod(X,t(theta[1:p])) + offs
+      eta <- X%*%theta[1:p] + offs
       phi <- exp(theta[p + 1])/(1 + exp(theta[p + 1]))
       mu <- familyf$linkinv(eta)
       dmudeta <- familyf$mu.eta(eta)
@@ -236,17 +236,17 @@ overglm <- function(formula, offset, family="nb1(log)", weights, data, subset, n
       a5 <- y/((1 - phi)*mu); a6 <- (m - y)/(1 - (1 - phi)*mu)
       a <- (a1*((a3 - a4)*(1 - phi) + 1/mu) + a2*((a5 - a6)*(1 - phi) - 1/(1 - mu)))/(a1 + a2)
       b <- (a1*(a3 - a4)*(1 - mu) + a2*(a6 - a5)*mu)*phi*(1 - phi)/(a1 + a2)
-      return(c(t(X)%*%(weights*a*dmudeta),sum(weights*b)))
+      return(c(crossprod(X,weights*a*dmudeta),sum(weights*b)))
     }
     theta0 <- function(start=NULL){
       if(is.null(start)) betas <- suppressWarnings(glm.fit(y=cbind(y,m - y),x=X,offset=offs,weights=weights,family=familyf)$coefficients)
       else betas <- start
-      mus <- familyf$linkinv(tcrossprod(X,t(betas)) + offs)
+      mus <- familyf$linkinv(X%*%betas + offs)
       l0 <- mean(abs((y - m*mus)^2/(m*mus*(1 - mus)) - 1)/ifelse(m==1,1,m - 1))
       return(c(betas,sqrt(abs(log(l0/(1-l0))))))
     }
     hess <- function(theta){
-      eta <- tcrossprod(X,t(theta[1:p])) + offs
+      eta <- X%*%theta[1:p] + offs
       phi <- exp(theta[p + 1])/(1 + exp(theta[p + 1]))
       mu <- familyf$linkinv(eta)
       dmudeta <- familyf$mu.eta(eta)
@@ -267,8 +267,8 @@ overglm <- function(formula, offset, family="nb1(log)", weights, data, subset, n
                a1*((a3 - a4)*(1 - mu)*(1 - 2*phi) - phi*(1 - phi)*(1 - mu)^2*(y/((1 - phi)*mu + phi)^2 +
                                                                                 (m - y)/(1 - (1 - phi)*mu - phi)^2)) + a2*((a6 - a5)*mu*(1 - 2*phi) - phi*(1 - phi)*mu^2*(y/((1 - phi)*mu)^2 +
                                                                                                                                                                             (m - y)/(1 - (1 - phi)*mu)^2)))*phi*(1 - phi)/(a1 + a2) - b^2
-      hessiana[1:p,1:p] <- t(X)%*%(matrix(weights*(aa*dmudeta^2 + a*dmu2deta2),nrow(X),ncol(X))*X)
-      hessiana[p + 1,1:ncol(X)] <- hessiana[1:p,p + 1] <- t(X)%*%(weights*ab*dmudeta)
+      hessiana[1:p,1:p] <- crossprod(X,matrix(weights*(aa*dmudeta^2 + a*dmu2deta2),n,p)*X)
+      hessiana[p + 1,1:ncol(X)] <- hessiana[1:p,p + 1] <- crossprod(X,weights*ab*dmudeta)
       hessiana[p + 1,p+1] <- sum(weights*bb)
       return(hessiana)
     }
@@ -276,7 +276,7 @@ overglm <- function(formula, offset, family="nb1(log)", weights, data, subset, n
   if(family=="bb"){
     ep <- 1
     objective <- function(theta){
-      eta <- tcrossprod(X,t(theta[1:p])) + offs
+      eta <- X%*%theta[1:p] + offs
       phi <- exp(theta[p + 1])
       mu <- familyf$linkinv(eta)
       l <- (Lgamma(m + 1) - Lgamma(y + 1) - Lgamma(m - y + 1) + Lgamma(1/phi) + Lgamma(y + mu/phi) +
@@ -284,7 +284,7 @@ overglm <- function(formula, offset, family="nb1(log)", weights, data, subset, n
       return(sum(weights*l))
     }
     score <- function(theta){
-      eta <- tcrossprod(X,t(theta[1:p])) + offs
+      eta <- X%*%theta[1:p] + offs
       phi <- exp(theta[p + 1])
       mu <- familyf$linkinv(eta)
       dmudeta <- familyf$mu.eta(eta)
@@ -297,12 +297,12 @@ overglm <- function(formula, offset, family="nb1(log)", weights, data, subset, n
     theta0 <- function(start=NULL){
       if(is.null(start)) betas <- suppressWarnings(glm.fit(y=cbind(y,m - y),x=X,offset=offset,weights=weights,family=familyf)$coefficients)
       else betas <- start
-      mus <- familyf$linkinv(tcrossprod(X,t(betas)) + offs)
+      mus <- familyf$linkinv(X%*%betas + offs)
       l0 <- mean(abs((y - m*mus)^2/(m*mus*(1 - mus)) - 1)/ifelse(m==1,1,m - 1))
       return(c(betas,log(l0/(1-l0))))
     }
     hess <- function(theta){
-      eta <- tcrossprod(X,t(theta[1:p])) + offs
+      eta <- X%*%theta[1:p] + offs
       phi <- exp(theta[p + 1])
       mu <- familyf$linkinv(eta)
       dmudeta <- familyf$mu.eta(eta)
@@ -313,7 +313,7 @@ overglm <- function(formula, offset, family="nb1(log)", weights, data, subset, n
       c4 <-  psigamma(y + mu/phi,1) - psigamma(mu/phi,1)
       c5 <- -psigamma((1 - mu)/phi,1) + psigamma(m - y + (1 - mu)/phi,1)
       hessiana <- matrix(0,p + 1,p + 1)
-      hessiana[1:p,1:p] <- crossprod(X,matrix(weights*((c4 + c5)*dmudeta^2/phi^2 + (c1 + c2)*dmu2deta2/phi),nrow(X),ncol(X))*X)
+      hessiana[1:p,1:p] <- crossprod(X,matrix(weights*((c4 + c5)*dmudeta^2/phi^2 + (c1 + c2)*dmu2deta2/phi),n,p)*X)
       hessiana[1:p,p+1] <- hessiana[p + 1,1:p] <- crossprod(X,weights*dmudeta*((1 - mu)*c5 - mu*c4 - phi*(c1 + c2))/phi^2)
       hessiana[p+1,p+1] <- sum(weights*((mu^2*c4 + (1 - mu)^2*c5 + psigamma(1/phi,1) - psigamma(m + 1/phi,1))/phi^2 - c3/phi))
       return(hessiana)
@@ -323,18 +323,18 @@ overglm <- function(formula, offset, family="nb1(log)", weights, data, subset, n
   if(family=="poi"){
     ep <- 0
     objective <- function(theta){
-      mu <- familyf$linkinv(tcrossprod(X,t(theta[1:p])) + offs)
+      mu <- familyf$linkinv(X%*%theta[1:p] + offs)
       if(zero.trunc) k0 <- - log(1 - exp(-mu)) else k0 <- 0
       l <- - mu + y*log(mu) - Lgamma(y + 1) + k0
       return(sum(weights*l))
     }
     score <- function(theta){
-      eta <- tcrossprod(X,t(theta[1:p])) + offs
+      eta <- X%*%theta[1:p] + offs
       mu <- familyf$linkinv(eta)
       dmudeta <- familyf$mu.eta(eta)
       if(zero.trunc) k <- - exp(-mu)/(1 - exp(-mu)) else k <- 0
       s <- (y/mu - 1 + k)*dmudeta
-      return(t(X)%*%(weights*s))
+      return(crossprod(X,weights*s))
     }
     theta0 <- function(start=NULL){
       if(!is.null(start)) betas <- start
@@ -342,7 +342,7 @@ overglm <- function(formula, offset, family="nb1(log)", weights, data, subset, n
       return(betas)
     }
     hess <- function(theta){
-      eta <- tcrossprod(X,t(theta[1:p])) + offs
+      eta <- X%*%theta[1:p] + offs
       mu <- familyf$linkinv(eta)
       dmudeta <- familyf$mu.eta(eta)
       dmu2deta2 <- grad(familyf$mu.eta,eta)
@@ -351,7 +351,7 @@ overglm <- function(formula, offset, family="nb1(log)", weights, data, subset, n
         k1 <- - exp(-mu)/(1 - exp(-mu)); k2 <- exp(-mu)/(1 - exp(-mu))^2
       }
       ss <- (-y/mu^2 + k2)*dmudeta^2 + (y/mu - 1 + k1)*dmu2deta2
-      hessiana <- t(X)%*%(matrix(weights*ss,nrow(X),ncol(X))*X)
+      hessiana <- crossprod(X,matrix(weights*ss,n,p)*X)
       return(hessiana)
     }
   }
@@ -365,7 +365,7 @@ overglm <- function(formula, offset, family="nb1(log)", weights, data, subset, n
       ep <- 1; tau <- -1
     }
     objective <- function(theta){
-      mu <- familyf$linkinv(tcrossprod(X,t(theta[1:p])) + offs)
+      mu <- familyf$linkinv(X%*%theta[1:p] + offs)
       phi <- exp(theta[p + 1])
       if(family=="nbf") tau <- theta[p + ep]
       u <- phi*mu^tau; v <- u*mu
@@ -374,7 +374,7 @@ overglm <- function(formula, offset, family="nb1(log)", weights, data, subset, n
       return(sum(weights*l))
     }
     score <- function(theta){
-      eta <- tcrossprod(X,t(theta[1:p])) + offs
+      eta <- X%*%theta[1:p] + offs
       phi <- exp(theta[p + 1])
       if(family=="nbf") tau <- theta[p + ep]
       mu <- familyf$linkinv(eta)
@@ -388,13 +388,13 @@ overglm <- function(formula, offset, family="nb1(log)", weights, data, subset, n
       }
       s1 <- (tau*E1 + (tau + 1)*E2 + k1*mu)*dmudeta/mu
       s2 <- E1 + E2 + k2; s3 <- s2*log(mu)
-      if(family=="nbf") return(c(t(X)%*%(weights*s1),sum(weights*s2),sum(weights*s3)))
-      else return(c(t(X)%*%(weights*s1),sum(weights*s2)))
+      if(family=="nbf") return(c(crossprod(X,weights*s1),sum(weights*s2),sum(weights*s3)))
+      else return(c(crossprod(X,weights*s1),sum(weights*s2)))
     }
     theta0 <- function(start=NULL){
       if(!is.null(start)) betas <- start
       else betas <- suppressWarnings(glm.fit(y=y,x=X,offset=offs,weights=weights,family=familyf)$coefficients)
-      mus <- familyf$linkinv(tcrossprod(X,t(betas)) + offs)
+      mus <- familyf$linkinv(X%*%betas + offs)
       if(family=="nbf"){
         fik <- lm((y - mus)^2 ~ -1 + I(mus^2),offset=mus)
         betas <- c(betas,log(abs(coef(fik))),0)
@@ -410,7 +410,7 @@ overglm <- function(formula, offset, family="nb1(log)", weights, data, subset, n
       return(betas)
     }
     hess <- function(theta){
-      eta <- tcrossprod(X,t(theta[1:p])) + offs
+      eta <- X%*%theta[1:p] + offs
       phi <- exp(theta[p + 1])
       if(family=="nbf") tau <- theta[p + ep]
       mu <- familyf$linkinv(eta)
@@ -437,12 +437,12 @@ overglm <- function(formula, offset, family="nb1(log)", weights, data, subset, n
       }
       aa <- - (tau/mu)*(tau*E1/mu - tau*psis/(u^2*mu) - (tau + 1)/(v + 1)) + k11 -
         ((tau + 1)/mu)*(u*(mu + (y - mu)*(tau + 1)) + 1)/(v + 1)^2 - E2*(tau + 1)/mu^2 - tau*E1/mu^2
-      hessiana[1:ncol(X),1:ncol(X)] <- t(X)%*%(matrix(weights*(aa*dmudeta^2 + (tau*E1 + (tau + 1)*E2 + k1*mu)*dmu2deta2/mu),nrow(X),ncol(X))*X)
-      hessiana[ncol(X) + 1,1:ncol(X)] <- hessiana[1:ncol(X),ncol(X) + 1] <- t(X)%*%(weights*(tau*cc1 + (tau + 1)*cc2 + mu*k12)*dmudeta/mu)
+      hessiana[1:ncol(X),1:ncol(X)] <- crossprod(X,matrix(weights*(aa*dmudeta^2 + (tau*E1 + (tau + 1)*E2 + k1*mu)*dmu2deta2/mu),n,p)*X)
+      hessiana[ncol(X) + 1,1:ncol(X)] <- hessiana[1:ncol(X),ncol(X) + 1] <- crossprod(X,weights*(tau*cc1 + (tau + 1)*cc2 + mu*k12)*dmudeta/mu)
       hessiana[ncol(X) + 1,ncol(X) + 1] <- sum(weights*(cc1 + cc2 + k22))
       if(family=="nbf"){
-        hessiana[ncol(X) + 2,1:ncol(X)] <- hessiana[1:ncol(X),ncol(X) + 2] <- t(X)%*%(weights*(log(mu)*(tau*cc1 + (tau + 1)*cc2) + E1 + E2 + mu*k13)*dmudeta/mu)
-        hessiana[ncol(X) + 2,1:ncol(X)] <- hessiana[1:ncol(X),ncol(X) + 2] <- t(X)%*%(weights*(log(mu)*(tau*cc1 + (tau + 1)*cc2 + mu*k12) + E1 + E2 + k24)*dmudeta/mu)
+        hessiana[ncol(X) + 2,1:ncol(X)] <- hessiana[1:ncol(X),ncol(X) + 2] <- crossprod(X,weights*(log(mu)*(tau*cc1 + (tau + 1)*cc2) + E1 + E2 + mu*k13)*dmudeta/mu)
+        hessiana[ncol(X) + 2,1:ncol(X)] <- hessiana[1:ncol(X),ncol(X) + 2] <- crossprod(X,weights*(log(mu)*(tau*cc1 + (tau + 1)*cc2 + mu*k12) + E1 + E2 + k24)*dmudeta/mu)
         hessiana[ncol(X) + 2,ncol(X) + 1] <- hessiana[ncol(X) + 1,ncol(X) + 2] <- sum(weights*(cc1 + cc2 + k23)*log(mu))
         hessiana[ncol(X) + 2,ncol(X) + 2] <- sum(weights*(cc1 + cc2 + k23)*log(mu)^2)
       }
@@ -648,18 +648,18 @@ zeroalt <- function(formula, data, offset, subset, na.action=na.omit(), weights,
   if(any(y != floor(y)) | any(y < 0)) stop("There are negative or non-integer values in the response variable!!",call.=FALSE)
   if(all(y > 0)) stop("Zero values in the response variable are required!!",call.=FALSE)
   mx <- model.part(Formula(formula), data = mmf, rhs = 1, terms = TRUE)
-  X <- model.matrix(mx, data = mmf); p <- ncol(X)
+  X <- model.matrix(mx, data = mmf); p <- ncol(X);nro <- nrow(X)
   if(!is.null(start$counts) & length(start$counts) != p) stop("Incorrect size of the starting values vector for the counts model!!",call.=FALSE)
   offsx <- model.offset(mx)
-  if(is.null(offsx)) offsx <- matrix(0,nrow(X),1)
+  if(is.null(offsx)) offsx <- matrix(0,nro,1)
   if(suppressWarnings(formula(Formula(formula),lhs=0,rhs=2)=="~0")) mz <- mx
   else mz <- model.part(Formula(formula), data = mmf, rhs = 2, terms = TRUE)
   Z <- model.matrix(mz, data = mmf); q <- ncol(Z)
   if(!is.null(start$zeros) & length(start$zeros) != q) stop("Incorrect size of the starting values vector for the zeros model!!",call.=FALSE)
   offsz <- model.offset(mz)
-  if(is.null(offsz)) offsz <- matrix(0,nrow(X),1)
+  if(is.null(offsz)) offsz <- matrix(0,nro,1)
   weights <- model.weights(mmf)
-  if(is.null(weights)) weights <- matrix(1,nrow(X),1)
+  if(is.null(weights)) weights <- matrix(1,nro,1)
   if(any(weights <= 0)) stop("Only positive weights are allowed!!",call.=FALSE)
   temp <- strsplit(gsub(" |link|=|'|'","",tolower(family)),"[()]")[[1]]
   family <- temp[1]
@@ -670,41 +670,41 @@ zeroalt <- function(formula, data, offset, subset, na.action=na.omit(), weights,
   if(family=="poi"){
     ep <- 0
     objective <- function(theta){
-      mu <- familyx$linkinv(tcrossprod(X,t(theta[1:p])) + offsx)
-      if(is.null(known)) pi <- familyz$linkinv(tcrossprod(Z,t(theta[-c(1:p)])) + offsz)
-      else pi <- familyz$linkinv(tcrossprod(Z,t(known)) + offsz)
+      mu <- familyx$linkinv(X%*%theta[1:p] + offsx)
+      if(is.null(known)) pi <- familyz$linkinv(Z%*%theta[-c(1:p)] + offsz)
+      else pi <- familyz$linkinv(Z%*%known + offsz)
       l <- ifelse(zeros,log(pi),log(1 - pi) - mu + y*log(mu) - lgamma(y + 1) - log(1 - exp(-mu)))
       return(sum(weights*l))
     }
     score <- function(theta){
-      etax <- tcrossprod(X2,t(theta[1:p])) + offsx2; mu <- familyx$linkinv(etax);
+      etax <- X2%*%theta[1:p] + offsx2; mu <- familyx$linkinv(etax);
       dmudetax <- familyx$mu.eta(etax);s1 <- y2/mu - 1 - exp(-mu)/(1 - exp(-mu))
       if(is.null(known)){
-        etaz <- tcrossprod(Z,t(theta[-c(1:p)])) + offsz
+        etaz <- Z%*%theta[-c(1:p)] + offsz
         pi <- familyz$linkinv(etaz);dpidetaz <- familyz$mu.eta(etaz)
         s2 <- ifelse(zeros,1/pi,-1/(1 - pi))
-        return(c(t(X2)%*%(weights2*s1*dmudetax),t(Z)%*%(weights*s2*dpidetaz)))
-      }else return(t(X2)%*%(weights2*s1*dmudetax))
+        return(c(crossprod(X2,weights2*s1*dmudetax),crossprod(Z,weights*s2*dpidetaz)))
+      }else return(crossprod(X2,weights2*s1*dmudetax))
     }
     theta0 <- function(start){
       if(!is.null(start$counts)) betas <- start$counts
       else betas <- suppressWarnings(glm.fit(y=y[!zeros],x=X[!zeros,],offset=offsx[!zeros],weights=weights[!zeros],family=familyx)$coefficients)
-      mus <- familyx$linkinv(tcrossprod(X,t(betas)) + offsx)
+      mus <- familyx$linkinv(X%*%betas + offsx)
       gammas <- suppressWarnings(glm.fit(y=ifelse(y==0,1,0),x=Z,offset=offsz,weights=weights,family=familyz,start=start$zeros))
       out <- matrix(c(betas,gammas$coefficients),length(betas) + length(gammas$coefficients),1)
       attr(out,"converged") <- gammas$converged
       return(out)
     }
     hess <- function(theta){
-      etax <- tcrossprod(X2,t(theta[1:p])) + offsx2; etaz <- tcrossprod(Z,t(theta[-c(1:p)])) + offsz
+      etax <- X2%*%theta[1:p] + offsx2; etaz <- Z%*%theta[-c(1:p)] + offsz
       mu <- familyx$linkinv(etax); pi <- familyz$linkinv(etaz)
       dmudetax <- familyx$mu.eta(etax); dpidetaz <- familyz$mu.eta(etaz)
       dmu2detax2 <- grad(familyx$mu.eta,etax); dpi2detaz2 <- grad(familyz$mu.eta,etaz)
       aa <- - y2/mu^2 + exp(-mu)/(1 - exp(-mu))^2; a <- y2/mu - 1 - exp(-mu)/(1 - exp(-mu))
       bb <- ifelse(zeros,-1/pi^2,-1/(1 - pi)^2); b <- ifelse(zeros,1/pi,-1/(1 - pi))
       hessiana <- matrix(0,p + q,p + q)
-      hessiana[1:p,1:p] <- t(X2)%*%(matrix(weights2*(aa*dmudetax^2 + a*dmu2detax2),nrow(X2),ncol(X2))*X2)
-      hessiana[-c(1:p),-c(1:p)] <- t(Z)%*%(matrix(weights*(bb*dpidetaz^2 + b*dpi2detaz2),nrow(Z),q)*Z)
+      hessiana[1:p,1:p] <- crossprod(X2,matrix(weights2*(aa*dmudetax^2 + a*dmu2detax2),nrow(X2),ncol(X2))*X2)
+      hessiana[-c(1:p),-c(1:p)] <- crossprod(Z,matrix(weights*(bb*dpidetaz^2 + b*dpi2detaz2),nrow(Z),q)*Z)
       return(hessiana)
     }
   }
@@ -717,42 +717,42 @@ zeroalt <- function(formula, data, offset, subset, na.action=na.omit(), weights,
       ep <- 1; tau <- -1
     }
     objective <- function(theta){
-      mu <- familyx$linkinv(tcrossprod(X,t(theta[1:p])) + offsx)
+      mu <- familyx$linkinv(X%*%theta[1:p] + offsx)
       phi <- exp(theta[p + 1])
       if(family=="nbf") tau <- theta[p + ep]
-      if(is.null(known)) pi <- familyz$linkinv(tcrossprod(Z,t(theta[-c(1:(p + ep))])) + offsz)
-      else pi <- familyz$linkinv(tcrossprod(Z,t(known)) + offsz)
+      if(is.null(known)) pi <- familyz$linkinv(Z%*%theta[-c(1:(p + ep))] + offsz)
+      else pi <- familyz$linkinv(Z%*%known + offsz)
       u <- phi*mu^tau; v <- u*mu; l <- ifelse(zeros,log(pi),log(1 - pi) + Lgamma(y + 1/u) -
                                                 Lgamma(1/u) - log(1 - (v + 1)^(-1/u)) - Lgamma(y + 1) + y*log(v) - (y + 1/u)*log(v + 1))
       return(sum(weights*l))
     }
     score <- function(theta){
-      etax <- tcrossprod(X2,t(theta[1:p])) + offsx2
+      etax <- X2%*%theta[1:p] + offsx2
       phi <- exp(theta[p + 1])
       if(family=="nbf") tau <- theta[p + ep]
       mu <- familyx$linkinv(etax)
       if(is.null(known)){
-        etaz <- tcrossprod(Z,t(theta[-c(1:(p + ep))])) + offsz
+        etaz <- Z%*%theta[-c(1:(p + ep))] + offsz
         pi <- familyz$linkinv(etaz)
         dpidetaz <- familyz$mu.eta(etaz)
       }
-      else pi <- familyz$linkinv(tcrossprod(Z,t(known)) + offsz)
+      else pi <- familyz$linkinv(Z%*%known + offsz)
       dmudetax <- familyx$mu.eta(etax)
       u <- phi*mu^tau; v <- u*mu; k0 <- 1/((v + 1)^(1/u) - 1)
       E1 <- -(Digamma(y2 + 1/u) - log(v + 1) - Digamma(1/u))/u
       E2 <- (y2 - mu)/(v + 1); k1 <- k0*(log(v + 1)*tau/v - (tau + 1)/(v + 1))
       k2 <- k0*(log(v + 1)/u - mu/(v + 1))
-      out_ <- c(t(X2)%*%(weights2*(tau*E1 + (tau + 1)*E2 + k1*mu)*dmudetax/mu),sum(weights2*(E1 + E2 + k2)))
+      out_ <- c(crossprod(X2,weights2*(tau*E1 + (tau + 1)*E2 + k1*mu)*dmudetax/mu),sum(weights2*(E1 + E2 + k2)))
       if(family=="nbf") out_ <- c(out_,sum(weights2*(E1 + E2 + k2)*log(mu)))
       if(is.null(known)){
         s2 <- ifelse(zeros,1/pi,-1/(1 - pi))
-        return(c(out_,t(Z)%*%(weights*s2*dpidetaz)))
+        return(c(out_,crossprod(Z,weights*s2*dpidetaz)))
       }else return(out_)
     }
     theta0 <- function(start){
       if(!is.null(start$counts)) betas <- start$counts
       else betas <- suppressWarnings(glm.fit(y=y[!zeros],x=X[!zeros,],offset=offsx[!zeros],weights=weights[!zeros],family=familyx)$coefficients)
-      mus <- familyx$linkinv(tcrossprod(X,t(betas)) + offsx)
+      mus <- familyx$linkinv(X%*%betas + offsx)
       if(family=="nbf"){
         fik <- lm((y - mus)^2 ~ -1 + I(mus^2),offset=mus)
         betas <- c(betas,log(abs(coef(fik))),0)
@@ -771,9 +771,9 @@ zeroalt <- function(formula, data, offset, subset, na.action=na.omit(), weights,
       return(out)
     }
     hess <- function(theta){
-      etax <- tcrossprod(X2,t(theta[1:p])) + offsx2;phi <- exp(theta[p + 1])
+      etax <- X2%*%theta[1:p] + offsx2;phi <- exp(theta[p + 1])
       if(family=="nbf") tau <- theta[p + ep]
-      mu <- familyx$linkinv(etax); etaz <- tcrossprod(Z,t(theta[-c(1:(p + ep))])) + offsz
+      mu <- familyx$linkinv(etax); etaz <- Z%*%theta[-c(1:(p + ep))] + offsz
       pi <- familyz$linkinv(etaz); dmudetax <- familyx$mu.eta(etax); dpidetaz <- familyz$mu.eta(etaz)
       u <- phi*mu^tau; v <- u*mu
       dmudetax <- familyx$mu.eta(etax); dpidetaz <- familyz$mu.eta(etaz)
@@ -792,16 +792,16 @@ zeroalt <- function(formula, data, offset, subset, na.action=na.omit(), weights,
       k22 <- ((f-1)*f22 + f*f2^2)/(f-1)^2;k23 <- ((f-1)*f22 + f*f2^2)/(f-1)^2;k1 <- f1/(f-1)
       aa <- -(tau/mu)*(tau*E1/mu - tau*(psi1 - psi2)/(mu*u^2) - (tau + 1)/(v + 1)) + k11 -
         ((tau + 1)/mu)*(u*(mu + (y2 - mu)*(tau + 1)) + 1)/(v + 1)^2 - E2*(tau + 1)/mu^2 - tau*E1/mu^2
-      hessiana[1:p,1:p] <- t(X2)%*%(matrix(weights2*(aa*dmudetax^2 + (tau*E1 + (tau + 1)*E2 + k1*mu)*dmu2detax2/mu),nrow(X2),ncol(X2))*X2)
-      hessiana[p + 1,1:p] <- hessiana[1:p,p + 1] <- t(X2)%*%(weights2*(tau*cc1 + (tau + 1)*cc2 + mu*k12)*dmudetax/mu)
+      hessiana[1:p,1:p] <- crossprod(X2,matrix(weights2*(aa*dmudetax^2 + (tau*E1 + (tau + 1)*E2 + k1*mu)*dmu2detax2/mu),nrow(X2),ncol(X2))*X2)
+      hessiana[p + 1,1:p] <- hessiana[1:p,p + 1] <- crossprod(X2,weights2*(tau*cc1 + (tau + 1)*cc2 + mu*k12)*dmudetax/mu)
       hessiana[p + 1,p + 1] <- sum(weights2*(cc1 + cc2 + k22))
       if(family=="nbf"){
-        hessiana[p + ep,1:p] <- hessiana[1:p,p + ep] <- t(X2)%*%(weights2*(log(mu)*(tau*cc1 + (tau + 1)*cc2 + mu*k12) + E1 + E2 + f2/(f-1))*dmudetax/mu)
+        hessiana[p + ep,1:p] <- hessiana[1:p,p + ep] <- crossprod(X2,weights2*(log(mu)*(tau*cc1 + (tau + 1)*cc2 + mu*k12) + E1 + E2 + f2/(f-1))*dmudetax/mu)
         hessiana[p + ep,p + 1] <- hessiana[p+1,p+2] <- sum(weights2*(cc1 + cc2 + k23)*log(mu))
         hessiana[p + ep,p + ep] <- sum(weights2*(cc1 + cc2 + k23)*log(mu)^2)
       }
       bb <- ifelse(zeros,-1/pi^2,-1/(1 - pi)^2); b <- ifelse(zeros,1/pi,-1/(1 - pi))
-      hessiana[-c(1:(p + ep)),-c(1:(p + ep))] <- t(Z)%*%(matrix(weights*(bb*dpidetaz^2 + b*dpi2detaz2),nrow(Z),q)*Z)
+      hessiana[-c(1:(p + ep)),-c(1:(p + ep))] <- crossprod(Z,matrix(weights*(bb*dpidetaz^2 + b*dpi2detaz2),nrow(Z),q)*Z)
       return(hessiana)
     }
   }
@@ -813,8 +813,8 @@ zeroalt <- function(formula, data, offset, subset, na.action=na.omit(), weights,
   theta_hat <- list(counts=matrix(salida$par[1:(p + ep)],nrow=p + ep,1),zeros=matrix(salida$par[-c(1:(p + ep))],nrow=q,1))
   nomb <- c(colnames(X),"log(phi)","tau"); rownames(theta_hat$counts) <- nomb[1:length(theta_hat$counts)]
   rownames(theta_hat$zeros) <- colnames(Z)
-  etax <- tcrossprod(X,t(theta_hat$counts[1:p])) + offsx
-  etaz <- tcrossprod(Z,t(theta_hat$zeros)) + offsz
+  etax <- X%*%theta_hat$counts[1:p] + offsx
+  etaz <- Z%*%theta_hat$zeros + offsz
   mu <- familyx$linkinv(etax);pi <- familyz$linkinv(etaz)
   estfun <- score(salida$par)
   estfun <- list(counts=matrix(estfun[1:(p + ep)],nrow=p + ep,1),zeros=matrix(estfun[-c(1:(p + ep))],nrow=q,1))
@@ -1020,19 +1020,19 @@ zeroinf <- function(formula, data, offset, subset, na.action=na.omit(), weights,
   if(family=="poi"){
     ep <- 0
     objective <- function(theta){
-      mu <- familyx$linkinv(tcrossprod(X,t(theta[1:p])) + offsx)
-      pi <- familyz$linkinv(tcrossprod(Z,t(theta[-c(1:p)])) + offsz)
+      mu <- familyx$linkinv(X%*%theta[1:p] + offsx)
+      pi <- familyz$linkinv(Z%*%theta[-c(1:p)] + offsz)
       l <- ifelse(zeros,log(pi + (1 - pi)*exp(-mu)),log(1 - pi) - mu + y*log(mu) - lgamma(y + 1))
       return(sum(weights*l))
     }
     score <- function(theta){
-      etax <- tcrossprod(X,t(theta[1:p])) + offsx; etaz <- tcrossprod(Z,t(theta[-c(1:p)])) + offsz
+      etax <- X%*%theta[1:p] + offsx; etaz <- Z%*%theta[-c(1:p)] + offsz
       mu <- familyx$linkinv(etax); pi <- familyz$linkinv(etaz)
       dmudetax <- familyx$mu.eta(etax); dpidetaz <- familyz$mu.eta(etaz)
       s0 <- pi + (1 - pi)*exp(-mu)
       s1 <- ifelse(zeros,-(1 - pi)*exp(-mu)/s0,y/mu - 1)
       s2 <- ifelse(zeros,(1 - exp(-mu))/s0,-1/(1 - pi))
-      return(c(t(X)%*%(weights*s1*dmudetax),t(Z)%*%(weights*s2*dpidetaz)))
+      return(c(crossprod(X,weights*s1*dmudetax),crossprod(Z,weights*s2*dpidetaz)))
     }
     theta0 <- function(start){
       if(!is.null(start$counts)) betas <- start$counts
@@ -1042,7 +1042,7 @@ zeroinf <- function(formula, data, offset, subset, na.action=na.omit(), weights,
       return(matrix(c(betas,gammas),length(betas)+length(gammas),1))
     }
     hess <- function(theta){
-      etax <- tcrossprod(X,t(theta[1:p])) + offsx; etaz <- tcrossprod(Z,t(theta[-c(1:p)])) + offsz
+      etax <- X%*%theta[1:p] + offsx; etaz <- Z%*%theta[-c(1:p)] + offsz
       mu <- familyx$linkinv(etax); pi <- familyz$linkinv(etaz)
       dmudetax <- familyx$mu.eta(etax); dpidetaz <- familyz$mu.eta(etaz)
       dmu2detax2 <- grad(familyx$mu.eta,etax); dpi2detaz2 <- grad(familyz$mu.eta,etaz)
@@ -1053,9 +1053,9 @@ zeroinf <- function(formula, data, offset, subset, na.action=na.omit(), weights,
       s22 <- ifelse(zeros,-((1 - exp(-mu))/s0)^2*dpidetaz^2 + ((1 - exp(-mu))/s0)*dpi2detaz2,
                     - (1 - pi)^(-2)*dpidetaz^2 - (1 - pi)^(-1)*dpi2detaz2)
       hessiana <- matrix(0,p + q,p + q)
-      hessiana[1:p,1:p] <- t(X)%*%(matrix(weights*s11,nrow(X),p)*X)
-      hessiana[1:p,-c(1:p)] <- t(X)%*%(matrix(weights*s12,nrow(Z),q)*Z); hessiana[-c(1:p),1:p] <- t(hessiana[1:p,-c(1:p)])
-      hessiana[-c(1:p),-c(1:p)] <- t(Z)%*%(matrix(weights*s22,nrow(Z),q)*Z)
+      hessiana[1:p,1:p] <- crossprod(X,matrix(weights*s11,nrow(X),p)*X)
+      hessiana[1:p,-c(1:p)] <- crossprod(X,matrix(weights*s12,nrow(Z),q)*Z); hessiana[-c(1:p),1:p] <- t(hessiana[1:p,-c(1:p)])
+      hessiana[-c(1:p),-c(1:p)] <- crossprod(Z,matrix(weights*s22,nrow(Z),q)*Z)
       return(hessiana)
     }
   }
@@ -1068,21 +1068,21 @@ zeroinf <- function(formula, data, offset, subset, na.action=na.omit(), weights,
       ep <- 1; tau <- -1
     }
     objective <- function(theta){
-      mu <- familyx$linkinv(tcrossprod(X,t(theta[1:p])) + offsx)
+      mu <- familyx$linkinv(X%*%theta[1:p] + offsx)
       phi <- exp(theta[p + 1])
       if(family=="nbf") tau <- theta[p + ep]
-      pi <- familyz$linkinv(tcrossprod(Z,t(theta[-c(1:(p + ep))])) + offsz)
+      pi <- familyz$linkinv(Z%*%theta[-c(1:(p + ep))] + offsz)
       u <- phi*mu^tau; v <- u*mu
       l <- ifelse(zeros,log(pi + (1 - pi)*(v + 1)^(-1/u)),Lgamma(y + 1/u) - Lgamma(1/u) - Lgamma(y + 1) +
                     y*log(v) - (y + 1/u)*log(v + 1) + log(1 - pi))
       return(sum(weights*l))
     }
     score <- function(theta){
-      etax <- tcrossprod(X,t(theta[1:p])) + offsx
+      etax <- X%*%theta[1:p] + offsx
       phi <- exp(theta[p + 1])
       if(family=="nbf") tau <- theta[p + ep]
       mu <- familyx$linkinv(etax)
-      etaz <- tcrossprod(Z,t(theta[-c(1:(p + ep))])) + offsz
+      etaz <- Z%*%theta[-c(1:(p + ep))] + offsz
       pi <- familyz$linkinv(etaz)
       dmudetax <- familyx$mu.eta(etax); dpidetaz <- familyz$mu.eta(etaz)
       u <- phi*mu^tau; v <- u*mu
@@ -1092,14 +1092,14 @@ zeroinf <- function(formula, data, offset, subset, na.action=na.omit(), weights,
       s1 <- ifelse(zeros,mu*k0*(log(v + 1)*tau/v - (tau + 1)/(v + 1)),tau*E1 + (tau + 1)*E2)
       s2 <- ifelse(zeros,k0*(log(v + 1)/u - mu/(v + 1)),E1 + E2)
       s3 <- ifelse(zeros,(1 - (v + 1)^(-1/u))/(pi + (1 - pi)*(v + 1)^(-1/u)),-1/(1 - pi))
-      out_ <- c(t(X)%*%(weights*s1*dmudetax/mu),sum(weights*s2))
+      out_ <- c(crossprod(X,weights*s1*dmudetax/mu),sum(weights*s2))
       if(family=="nbf") out_ <- c(out_,sum(weights*s2*log(mu)))
-      return(c(out_,t(Z)%*%(weights*s3*dpidetaz)))
+      return(c(out_,crossprod(Z,weights*s3*dpidetaz)))
     }
     theta0 <- function(start){
       if(!is.null(start$counts)) betas <- start$counts
       else betas <- suppressWarnings(glm.fit(y=y[!zeros],x=X[!zeros,],offset=offsx[!zeros],weights=weights[!zeros],family=familyx)$coefficients)
-      mus <- familyx$linkinv(tcrossprod(X,t(betas)) + offsx)
+      mus <- familyx$linkinv(X%*%betas + offsx)
       if(family=="nbf"){
         fik <- lm((y - mus)^2 ~ -1 + I(mus^2),offset=mus)
         betas <- c(betas,log(abs(coef(fik))),0)
@@ -1117,11 +1117,11 @@ zeroinf <- function(formula, data, offset, subset, na.action=na.omit(), weights,
       return(matrix(c(betas,gammas),length(betas)+length(gammas),1))
     }
     hess <- function(theta){
-      etax <- tcrossprod(X,t(theta[1:p])) + offsx
+      etax <- X%*%theta[1:p] + offsx
       phi <- exp(theta[p + 1])
       if(family=="nbf") tau <- theta[p + ep]
       mu <- familyx$linkinv(etax)
-      etaz <- tcrossprod(Z,t(theta[-c(1:(p + ep))])) + offsz
+      etaz <- Z%*%theta[-c(1:(p + ep))] + offsz
       pi <- familyz$linkinv(etaz)
       dmudetax <- familyx$mu.eta(etax); dpidetaz <- familyz$mu.eta(etaz)
       u <- phi*mu^tau; v <- u*mu
@@ -1147,23 +1147,23 @@ zeroinf <- function(formula, data, offset, subset, na.action=na.omit(), weights,
       k0 <- ifelse(zeros,(v + 1)^(-1/u)*(1 - pi)/(pi + (1 - pi)*(v + 1)^(-1/u)),0)
       s3 <-	s3 + ifelse(zeros,mu*k0*(log(v + 1)/v - 1/(v + 1)),E1 + E2)
       s4 <- ifelse(zeros,(m*f22 + pi*f*f2^2)/m2,cc1 + cc2)
-      hessiana[1:p,1:p] <- t(X)%*%(matrix(weights*(aa*dmudetax^2 + s1*dmu2detax2/mu),nrow(X),ncol(X))*X)
-      hessiana[p + 1,1:p] <- hessiana[1:p,p + 1] <- t(X)%*%(weights*s2*dmudetax/mu)
+      hessiana[1:p,1:p] <- crossprod(X,matrix(weights*(aa*dmudetax^2 + s1*dmu2detax2/mu),nrow(X),ncol(X))*X)
+      hessiana[p + 1,1:p] <- hessiana[1:p,p + 1] <- crossprod(X,weights*s2*dmudetax/mu)
       hessiana[p + 1,p + 1] <- sum(weights*s4)
       if(family=="nbf"){
-        hessiana[p + ep,1:p] <- hessiana[1:p,p + ep] <- t(X)%*%(weights*s3*dmudetax/mu)
+        hessiana[p + ep,1:p] <- hessiana[1:p,p + ep] <- crossprod(X,weights*s3*dmudetax/mu)
         hessiana[p + ep,p + 1] <- hessiana[p + 1,p + ep] <- sum(weights*s4*log(mu))
         hessiana[p + ep,p + ep] <- sum(weights*s4*log(mu)^2)
       }
       z0 <- ifelse(zeros,-dpidetaz/(f*(pi + (1 - pi)*(1/f))^2),0)
-      hessiana[1:p,-c(1:(p + ep))] <- t(X)%*%(matrix(weights*f1*dmudetax*z0,nrow(Z),ncol(Z))*Z)
+      hessiana[1:p,-c(1:(p + ep))] <- crossprod(X,matrix(weights*f1*dmudetax*z0,nrow(Z),ncol(Z))*Z)
       hessiana[-c(1:(p + ep)),1:p] <- t(hessiana[1:p,-c(1:(p + ep))])
       hessiana[p + 1,-c(1:(p + ep))] <- t(weights*f2*z0)%*%Z;hessiana[-c(1:(p + ep)),p + 1] <- t(hessiana[p + 1,-c(1:(p + ep))])
       if(family=="nbf"){
-        hessiana[p + ep,-c(1:(p + ep))] <- t(weights*f2*log(mu)*z0)%*%Z;hessiana[-c(1:(p + ep)),p + ep] <- t(hessiana[p + ep,-c(1:(p + ep))])
+        hessiana[p + ep,-c(1:(p + ep))] <- crossprod(weights*f2*log(mu)*z0,Z);hessiana[-c(1:(p + ep)),p + ep] <- t(hessiana[p + ep,-c(1:(p + ep))])
       }
       z1 <- ifelse(zeros,(1 - (v + 1)^(-1/u))/(pi + (1 - pi)*(v + 1)^(-1/u)),-1/(1 - pi))
-      hessiana[-c(1:(p + ep)),-c(1:(p + ep))] <- t(Z)%*%(matrix(weights*(dpi2detaz2*z1 - dpidetaz^2*z1^2),nrow(Z),ncol(Z))*Z)
+      hessiana[-c(1:(p + ep)),-c(1:(p + ep))] <- crossprod(Z,matrix(weights*(dpi2detaz2*z1 - dpidetaz^2*z1^2),nrow(Z),ncol(Z))*Z)
       return(hessiana)
     }
   }
@@ -1173,8 +1173,8 @@ zeroinf <- function(formula, data, offset, subset, na.action=na.omit(), weights,
   theta_hat <- list(counts=matrix(salida$par[1:(p + ep)],nrow=p + ep,1),zeros=matrix(salida$par[-c(1:(p + ep))],nrow=q,1))
   nomb <- c(colnames(X),"log(phi)","tau"); rownames(theta_hat$counts) <- nomb[1:length(theta_hat$counts)]
   rownames(theta_hat$zeros) <- colnames(Z)
-  etax <- tcrossprod(X,t(theta_hat$counts[1:p])) + offsx
-  etaz <- tcrossprod(Z,t(theta_hat$zeros)) + offsz
+  etax <- X%*%theta_hat$counts[1:p] + offsx
+  etaz <- Z%*%theta_hat$zeros + offsz
   mu <- familyx$linkinv(etax);pi <- familyz$linkinv(etaz)
   estfun <- score(salida$par)
   estfun <- list(counts=matrix(estfun[1:(p + ep)],nrow=p + ep,1),zeros=matrix(estfun[-c(1:(p + ep))],nrow=q,1))
@@ -1457,7 +1457,7 @@ estequa.overglm <- function(object, ...){
 #' @export
 #'
 estequa.zeroinflation <- function(object, submodel=c("counts","zeros"), ...){
-  submodel <- match.arg(submodel)
+  submodel <- match.arg(submodel); submodel <- match.arg(submodel)
   out_ <- object$estfun[[submodel]]
   colnames(out_) <- " "
   return(out_)
@@ -1864,7 +1864,7 @@ anova.overglm <- function(object,...,test=c("wald","lr","score","gradient"),verb
     vars1 <- rownames(coef(x[[i]]))
     nest <- vars0 %in% vars1
     ids <- is.na(match(vars1,vars0))
-    if(test=="wald") sc <- t(coef(x[[i]])[ids])%*%chol2inv(chol(vcov(x[[i]])[ids,ids]))%*%coef(x[[i]])[ids]
+    if(test=="wald") sc <- crossprod(coef(x[[i]])[ids],chol2inv(chol(vcov(x[[i]])[ids,ids])))%*%coef(x[[i]])[ids]
     if(test=="lr") sc <- 2*(logLik(x[[i]])-logLik(x[[i-1]]))
     if(test %in% c("score","gradient")){
       envir <- environment(x[[i]]$score)
@@ -1985,7 +1985,7 @@ anova.zeroinflation <- function(object,...,test=c("wald","lr","score","gradient"
     if(test=="wald"){
       b <- c(x[[i]]$coefficients$counts,x[[i]]$coefficients$zeros)[ids]
       vc <- chol2inv(x[[i]]$R)[ids,ids]
-      sc <- t(b)%*%chol2inv(chol(vc))%*%b
+      sc <- crossprod(b,chol2inv(chol(vc)))%*%b
     }
     if(test=="lr") sc <- 2*(logLik(x[[i]])-logLik(x[[i-1]]))
     if(test %in% c("score","gradient")){
@@ -2009,7 +2009,7 @@ anova.zeroinflation <- function(object,...,test=c("wald","lr","score","gradient"
         v0 <- try(chol(-x[[i]]$hess(theta0)),silent=TRUE)
         if(is.matrix(v0)) v0 <- chol2inv(v0) else v0 <- solve(-x[[i]]$hess(theta0))
         sc <- abs(crossprod(u0,v0[ids,ids])%*%u0)
-      }else sc <- abs(t(u0)%*%b[ids])
+      }else sc <- abs(crossprod(u0,b[ids]))
     }
     df <- sum(ids)
     out_[i-1,] <- cbind(sc,df,1-pchisq(sc,df))
@@ -2718,6 +2718,8 @@ envelope.overglm <- function(object, rep=25, conf=0.95, type=c("quantile","respo
 #' @param scope an (optional) list, containing components \code{lower} and \code{upper}, both formula-type objects,
 #' indicating the range of models which should be examined in the stepwise search. As default, \code{lower} is a model
 #' with no predictors and \code{upper} is the linear predictor of the model in \code{model}.
+#' @param force.in an (optional) formula-type object indicating the effects that should be in all models
+#' @param force.out an (optional) formula-type object indicating the effects that should be in no models
 #' @return A list which contains the following objects:
 #' \tabular{ll}{
 #' \code{initial} \tab a character string indicating the linear predictor of the "initial model",\cr
@@ -2727,6 +2729,8 @@ envelope.overglm <- function(object, rep=25, conf=0.95, type=c("quantile","respo
 #' \code{criterion}\tab a character string indicating the criterion used to compare the candidate models,\cr
 #' \tab \cr
 #' \code{final}\tab a character string indicating the linear predictor of the "final model",\cr
+#' \tab \cr
+#' \code{final.fit} \tab an object of class \code{overglm} with the results of the fit to the data of the "final model",\cr
 #' }
 #' @seealso \link{stepCriterion.lm}, \link{stepCriterion.glm}, \link{stepCriterion.glmgee}
 #' @examples
@@ -2736,7 +2740,7 @@ envelope.overglm <- function(object, rep=25, conf=0.95, type=c("quantile","respo
 #'
 #' stepCriterion(fit1, criterion="p-value", direction="forward", test="lr")
 #'
-#' stepCriterion(fit1, criterion="bic", direction="backward", test="score")
+#' stepCriterion(fit1, criterion="bic", direction="backward", test="score", force.in=~location)
 #'
 #' ###### Example 2: Article production by graduate students in biochemistry PhD programs
 #' bioChemists <- pscl::bioChemists
@@ -2744,7 +2748,7 @@ envelope.overglm <- function(object, rep=25, conf=0.95, type=c("quantile","respo
 #'
 #' stepCriterion(fit2, criterion="p-value", direction="forward", test="lr")
 #'
-#' stepCriterion(fit2, criterion="bic", direction="backward", test="score")
+#' stepCriterion(fit2, criterion="bic", direction="backward", test="score", force.in=~fem)
 #'
 #' ###### Example 3: Agents to stimulate cellular differentiation
 #' data(cellular)
@@ -2759,9 +2763,10 @@ envelope.overglm <- function(object, rep=25, conf=0.95, type=c("quantile","respo
 #' @references James G., Witten D., Hastie T., Tibshirani R. (2013, page 210) An Introduction to Statistical Learning
 #' with Applications in R. Springer, New York.
 #'
-stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), test=c("wald","score","lr","gradient"), direction=c("forward","backward"), levels=c(0.05,0.05), trace=TRUE, scope, ...){
+stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), test=c("wald","score","lr","gradient"), direction=c("forward","backward"), levels=c(0.05,0.05), trace=TRUE, scope, force.in, force.out, ...){
   xxx <- list(...)
   if(is.null(xxx$k)) k <- 2 else k <- xxx$k
+  if(!missingArg(criterion)) criterion <- tolower(criterion)
   criterion <- match.arg(criterion)
   direction <- match.arg(direction)
   test <- match.arg(test)
@@ -2778,15 +2783,31 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), tes
     lower <- formula(eval(model$call$formula))
     lower <- formula(paste(deparse(lower[[2]]),"~",attr(terms(lower,data=eval(model$call$data)),"intercept")))
   }else{
-    lower <- scope$lower
-    upper <- scope$upper
+    if(is.null(scope$lower)){
+      lower <- formula(eval(model$call$formula))
+      lower <- formula(paste(deparse(lower[[2]]),"~",attr(terms(lower,data=eval(model$call$data)),"intercept")))
+    }else lower <- scope$lower
+    if(is.null(scope$upper)) upper <- formula(eval(model$call$formula)) else upper <- scope$upper
   }
   if(is.null(model$call$data)) datas <- get_all_vars(upper,environment(eval(model$call$formula)))
   else datas <- get_all_vars(upper,eval(model$call$data))
   if(!is.null(model$call$subset)) datas <- datas[eval(model$call$subset,datas),]
   datas <- na.omit(datas)
+  if(length(eval(model$call$formula)[[length(eval(model$call$formula))]])==1)
+    if(eval(model$call$formula)[[length(eval(model$call$formula))]]==".")
+      upper <- as.formula(paste0(eval(model$call$formula)[[length(eval(model$call$formula))]],"~",paste0(attr(terms(eval(model$call$formula),data=datas),"term.labels"),collapse="+")))
 
-  U <- unlist(lapply(strsplit(attr(terms(upper,data=datas),"term.labels"),":"),function(x) paste(sort(x),collapse =":")))
+  if(!missingArg(force.in)){
+    force.in <- attr(terms(as.formula(force.in)),"term.labels")
+    lower <- as.formula(paste0("~",paste0(c(deparse(lower[[length(lower)]]),force.in[!(force.in %in% attr(terms(lower),"term.labels"))]),collapse="+")))
+    upper <- as.formula(paste0("~",paste0(c(deparse(upper[[length(upper)]]),force.in[!(force.in %in% attr(terms(upper),"term.labels"))]),collapse="+")))
+  }else force.in <- ""
+  if(!missingArg(force.out)){
+    force.out <- attr(terms(as.formula(force.out)),"term.labels")
+    upper <- as.formula(paste0("~",paste0(deparse(upper[[length(upper)]])[!(deparse(upper[[length(upper)]]) %in% force.out)],collapse="+")))
+  }else force.out <- ""
+
+U <- unlist(lapply(strsplit(attr(terms(upper,data=datas),"term.labels"),":"),function(x) paste(sort(x),collapse =":")))
   fs <- attr(terms(upper,data=datas),"factors")
   long <- max(nchar(U)) + 2
   nonename <- paste("<none>",paste(replicate(max(long-6,0)," "),collapse=""),collapse="")
@@ -2823,7 +2844,7 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), tes
         nombres <- matrix("",length(salen),1)
         for(i in 1:length(salen)){
           salida <- apply(as.matrix(fs[,salen[i]]*fs[,-c(entran,salen[i])]),2,sum)
-          if(all(salida < sum(fs[,salen[i]])) & U[salen[i]]!=cambio){
+          if(all(salida < sum(fs[,salen[i]])) & U[salen[i]]!=cambio & !(U[salen[i]] %in% force.in)){
             newformula <- update(oldformula, paste("~ . -",U[salen[i]]))
             fit.0 <- update(model,formula=newformula,start=NULL)
             fsalen[i,1] <- fit.0$df.residual - fit.x$df.residual
@@ -2866,7 +2887,7 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), tes
         nombres <- matrix("",length(entran),1)
         for(i in 1:length(entran)){
           salida <- apply(as.matrix(fs[,-c(salen,entran[i])]),2,function(x) sum(fs[,entran[i]]*x)!=sum(x))
-          if(all(salida) & U[entran[i]]!=cambio){
+          if(all(salida) & U[entran[i]]!=cambio & !(U[entran[i]] %in% force.out)){
             newformula <- update(oldformula, paste("~ . +",U[entran[i]]))
             fit.0 <- update(model,formula=newformula,adjr2=FALSE,start=NULL)
             fentran[i,1] <- fit.x$df.residual - fit.0$df.residual
@@ -2952,7 +2973,7 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), tes
         nombres <- matrix("",length(entran),1)
         for(i in 1:length(entran)){
           salida <- apply(as.matrix(fs[,-c(salen,entran[i])]),2,function(x) sum(fs[,entran[i]]*x)!=sum(x))
-          if(all(salida) & U[entran[i]]!=cambio){
+          if(all(salida) & U[entran[i]]!=cambio & !(U[entran[i]] %in% force.out)){
             newformula <- update(oldformula, paste("~ . +",U[entran[i]]))
             fit.0 <- update(model,formula=newformula,adjr2=FALSE,start=NULL)
             fentran[i,1] <- fit.x$df.residual - fit.0$df.residual
@@ -2995,7 +3016,7 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), tes
         nombres <- matrix("",length(salen),1)
         for(i in 1:length(salen)){
           salida <- apply(as.matrix(fs[,salen[i]]*fs[,-c(entran,salen[i])]),2,sum)
-          if(all(salida < sum(fs[,salen[i]]))){
+          if(all(salida < sum(fs[,salen[i]])) & !(U[salen[i]] %in% force.in)){
             newformula <- update(oldformula, paste("~ . -",U[salen[i]]))
             fit.0 <- update(model,formula=newformula,start=NULL)
             fsalen[i,1] <- fit.0$df.residual - fit.x$df.residual
@@ -3073,6 +3094,10 @@ stepCriterion.overglm <- function(model, criterion=c("bic","aic","p-value"), tes
     cat("\n")
   }
   out_$final <- paste("~",as.character(oldformula)[length(oldformula)],sep=" ")
+  if(!trace){
+    final.fit <- fit.0 <- update(model,formula=oldformula,adjr2=FALSE,start=NULL)
+    out_$final.fit <- final.fit
+  }
   return(invisible(out_))
 }
 
@@ -3196,7 +3221,7 @@ localInfluence.overglm <- function(object,type=c("total","local"),coefs,plot.it=
     bnew <- matrix(rnorm(nrow(li)),nrow(li),1)
     while(tol > 0.000001){
       bold <- bnew
-      bnew <- tcrossprod(li,t(crossprod(Delta,bold)))
+      bnew <- li%*%crossprod(Delta,bold)
       bnew <- bnew/sqrt(sum(bnew^2))
       tol <- max(ifelse(abs(bold) > 1e-10,abs((bnew - bold)/bold),abs(bnew - bold)))
     }

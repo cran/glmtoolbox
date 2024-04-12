@@ -11,6 +11,8 @@
   levels = c(0.05, 0.05),
   trace = TRUE,
   scope,
+  force.in,
+  force.out,
   ...
 )
 }
@@ -27,6 +29,10 @@
 
 \item{scope}{an (optional) list containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. As default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.}
 
+\item{force.in}{an (optional) formula-type object indicating the effects that should be in all models}
+
+\item{force.out}{an (optional) formula-type object indicating the effects that should be in no models}
+
 \item{...}{further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC/QICu, which by default is set to 2.}
 }
 \value{
@@ -39,6 +45,8 @@ a list list with components including
 \code{criterion} \tab a character string indicating the criterion used to compare the candidate models,\cr
 \tab \cr
 \code{final} \tab a character string indicating the linear predictor of the "final model",\cr
+\tab \cr
+\code{final.fit} \tab an object of class \code{lm} with the results of the fit to the data of the "final model",\cr
 }
 }
 \description{

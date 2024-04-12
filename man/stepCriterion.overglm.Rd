@@ -12,6 +12,8 @@
   levels = c(0.05, 0.05),
   trace = TRUE,
   scope,
+  force.in,
+  force.out,
   ...
 )
 }
@@ -41,6 +43,10 @@ the variables should in and out from the model. This is only appropiate if \code
 indicating the range of models which should be examined in the stepwise search. As default, \code{lower} is a model
 with no predictors and \code{upper} is the linear predictor of the model in \code{model}.}
 
+\item{force.in}{an (optional) formula-type object indicating the effects that should be in all models}
+
+\item{force.out}{an (optional) formula-type object indicating the effects that should be in no models}
+
 \item{...}{further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the
 penalty in the AIC, which by default is set to 2.}
 }
@@ -54,6 +60,8 @@ A list which contains the following objects:
 \code{criterion}\tab a character string indicating the criterion used to compare the candidate models,\cr
 \tab \cr
 \code{final}\tab a character string indicating the linear predictor of the "final model",\cr
+\tab \cr
+\code{final.fit} \tab an object of class \code{overglm} with the results of the fit to the data of the "final model",\cr
 }
 }
 \description{
@@ -68,7 +76,7 @@ fit1 <- overglm(infections ~ age + gender + frequency + location, family="nb1(lo
 
 stepCriterion(fit1, criterion="p-value", direction="forward", test="lr")
 
-stepCriterion(fit1, criterion="bic", direction="backward", test="score")
+stepCriterion(fit1, criterion="bic", direction="backward", test="score", force.in=~location)
 
 ###### Example 2: Article production by graduate students in biochemistry PhD programs
 bioChemists <- pscl::bioChemists
@@ -76,7 +84,7 @@ fit2 <- overglm(art ~ fem + mar + kid5 + phd + ment, family="nb1(log)", data = b
 
 stepCriterion(fit2, criterion="p-value", direction="forward", test="lr")
 
-stepCriterion(fit2, criterion="bic", direction="backward", test="score")
+stepCriterion(fit2, criterion="bic", direction="backward", test="score", force.in=~fem)
 
 ###### Example 3: Agents to stimulate cellular differentiation
 data(cellular)

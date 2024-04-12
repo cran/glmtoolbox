@@ -1244,7 +1244,7 @@
 #' including methods to the generic functions such as \code{summary}, \code{model.matrix}, \code{estequa},
 #' \code{coef}, \code{vcov}, \code{logLik}, \code{fitted}, \code{confint}, \code{AIC}, \code{BIC} and \code{predict}.
 #' In addition, the model fitted to the	data may be assessed using functions such as \code{adjR2.gnm}, \link{anova.gnm},
-#' \link{residuals.gnm}, \link{dfbeta.gnm}, \link{cooks.distance.gnm} and \link{envelope.gnm}.
+#' \link{residuals.gnm}, \link{dfbeta.gnm}, \link{cooks.distance.gnm}, \link{localInfluence.gnm} and \link{envelope.gnm}.
 #' @export gnm
 #' @examples
 #' ###### Example 1: The effects of fertilizers on coastal Bermuda grass
@@ -1311,7 +1311,8 @@ gnm <- function(formula,family=gaussian(),offset=NULL,weights=NULL,data,subset=N
   avs <- all.vars(formula)[-1]
   if(is.null(names(start))) pars <- rownames(start) else pars <- names(start)
   vnames <- avs[is.na(match(avs,pars))]
-  formula <- paste(formula[2],"~ 1 + ",paste(vnames,collapse="+"))
+  if(length(vnames)>0) formula <- paste(formula[2],"~ 1 + ",paste(vnames,collapse="+"))
+  else formula <- paste(formula[2],"~ 1")
   formula <- as.formula(formula)
   mf <- match.call(expand.dots = FALSE)
   m <- match(c("formula", "weights", "offset", "data", "subset"), names(mf), 0L)
@@ -1349,7 +1350,7 @@ gnm <- function(formula,family=gaussian(),offset=NULL,weights=NULL,data,subset=N
   etaf <- function(beta){
     temp <- deparse(formula2[[3]])
     for(i in 1:p) temp <- gsub(pars[i],beta[i],temp)
-    matrix(eval(parse(text=temp),envir=data.frame(X)),ncol=1)
+    matrix(eval(parse(text=temp),envir=data.frame(X)),nrow=n,ncol=1)
   }
   Der <- function(beta) matrix(jacobian(etaf,beta),ncol=p)
   beta_new <- start
@@ -1367,7 +1368,7 @@ gnm <- function(formula,family=gaussian(),offset=NULL,weights=NULL,data,subset=N
     I <- crossprod(Dersw,Dersw)
     kchol <- try(chol(I),silent=TRUE)
     if(is.matrix(kchol)) kchol <- chol2inv(kchol) else kchol <- solve(I)
-    beta_new <- beta_old + kchol%*%U
+    beta_new <- beta_old + crossprod(kchol,U)
     tol <- max(abs((beta_new-beta_old)/beta_old))
     niter <- niter + 1
     if(trace) message("    ",niter,"            ",signif(tol,digits=5))
@@ -1518,7 +1519,7 @@ confint.gnm <- function(object,parm,level=0.95,contrast,digits=max(3, getOption(
     contrast <- as.matrix(contrast)
     if(ncol(contrast)!=length(name.s)) stop(paste("Number of columns of contrast matrix must to be",length(name.s)),call.=FALSE)
     bs <- contrast%*%coef(object)
-    ee <- sqrt(diag(contrast%*%vcov(object,dispersion=dispersion)%*%t(contrast)))
+    ee <- sqrt(diag(contrast%*%tcrossprod(vcov(object,dispersion=dispersion),contrast)))
     name.s <- apply(contrast,1,function(x) paste0(x[x!=0],"*",name.s[x!=0],collapse=" + "))
   }
   results <- matrix(0,length(ee),2)
@@ -1536,7 +1537,7 @@ confint.gnm <- function(object,parm,level=0.95,contrast,digits=max(3, getOption(
 #' @method predict gnm
 #' @export
 predict.gnm <- function(object, ...,newdata, se.fit=FALSE, type=c("link","response"), dispersion=NULL){
-  type <- match.arg(type)
+  type <- tolower(type); type <- match.arg(type)
   if(missingArg(newdata)) predicts <- object$linear.predictors
   else{
     newdata <- data.frame(newdata)
@@ -1671,7 +1672,7 @@ summary.gnm <- function(object, ...,digits=max(3, getOption("digits") - 2),dispe
 #' @method residuals gnm
 #' @export
 residuals.gnm <- function(object,type=c("quantile","deviance","pearson"),standardized=FALSE,plot.it=FALSE,identify,dispersion=NULL,...){
-  type <- match.arg(type)
+  type <- tolower(type); type <- match.arg(type)
   .Theta <- function() return(.Theta)
   environment(.Theta) <- environment(object$family$variance)
   family <- object$family
@@ -1810,7 +1811,7 @@ envelope.gnm <- function(object, rep=25, conf=0.95, type=c("quantile","deviance"
     }
     update(proc(x), . ~ . - offset)
   }
-  type <- match.arg(type)
+  type <- tolower(type); type <- match.arg(type)
   .Theta <- function() return(.Theta)
   defaultW <- getOption("warn")
   options(warn = -1)
@@ -1951,10 +1952,10 @@ dfbeta.gnm <- function(model, coefs, identify, ...){
   p <- ncol(X)
   y <- model$y
   mus <- model$fitted.values
-  Xw <- X*matrix(sqrt(model$weights),nrow(X),ncol(X))
+  Xw <- X*matrix(sqrt(model$weights),n,p)
   salida <- svd(Xw)
   h <- apply(salida$u^2,1,sum)
-  dfbetas <- Xw%*%chol2inv(chol(crossprod(Xw)))*matrix((y-mus)*sqrt(model$prior.weights)/(sqrt(model$family$variance(mus))*(1-h)),n,p)
+  dfbetas <- tcrossprod(Xw,chol2inv(chol(crossprod(Xw))))*matrix((y-mus)*sqrt(model$prior.weights)/(sqrt(model$family$variance(mus))*(1-h)),n,p)
   colnames(dfbetas) <- rownames(coef(model))
   if(!missingArg(coefs)){
     ids <- grep(coefs,colnames(dfbetas),ignore.case=TRUE)
@@ -2057,7 +2058,7 @@ cooks.distance.gnm <- function(model, plot.it=FALSE, dispersion=NULL, coefs, ide
   }
   met2 <- try(chol(met),silent=TRUE)
   if(is.matrix(met2)) met2 <- chol2inv(met2) else met2 <- solve(met)
-  CD <- as.matrix(apply((dfbetas%*%met2)*dfbetas,1,mean))
+  CD <- as.matrix(apply((tcrossprod(dfbetas,met2))*dfbetas,1,mean))
   colnames(CD) <- "Cook's distance"
   if(plot.it){
     nano <- list(...)
@@ -2309,8 +2310,8 @@ vdtest.gnm <- function(model,varformula,verbose=TRUE,...){
     tau <- sqrt(2)*(y/mus + log(mus*phies/(w*y)) + psigamma(w/phies) - 1)*(w/phies)
     Z2 <- Z*matrix(sqrt(psigamma(w/phies,1)*(w/phies)^2 - w/phies),n,p+1)
   }
-  Zstar <- chol2inv(chol(t(Z2)%*%Z2))[-1,-1]
-  sc = as.numeric(0.5*(t(tau)%*%Z[,-1])%*%Zstar%*%(t(Z[,-1])%*%tau))
+  Zstar <- chol2inv(chol(crossprod(Z2)))[-1,-1]
+  sc = as.numeric(0.5*(crossprod(tau,Z[,-1])%*%Zstar%*%crossprod(Z[,-1],tau)))
   if(verbose){
     cat("\n             Score test for varying dispersion parameter\n\n")
     cat("          Statistic = ",round(sc,digits=5),"\n degrees of freedom = ",p,"\n            p-value = ",format.pval(1-pchisq(sc,p)),"\n\n")
@@ -2408,8 +2409,8 @@ vdtest.glm <- function(model,varformula,verbose=TRUE,...){
     tau <- sqrt(2)*(y/mus + log(mus*phies/(w*y)) + psigamma(w/phies) - 1)*(w/phies)
     Z2 <- Z*matrix(sqrt(psigamma(w/phies,1)*(w/phies)^2 - w/phies),n,p+1)
   }
-  Zstar <- chol2inv(chol(t(Z2)%*%Z2))[-1,-1]
-  sc = as.numeric(0.5*(t(tau)%*%Z[,-1])%*%Zstar%*%(t(Z[,-1])%*%tau))
+  Zstar <- chol2inv(chol(crossprod(Z2)))[-1,-1]
+  sc = as.numeric(0.5*(crossprod(tau,Z[,-1])%*%Zstar%*%crossprod(Z[,-1],tau)))
   if(verbose){
     cat("\n             Score test for varying dispersion parameter\n\n")
     cat("          Statistic = ",round(sc,digits=5),"\n degrees of freedom = ",p,"\n            p-value = ",format.pval(1-pchisq(sc,p)),"\n\n")
@@ -2488,14 +2489,15 @@ vdtest.glm <- function(model,varformula,verbose=TRUE,...){
 #' @method envelope glm
 #' @export
 envelope.glm <- function(object, rep=25, conf=0.95, type=c("quantile","deviance","pearson"), standardized=FALSE, plot.it=TRUE, identify, ...){
-  type <- match.arg(type)
+  type <- tolower(type); type <- match.arg(type)
   .Theta <- function() return(.Theta)
   defaultW <- getOption("warn")
   options(warn = -1)
   if(object$family$family=="gaussian")
     object$family$simulate <- function(object,nsim){
+      wts <- object$prior.weights
       mus <- fitted(object)
-      return(rnorm(length(mus),mean=mus,sd=sqrt(object$phi/weights)))
+      return(rnorm(length(mus)*nsim,mean=mus,sd=sqrt(summary(object)$dispersion/wts)))
     }
   if(is.null(object$family$simulate)) stop(paste("family",object$family$family,"is not implemented!!"),call.=FALSE)
   if(any(object$prior.weights == 0)) stop("Only positive weights are supported!!",call.=FALSE)
@@ -2521,7 +2523,8 @@ envelope.glm <- function(object, rep=25, conf=0.95, type=c("quantile","deviance"
           i <- i + 1
         }
       }
-    }})
+    }
+  })
   close(bar)
   alpha <- 1 - max(0,min(1,abs(conf)))
   e <- as.matrix(e[,1:(i-1)])
@@ -2620,8 +2623,8 @@ zero.excess <- function(object, alternative=c("excess","lack","both"), method=c(
       stop("Only 'nb1', 'nb2' and 'nbf' families of overglm-type objects and 'poisson' family of glm-type objects are supported!!",call.=FALSE)
     }
   }
-  alternative <- match.arg(alternative)
-  method <- match.arg(method)
+  alternative <- tolower(alternative); alternative <- match.arg(alternative)
+  method <- tolower(method); method <- match.arg(method)
   defaultW <- getOption("warn")
   options(warn = -1)
   mu <- object$fitted.values
@@ -2752,8 +2755,8 @@ zero.excess <- function(object, alternative=c("excess","lack","both"), method=c(
 #'                lty=1, lwd=1, col.lab="blue", col.axis="blue", col.main="black", family="mono")
 #'
 localInfluence.gnm <- function(object,type=c("total","local"),perturbation=c("case-weight","response"),coefs,plot.it=FALSE,identify,...){
-  type <- match.arg(type)
-  perturbation <- match.arg(perturbation)
+  type <- tolower(type); type <- match.arg(type)
+  perturbation <- tolower(perturbation); perturbation <- match.arg(perturbation)
   subst <- NULL
   if(!missingArg(coefs)){
     ids <- grepl(coefs,rownames(object$coefficients),ignore.case=TRUE)
@@ -2788,13 +2791,13 @@ localInfluence.gnm <- function(object,type=c("total","local"),perturbation=c("ca
   Qpp2 <- try(chol(Qpp),silent=TRUE)
   if(is.matrix(Qpp2)) Qpp2 <- chol2inv(Qpp2) else Qpp2 <- solve(Qpp)
   if(!is.null(subst)) Qpp2[-ids,-ids] <- Qpp2[-ids,-ids] - solve(Qpp[-ids,-ids])
-  li <- tcrossprod(Delta,t(Qpp2))
+  li <- Delta%*%Qpp2
   if(type=="local"){
     tol <- 1
     bnew <- matrix(rnorm(nrow(li)),nrow(li),1)
     while(tol > 0.000001){
       bold <- bnew
-      bnew <- tcrossprod(li,t(crossprod(Delta,bold)))
+      bnew <- li%*%crossprod(Delta,bold)
       bnew <- bnew/sqrt(sum(bnew^2))
       tol <- max(abs((bnew - bold)/bold))
     }
@@ -2823,4 +2826,156 @@ localInfluence.gnm <- function(object,type=c("total","local"),perturbation=c("ca
   if(!is.null(subst))
     message("The coefficients included in the measures of local influence are: ",paste(subst,sep=""),"\n")
   return(invisible(out_))
+}
+#'
+#' @title Best Subset Selection
+#' @description Best subset selection by exhaustive search in generalized linear models.
+#' @param object one object of the class \emph{glm}, which is assumed to be the full model.
+#' @param nvmax	an (optional) positive integer value indicating the maximum size of subsets to examine.
+#' @param nbest	an (optional) positive integer value indicating the number of subsets of each size to record.
+#' @param force.in an (optional) positive integers vector indicating the index of columns of model matrix that should be in all models.
+#' @param force.out an (optional) positive integers vector indicating the index of columns of model matrix that should be in no models.
+#' @param verbose an (optional) logical indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
+#' @param digits an (optional) integer value indicating the number of decimal places to be used. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.
+#' @details In order to apply the "best subset" selection, an exhaustive search is conducted, separately for every size from \eqn{i} to
+#' \code{nvmax}, to identify the model with the smallest deviance value. Therefore, if, for a fixed model size, the interest model selection criteria reduce to
+#' monotone functions of deviance, thus differing only in the way the sizes of the models are compared, then the results of the "best subset"
+#' selection do not depend upon the choice of the trade-off between goodness-of-fit and complexity on which they are based.
+#' @examples
+#' ###### Example 1: Fuel consumption of automobiles
+#' Auto <- ISLR::Auto
+#' Auto2 <- within(Auto, origin <- factor(origin))
+#' mod <- mpg ~ cylinders + displacement + acceleration + origin + horsepower*weight
+#' fit1 <- glm(mod, family=inverse.gaussian(log), data=Auto2)
+#' out1 <- bestSubset(fit1)
+#' out1
+#'
+#' ###### Example 2: Patients with burn injuries
+#' burn1000 <- aplore3::burn1000
+#' burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
+#' mod <- death ~ gender + race + flame + age*tbsa*inh_inj
+#' fit2 <- glm(mod, family=binomial(logit), data=burn1000)
+#' out2 <- bestSubset(fit2)
+#' out2
+#'
+#' ###### Example 3: Advertising
+#' data(advertising)
+#' fit3 <- glm(sales ~ log(TV)*radio*newspaper, family=gaussian(log), data=advertising)
+#' out3 <- bestSubset(fit3)
+#' out3
+#'
+#' @export bestSubset
+#'
+bestSubset <- function(object, nvmax=8, nbest=1, force.in=NULL, force.out=NULL, verbose=TRUE, digits=max(3, getOption("digits") - 2)){
+  if(class(object)[1]!="glm")
+    stop("Only glm-type objects are supported!!",call.=FALSE)
+  .Theta <- function() return(.Theta)
+  X <- model.matrix(object)
+  if(colnames(X)[1]=="(Intercept)"){
+    Intercept <- TRUE
+    nn <- colnames(X)[-1]
+  }else{
+    Intercept <- FALSE
+    nn <- colnames(X)
+  }
+  p <- ncol(X) - Intercept
+  if(!is.null(force.in)){
+    force.in <- unique(force.in)
+    if(min(force.in)<=0 | any(floor(force.in)!=force.in) | any(force.in>p))
+      stop(paste0("Argument 'force.in' must be NULL or a vector of positive integer values lower or equal to ",p,"!!!\n"),call.=FALSE)
+    force.in <- 1:p %in% force.in
+  }else force.in <- rep(FALSE,p)
+  pin <- sum(force.in)
+  if(!is.null(force.out)){
+    force.out <- unique(force.out)
+    if(min(force.out)<=0 | any(floor(force.out)!=force.out) | any(force.out>p))
+      stop(paste0("Argument 'force.out' must be NULL or a vector of positive integer values lower or equal to ",p,"!!!\n"),call.=FALSE)
+    force.out <- 1:p %in% force.out
+  }else force.out <- rep(FALSE,p)
+  pout <- sum(force.out)
+  if(!is.null(force.in) & !is.null(force.out) & sum(force.in*force.out)>0)
+    stop("There must be no common elements between 'force.in' and 'force.out'!!!\n",call.=FALSE)
+  pindex <- rep(FALSE,p)
+  pindex[force.in] <- TRUE
+  subsets <- vector()
+  epsilon <- 1e-5
+  maxit <- 25
+  mus <- fitted(object)
+  y <- object$y
+  n <- nrow(X)
+  omega <- object$prior.weights
+  if(is.null(object$offset)) offset <- rep(0,length(mus))
+  devnews <- sum(object$family$dev.resids(y,mus,omega))
+  cmw <- (object$family$family=="gaussian" & object$family$link=="identity") | (object$family$family=="poisson" & object$family$link=="sqrt") |
+    (object$family$family=="Gamma" & object$family$link=="log")
+  bar <- txtProgressBar(min=0, max=6*min(p-pout-pin,nvmax), initial=0, width=6*min(p-pout-pin,nvmax), char="+", style=3)
+  k <- 6
+  Lik <- ifelse(is.na(object$family$aic(y,1,mus,omega,object$deviance)),FALSE,TRUE)
+  if(Lik) dispersion <- ifelse(attr(logLik(object),"df") > length(coef(object)),TRUE,FALSE)
+  for(i in ifelse(pin>0,0,1):min(p-pout-pin,nvmax)){
+    varsi <- comb_n(1:(p-pout-pin),i)
+    logLiks <- matrix(0,ncol(varsi),p+1+Lik)
+    for(l in 1:ncol(varsi)){
+      vars <- varsi[,l]
+      pindex2 <- pindex
+      pindex2[!force.in & !force.out] <- 1:(p-pin-pout) %in% vars
+      if(Intercept) Xi <- X[,c(TRUE,pindex2)] else Xi <- X[,pindex2]
+      tol <- 2*epsilon
+      j <- 1
+      mu <- mus
+      devnew <- devnews
+      while(tol > epsilon & j <= maxit){
+        devold <- devnew
+        eta <- object$family$linkfun(mu)
+        G <- object$family$mu.eta(eta)
+        V <- object$family$variance(mu)
+        z <- eta - offset + (y - mu)/G
+        if(!cmw | j==1){
+          b <- Xi*matrix(omega*G^2/V,n,i+Intercept)
+          a <- tcrossprod(chol2inv(chol(crossprod(Xi,b))),b)
+        }
+        betanew <- a%*%z
+        eta <- offset + Xi%*%betanew
+        mu <- object$family$linkinv(eta)
+        devnew <- sum(object$family$dev.resids(y,mu,omega))
+        tol <- abs(devnew - devold)/(abs(devold) + 0.1)
+        j <- j + 1
+      }
+      if(tol > epsilon) stop("\nConvergence was not achieved!!!\n",call.=FALSE)
+      if(Lik) out_ <- c(object$family$aic(y,1,mu,omega,devnew) - 2*dispersion, devnew/(n-i-Intercept))
+      else out_ <- devnew/(n-i-Intercept)
+      logLiks[l,] <- c(pindex2,out_)
+    }
+    logLiks <- matrix(logLiks[order(logLiks[,p+1+Lik],decreasing=FALSE),],ncol(varsi))
+    cuan <- min(nbest,ncol(varsi))
+    if(Lik) subsets <- rbind(subsets,cbind(i+pin,matrix(logLiks[1:cuan,],cuan),0))
+    else subsets <- rbind(subsets,cbind(i+pin,matrix(logLiks[1:cuan,],cuan)))
+    k <- k + 6
+    setTxtProgressBar(bar,k)
+  }
+  subsets <- data.frame(subsets)
+  if(Lik){
+    if(Intercept){
+      subsets[,p+3] <- 1 - subsets[,p+3]/(object$null.deviance/object$df.null)
+      colnames(subsets) <- c("_SIZE_",colnames(X)[-1],"AIC","adj.R-squared","BIC")
+    }else colnames(subsets) <- c("_SIZE_",colnames(X),"AIC","Deviance*","BIC")
+    subsets[,p+3] <- round(subsets[,p+3],digits=digits)
+    subsets[,p+4] <- subsets[,p+2]
+    subsets[,p+2] <- round(subsets[,p+2] +      2*(subsets[,1] + Intercept + dispersion),digits=digits)
+    subsets[,p+4] <- round(subsets[,p+4] + log(n)*(subsets[,1] + Intercept + dispersion),digits=digits)
+  }else{
+    if(Intercept){
+      subsets[,p+1] <- 1 - subsets[,p+1]/(object$null.deviance/object$df.null)
+      colnames(subsets) <- c("_SIZE_",colnames(X)[-1],"adj.R-squared")
+    }else colnames(subsets) <- c("_SIZE_",colnames(X),"Deviance*")
+  }
+  if(verbose){
+    cat("\n\n")
+    if(pin>0) cat("\nForce.in :",paste0(nn[force.in],collapse=", "))
+    if(pout>0) cat("\nForce.out:",paste0(nn[force.out],collapse=", "))
+    cat("\n\n")
+    print(subsets,row.names=FALSE)
+    if(!Intercept) cat("\n*Deviance divided by its degrees of freedom.\n")
+  }
+  return(invisible(subsets))
 }

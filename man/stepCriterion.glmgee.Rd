@@ -14,11 +14,13 @@
   scope,
   digits = max(3, getOption("digits") - 2),
   varest = c("robust", "df-adjusted", "model", "bias-corrected"),
+  force.in,
+  force.out,
   ...
 )
 }
 \arguments{
-\item{model}{an object of the class glmgee which is obtained from the fit of a generalized estimating equation.}
+\item{model}{an object of the class \code{glmgee} which is obtained from the fit of a generalized estimating equation.}
 
 \item{criterion}{an (optional) character string indicating the criterion which should be used to compare the candidate
 models. The available options are: QIC ("qic"), QICu ("qicu"), Akaike-type penalized gaussian pseudo-likelihood criterion ("agpc"),
@@ -49,6 +51,10 @@ criteria to compare the candidate models. As default, \code{digits} is set to \c
 
 \item{varest}{an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters in the Wald-type test. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). As default, \code{varest} is set to "robust".}
 
+\item{force.in}{an (optional) formula-type object indicating the effects that should be in all models}
+
+\item{force.out}{an (optional) formula-type object indicating the effects that should be in no models}
+
 \item{...}{further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the
 penalty in the AGPC, which by default is set to 2.}
 }
@@ -59,6 +65,7 @@ A list which contains the following objects:
 \item{\code{direction}}{ a character string indicating the type of procedure which was used.}
 \item{\code{criterion}}{ a character string indicating the criterion used to compare the candidate models.}
 \item{\code{final}}{ a character string indicating the linear predictor of the "final model".}
+\item{\code{final.fit}}{ an object of class \code{glmgee} with the results of the fit to the data of the "final model".}'
 }
 }
 \description{
@@ -70,18 +77,18 @@ and backward stepwise.
 data(spruces)
 mod <- size ~ poly(days,4)*treat
 fit1 <- glmgee(mod, id=tree, family=Gamma(log), data=spruces, corstr="AR-M-dependent")
-stepCriterion(fit1, criterion="p-value", direction="forward", scope=list(lower=~1,upper=mod))
+stepCriterion(fit1, criterion="p-value", direction="forward", scope=list(upper=mod),force.in=~treat)
 
 ###### Example 2: Treatment for severe postnatal depression
 data(depression)
 mod <- depressd ~ visit*group
 fit2 <- glmgee(mod, id=subj, family=binomial(probit), corstr="AR-M-dependent", data=depression)
-stepCriterion(fit2, criterion="agpc", direction="forward", scope=list(lower=~1,upper=mod))
+stepCriterion(fit2, criterion="agpc", direction="forward", scope=list(upper=mod),force.in=~group)
 
 ###### Example 3: Treatment for severe postnatal depression (2)
 mod <- dep ~ visit*group
 fit2 <- glmgee(mod, id=subj, family=gaussian(identity), corstr="AR-M-dependent", data=depression)
-stepCriterion(fit2, criterion="sgpc", direction="forward", scope=list(lower=~1,upper=mod))
+stepCriterion(fit2, criterion="sgpc", direction="forward", scope=list(upper=mod),force.in=~group)
 
 }
 \references{

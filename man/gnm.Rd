@@ -93,7 +93,7 @@ A set of standard extractor functions for fitted model objects is available for 
 including methods to the generic functions such as \code{summary}, \code{model.matrix}, \code{estequa},
 \code{coef}, \code{vcov}, \code{logLik}, \code{fitted}, \code{confint}, \code{AIC}, \code{BIC} and \code{predict}.
 In addition, the model fitted to the	data may be assessed using functions such as \code{adjR2.gnm}, \link{anova.gnm},
-\link{residuals.gnm}, \link{dfbeta.gnm}, \link{cooks.distance.gnm} and \link{envelope.gnm}.
+\link{residuals.gnm}, \link{dfbeta.gnm}, \link{cooks.distance.gnm}, \link{localInfluence.gnm} and \link{envelope.gnm}.
 }
 \examples{
 ###### Example 1: The effects of fertilizers on coastal Bermuda grass

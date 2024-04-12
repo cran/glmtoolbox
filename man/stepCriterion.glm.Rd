@@ -12,6 +12,8 @@
   levels = c(0.05, 0.05),
   trace = TRUE,
   scope,
+  force.in,
+  force.out,
   ...
 )
 }
@@ -30,6 +32,10 @@
 
 \item{scope}{an (optional) list, containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. As default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.}
 
+\item{force.in}{an (optional) formula-type object indicating the effects that should be in all models}
+
+\item{force.out}{an (optional) formula-type object indicating the effects that should be in no models}
+
 \item{...}{further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC/QICu, which by default is set to 2.}
 }
 \value{
@@ -42,6 +48,8 @@ a list list with components including
 \code{criterion} \tab a character string indicating the criterion used to compare the candidate models,\cr
 \tab \cr
 \code{final} \tab a character string indicating the linear predictor of the "final model",\cr
+\tab \cr
+\code{final.fit} \tab an object of class \code{glm} with the results of the fit to the data of the "final model",\cr
 }
 }
 \description{
@@ -66,15 +74,14 @@ Auto2 <- within(Auto, origin <- factor(origin))
 mod <- mpg ~ cylinders + displacement + acceleration + origin + horsepower*weight
 fit1 <- glm(mod, family=inverse.gaussian("log"), data=Auto2)
 stepCriterion(fit1, direction="forward", criterion="p-value", test="lr")
-stepCriterion(fit1, direction="backward", criterion="bic")
+stepCriterion(fit1, direction="backward", criterion="bic", force.in=~cylinders)
 
 ###### Example 2: Patients with burn injuries
 burn1000 <- aplore3::burn1000
 burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
 upper <- ~ age + gender + race + tbsa + inh_inj + flame + age*inh_inj + tbsa*inh_inj
-lower <- ~ 1
 fit2 <- glm(death ~ age + gender + race + tbsa + inh_inj, family=binomial("logit"), data=burn1000)
-stepCriterion(fit2, direction="backward", criterion="bic", scope=list(lower=lower,upper=upper))
+stepCriterion(fit2, direction="backward", criterion="bic", scope=list(upper=upper),force.in=~tbsa)
 stepCriterion(fit2, direction="forward", criterion="p-value", test="score")
 
 ###### Example 3: Skin cancer in women
@@ -88,5 +95,5 @@ stepCriterion(fit3, direction="forward", criterion="p-value", test="lr")
 James G., Witten D., Hastie T., Tibshirani R. (2013, page 210) An Introduction to Statistical Learning with Applications in R, Springer, New York.
 }
 \seealso{
-\link{stepCriterion.lm}, \link{stepCriterion.overglm}, \link{stepCriterion.glmgee}
+\link{bestSubset}, \link{stepCriterion.lm}, \link{stepCriterion.overglm}, \link{stepCriterion.glmgee}
 }

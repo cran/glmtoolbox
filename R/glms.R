@@ -63,7 +63,7 @@ FisherScoring <- function(object,verbose=TRUE,digits=max(3, getOption("digits") 
   start <- object$call$start
   nobs <- nrow(X)
   omega <- weights <- object$prior.weights
-  if(is.null(object$offset)) offset <- matrix(0,nrow(X),1) else offset <- object$offset
+  if(is.null(object$offset)) offset <- matrix(0,nobs,1) else offset <- object$offset
   if(is.null(mustart)){
     if(is.null(etastart)){
       if(is.null(start)){
@@ -97,7 +97,7 @@ FisherScoring <- function(object,verbose=TRUE,digits=max(3, getOption("digits") 
     W <- omega*G^2/V
     X2 <- X*matrix(W,nrow(X),ncol(X))
     z <- eta - offset + (y-mu)/G
-    betanew <- chol2inv(chol(t(X)%*%X2))%*%t(X2)%*%z
+    betanew <- tcrossprod(chol2inv(chol(crossprod(X,X2))),X2)%*%z
     eta <- offset + X%*%betanew
     mu <- object$family$linkinv(eta)
     devnew <- sum(object$family$dev.resids(y,mu,omega))
@@ -397,8 +397,8 @@ vdtest.lm <- function(model,varformula,verbose=TRUE,...){
   mus <- fitted(model)
   tau <- resid(model)^2*w/phies - 1
   Zstar <- matrix(1,n,ncol(Zstar))*Zstar
-  Zstar2 <- chol2inv(chol(t(Zstar)%*%Zstar))[-1,-1]
-  sc = 0.5*(t(tau)%*%Z)%*%Zstar2%*%(t(Z)%*%tau)
+  Zstar2 <- chol2inv(chol(crossprod(Zstar)))[-1,-1]
+  sc = 0.5*(crossprod(tau,Z)%*%Zstar2%*%crossprod(Z,tau))
   if(verbose){
     cat("\n             Score test for varying dispersion parameter\n\n")
     cat("          Statistic = ",round(sc,digits=5),"\n degrees of freedom = ",p,"\n            p-value = ",format.pval(1-pchisq(sc,p)),"\n\n")
@@ -415,6 +415,8 @@ vdtest.lm <- function(model,varformula,verbose=TRUE,...){
 #' @param ...	further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC/QICu, which by default is set to 2.
 #' @param trace an (optional) logical switch indicating if should the stepwise reports be printed. As default, \code{trace} is set to TRUE.
 #' @param scope an (optional) list containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. As default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.
+#' @param force.in an (optional) formula-type object indicating the effects that should be in all models
+#' @param force.out an (optional) formula-type object indicating the effects that should be in no models
 #' @details The "hybrid forward stepwise" algorithm starts with the
 #' simplest model (which may be chosen at the argument \code{scope}, and
 #' As default, is a model whose parameters in the linear predictor,
@@ -437,6 +439,8 @@ vdtest.lm <- function(model,varformula,verbose=TRUE,...){
 #' \code{criterion} \tab a character string indicating the criterion used to compare the candidate models,\cr
 #' \tab \cr
 #' \code{final} \tab a character string indicating the linear predictor of the "final model",\cr
+#' \tab \cr
+#' \code{final.fit} \tab an object of class \code{lm} with the results of the fit to the data of the "final model",\cr
 #' }
 #' @seealso \link{stepCriterion.glm}, \link{stepCriterion.overglm}, \link{stepCriterion.glmgee}
 #' @examples
@@ -466,9 +470,10 @@ vdtest.lm <- function(model,varformula,verbose=TRUE,...){
 #' @export
 #' @references James G., Witten D., Hastie T., Tibshirani R. (2013, page 210) An Introduction to Statistical Learning with Applications in R, Springer, New York.
 #'
-stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp","p-value"), direction=c("forward","backward"), levels=c(0.05,0.05), trace=TRUE, scope, ...){
+stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp","p-value"), direction=c("forward","backward"), levels=c(0.05,0.05), trace=TRUE, scope, force.in, force.out, ...){
   xxx <- list(...)
   if(is.null(xxx$k)) k <- 2 else k <- xxx$k
+  if(!missingArg(criterion)) criterion <- tolower(criterion)
   criterion <- match.arg(criterion)
   direction <- match.arg(direction)
   criters <- c("aic","bic","adjr2","prdr2","cp","p-value")
@@ -480,10 +485,15 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp"
     lower <- formula(eval(model$call$formula))
     lower <- formula(paste(deparse(lower[[2]]),"~",attr(terms(lower,data=eval(model$call$data)),"intercept")))
   }else{
-    lower <- scope$lower
-    upper <- scope$upper
+    if(is.null(scope$lower)){
+      lower <- formula(eval(model$call$formula))
+      lower <- formula(paste(deparse(lower[[2]]),"~",attr(terms(lower,data=eval(model$call$data)),"intercept")))
+    }else lower <- scope$lower
+    if(is.null(scope$upper)) upper <- formula(eval(model$call$formula)) else upper <- scope$upper
   }
-  #formulae <- update(upper, paste(deparse(eval(model$call$formula)[[2]]),"~ ."))
+  if(length(model$call$formula[[length(model$call$formula)]])==1)
+    if(model$call$formula[[length(model$call$formula)]]==".")
+      upper <- as.formula(paste0(model$call$formula[[length(model$call$formula)]],"~",paste0(attr(terms(eval(model$call$formula),data=eval(model$call$data)),"term.labels"),collapse="+")))
   model <- update(model,formula=upper)
   mf <- model$model
   y <- mf[,attr(model$terms,"response")]
@@ -512,6 +522,16 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp"
     cp <- (n-p)*(sigma2/sigma20-1) + p
     return(c(aic,bic,adjr2,predr2,cp,sigma2))
   }
+  if(!missingArg(force.in)){
+    force.in <- attr(terms(as.formula(force.in)),"term.labels")
+    lower <- as.formula(paste0("~",paste0(c(deparse(lower[[length(lower)]]),force.in[!(force.in %in% attr(terms(lower),"term.labels"))]),collapse="+")))
+    upper <- as.formula(paste0("~",paste0(c(deparse(upper[[length(upper)]]),force.in[!(force.in %in% attr(terms(upper),"term.labels"))]),collapse="+")))
+  }else force.in <- ""
+  if(!missingArg(force.out)){
+    force.out <- attr(terms(as.formula(force.out)),"term.labels")
+    upper <- as.formula(paste0("~",paste0(deparse(upper[[length(upper)]])[!(deparse(upper[[length(upper)]]) %in% force.out)],collapse="+")))
+  }else force.out <- ""
+
   U <- unlist(lapply(strsplit(attr(terms(upper,data=eval(model$call$data)),"term.labels"),":"),function(x) paste(sort(x),collapse =":")))
   fs <- attr(terms(upper,data=eval(model$call$data)),"factors")
   long <- max(nchar(U)) + 2
@@ -546,7 +566,7 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp"
         nombres <- matrix("",length(salen),1)
         for(i in 1:length(salen)){
           salida <- apply(as.matrix(fs[,salen[i]]*fs[,-c(entran,salen[i])]),2,sum)
-          if(all(salida < sum(fs[,salen[i]])) & U[salen[i]]!=cambio){
+          if(all(salida < sum(fs[,salen[i]])) & U[salen[i]]!=cambio & !(U[salen[i]] %in% force.in)){
             newformula <- update(oldformula, paste("~ . -",U[salen[i]]))
             X <- model.matrix(newformula,mf)
             fit.0 <- lm.fit(y=sqrt(weights)*(y-offset),x=X*matrix(sqrt(weights),nrow(X),ncol(X)))
@@ -587,7 +607,7 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp"
         nombres <- matrix("",length(entran),1)
         for(i in 1:length(entran)){
           salida <- apply(as.matrix(fs[,-c(salen,entran[i])]),2,function(x) sum(fs[,entran[i]]*x)!=sum(x))
-          if(all(salida) & U[entran[i]]!=cambio){
+          if(all(salida) & U[entran[i]]!=cambio & !(U[entran[i]] %in% force.out)){
             newformula <- update(oldformula, paste("~ . +",U[entran[i]]))
             X <- model.matrix(newformula,mf)
             fit.0 <- lm.fit(y=sqrt(weights)*(y-offset),x=X*matrix(sqrt(weights),nrow(X),ncol(X)))
@@ -676,7 +696,7 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp"
         nombres <- matrix("",length(entran),1)
         for(i in 1:length(entran)){
           salida <- apply(as.matrix(fs[,-c(salen,entran[i])]),2,function(x) sum(fs[,entran[i]]*x)!=sum(x))
-          if(all(salida) & U[entran[i]]!=cambio){
+          if(all(salida) & U[entran[i]]!=cambio & !(U[entran[i]] %in% force.out)){
             newformula <- update(oldformula, paste("~ . +",U[entran[i]]))
             X <- model.matrix(newformula,mf)
             fit.0 <- lm.fit(y=sqrt(weights)*(y-offset),x=X*matrix(sqrt(weights),nrow(X),ncol(X)))
@@ -718,7 +738,7 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp"
         nombres <- matrix("",length(salen),1)
         for(i in 1:length(salen)){
           salida <- apply(as.matrix(fs[,salen[i]]*fs[,-c(entran,salen[i])]),2,sum)
-          if(all(salida < sum(fs[,salen[i]]))){
+          if(all(salida < sum(fs[,salen[i]])) & !(U[salen[i]] %in% force.in)){
             newformula <- update(oldformula, paste("~ . -",U[salen[i]]))
             X <- model.matrix(newformula,mf)
             fit.0 <- lm.fit(y=sqrt(weights)*(y-offset),x=X*matrix(sqrt(weights),nrow(X),ncol(X)))
@@ -797,6 +817,12 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp"
     cat("\n")
   }
   out_$final <- paste("~",as.character(oldformula)[length(oldformula)],sep=" ")
+  if(!trace){
+    X <- model.matrix(oldformula,mf)
+    final.fit <- lm(sqrt(weights)*(y-offset)~0+X*matrix(sqrt(weights),nrow(X),ncol(X)))
+    names(final.fit$coefficients) <- substring(names(final.fit$coefficients),2)
+    out_$final.fit <- final.fit
+  }
   return(invisible(out_))
 }
 
@@ -807,7 +833,7 @@ stepCriterion.lm <- function(model, criterion=c("bic","aic","adjr2","prdr2","cp"
 #'             qnbinom qpois rbeta rnbinom .getXlevels lm optim simulate
 #' @importFrom utils setTxtProgressBar txtProgressBar
 #' @importFrom numDeriv grad hessian jacobian
-#' @importFrom Rfast Digamma Lgamma
+#' @importFrom Rfast Digamma Lgamma comb_n
 #' @importFrom Formula Formula model.part
 #' @importFrom methods is
 #' @importFrom SuppDists rinvGauss
@@ -1011,17 +1037,20 @@ hltest <- function(model,verbose=TRUE,...){
 }
 
 #' @title The Receiver Operating Characteristic (ROC) Curve
-#' @description Computes the exact area under the ROC curve (AUROC), the Gini coefficient, and the Kolmogorov-Smirnov (KS) statistic for a binary classifier. Optionally, this function can plot the ROC curve, that is, the plot of the estimates of Sensitivity versus the estimates of 1-Specificity.
+#' @description Computes the exact area under the ROC curve (AUROC), the Gini coefficient, and the Kolmogorov-Smirnov (KS) statistic for a binary classifier. Optionally, this function can plot the ROC curve, that is, the plot of the estimates of Sensitivity versus the estimates of 1-Specificity. This function also computes confidence intervals for AUROC and Gini coefficient using the method proposed by DeLong et al. (1988).
 #' @param object a matrix with two columns: the first one is a numeric vector of 1's and 0's indicating whether each row is a "success" or a "failure"; the second one is a numeric vector of values indicating the probability (or propensity score) of each row to be a "success". Optionally, \code{object} can be an object of the class glm which is obtained from the fit of a generalized linear model where the distribution of the response variable is assumed to be binomial.
 #' @param plot.it an (optional) logical switch indicating if the plot of the ROC curve is required or just the data matrix in which it is based. As default, \code{plot.it} is set to TRUE.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
+#' @param level an (optional) value indicating the required confidence level. As default, \code{level} is set to 0.95.
+#' @param digits an (optional) integer value indicating the number of decimal places to be used. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.
 #' @param ... further arguments passed to or from other methods. For example, if \code{plot.it=TRUE} then \code{...} may to include graphical parameters as \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
-#' @references Hanley J.A., McNeil B.J. (1982) The Meaning and Use of the Area under a Receiver Operating Characteristic (ROC) Curve. \emph{Radiology} 143, 29–36.
 #' @return A list which contains the following objects:
 #' \describe{
 #' \item{\code{roc}}{ A matrix with the Cutoffs and the associated estimates of Sensitivity and Specificity.}
 #' \item{\code{auroc}}{ The exact area under the ROC curve.}
+#' \item{\code{ci.auroc}}{ Confidence interval for the area under the ROC curve.}
 #' \item{\code{gini}}{ The value of the Gini coefficient computed as 2(\code{auroc}-0.5).}
+#' \item{\code{ci.gini}}{ Confidence interval for the Gini coefficient.}
 #' \item{\code{ks}}{ The value of the Kolmogorov-Smirnov statistic computed as the maximum value of |1-Sensitivity-Specificity|.}
 #' }
 #' @examples
@@ -1042,8 +1071,11 @@ hltest <- function(model,verbose=TRUE,...){
 #'      col.main="black", family="mono")
 #' @export ROCc
 #' @importFrom stats aggregate sd
-#'
-ROCc <- function(object,plot.it=TRUE,verbose=TRUE,...){
+#' @references Cho H., Matthews G.J., Harel O. (2019) Confidence Intervals for the Area Under the Receiver Operating Characteristic Curve in the Presence of Ignorable Missing Data. \emph{International statistical review} 87, 152–177.
+#' @references DeLong E.R., DeLong D.M., Clarke-Pearson D.L. (1988). Comparing the areas under two or more correlated receiver operating characteristic curves: a nonparametric approach. \emph{Biometrics} 44, 837–845.
+#' @references Nahm F.S. (2022). Receiver operating characteristic curve: overview and practical use for clinicians. \emph{Korean journal of anesthesiology} 75, 25–36.
+#' @references Hanley J.A., McNeil B.J. (1982) The Meaning and Use of the Area under a Receiver Operating Characteristic (ROC) Curve. \emph{Radiology} 143, 29–36.
+ROCc <- function(object,plot.it=TRUE,verbose=TRUE,level=0.95,digits=max(3, getOption("digits") - 2),...){
   if(is(object,"glm")){
     if(object$family$family!="binomial") stop("Only binomial regression models are supported!!",call.=FALSE)
     temp <- data.frame(mus=fitted(object),ys=object$y*object$prior.weights,size=object$prior.weights)
@@ -1054,7 +1086,7 @@ ROCc <- function(object,plot.it=TRUE,verbose=TRUE,...){
   }
   temp2 <- aggregate(cbind(m=size,events=ys)~mus,data=temp,sum)
   mus <- temp2[,1]
-  if(nrow(temp2) > 10000) mus <- quantile(rep(temp2[,1],temp2[,2]), probs=c(0:9999)/10000)
+  if(nrow(temp2) > 10000) mus <- quantile(rep(temp2[,1],temp2[,2]), probs=c(0:10000)/10000)
   results <- matrix(0,length(mus),3)
   d1 <- sum(temp2[,3])
   d3 <- sum(temp2[,2])
@@ -1066,6 +1098,17 @@ ROCc <- function(object,plot.it=TRUE,verbose=TRUE,...){
     results[i,3] <- (sum(temp2[temp2[,1] < mus[i],2]) - sum(temp2[temp2[,1] < mus[i],3]))/d2
     if(i >= 2) C <- C + (1/2)*(results[i,3] - results[i-1,3])*(min(results[i,2],results[i-1,2]) + max(results[i,2],results[i-1,2]))
   }
+  if(length(mus)==1){
+    results <- rbind(results,c(1,0,1))
+    C <- 0.5
+  }
+  z <- cbind(temp2[temp2[,2]>temp2[,3],1],temp2[temp2[,2]>temp2[,3],2]-temp2[temp2[,2]>temp2[,3],3])
+  o <- temp2[temp2[,3]>0,c(1,3)]
+  v <- matrix(0,nrow(z),1)
+  u <- matrix(0,nrow(o),1)
+  for(i in 1:nrow(z)) v[i] <- z[i,2]*(sum(o[ ,2]*((z[i,1] < o[ ,1]) + 0.5*(z[i,1]==o[ ,1])))/sum(o[,2]) - C)^2
+  for(i in 1:nrow(o)) u[i] <-	o[i,2]*(sum(z[ ,2]*((z[ ,1] < o[i,1]) + 0.5*(z[ ,1]==o[i,1])))/sum(z[,2]) - C)^2
+  sdA <- sqrt(sum(v)/(sum(z[,2])*(sum(z[,2])-1)) + sum(u)/(sum(o[,2])*(sum(o[,2])-1)))
   if(plot.it){
     nano <- list(...)
     nano$x <- 1-results[,3]
@@ -1090,14 +1133,18 @@ ROCc <- function(object,plot.it=TRUE,verbose=TRUE,...){
     segments(kss[idks,1],kss[idks,2],kss[idks,1],kss[idks,3])
   }
   ks <- max(abs(1-results[,3]-results[,2]))
+  liA <- max(C - qnorm(1-(1-level)/2)*sdA,0)
+  lsA <- min(C + qnorm(1-(1-level)/2)*sdA,1)
+  liG <- max(2*(C-0.5) - 2*qnorm(1-(1-level)/2)*sdA,-1)
+  lsG <- min(2*(C-0.5) + 2*qnorm(1-(1-level)/2)*sdA,1)
   if(verbose){
-    cat("\n Area Under ROC Curve  = ",round(C,digits=3),"\n")
-    cat("     Gini Coefficient  = ",round(2*(C-0.5),digits=3),"\n")
+    cat("\n Area Under ROC Curve  = ",paste0(round(C,digits=3),",   ",round(100*level,digits=1),"% CI: (",round(liA,digits=3),", ",round(lsA,digits=3),")"),"\n")
+    cat("     Gini Coefficient  = ",paste0(round(2*(C-0.5),digits=3),",   ",round(100*level,digits=1),"% CI: (",round(liG,digits=3),", ",round(lsG,digits=3),")"),"\n")
     cat("        K-S Statistic  = ",round(ks,digits=3),"\n")
   }
   results <- as.data.frame(results)
   colnames(results) <- c("Cutoff","Sensitivity","Specificity")
-  out_ <- list(roc=results,auroc=C,gini=2*(C-0.5),ks=ks)
+  out_ <- list(roc=results,auroc=C,ci.auroc=c(liA,lsA),gini=2*(C-0.5),ci.gini=c(liG,lsG),ks=ks)
   return(invisible(out_))
 }
 
@@ -1413,7 +1460,7 @@ confint2 <- function(model, level=0.95, test=c("wald","lr","score","gradient"), 
         if(test=="score"){
           ui <- (crossprod(X,resid(fit0s,type="pearson")*sqrt(fit0s$weights))/phi)[i]
           Xw <- X*matrix(sqrt(fit0s$weights),n,p)
-          vi <- phi*solve(t(Xw)%*%Xw)[i,i]
+          vi <- phi*solve(crossprod(Xw))[i,i]
           salida <- ui^2*vi - qchisq(1-alpha,1)
         }
         if(test=="gradient"){
@@ -1527,8 +1574,10 @@ residuals2 <- function(object,type,standardized=FALSE,plot.it=FALSE,identify,...
     nano$y <- rd
     if(is.null(nano$ylim)) nano$ylim <- c(min(-3.5,min(rd)),max(+3.5,max(rd)))
     if(is.null(nano$xlab)) nano$xlab <- "Fitted values"
-    if(class(object)[1]=="lm") nano$ylab <- paste0(type,"lly studentized residual",sep="")
-    else if(is.null(nano$ylab)) nano$ylab <- paste(type," - type residual",sep="")
+    if(is.null(nano$ylab)){
+      if(class(object)[1]=="lm") nano$ylab <- paste0(type,"lly studentized residual",sep="")
+      else nano$ylab <- paste(type," - type residual",sep="")
+    }
     if(is.null(nano$pch))  nano$pch  <- 20
     if(is.null(nano$labels))  labels <- 1:length(rd)
     else{
@@ -1555,6 +1604,8 @@ residuals2 <- function(object,type,standardized=FALSE,plot.it=FALSE,identify,...
 #' @param ...	further arguments passed to or from other methods. For example, \code{k}, that is, the magnitude of the penalty in the AIC/QICu, which by default is set to 2.
 #' @param trace an (optional) logical switch indicating if should the stepwise reports be printed. As default, \code{trace} is set to TRUE.
 #' @param scope an (optional) list, containing components \code{lower} and \code{upper}, both formula-type objects, indicating the range of models which should be examined in the stepwise search. As default, \code{lower} is a model with no predictors and \code{upper} is the linear predictor of the model in \code{model}.
+#' @param force.in an (optional) formula-type object indicating the effects that should be in all models
+#' @param force.out an (optional) formula-type object indicating the effects that should be in no models
 #' @details The "hybrid forward stepwise" algorithm starts with the simplest model (which may
 #' be chosen at the argument \code{scope}, and As default, is a model whose parameters in the
 #' linear predictor, except the intercept, if any, are set to 0), and then the candidate
@@ -1575,8 +1626,10 @@ residuals2 <- function(object,type,standardized=FALSE,plot.it=FALSE,identify,...
 #' \code{criterion} \tab a character string indicating the criterion used to compare the candidate models,\cr
 #' \tab \cr
 #' \code{final} \tab a character string indicating the linear predictor of the "final model",\cr
+#' \tab \cr
+#' \code{final.fit} \tab an object of class \code{glm} with the results of the fit to the data of the "final model",\cr
 #' }
-#' @seealso \link{stepCriterion.lm}, \link{stepCriterion.overglm}, \link{stepCriterion.glmgee}
+#' @seealso \link{bestSubset}, \link{stepCriterion.lm}, \link{stepCriterion.overglm}, \link{stepCriterion.glmgee}
 #' @examples
 #' ###### Example 1: Fuel consumption of automobiles
 #' Auto <- ISLR::Auto
@@ -1584,15 +1637,14 @@ residuals2 <- function(object,type,standardized=FALSE,plot.it=FALSE,identify,...
 #' mod <- mpg ~ cylinders + displacement + acceleration + origin + horsepower*weight
 #' fit1 <- glm(mod, family=inverse.gaussian("log"), data=Auto2)
 #' stepCriterion(fit1, direction="forward", criterion="p-value", test="lr")
-#' stepCriterion(fit1, direction="backward", criterion="bic")
+#' stepCriterion(fit1, direction="backward", criterion="bic", force.in=~cylinders)
 #'
 #' ###### Example 2: Patients with burn injuries
 #' burn1000 <- aplore3::burn1000
 #' burn1000 <- within(burn1000, death <- factor(death, levels=c("Dead","Alive")))
 #' upper <- ~ age + gender + race + tbsa + inh_inj + flame + age*inh_inj + tbsa*inh_inj
-#' lower <- ~ 1
 #' fit2 <- glm(death ~ age + gender + race + tbsa + inh_inj, family=binomial("logit"), data=burn1000)
-#' stepCriterion(fit2, direction="backward", criterion="bic", scope=list(lower=lower,upper=upper))
+#' stepCriterion(fit2, direction="backward", criterion="bic", scope=list(upper=upper),force.in=~tbsa)
 #' stepCriterion(fit2, direction="forward", criterion="p-value", test="score")
 #'
 #' ###### Example 3: Skin cancer in women
@@ -1604,10 +1656,11 @@ residuals2 <- function(object,type,standardized=FALSE,plot.it=FALSE,identify,...
 #' @method stepCriterion glm
 #' @export
 #' @references James G., Witten D., Hastie T., Tibshirani R. (2013, page 210) An Introduction to Statistical Learning with Applications in R, Springer, New York.
-
-stepCriterion.glm <- function(model, criterion=c("adjr2","bic","aic","p-value","qicu"), test=c("wald","lr","score","gradient"), direction=c("forward","backward"), levels=c(0.05,0.05), trace=TRUE, scope, ...){
+#'
+stepCriterion.glm <- function(model, criterion=c("adjr2","bic","aic","p-value","qicu"), test=c("wald","lr","score","gradient"), direction=c("forward","backward"), levels=c(0.05,0.05), trace=TRUE, scope, force.in, force.out,...){
   xxx <- list(...)
   if(is.null(xxx$k)) k <- 2 else k <- xxx$k
+  if(!missingArg(criterion)) criterion <- tolower(criterion)
   criterion <- match.arg(criterion)
   direction <- match.arg(direction)
   test <- match.arg(test)
@@ -1648,14 +1701,14 @@ stepCriterion.glm <- function(model, criterion=c("adjr2","bic","aic","p-value","
     cuales <- is.na(match(names(fitcom$coefficients),names(fitred$coefficients)))
     if(type=="wald"){
       vcovar <- phi*chol2inv(fitcom$R)
-      sc <- t(fitcom$coefficients[cuales])%*%chol2inv(chol(vcovar[cuales,cuales]))%*%fitcom$coefficients[cuales]
+      sc <- crossprod(fitcom$coefficients[cuales],chol2inv(chol(vcovar[cuales,cuales])))%*%fitcom$coefficients[cuales]
     }
     if(type=="score"){
       X <- qr.X(fitcom$qr)/sqrt(fitcom$weights)
       Xw <- X*matrix(sqrt(fitred$weights),nrow(X),ncol(X))
-      vcovar0 <- phi*chol2inv(chol(t(Xw)%*%Xw))
-      U0 <- t(Xw)%*%((model$y-fitred$fitted.values)*sqrt(model$prior.weights/model$family$variance(fitred$fitted.values)))/phi
-      sc <- t(U0[cuales])%*%vcovar0[cuales,cuales]%*%U0[cuales]
+      vcovar0 <- phi*chol2inv(chol(crossprod(Xw)))
+      U0 <- crossprod(Xw,(model$y-fitred$fitted.values)*sqrt(model$prior.weights/model$family$variance(fitred$fitted.values)))/phi
+      sc <- crossprod(U0[cuales],vcovar0[cuales,cuales])%*%U0[cuales]
     }
     if(type=="gradient"){
       X <- qr.X(fitcom$qr)/sqrt(fitcom$weights)
@@ -1676,14 +1729,30 @@ stepCriterion.glm <- function(model, criterion=c("adjr2","bic","aic","p-value","
     lower <- formula(eval(model$call$formula))
     lower <- formula(paste(deparse(lower[[2]]),"~",attr(terms(lower,data=eval(model$call$data)),"intercept")))
   }else{
-    lower <- scope$lower
-    upper <- scope$upper
+    if(is.null(scope$lower)){
+      lower <- formula(eval(model$call$formula))
+      lower <- formula(paste(deparse(lower[[2]]),"~",attr(terms(lower,data=eval(model$call$data)),"intercept")))
+    }else lower <- scope$lower
+    if(is.null(scope$upper)) upper <- formula(eval(model$call$formula)) else upper <- scope$upper
   }
+
   if(is.null(model$call$data)) datas <- get_all_vars(upper,environment(eval(model$call$formula)))
   else datas <- get_all_vars(upper,eval(model$call$data))
   if(!is.null(model$call$subset)) datas <- datas[eval(model$call$subset,datas),]
   datas <- na.omit(datas)
+  if(length(eval(model$call$formula)[[length(eval(model$call$formula))]])==1)
+    if(eval(model$call$formula)[[length(eval(model$call$formula))]]==".")
+      upper <- as.formula(paste0(eval(model$call$formula)[[length(eval(model$call$formula))]],"~",paste0(attr(terms(eval(model$call$formula),data=datas),"term.labels"),collapse="+")))
 
+  if(!missingArg(force.in)){
+    force.in <- attr(terms(as.formula(force.in)),"term.labels")
+    lower <- as.formula(paste0("~",paste0(c(deparse(lower[[length(lower)]]),force.in[!(force.in %in% attr(terms(lower),"term.labels"))]),collapse="+")))
+    upper <- as.formula(paste0("~",paste0(c(deparse(upper[[length(upper)]]),force.in[!(force.in %in% attr(terms(upper),"term.labels"))]),collapse="+")))
+  }else force.in <- ""
+  if(!missingArg(force.out)){
+    force.out <- attr(terms(as.formula(force.out)),"term.labels")
+    upper <- as.formula(paste0("~",paste0(deparse(upper[[length(upper)]])[!(deparse(upper[[length(upper)]]) %in% force.out)],collapse="+")))
+  }else force.out <- ""
   U <- attr(terms(upper,data=datas),"term.labels")
   U <- lapply(lapply(strsplit(U,":"),sort),paste,collapse=":")
   fs <- attr(terms(upper,data=datas),"factors")
@@ -1698,8 +1767,8 @@ stepCriterion.glm <- function(model, criterion=c("adjr2","bic","aic","p-value","
       if(model$family$varfun!="constant") cat("     Variance:  proportional to",model$family$varfun,"\n")
       else cat("     Variance: ",model$family$varfun,"\n")
     }else cat("\n       Family: ",model$family$family,"\n")
-  cat("Link function: ",model$family$link,"\n")
-  cat("    Criterion: ",criters2[criters==criterion],"\n")
+    cat("Link function: ",model$family$link,"\n")
+    cat("    Criterion: ",criters2[criters==criterion],"\n")
   }
 
   if(direction=="forward"){
@@ -1724,7 +1793,7 @@ stepCriterion.glm <- function(model, criterion=c("adjr2","bic","aic","p-value","
         nombres <- matrix("",length(salen),1)
         for(i in 1:length(salen)){
           salida <- apply(as.matrix(fs[,salen[i]]*fs[,-c(entran,salen[i])]),2,sum)
-          if(all(salida < sum(fs[,salen[i]])) & U[salen[i]]!=cambio){
+          if(all(salida < sum(fs[,salen[i]])) & U[salen[i]]!=cambio & !(U[salen[i]] %in% force.in)){
             newformula <- update(oldformula, paste("~ . -",U[salen[i]]))
             X <- model.matrix(newformula,data=datas)
             fit.0 <- glm.fit(y=model$y,x=X,family=model$family,offset=model$offset,weights=model$prior.weights)
@@ -1775,7 +1844,7 @@ stepCriterion.glm <- function(model, criterion=c("adjr2","bic","aic","p-value","
         nombres <- matrix("",length(entran),1)
         for(i in 1:length(entran)){
           salida <- apply(as.matrix(fs[,-c(salen,entran[i])]),2,function(x) sum(fs[,entran[i]]*x)!=sum(x))
-          if(all(salida) & U[entran[i]]!=cambio){
+          if(all(salida) & U[entran[i]]!=cambio & !(U[entran[i]] %in% force.out)){
             newformula <- update(oldformula, paste("~ . +",U[entran[i]]))
             X <- model.matrix(newformula,data=datas)
             fit.0 <- glm.fit(y=model$y,x=X,family=model$family,offset=model$offset,weights=model$prior.weights)
@@ -1880,7 +1949,7 @@ stepCriterion.glm <- function(model, criterion=c("adjr2","bic","aic","p-value","
         nombres <- matrix("",length(entran),1)
         for(i in 1:length(entran)){
           salida <- apply(as.matrix(fs[,-c(salen,entran[i])]),2,function(x) sum(fs[,entran[i]]*x)!=sum(x))
-          if(all(salida) & U[entran[i]]!=cambio){
+          if(all(salida) & U[entran[i]]!=cambio & !(U[entran[i]] %in% force.out)){
             newformula <- update(oldformula, paste("~ . +",U[entran[i]]))
             X <- model.matrix(newformula,data=datas)
             fit.0 <- glm.fit(y=model$y,x=X,family=model$family,offset=model$offset,weights=model$prior.weights)
@@ -1931,7 +2000,7 @@ stepCriterion.glm <- function(model, criterion=c("adjr2","bic","aic","p-value","
         nombres <- matrix("",length(salen),1)
         for(i in 1:length(salen)){
           salida <- apply(as.matrix(fs[,salen[i]]*fs[,-c(entran,salen[i])]),2,sum)
-          if(all(salida < sum(fs[,salen[i]]))){
+          if(all(salida < sum(fs[,salen[i]])) & !(U[salen[i]] %in% force.in)){
             newformula <- update(oldformula, paste("~ . -",U[salen[i]]))
             X <- model.matrix(newformula,data=datas)
             fit.0 <- glm.fit(y=model$y,x=X,family=model$family,offset=model$offset,weights=model$prior.weights)
@@ -2026,8 +2095,15 @@ stepCriterion.glm <- function(model, criterion=c("adjr2","bic","aic","p-value","
     cat("\n")
   }
   out_$final <- paste("~",as.character(oldformula)[length(oldformula)],sep=" ")
+  if(!trace){
+    X <- model.matrix(oldformula,data=datas)
+    final.fit <- glm(model$y~0+X,family=model$family,offset=model$offset,weights=model$prior.weights)
+    names(final.fit$coefficients) <- substring(names(final.fit$coefficients),2)
+    out_$final.fit <- final.fit
+  }
   return(invisible(out_))
 }
+
 #' @title Local Influence for Generalized Linear Models
 #' @description Computes some measures and, optionally, display	graphs of them to perform
 #' influence analysis based on the approaches described by Cook (1986).
@@ -2086,7 +2162,7 @@ localInfluence.glm <- function(object,type=c("total","local"),perturbation=c("ca
   vp <- grad(object$family$variance,mu)
   vmu <- object$family$variance(mu)
   Xw <- X*matrix(w*(vmu*((y - mu)*kp2 - kp1^2) - (y - mu)*kp1^2*vp)/vmu^2,n,p)
-  Qpp <- -t(X)%*%Xw
+  Qpp <- -crossprod(X,Xw)
   if(perturbation=="case-weight") Delta <- matrix(w*(y - mu)*kp1/vmu,n,p)*X
   if(perturbation=="response") Delta <- matrix(kp1/sqrt(vmu/w),n,p)*X
   if(perturbation=="covariate") Delta <- Xw*br + matrix(w*(y - mu)*kp1/vmu,n,p)*Xr
@@ -2094,13 +2170,13 @@ localInfluence.glm <- function(object,type=c("total","local"),perturbation=c("ca
   Qpp2 <- try(chol(Qpp),silent=TRUE)
   if(is.matrix(Qpp2)) Qpp2 <- chol2inv(Qpp2) else Qpp2 <- solve(Qpp)
   if(!is.null(subst)) Qpp2[-ids,-ids] <- Qpp2[-ids,-ids] - solve(Qpp[-ids,-ids])
-  li <- tcrossprod(Delta,t(Qpp2))
+  li <- Delta%*%Qpp2
   if(type=="local"){
     tol <- 1
     bnew <- matrix(rnorm(nrow(li)),nrow(li),1)
     while(tol > 0.000001){
       bold <- bnew
-      bnew <- tcrossprod(li,t(crossprod(Delta,bold)))
+      bnew <- li%*%crossprod(Delta,bold)
       bnew <- bnew/sqrt(sum(bnew^2))
       tol <- max(abs((bnew - bold)/bold))
     }
@@ -2165,7 +2241,7 @@ BoxTidwell <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,digit
 #' @param ...	further arguments passed to or from other methods.
 #' @return a list list with components including
 #' \tabular{ll}{
-#' \code{marginal} \tab a matrix with estimates and standard errors of the estimated powers, as well as the statistic
+#' \code{marginal} \tab a matrix with estimates, standard errors, and 95% confidence intervals for the powers, as well as the statistic
 #'                       and the p-value of the Wald test to assess the hypothesis \eqn{H_0:\tau=1} versus \eqn{H_1:\tau\neq 1},\cr
 #' \tab \cr
 #' \code{omnibus} \tab a matrix with the statistic and the p-value of the Wald test for null hypothesis that all powers
@@ -2253,14 +2329,16 @@ BoxTidwell.lm <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,di
   vc <- summary(mod)$sigma^2*chol2inv(chol(crossprod(XX)))[1:nv,1:nv]
   TAB	<- cbind(Estimate <- new.powers,
                StdErr <- sqrt(diag(if(nv==1) matrix(vc) else vc)),
+               li <- Estimate - qnorm(0.975)*StdErr,
+               ls <- Estimate + qnorm(0.975)*StdErr,
                zval <- (Estimate-1)/StdErr,
                p.value <- 1-pchisq(zval^2,df=1))
-  TAB <- matrix(TAB,nrow=nv,ncol=4)
-  colnames(TAB) <- c("Estimate", "Std.Error", "z-value", "Pr(>|z|)")
+  TAB <- matrix(TAB,nrow=nv,ncol=6)
+  colnames(TAB) <- c("Estimate", "Std.Error", "    95%","CI    ","z-value", "Pr(>|z|)")
   rownames(TAB) <- colnames(X)[transf.terms]
   cat("\n")
   printCoefmat(TAB, P.values=TRUE, signif.stars=FALSE, has.Pvalue=TRUE, digits=digits, dig.tst=digits, signif.legend=FALSE, tst.ind=c(1,2,3), na.print="")
-  chi <- t(new.powers-1)%*%chol2inv(chol(vc))%*%(new.powers-1)
+  chi <- crossprod((new.powers-1),chol2inv(chol(vc)))%*%(new.powers-1)
   omnibus <- cbind(chi,nv,1-pchisq(chi,df=nv))
   colnames(omnibus) <- c("Chi","df","Pr(>Chi)"); rownames(omnibus) <- ""
   cat("\nWald test for null hypothesis that all taus are 1:\n")
@@ -2282,7 +2360,7 @@ BoxTidwell.lm <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,di
 #' @param ...	further arguments passed to or from other methods.
 #' @return a list list with components including
 #' \tabular{ll}{
-#' \code{marginal} \tab a matrix with estimates and standard errors of the estimated powers, as well as the statistic
+#' \code{marginal} \tab a matrix with estimates, standard errors, and 95% confidence intervals for the powers, as well as the statistic
 #'                       and the p-value of the Wald test to assess the hypothesis \eqn{H_0:\tau=1} versus \eqn{H_1:\tau\neq 1},\cr
 #' \tab \cr
 #' \code{omnibus} \tab a matrix with the statistic and the p-value of the Wald test for null hypothesis that all powers
@@ -2363,10 +2441,12 @@ BoxTidwell.glm <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,d
   vc <- summary(mod)$dispersion*chol2inv(chol(crossprod(XX)))[1:nv,1:nv]
   TAB	<- cbind(Estimate <- new.powers,
                StdErr <- sqrt(diag(if(nv==1) matrix(vc) else vc)),
+               li <- Estimate - qnorm(0.975)*StdErr,
+               ls <- Estimate + qnorm(0.975)*StdErr,
                zval <- (Estimate-1)/StdErr,
                p.value <- 1-pchisq(zval^2,df=1))
-  TAB <- matrix(TAB,nrow=nv,ncol=4)
-  colnames(TAB) <- c("Estimate", "Std.Error", "z-value", "Pr(>|z|)")
+  TAB <- matrix(TAB,nrow=nv,ncol=6)
+  colnames(TAB) <- c("Estimate", "Std.Error", "   95%", "   CI", "z-value", "Pr(>|z|)")
   rownames(TAB) <- colnames(X)[transf.terms]
   cat("\n")
   printCoefmat(TAB, P.values=TRUE, signif.stars=FALSE, has.Pvalue=TRUE, digits=digits, dig.tst=digits, signif.legend=FALSE, tst.ind=c(1,2,3), na.print="")

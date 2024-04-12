@@ -35,7 +35,7 @@
 \value{
 a list list with components including
 \tabular{ll}{
-\code{marginal} \tab a matrix with estimates and standard errors of the estimated powers, as well as the statistic
+\code{marginal} \tab a matrix with estimates, standard errors, and 95% confidence intervals for the powers, as well as the statistic
                       and the p-value of the Wald test to assess the hypothesis \eqn{H_0:\tau=1} versus \eqn{H_1:\tau\neq 1},\cr
 \tab \cr
 \code{omnibus} \tab a matrix with the statistic and the p-value of the Wald test for null hypothesis that all powers

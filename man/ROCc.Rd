@@ -4,7 +4,14 @@
 \alias{ROCc}
 \title{The Receiver Operating Characteristic (ROC) Curve}
 \usage{
-ROCc(object, plot.it = TRUE, verbose = TRUE, ...)
+ROCc(
+  object,
+  plot.it = TRUE,
+  verbose = TRUE,
+  level = 0.95,
+  digits = max(3, getOption("digits") - 2),
+  ...
+)
 }
 \arguments{
 \item{object}{a matrix with two columns: the first one is a numeric vector of 1's and 0's indicating whether each row is a "success" or a "failure"; the second one is a numeric vector of values indicating the probability (or propensity score) of each row to be a "success". Optionally, \code{object} can be an object of the class glm which is obtained from the fit of a generalized linear model where the distribution of the response variable is assumed to be binomial.}
@@ -13,6 +20,10 @@ ROCc(object, plot.it = TRUE, verbose = TRUE, ...)
 
 \item{verbose}{an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.}
 
+\item{level}{an (optional) value indicating the required confidence level. As default, \code{level} is set to 0.95.}
+
+\item{digits}{an (optional) integer value indicating the number of decimal places to be used. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.}
+
 \item{...}{further arguments passed to or from other methods. For example, if \code{plot.it=TRUE} then \code{...} may to include graphical parameters as \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.}
 }
 \value{
@@ -20,12 +31,14 @@ A list which contains the following objects:
 \describe{
 \item{\code{roc}}{ A matrix with the Cutoffs and the associated estimates of Sensitivity and Specificity.}
 \item{\code{auroc}}{ The exact area under the ROC curve.}
+\item{\code{ci.auroc}}{ Confidence interval for the area under the ROC curve.}
 \item{\code{gini}}{ The value of the Gini coefficient computed as 2(\code{auroc}-0.5).}
+\item{\code{ci.gini}}{ Confidence interval for the Gini coefficient.}
 \item{\code{ks}}{ The value of the Kolmogorov-Smirnov statistic computed as the maximum value of |1-Sensitivity-Specificity|.}
 }
 }
 \description{
-Computes the exact area under the ROC curve (AUROC), the Gini coefficient, and the Kolmogorov-Smirnov (KS) statistic for a binary classifier. Optionally, this function can plot the ROC curve, that is, the plot of the estimates of Sensitivity versus the estimates of 1-Specificity.
+Computes the exact area under the ROC curve (AUROC), the Gini coefficient, and the Kolmogorov-Smirnov (KS) statistic for a binary classifier. Optionally, this function can plot the ROC curve, that is, the plot of the estimates of Sensitivity versus the estimates of 1-Specificity. This function also computes confidence intervals for AUROC and Gini coefficient using the method proposed by DeLong et al. (1988).
 }
 \examples{
 ###### Example: Patients with burn injuries
@@ -45,5 +58,11 @@ ROCc(cbind(testdata[,"death2"],probs), col="red", col.lab="blue", col.axis="blac
      col.main="black", family="mono")
 }
 \references{
+Cho H., Matthews G.J., Harel O. (2019) Confidence Intervals for the Area Under the Receiver Operating Characteristic Curve in the Presence of Ignorable Missing Data. \emph{International statistical review} 87, 152–177.
+
+DeLong E.R., DeLong D.M., Clarke-Pearson D.L. (1988). Comparing the areas under two or more correlated receiver operating characteristic curves: a nonparametric approach. \emph{Biometrics} 44, 837–845.
+
+Nahm F.S. (2022). Receiver operating characteristic curve: overview and practical use for clinicians. \emph{Korean journal of anesthesiology} 75, 25–36.
+
 Hanley J.A., McNeil B.J. (1982) The Meaning and Use of the Area under a Receiver Operating Characteristic (ROC) Curve. \emph{Radiology} 143, 29–36.
 }

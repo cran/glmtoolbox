@@ -306,7 +306,7 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
       }
       alphas <- alphas/phi
       alphasf <- function(x) if(x==0) return(1) else return(alphas[x])
-      phises <- chol2inv(chol(apply(toeplitz(0:(M-1)),c(1,2),alphasf)))%*%alphas
+      phises <- crossprod(chol2inv(chol(apply(toeplitz(0:(M-1)),c(1,2),alphasf))),alphas)
       rhos <- matrix(0,maxsize-1,1)
       rhos[1:M] <- alphas
       for(i in (M+1):(maxsize-1)) rhos[i] <- sum(phises*rhos[i-c(1:M)])
@@ -326,7 +326,7 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
     Xi <- matrix(D[,1:p],ncol=p)
     yi <- D[,p+1]
     ni <- nrow(Xi)
-    etai <- tcrossprod(Xi,t(beta)) + D[,p+2]
+    etai <- Xi%*%beta + D[,p+2]
     mui <- family$linkinv(etai)
     wi <- sqrt(family$variance(mui)/D[,p+3])
     Xiw <- Xi*matrix(family$mu.eta(etai),nrow(Xi),p)
@@ -373,7 +373,7 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
     for(i in 1:nclus) resume2 <- resume2 + score(datas[[i]],beta=beta_old,out=FALSE)
     kchol <- try(chol(resume2[1:p,2:(p+1)]),silent=TRUE)
     if(is.matrix(kchol)) kchol <- chol2inv(kchol) else kchol <- solve(resume2[1:p,2:(p+1)])
-    beta_new <- beta_old + kchol%*%resume2[,1]
+    beta_new <- beta_old + crossprod(kchol,resume2[,1])
     tol <- max(abs((beta_new-beta_old)/beta_old))
     niter <- niter + 1
     if(trace) message("    ",niter,"            ",signif(tol,digits=5))
@@ -381,7 +381,7 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
   rownames(beta_new) <- colnames(X)
   colnames(beta_new) <- ""
   if(niter==maxit) warning("Iteration limit exceeded!!\n",call.=FALSE)
-  eta <- tcrossprod(X,t(beta_new)) + offs
+  eta <- X%*%beta_new + offs
   mu <- family$linkinv(eta)
   phi <- sum(diag(matrix(resume[1:maxsize,1:maxsize],maxsize,maxsize)))/(sum(sizes)-p)
   sera <- try(chol(R),silent=TRUE)
@@ -389,7 +389,7 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
     I0 <- try(chol(resume2[1:p,2:(p+1)]),silent=TRUE)
     if(is.matrix(I0)) I0 <- chol2inv(I0) else I0 <- solve(resume2[1:p,2:(p+1)])
     I1 <- resume2[1:p,(p+2):(2*p+1)]
-    RJC <- I0%*%I1
+    RJC <- crossprod(I0,I1)
     vcovs <- RJC%*%I0
     rownames(vcovs) <- colnames(X)
     colnames(vcovs) <- colnames(X)
@@ -418,7 +418,7 @@ glmgee <- function(formula,family=gaussian(),weights,id,waves,data,subset,corstr
     if(is.null(qll)) qll <- family$dev.resids(y,mu,weights)
     w <- sqrt(weights*family2$mu.eta(eta)^2/family2$variance(mu))
     Xw <- matrix(w,nrow(X),ncol(X))*X
-    CIC <- sum(diag((crossprod(Xw,Xw)/phi)%*%vcovs))
+    CIC <- sum(diag((crossprod(Xw)/phi)%*%vcovs))
     phi <- ifelse(scale.fix,scale.value,phi)
     RJC <- sqrt((1 - sum(diag(RJC))/(p*phi))^2 + (1 - sum(diag(RJC%*%RJC))/(p*phi^2))^2)
     logLik <- sum(qll)/phi
@@ -620,7 +620,7 @@ dfbeta.glmgee <- function(model, level=c("clusters","observations"), method=c("P
       resume <- Reduce('+',lapply(datas2,model$score,beta=model$coefficients,out=TRUE))
       kchol <- try(chol(resume[,-1]),silent=TRUE)
       if(is.matrix(kchol)) kchol <- chol2inv(kchol) else kchol <- solve(resume[,-1])
-      dfbetas[i,] <- -kchol%*%resume[,1]
+      dfbetas[i,] <- -crossprod(kchol,resume[,1])
     }
   }else{
     dfbetaCO <- function(D){
@@ -630,7 +630,7 @@ dfbeta.glmgee <- function(model, level=c("clusters","observations"), method=c("P
       ni <- length(yi)
       if(model$linear){
         Xi <- matrix(D[,1:p],ncol=p)
-        etai <- tcrossprod(Xi,t(beta)) + D[,p+2]
+        etai <- Xi%*%beta + D[,p+2]
       }else{
         places <- model$ids[D[1,p+5]]==model$id
         Xi <- matrix(Ders[places,],ncol=p)
@@ -645,8 +645,8 @@ dfbeta.glmgee <- function(model, level=c("clusters","observations"), method=c("P
         else{Vi2 <- try(chol(Vi),silent=TRUE)
         if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)}
         Xiw2 <- crossprod(Vi2,Xiw)
-        Hi <-  Xiw%*%model$naive%*%t(Xiw2)
-        dfbetaCi <- model$naive%*%t(Xiw2)%*%solve(diag(ni)-Hi)%*%(yi-mui)
+        Hi <-  Xiw%*%tcrossprod(model$naive,Xiw2)
+        dfbetaCi <- tcrossprod(model$naive,Xiw2)%*%solve(diag(ni)-Hi)%*%(yi-mui)
         return(dfbetaCi)
       }else{
         dfbetaOij <- matrix(0,ni,p)
@@ -656,7 +656,7 @@ dfbeta.glmgee <- function(model, level=c("clusters","observations"), method=c("P
           Dt <- Xiw[j,] - a%*%Xiw[-j,]
           rt <- ri[j] - a%*%ri[-j]
           vt <- Vi[j,j] - a%*%Vi[-j,j]
-          ht <- (Dt%*%model$naive%*%t(Dt))/vt
+          ht <- (Dt%*%tcrossprod(model$naive,Dt))/vt
           dfbetaOij[j,] <- as.numeric(rt/(vt*(1-ht)))*(Dt%*%model$naive)
         }
         return(dfbetaOij)
@@ -773,7 +773,7 @@ cooks.distance.glmgee <- function(model, method=c("Preisser-Qaqish","full"), lev
   }
   met2 <- try(chol(met),silent=TRUE)
   if(is.matrix(met2)) met2 <- chol2inv(met2) else met2 <- solve(met)
-  CD <- as.matrix(apply((dfbetas%*%met2)*dfbetas,1,sum))/ncol(met2)
+  CD <- as.matrix(apply((tcrossprod(dfbetas,met2))*dfbetas,1,sum))/ncol(met2)
   colnames(CD) <- "Cook's distance"
   if(plot.it){
     nano <- list(...)
@@ -893,7 +893,7 @@ predict.glmgee <- function(object, ...,newdata, se.fit=FALSE, type=c("link","res
     newdata <- data.frame(newdata)
     mf <- model.frame(delete.response(object$terms),newdata,xlev=object$levels)
     X <- model.matrix(delete.response(object$terms),mf,contrasts=object$contrasts)
-    if(object$linear) predicts <- tcrossprod(X,t(object$coefficients))
+    if(object$linear) predicts <- X%*%object$coefficients
     else{
       p <- length(object$coefficients)
       pars <- rownames(object$coefficients)
@@ -1619,7 +1619,7 @@ RJC <- function(...,verbose=TRUE,digits=max(3, getOption("digits") - 2)){
 #' @title Variable selection in Generalized Estimating Equations
 #' @description Performs variable selection in generalized estimating equations using hybrid versions of forward stepwise
 #' and backward stepwise.
-#' @param model an object of the class glmgee which is obtained from the fit of a generalized estimating equation.
+#' @param model an object of the class \code{glmgee} which is obtained from the fit of a generalized estimating equation.
 #' @param direction an (optional) character string indicating the type of procedure which should be used. The available
 #' options are: hybrid backward stepwise ("backward") and hybrid forward stepwise ("forward"). As default, \code{direction}
 #' is set to "forward".
@@ -1643,12 +1643,15 @@ RJC <- function(...,verbose=TRUE,digits=max(3, getOption("digits") - 2)){
 #' @param scope an (optional) list, containing components \code{lower} and \code{upper}, both formula-type objects,
 #' indicating the range of models which should be examined in the stepwise search. As default, \code{lower} is a model
 #' with no predictors and \code{upper} is the linear predictor of the model in \code{model}.
+#' @param force.in an (optional) formula-type object indicating the effects that should be in all models
+#' @param force.out an (optional) formula-type object indicating the effects that should be in no models
 #' @return A list which contains the following objects:
 #' \describe{
 #' \item{\code{initial}}{ a character string indicating the linear predictor of the "initial model".}
 #' \item{\code{direction}}{ a character string indicating the type of procedure which was used.}
 #' \item{\code{criterion}}{ a character string indicating the criterion used to compare the candidate models.}
 #' \item{\code{final}}{ a character string indicating the linear predictor of the "final model".}
+#' \item{\code{final.fit}}{ an object of class \code{glmgee} with the results of the fit to the data of the "final model".}'
 #' }
 #' @seealso \link{stepCriterion.lm}, \link{stepCriterion.glm}, \link{stepCriterion.overglm}
 #' @examples
@@ -1656,18 +1659,18 @@ RJC <- function(...,verbose=TRUE,digits=max(3, getOption("digits") - 2)){
 #' data(spruces)
 #' mod <- size ~ poly(days,4)*treat
 #' fit1 <- glmgee(mod, id=tree, family=Gamma(log), data=spruces, corstr="AR-M-dependent")
-#' stepCriterion(fit1, criterion="p-value", direction="forward", scope=list(lower=~1,upper=mod))
+#' stepCriterion(fit1, criterion="p-value", direction="forward", scope=list(upper=mod),force.in=~treat)
 #'
 #' ###### Example 2: Treatment for severe postnatal depression
 #' data(depression)
 #' mod <- depressd ~ visit*group
 #' fit2 <- glmgee(mod, id=subj, family=binomial(probit), corstr="AR-M-dependent", data=depression)
-#' stepCriterion(fit2, criterion="agpc", direction="forward", scope=list(lower=~1,upper=mod))
+#' stepCriterion(fit2, criterion="agpc", direction="forward", scope=list(upper=mod),force.in=~group)
 #'
 #' ###### Example 3: Treatment for severe postnatal depression (2)
 #' mod <- dep ~ visit*group
 #' fit2 <- glmgee(mod, id=subj, family=gaussian(identity), corstr="AR-M-dependent", data=depression)
-#' stepCriterion(fit2, criterion="sgpc", direction="forward", scope=list(lower=~1,upper=mod))
+#' stepCriterion(fit2, criterion="sgpc", direction="forward", scope=list(upper=mod),force.in=~group)
 #'
 #' @method stepCriterion glmgee
 #' @export
@@ -1677,12 +1680,13 @@ RJC <- function(...,verbose=TRUE,digits=max(3, getOption("digits") - 2)){
 #' likelihood and Gaussian pseudo-likelihood. \emph{Communications in Statistics - Simulation and Computation} 48:1239-1250.
 #' @references \href{https://journal.r-project.org/articles/RJ-2023-056/}{Vanegas L.H., Rondon L.M., Paula G.A. (2023) Generalized Estimating Equations using the new R package glmtoolbox.
 #' \emph{The R Journal} 15:105-133.}
-stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","agpc","sgpc"), test=c("wald","score"), direction=c("forward","backward"), levels=c(0.05,0.05), trace=TRUE, scope, digits=max(3, getOption("digits") - 2),varest=c("robust","df-adjusted","model","bias-corrected"),...){
+stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","agpc","sgpc"), test=c("wald","score"), direction=c("forward","backward"), levels=c(0.05,0.05), trace=TRUE, scope, digits=max(3, getOption("digits") - 2),varest=c("robust","df-adjusted","model","bias-corrected"), force.in, force.out,...){
   .Theta <- function() return(.Theta)
   if(!model$linear)
     stop("Objects generated by the function gnmgee() are not supported!!",call.=FALSE)
   xxx <- list(...)
   if(is.null(xxx$k)) k <- 2 else k <- xxx$k
+  if(!missingArg(criterion)) criterion <- tolower(criterion)
   criterion <- match.arg(criterion)
   direction <- match.arg(direction)
   test <- match.arg(test)
@@ -1703,13 +1707,33 @@ stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","agpc
   if(missingArg(scope)){
     upper <- formula(eval(model$call$formula))
     lower <- formula(eval(model$call$formula))
-    lower <- formula(paste(deparse(lower[[2]]),"~",attr(terms(lower),"intercept")))
+    lower <- formula(paste(deparse(lower[[2]]),"~",attr(terms(lower,data=eval(model$call$data)),"intercept")))
   }else{
-    lower <- scope$lower
-    upper <- scope$upper
+    if(is.null(scope$lower)){
+      lower <- formula(eval(model$call$formula))
+      lower <- formula(paste(deparse(lower[[2]]),"~",attr(terms(lower,data=eval(model$call$data)),"intercept")))
+    }else lower <- scope$lower
+    if(is.null(scope$upper)) upper <- formula(eval(model$call$formula)) else upper <- scope$upper
   }
-  U <- unlist(lapply(strsplit(attr(terms(upper),"term.labels"),":"),function(x) paste(sort(x),collapse =":")))
-  fs <- attr(terms(upper),"factors")
+  if(is.null(model$call$data)) datas <- get_all_vars(upper,environment(eval(model$call$formula)))
+  else datas <- get_all_vars(upper,eval(model$call$data))
+  if(!is.null(model$call$subset)) datas <- datas[eval(model$call$subset,datas),]
+  datas <- na.omit(datas)
+  if(length(eval(model$call$formula)[[length(eval(model$call$formula))]])==1)
+    if(eval(model$call$formula)[[length(eval(model$call$formula))]]==".")
+      upper <- as.formula(paste0(eval(model$call$formula)[[length(eval(model$call$formula))]],"~",paste0(attr(terms(eval(model$call$formula),data=datas),"term.labels"),collapse="+")))
+  if(!missingArg(force.in)){
+    force.in <- attr(terms(as.formula(force.in)),"term.labels")
+    lower <- as.formula(paste0("~",paste0(c(deparse(lower[[length(lower)]]),force.in[!(force.in %in% attr(terms(lower),"term.labels"))]),collapse="+")))
+    upper <- as.formula(paste0("~",paste0(c(deparse(upper[[length(upper)]]),force.in[!(force.in %in% attr(terms(upper),"term.labels"))]),collapse="+")))
+  }else force.in <- ""
+  if(!missingArg(force.out)){
+    force.out <- attr(terms(as.formula(force.out)),"term.labels")
+    upper <- as.formula(paste0("~",paste0(deparse(upper[[length(upper)]])[!(deparse(upper[[length(upper)]]) %in% force.out)],collapse="+")))
+  }else force.out <- ""
+
+  U <- unlist(lapply(strsplit(attr(terms(upper,data=datas),"term.labels"),":"),function(x) paste(sort(x),collapse =":")))
+  fs <- attr(terms(upper,data=datas),"factors")
   long <- max(nchar(U)) + 2
   nonename <- paste("<none>",paste(replicate(max(long-6,0)," "),collapse=""),collapse="")
   cambio <- ""
@@ -1744,7 +1768,7 @@ stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","agpc
         nombres <- matrix("",length(salen),1)
         for(i in 1:length(salen)){
           salida <- apply(as.matrix(fs[,salen[i]]*fs[,-c(entran,salen[i])]),2,sum)
-          if(all(salida < sum(fs[,salen[i]])) & U[salen[i]]!=cambio){
+          if(all(salida < sum(fs[,salen[i]])) & U[salen[i]]!=cambio & !(U[salen[i]] %in% force.in)){
             newformula <- update(oldformula, paste("~ . -",U[salen[i]]))
             fit.0 <- update(model,formula=newformula,start=NULL)
             fsalen[i,1] <- fit.0$df.residual - fit.x$df.residual
@@ -1784,7 +1808,7 @@ stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","agpc
         nombres <- matrix("",length(entran),1)
         for(i in 1:length(entran)){
           salida <- apply(as.matrix(fs[,-c(salen,entran[i])]),2,function(x) sum(fs[,entran[i]]*x)!=sum(x))
-          if(all(salida) & U[entran[i]]!=cambio){
+          if(all(salida) & U[entran[i]]!=cambio & !(U[entran[i]] %in% force.out)){
             newformula <- update(oldformula, paste("~ . +",U[entran[i]]))
             fit.0 <- update(model,formula=newformula,start=NULL)
             fentran[i,1] <- fit.x$df.residual - fit.0$df.residual
@@ -1865,7 +1889,7 @@ stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","agpc
         nombres <- matrix("",length(entran),1)
         for(i in 1:length(entran)){
           salida <- apply(as.matrix(fs[,-c(salen,entran[i])]),2,function(x) sum(fs[,entran[i]]*x)!=sum(x))
-          if(all(salida) & U[entran[i]]!=cambio){
+          if(all(salida) & U[entran[i]]!=cambio & !(U[entran[i]] %in% force.out)){
             newformula <- update(oldformula, paste("~ . +",U[entran[i]]))
             fit.0 <- update(model,formula=newformula,start=NULL)
             fentran[i,1] <- fit.x$df.residual - fit.0$df.residual
@@ -1905,7 +1929,7 @@ stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","agpc
         nombres <- matrix("",length(salen),1)
         for(i in 1:length(salen)){
           salida <- apply(as.matrix(fs[,salen[i]]*fs[,-c(entran,salen[i])]),2,sum)
-          if(all(salida < sum(fs[,salen[i]]))){
+          if(all(salida < sum(fs[,salen[i]])) & !(U[salen[i]] %in% force.in)){
             newformula <- update(oldformula, paste("~ . -",U[salen[i]]))
             fit.0 <- update(model,formula=newformula,start=NULL)
             fsalen[i,1] <- fit.0$df.residual - fit.x$df.residual
@@ -1977,6 +2001,10 @@ stepCriterion.glmgee <- function(model, criterion=c("p-value","qic","qicu","agpc
     cat("\n")
   }
   out_$final <- paste("~",as.character(oldformula)[length(oldformula)],sep=" ")
+  if(!trace){
+    final.fit <- update(model,formula=oldformula,adjr2=FALSE,start=NULL)
+    out_$final.fit <- final.fit
+  }
   return(invisible(out_))
 }
 
@@ -2294,7 +2322,7 @@ leverage.glmgee <- function(object,level=c("clusters","observations"),plot.it=FA
     Xi <- matrix(D[,1:p],ncol=p)
     yi <- D[,p+1]
     ni <- nrow(Xi)
-    etai <- tcrossprod(Xi,t(beta)) + D[,p+2]
+    etai <- Xi%*%beta + D[,p+2]
     mui <- object$family$linkinv(etai)
     wi <- sqrt(object$family$variance(mui)/D[,p+3])
     Vi <- t(object$corr[D[,p+4],D[,p+4]]*matrix(wi,ni,ni))*matrix(wi,ni,ni)
@@ -2302,7 +2330,7 @@ leverage.glmgee <- function(object,level=c("clusters","observations"),plot.it=FA
     if(object$corstr=="Independence") Vi2 <- diag(as.vector(1/wi[D[,p+4]]^2),ni,ni)
     else{Vi2 <- try(chol(Vi),silent=TRUE)
          if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)}
-    hi <- diag(Xiw%*%object$naive%*%t(Xiw)%*%Vi2)
+    hi <- diag(Xiw%*%tcrossprod(object$naive,Xiw)%*%Vi2)
     return(hi)
   }
   p <- length(object$coefficients)
@@ -2381,6 +2409,7 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
   if(!missingArg(coefs)){
     ids <- grepl(coefs,rownames(object$coefficients),ignore.case=TRUE)
     if(sum(ids) > 0) subst <- rownames(object$coefficients)[ids]
+    else stop(paste("There are no variables with the name",coefs,collapse=""),call.=FALSE)
   }
   Qbb <- function(D){
     beta <- object$coefficients
@@ -2388,7 +2417,7 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
     Xi <- matrix(D[,1:p],ncol=p)
     yi <- D[,p+1]
     ni <- nrow(Xi)
-    etai <- tcrossprod(Xi,t(beta)) + D[,p+2]
+    etai <- Xi%*%beta + D[,p+2]
     mui <- object$family$linkinv(etai)
     vmui <- object$family$variance(mui)
     wi <- sqrt(vmui/D[,p+3])
@@ -2401,10 +2430,10 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
     if(object$corstr=="Independence") Vi2 <- diag(as.vector(1/wi[D[,p+4]]^2),ni,ni)
     else{Vi2 <- try(chol(Vi),silent=TRUE)
     if(is.matrix(Vi2)) Vi2 <- chol2inv(Vi2) else Vi2 <- solve(Vi)}
-    zi <- Vi2%*%(yi-mui)
+    zi <- crossprod(Vi2,yi-mui)
     a <- kpii - (1/2)*kpi^2*vpi/vmui
     b <- as.vector(-kpi*(1 + (1/2)*(yi-mui)*vpi/vmui))
-    Qpp <- -t(Xi)%*%(diag(as.vector(a*zi),ni,ni) + diag(kpi,ni,ni)%*%Vi2%*%diag(b,ni,ni))%*%Xi
+    Qpp <- -crossprod(Xi,diag(as.vector(a*zi),ni,ni) + diag(kpi,ni,ni)%*%Vi2%*%diag(b,ni,ni))%*%Xi
     if(perturbation=="cw-clusters") Delta <- matrix(apply(matrix(kpi*zi,ni,p)*Xi,2,sum),ncol=p,nrow=1)
     if(perturbation=="cw-observations") Delta <- matrix(kpi*zi,ni,p)*Xi
     if(perturbation=="response") Delta <- diag(sqrt(diag(Vi)))%*%Vi2%*%diag(kpi)%*%Xi
@@ -2422,13 +2451,13 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
   Qpp2 <- try(chol(Qpp),silent=TRUE)
   if(is.matrix(Qpp2)) Qpp2 <- chol2inv(Qpp2) else Qpp2 <- solve(Qpp)
   if(!is.null(subst)) Qpp2[-ids,-ids] <- Qpp2[-ids,-ids] - solve(Qpp[-ids,-ids])
-  li <- tcrossprod(Delta,t(Qpp2))
+  li <- Delta%*%Qpp2
   if(type=="local"){
     tol <- 1
     bnew <- matrix(rnorm(nrow(li)),nrow(li),1)
     while(tol > 0.000001){
       bold <- bnew
-      bnew <- tcrossprod(li,t(crossprod(Delta,bold)))
+      bnew <- li%*%crossprod(Delta,bold)
       bnew <- bnew/sqrt(sum(bnew^2))
       tol <- max(abs((bnew - bold)/bold))
     }
@@ -2739,7 +2768,7 @@ gnmgee <- function(formula,family=gaussian(),offset=NULL,weights=NULL,id,waves,d
       }
       alphas <- alphas/phi
       alphasf <- function(x) if(x==0) return(1) else return(alphas[x])
-      phises <- chol2inv(chol(apply(toeplitz(0:(M-1)),c(1,2),alphasf)))%*%alphas
+      phises <- crossprod(chol2inv(chol(apply(toeplitz(0:(M-1)),c(1,2),alphasf))),alphas)
       rhos <- matrix(0,maxsize-1,1)
       rhos[1:M] <- alphas
       for(i in (M+1):(maxsize-1)) rhos[i] <- sum(phises*rhos[i-c(1:M)])
@@ -2796,7 +2825,7 @@ gnmgee <- function(formula,family=gaussian(),offset=NULL,weights=NULL,id,waves,d
     for(i in 1:nclus) resume2 <- resume2 + score(datas[[i]],beta=beta_old,out=FALSE)
     kchol <- try(chol(resume2[1:p,2:(p+1)]),silent=TRUE)
     if(is.matrix(kchol)) kchol <- chol2inv(kchol) else kchol <- solve(resume2[1:p,2:(p+1)])
-    beta_new <- beta_old + kchol%*%resume2[,1]
+    beta_new <- beta_old + crossprod(kchol,resume2[,1])
     tol <- max(abs((beta_new-beta_old)/beta_old))
     niter <- niter + 1
     if(trace) message("    ",niter,"            ",signif(tol,digits=5))
@@ -3088,7 +3117,7 @@ wglmgee <- function(formula,level=c("observations","clusters"),family=gaussian()
   if(maxsize==1) corstr <- "Independence"
   Rhat <- function(D2,beta){
     D <- matrix(na.omit(D2[,-c(1:(q+1))]),ncol=p+7)
-    etai <- tcrossprod(D[,1:p],t(beta)) + D[,p+2]
+    etai <- D[,1:p]%*%beta + D[,p+2]
     mui <- family$linkinv(etai)
     if(level=="observations") wi <- sqrt(family$variance(mui)/(D[,p+3]))
     else wi <- sqrt(family$variance(mui)/(D[,p+3]*D[,p+7]))
@@ -3155,7 +3184,7 @@ wglmgee <- function(formula,level=c("observations","clusters"),family=gaussian()
       }
       alphas <- alphas/phi
       alphasf <- function(x) if(x==0) return(1) else return(alphas[x])
-      phises <- chol2inv(chol(apply(toeplitz(0:(M-1)),c(1,2),alphasf)))%*%alphas
+      phises <- crossprod(chol2inv(chol(apply(toeplitz(0:(M-1)),c(1,2),alphasf))),alphas)
       rhos <- matrix(0,maxsize-1,1)
       rhos[1:M] <- alphas
       for(i in (M+1):(maxsize-1)) rhos[i] <- sum(phises*rhos[i-c(1:M)])
@@ -3185,7 +3214,7 @@ wglmgee <- function(formula,level=c("observations","clusters"),family=gaussian()
     Xi <- matrix(D[,1:p],ncol=p)
     yi <- ifelse(is.na(D[,p+1]),0,D[,p+1])
     ni <- nrow(Xi)
-    etai <- tcrossprod(Xi,t(beta)) + D[,p+2]
+    etai <- Xi%*%beta + D[,p+2]
     mui <- family$linkinv(etai)
     wi <- sqrt(family$variance(mui)/W2)
     Xiw <- Xi*matrix(family$mu.eta(etai),nrow(Xi),p)
@@ -3237,7 +3266,7 @@ wglmgee <- function(formula,level=c("observations","clusters"),family=gaussian()
     for(i in 1:nclus) resume2 <- resume2 + score(datas[[i]],beta=beta_old,out=FALSE)
     kchol <- try(chol(resume2[1:p,2:(p+1)]),silent=TRUE)
     if(is.matrix(kchol)) kchol <- chol2inv(kchol) else kchol <- solve(resume2[1:p,2:(p+1)])
-    beta_new <- beta_old + kchol%*%resume2[,1]
+    beta_new <- beta_old + crossprod(kchol,resume2[,1])
     tol <- max(abs((beta_new-beta_old)/beta_old))
     niter <- niter + 1
     if(trace) message("    ",niter,"            ",signif(tol,digits=5))
@@ -3248,7 +3277,7 @@ wglmgee <- function(formula,level=c("observations","clusters"),family=gaussian()
   rownames(estfun) <- colnames(X)
   colnames(estfun) <- ""
   if(niter==maxit) warning("Iteration limit exceeded!!\n",call.=FALSE)
-  eta <- tcrossprod(X,t(beta_new)) + offs
+  eta <- X%*%beta_new + offs
   mu <- family$linkinv(eta)
   phi <- sum(diag(resume[1:maxsize,1:maxsize]))/(sum(sizes)-p)
   phi <- ifelse(scale.fix,scale.value,phi)
@@ -3274,7 +3303,7 @@ wglmgee <- function(formula,level=c("observations","clusters"),family=gaussian()
     Xi <- matrix(D[,1:p],ncol=p)
     yi <- ifelse(is.na(D[,p+1]),0,D[,p+1])
     ni <- nrow(Xi)
-    etai <- tcrossprod(Xi,t(beta)) + D[,p+2]
+    etai <- Xi%*%beta + D[,p+2]
     mui <- family$linkinv(etai)
     wi <- sqrt(family$variance(mui)/W2)
     Xiw <- Xi*matrix(family$mu.eta(etai),nrow(Xi),p)
@@ -3367,7 +3396,7 @@ predict.wglmgee <- function(object, ...,newdata, se.fit=FALSE, type=c("link","re
     newdata <- data.frame(newdata)
     mf <- model.frame(delete.response(object$terms),newdata,xlev=object$levels)
     X <- model.matrix(delete.response(object$terms),mf,contrasts=object$contrasts)
-    predicts <- tcrossprod(X,t(object$coefficients))
+    predicts <- X%*%object$coefficients
     offs <- model.offset(mf)
     if(!is.null(offs)) predicts <- predicts + offs
   }
