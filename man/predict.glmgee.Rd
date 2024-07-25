@@ -20,7 +20,7 @@
 
 \item{newdata}{an (optional) \code{data frame} in which to look for variables with which to predict. If omitted, the fitted linear predictors are used.}
 
-\item{se.fit}{an (optional) logical switch indicating if standard errors are required. As default, \code{se.fit} is set to FALSE.}
+\item{se.fit}{an (optional) logical switch indicating if standard errors are required. As default, \code{se.fit} is set to \code{FALSE}.}
 
 \item{type}{an (optional) character string giving the type of prediction required. The default, "link", is on the scale of the linear predictors, and the alternative, "response", is on the scale of the response variable.}
 

@@ -45,7 +45,7 @@ wglmgee(
 
 \item{start}{an (optional) vector of starting values for the parameters in the linear predictor.}
 
-\item{scale.fix}{an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. As default, \code{scale.fix} is set to FALSE.}
+\item{scale.fix}{an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. As default, \code{scale.fix} is set to \code{FALSE}.}
 
 \item{scale.value}{an (optional) numeric value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. As default, \code{scale.value} is set to 1.}
 

@@ -494,7 +494,7 @@ overglm <- function(formula, offset, family="nb1(log)", weights, data, subset, n
 #' @description Allows to fit a zero-altered (Poisson or negative binomial) regression model to deal with zero-excess in count data.
 #' @param formula a \code{Formula} expression of the form \code{response ~ x1 + x2 + ...| z1 + z2 + ...},
 #'        which is a symbolic description of the linear predictors of the models to be fitted to
-#'        \eqn{\mu} and \eqn{\pi}, respectively.	See \link{Formula} documentation. If a formula
+#'        \eqn{\mu} and \eqn{\pi}, respectively.	See \link[Formula]{Formula} documentation. If a formula
 #'        of the form \code{response ~ x1 + x2 + ...} is supplied, the same regressors are
 #'        employed in both components. This is equivalent to \code{response ~ x1 + x2 + ...| x1 + x2 + ...}.
 #' @param family an (optional) character string that allows you to specify the distribution
@@ -844,7 +844,7 @@ zeroalt <- function(formula, data, offset, subset, na.action=na.omit(), weights,
 #' @title Zero-Inflated Regression Models to deal with Zero-Excess in Count Data
 #' @description Allows to fit a zero-inflated (Poisson or negative binomial) regression model to deal with zero-excess in count data.
 #' @param formula a \code{Formula} expression of the form \code{response ~ x1 + x2 + ... | z1 + z2 + ...}, which is a symbolic description
-#'        of the linear predictors of the models to be fitted to \eqn{\mu} and \eqn{\pi}, respectively.	See \link{Formula} documentation.  If a
+#'        of the linear predictors of the models to be fitted to \eqn{\mu} and \eqn{\pi}, respectively.	See \link[Formula]{Formula} documentation.  If a
 #'        formula of the form \code{response ~ x1 + x2 + ...} is supplied, then the same regressors are employed in both components. This is equivalent to
 #'        \code{response ~ x1 + x2 + ...| x1 + x2 + ...}.
 #' @param family an (optional) character string that allows you to specify the distribution
@@ -1595,7 +1595,7 @@ print.overglm <- function(x,...){
 #' the difference between the observed response and the fitted mean ("response"); (2) the standardized difference between
 #' the observed response and the fitted mean ("standardized"); (3) the randomized quantile residual ("quantile"). By
 #' default, \code{type} is set to "quantile".
-#' @param plot.it an (optional) logical switch indicating if the plot of residuals versus the fitted values is required. As default, \code{plot.it} is set to FALSE.
+#' @param plot.it an (optional) logical switch indicating if the plot of residuals versus the fitted values is required. As default, \code{plot.it} is set to \code{FALSE}.
 #' @param identify an (optional) positive integer value indicating the number of individuals to identify on the plot of residuals versus the fitted values. This is only appropriate if \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example, \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
 #' @return A vector with the observed residuals type \code{type}.
@@ -1680,7 +1680,7 @@ residuals.zeroinflation <- function(object,type=c("quantile","standardized","res
 #' the difference between the observed response and the fitted mean ("response"); (2) the standardized difference between
 #' the observed response and the fitted mean ("standardized"); and (3) the randomized quantile residual ("quantile"). By
 #' default, \code{type} is set to "quantile".
-#' @param plot.it an (optional) logical switch indicating if the plot of residuals versus the fitted values is required. As default, \code{plot.it} is set to FALSE.
+#' @param plot.it an (optional) logical switch indicating if the plot of residuals versus the fitted values is required. As default, \code{plot.it} is set to \code{FALSE}.
 #' @param identify an (optional) positive integer value indicating the number of individuals to identify on the plot of residuals versus the fitted values. This is only appropriate if \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example, \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
 #' @return A vector with the observed \code{type}-type residuals.
@@ -2265,7 +2265,7 @@ dfbeta.zeroinflation <- function(model,submodel=c("counts","zeros"),coefs,identi
 #' the linear predictor or for some subset of them (via the argument \code{coefs}).
 #' @param model an object of class \emph{overglm}.
 #' @param plot.it an (optional) logical indicating if the plot is required or just the data matrix in which that
-#' plot is based. As default, \code{plot.it} is set to FALSE.
+#' plot is based. As default, \code{plot.it} is set to \code{FALSE}.
 #' @param coefs	an (optional) character string which (partially) match with the names of some model parameters.
 #' @param identify an (optional) integer indicating the number of individuals to identify on the plot of the Cook's
 #' distance. This is only appropriate if \code{plot.it=TRUE}.
@@ -2367,7 +2367,7 @@ cooks.distance.overglm <- function(model, plot.it=FALSE, coefs, identify,...){
 #' @param submodel an (optional) character string which allows to specify the model: "counts", "zeros" or "full". By default,
 #' \code{submodel} is set to "counts".
 #' @param plot.it an (optional) logical indicating if the plot is required or just the data matrix in which that
-#' plot is based. As default, \code{plot.it} is set to FALSE.
+#' plot is based. As default, \code{plot.it} is set to \code{FALSE}.
 #' @param coefs	an (optional) character string which (partially) match with the names of some model parameters.
 #' @param identify an (optional) integer indicating the number of individuals to identify on the plot of the Cook's
 #' distance. This is only appropriate if \code{plot.it=TRUE}.
@@ -3110,7 +3110,7 @@ U <- unlist(lapply(strsplit(attr(terms(upper,data=datas),"term.labels"),":"),fun
 #' the absolute value of the elements of the main diagonal of the normal curvature matrix ("total") or
 #' the eigenvector which corresponds to the maximum absolute eigenvalue of the normal curvature matrix ("local").
 #' As default, \code{type} is set to "total".
-#' @param plot.it an (optional) logical indicating if the plot is required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to FALSE.
+#' @param plot.it an (optional) logical indicating if the plot is required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to \code{FALSE}.
 #' @param coefs	an (optional) character string which (partially) match with the names of some model parameters.
 #' @param identify an (optional) integer indicating the number of individuals to identify on the plot. This is only appropriate if \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used

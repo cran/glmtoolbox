@@ -17,7 +17,7 @@
 
 \item{level}{an (optional) character string indicating the level for which the leverage measures are required. The options are: cluster-level ("clusters") and observation-level ("observations"). As default, \code{level} is set to "clusters".}
 
-\item{plot.it}{an (optional) logical indicating if the plot of the measures of leverage are required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to FALSE.}
+\item{plot.it}{an (optional) logical indicating if the plot of the measures of leverage are required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to \code{FALSE}.}
 
 \item{identify}{an (optional) integer indicating the number of (\code{level=``clusters''}) or observations (\code{level=``observations''}) to identify on the plot of the leverage measures. This is only appropriate if \code{plot.it} is specified to be \code{TRUE}.}
 

@@ -20,7 +20,7 @@
 \code{submodel} is set to "counts".}
 
 \item{plot.it}{an (optional) logical indicating if the plot is required or just the data matrix in which that
-plot is based. As default, \code{plot.it} is set to FALSE.}
+plot is based. As default, \code{plot.it} is set to \code{FALSE}.}
 
 \item{coefs}{an (optional) character string which (partially) match with the names of some model parameters.}
 

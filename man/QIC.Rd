@@ -17,7 +17,7 @@ QIC(
 
 \item{k}{an (optional) non-negative value giving the magnitude of the penalty. As default, \code{k} is set to 2.}
 
-\item{u}{an (optional) logical switch indicating if QIC should be replaced by QICu. As default, \code{u} is set to FALSE.}
+\item{u}{an (optional) logical switch indicating if QIC should be replaced by QICu. As default, \code{u} is set to \code{FALSE}.}
 
 \item{verbose}{an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.}
 

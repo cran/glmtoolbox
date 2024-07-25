@@ -1,4 +1,35 @@
 #'
+#' @title Growth of Paramecium aurelium
+#'
+#' @description Data on the growth of three colonies of Paramecium
+#' aurelium in a nutritive medium containing salt solution. In each
+#' experiment, 20 Paramecia were placed in a tube with a constant
+#' temperature medium. Starting on the second day, the number of
+#' individuals is counted every day.
+#'
+#' @docType data
+#'
+#' @usage data(paramecium)
+#'
+#' @format A data frame with 57 rows and 3 variables:
+#' \describe{
+#'   \item{Days}{a numeric vector indicating the time, in number of days.}
+#'   \item{Colony}{a factor with three levels: "A", "B" and "C".}
+#'   \item{Number}{a numeric vector indicating the number of individuals in the colony.}
+#' }
+#' @keywords datasets
+#' @references Svetliza C.F., Paula G.A. (2003) Diagnostics in Nonlinear Negative Binomial Models. \emph{Communications in Statistics - Theory and Methods}, 32, 1227-1250.
+#' @examples
+#' data(paramecium)
+#' dev.new()
+#' with(paramecium,plot(Days,Number,ylab="Number of individuals",pch=20,
+#'      xlab="Time, in days",
+#'      col=ifelse(Colony=="A","black",ifelse(Colony=="B","blue","red"))))
+#' legend(c(0,680),col=c("black","blue","red"),legend=c("A","B","C"),
+#'        pch=20,title="Colony",bty="n")
+"paramecium"
+#'
+#'
 #' @title Calls to a technical support help line
 #'
 #' @description Data on technical support calls after a product release. Using
@@ -1283,6 +1314,12 @@
 #' fit6 <- gnm(calls ~ SSlogis(week, Asym, xmid, scal), family=poisson(identity), data=calls)
 #' summary(fit6)
 #'
+#' ###### Example 7: Growth of Paramecium aurelium
+#' data(paramecium)
+#' fit7 <- gnm(Number ~ exp(alpha - exp(beta - gamma*Days)), family=poisson(log),
+#'             start=c(alpha=1.85,beta=0.7,gamma=0.35), data=paramecium)
+#' summary(fit7)
+#'
 gnm <- function(formula,family=gaussian(),offset=NULL,weights=NULL,data,subset=NULL,start=NULL,toler=0.00001,maxit=50,trace=FALSE,...){
   if(missingArg(data)) data <- environment(eval(formula))
   if(is(family,"function")) family <- family()
@@ -1291,18 +1328,18 @@ gnm <- function(formula,family=gaussian(),offset=NULL,weights=NULL,data,subset=N
   if(is.null(start)){
     defaultW <- getOption("warn")
     options(warn = -1)
-    form <- paste0("y2 <- family$linkfun(",formula[[2]],")")
+    form <- paste0("y2 <- family$linkfun(",deparse(formula[[2]]),")")
     if(family$family=="binomial"){
-      form <- paste0("ifelse(",formula[[2]],"*(1-",formula[[2]],")==0,abs(",formula[[2]],"-0.01),",formula[[2]],")")
+      form <- paste0("ifelse(",deparse(formula[[2]]),"*(1-",deparse(formula[[2]]),")==0,abs(",deparse(formula[[2]]),"-0.01),",deparse(formula[[2]]),")")
       form <- paste0("y2 <- family$linkfun(",form,")")
     }
-    if(family$family=="poisson") form <- paste0("y2 <- family$linkfun(ifelse(",formula[[2]],"==0,0.01,",formula[[2]],"))")
+    if(family$family=="poisson") form <- paste0("y2 <- family$linkfun(ifelse(",deparse(formula[[2]]),"==0,0.01,",deparse(formula[[2]]),"))")
     eval(parse(text=paste0("data <- within(data,",form,")")))
     mmf <- match.call(expand.dots = FALSE)
     m <- match(c("subset", "weights", "offset"), names(mmf), 0)
     mmf <- mmf[c(1L,m)]
     if(!is.null(mmf$offset)) eval(parse(text=paste0("data <- within(data,y2 <- y2 - ",deparse(mmf$offset),")") ))
-    conls <- try(do.call(nls,list(formula=as.formula(paste0("y2 ~ ",as.character(formula[3]))),data=data,subset=mmf$subset,weights=mmf$weights)),silent=TRUE)
+    conls <- try(do.call(nls,list(formula=as.formula(paste0("y2 ~ ",deparse(formula[[3]]))),data=data,subset=mmf$subset,weights=mmf$weights)),silent=TRUE)
     options(warn = defaultW)
     if(is.list(conls)) start <- coef(conls)
   }
@@ -1616,8 +1653,8 @@ summary.gnm <- function(object, ...,digits=max(3, getOption("digits") - 2),dispe
 #' @description Computes residuals for a fitted generalized nonlinear model.
 #' @param object a object of the class \emph{gnm}.
 #' @param type an (optional) character string giving the type of residuals which should be returned. The available options are: (1) "quantile", (2) "deviance", and (3) "pearson". As default, \code{type} is set to "quantile".
-#' @param standardized an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. As default, \code{standardized} is set to FALSE.
-#' @param plot.it an (optional) logical switch indicating if a plot of the residuals versus the fitted values is required. As default, \code{plot.it} is set to FALSE.
+#' @param standardized an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. As default, \code{standardized} is set to \code{FALSE}.
+#' @param plot.it an (optional) logical switch indicating if a plot of the residuals versus the fitted values is required. As default, \code{plot.it} is set to \code{FALSE}.
 #' @param identify an (optional) integer value indicating the number of individuals to identify on the plot of residuals. This is only appropriate when \code{plot.it=TRUE}.
 #' @param dispersion an (optional) value indicating the dispersion parameter estimate that must be used to calculate residuals.
 #' @param ... further arguments passed to or from other methods
@@ -1735,7 +1772,7 @@ residuals.gnm <- function(object,type=c("quantile","deviance","pearson"),standar
 #' @param rep an (optional) positive integer which allows to specify the number of replicates which should be used to build the simulated envelope. As default, \code{rep} is set to 25.
 #' @param conf an (optional) value in the interval (0,1) indicating the confidence level which should be used to build the pointwise confidence intervals, which form the envelope. As default, \code{conf} is set to 0.95.
 #' @param type a character string indicating the type of residuals which should be used. The available options are: randomized quantile ("quantile"), deviance ("deviance") and pearson ("pearson") residuals. As default, \code{type} is set to "quantile".
-#' @param standardized an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. As default, \code{standardized} is set to FALSE.
+#' @param standardized an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. As default, \code{standardized} is set to \code{FALSE}.
 #' @param plot.it an (optional) logical switch indicating if the normal QQ-plot with simulated envelope of residuals is required or just the data matrix in which it is based. As default, \code{plot.it} is set to TRUE.
 #' @param identify an (optional) positive integer indicating the number of individuals to identify on the QQ-plot with simulated envelope of residuals. This is only appropriate if \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example,  \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
@@ -1994,7 +2031,7 @@ dfbeta.gnm <- function(model, coefs, identify, ...){
 #' @param model an object of class \emph{gnm}.
 #' @param dispersion an (optional) value indicating the estimate of the dispersion parameter. As default, \code{dispersion} is set to \code{summary(object)$dispersion}.
 #' @param plot.it an (optional) logical indicating if the plot is required or just the data matrix in which that
-#' plot is based. As default, \code{plot.it} is set to FALSE.
+#' plot is based. As default, \code{plot.it} is set to \code{FALSE}.
 #' @param coefs	an (optional) character string that matches (partially) some of the model parameter names.
 #' @param identify an (optional) integer indicating the number of individuals to identify on the plot of the Cook's
 #' distance. This is only appropriate if \code{plot.it=TRUE}.
@@ -2424,7 +2461,7 @@ vdtest.glm <- function(model,varformula,verbose=TRUE,...){
 #' @param rep an (optional) positive integer which allows to specify the number of replicates which should be used to build the simulated envelope. As default, \code{rep} is set to 25.
 #' @param conf an (optional) value in the interval (0,1) indicating the confidence level which should be used to build the pointwise confidence intervals, which form the envelope. As default, \code{conf} is set to 0.95.
 #' @param type an (optional) character string indicating the type of residuals which should be used. The available options are: randomized quantile ("quantile"), deviance ("deviance") and pearson ("pearson") residuals. As default, \code{type} is set to "quantile".
-#' @param standardized an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. As default, \code{standardized} is set to FALSE.
+#' @param standardized an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. As default, \code{standardized} is set to \code{FALSE}.
 #' @param plot.it an (optional) logical switch indicating if the normal QQ-plot with simulated envelope of residuals is required or just the data matrix in which it is based. As default, \code{plot.it} is set to TRUE.
 #' @param identify an (optional) positive integer indicating the number of individuals to identify on the QQ-plot with simulated envelope of residuals. This is only appropriate if \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example,  \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
@@ -2706,7 +2743,7 @@ zero.excess <- function(object, alternative=c("excess","lack","both"), method=c(
 #' to apply. The options are: case weight perturbation of observations ("case-weight") and perturbation of response ("response"). As default, \code{perturbation} is set to "case-weight".
 #' @param plot.it an (optional) logical indicating if the plot of the measures of local
 #' influence is required or just the data matrix in which that plot is based. As default,
-#' \code{plot.it} is set to FALSE.
+#' \code{plot.it} is set to \code{FALSE}.
 #' @param coefs	an (optional) character string which (partially) match with the names of
 #' some of the parameters in the 'linear' predictor.
 #' @param identify an (optional) integer indicating the number of observations to identify
@@ -2978,4 +3015,56 @@ bestSubset <- function(object, nvmax=8, nbest=1, force.in=NULL, force.out=NULL, 
     if(!Intercept) cat("\n*Deviance divided by its degrees of freedom.\n")
   }
   return(invisible(subsets))
+}
+#' @title Tidy a(n) glmgee object
+#' @description Tidy summarizes information about the components of a GEE model.
+#' @param x an object of class \emph{glmgee}.
+#' @param conf.int an (optional) character string indicating whether or not to include a confidence interval in the tidied output. As default, \code{conf.int} is set to \code{FALSE}.
+#' @param conf.level an (optional) value indicating the confidence level to use for the confidence interval if \code{conf.int=TRUE}. As default, \code{conf.level} is set to 0.95.
+#' @param exponentiate an (optional) logical indicating whether or not to exponentiate the coefficient estimates. As default, \code{exponentiate} is set to \code{FALSE}.
+#' @param varest an (optional) character string indicating the type of estimator which should be used. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). As default, \code{type} is set to "robust".
+#' @param ... further arguments passed to or from other methods.
+#' @importFrom broom tidy
+#' @method tidy glmgee
+#' @export
+tidy.glmgee <- function(x, conf.int=FALSE, conf.level=0.95, exponentiate=FALSE, varest=c("robust","df-adjusted","bias-corrected","model"),...) {
+  as_tidy_tibble <- utils::getFromNamespace("as_tidy_tibble", "broom")
+  exponentiates <- utils::getFromNamespace("exponentiate", "broom")
+  varest <- match.arg(varest)
+  .Theta <- function() return(.Theta)
+  environment(.Theta) <- environment(x$family$variance)
+  TAB <- cbind(x$coefficients,sqrt(diag(vcov(x,type=varest))))
+  TAB <- cbind(TAB,TAB[,1]/TAB[,2],2*pnorm(-abs(TAB[,1]/TAB[,2])))
+  if(conf.int){
+    if(conf.level<=0 || conf.level>=1) stop("Value of conf.int must be in the interval (0,1)!!",call.=FALSE)
+    TAB <- cbind(TAB,TAB[,1]-qnorm((1+conf.level)/2)*TAB[,2],TAB[,1]+qnorm((1+conf.level)/2)*TAB[,2])
+    TAB <- as_tidy_tibble(TAB,c("estimate", "std.error", "statistic", "p.value", "conf.low", "conf.high"))
+  }else	TAB <- as_tidy_tibble(TAB,c("estimate", "std.error", "statistic", "p.value"))
+  if(exponentiate){
+    if(is.null(x$family) ||	(x$family$link!="logit" && x$family$link!="log"))
+      warning(paste("Exponentiating coefficients, but the model did not use a log or logit link function."))
+    TAB <- exponentiates(TAB)
+  }
+  TAB
+}
+#' @title Glance at a(n) glmgee object
+#' @description Glance summarizes information about a GEE model.
+#' @param x an object of class \emph{glmgee}.
+#' @param ... further arguments passed to or from other methods.
+#' @importFrom broom glance
+#' @method glance glmgee
+#' @export
+glance.glmgee <- function(x, ...){
+  as_glance_tibble <- utils::getFromNamespace("as_glance_tibble", "broom")
+  as_glance_tibble(
+    nobs = sum(x$sizes),
+    n.clusters = x$clusters[1],
+    min.cluster.size = x$clusters[3],
+    max.cluster.size = x$clusters[2],
+    df.residual = x$df.residual,
+    variance = x$family$family,
+    link = x$family$link,
+    correlation = ifelse(grepl("M-dependent",x$corstr),paste(x$corstr,"(",attr(x$corstr,"M"),")",sep=""),x$corstr),
+    na_types = "iiiiiccc"
+  )
 }

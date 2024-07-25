@@ -22,7 +22,7 @@
 
 \item{level}{an (optional) character string indicating the level for which the Cook's distance is required. The options are: cluster-level ("clusters") and observation-level ("observations"). As default, \code{level} is set to "clusters".}
 
-\item{plot.it}{an (optional) logical indicating if the plot of Cook's distance is required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to FALSE.}
+\item{plot.it}{an (optional) logical indicating if the plot of Cook's distance is required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to \code{FALSE}.}
 
 \item{coefs}{an (optional) character string which (partially) match with the names of some of the parameters in the linear predictor.}
 

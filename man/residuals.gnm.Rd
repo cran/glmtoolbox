@@ -19,9 +19,9 @@
 
 \item{type}{an (optional) character string giving the type of residuals which should be returned. The available options are: (1) "quantile", (2) "deviance", and (3) "pearson". As default, \code{type} is set to "quantile".}
 
-\item{standardized}{an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. As default, \code{standardized} is set to FALSE.}
+\item{standardized}{an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. As default, \code{standardized} is set to \code{FALSE}.}
 
-\item{plot.it}{an (optional) logical switch indicating if a plot of the residuals versus the fitted values is required. As default, \code{plot.it} is set to FALSE.}
+\item{plot.it}{an (optional) logical switch indicating if a plot of the residuals versus the fitted values is required. As default, \code{plot.it} is set to \code{FALSE}.}
 
 \item{identify}{an (optional) integer value indicating the number of individuals to identify on the plot of residuals. This is only appropriate when \code{plot.it=TRUE}.}
 

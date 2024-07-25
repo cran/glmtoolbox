@@ -26,7 +26,7 @@ BoxTidwell(
 \emph{maxiter} is set to 30.}
 
 \item{trace}{an (optional) logical indicating if should the record of iterations be printed. By default,
-\emph{trace} is set to FALSE.}
+\emph{trace} is set to \code{FALSE}.}
 
 \item{digits}{an (optional) integer value indicating the number of decimal places to be used.}
 

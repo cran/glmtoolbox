@@ -1503,8 +1503,8 @@ confint2 <- function(model, level=0.95, test=c("wald","lr","score","gradient"), 
 #' @description Computes residuals for a fitted linear or generalized linear model.
 #' @param object a object of the class \emph{lm} or \emph{glm}.
 #' @param type an (optional) character string giving the type of residuals which should be returned. The available options for LMs are: (1) externally studentized ("external"); (2) internally studentized ("internal") (default). The available options for GLMs are: (1) "pearson"; (2) "deviance" (default);  (3) "quantile".
-#' @param standardized an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. As default, \code{standardized} is set to FALSE.
-#' @param plot.it an (optional) logical switch indicating if a plot of the residuals versus the fitted values is required. As default, \code{plot.it} is set to FALSE.
+#' @param standardized an (optional) logical switch indicating if the residuals should be standardized by dividing by the square root of \eqn{(1-h)}, where \eqn{h} is a measure of leverage. As default, \code{standardized} is set to \code{FALSE}.
+#' @param plot.it an (optional) logical switch indicating if a plot of the residuals versus the fitted values is required. As default, \code{plot.it} is set to \code{FALSE}.
 #' @param identify an (optional) integer value indicating the number of individuals to identify on the plot of residuals. This is only appropriate when \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods
 #' @return A vector with the observed residuals type \code{type}.
@@ -2114,7 +2114,7 @@ stepCriterion.glm <- function(model, criterion=c("adjr2","bic","aic","p-value","
 #' to apply. The options are: case weight perturbation of observations ("case-weight"); perturbation of covariates ("covariate"); and perturbation of response ("response"). As default, \code{perturbation} is set to "case-weight".
 #' @param plot.it an (optional) logical indicating if the plot of the measures of local
 #' influence is required or just the data matrix in which that plot is based. By default,
-#' \code{plot.it} is set to FALSE.
+#' \code{plot.it} is set to \code{FALSE}.
 #' @param covariate an character string which (partially) match with the names of one of
 #' the parameters in the linear predictor. This is only appropriate if \code{perturbation="covariate"}.
 #' @param coefs	an (optional) character string which (partially) match with the names of
@@ -2217,7 +2217,7 @@ localInfluence.glm <- function(object,type=c("total","local"),perturbation=c("ca
 #' @param maxiter an (optional) positive integer value indicating the maximum number of iterations. By default,
 #'                \emph{maxiter} is set to 30.
 #' @param trace an (optional) logical indicating if should the record of iterations be printed. By default,
-#'                \emph{trace} is set to FALSE.
+#'                \emph{trace} is set to \code{FALSE}.
 #' @param digits an (optional) integer value indicating the number of decimal places to be used.
 #' @param ...	further arguments passed to or from other methods.
 #' @return Two matrices with the values of marginal and omnibus tests.
@@ -2236,7 +2236,7 @@ BoxTidwell <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,digit
 #' @param maxiter an (optional) positive integer value indicating the maximum number of iterations. By default,
 #'                \emph{maxiter} is set to 30.
 #' @param trace an (optional) logical indicating if should the record of iterations be printed. By default,
-#'              \emph{trace} is set to FALSE.
+#'              \emph{trace} is set to \code{FALSE}.
 #' @param digits an (optional) integer value indicating the number of decimal places to be used.
 #' @param ...	further arguments passed to or from other methods.
 #' @return a list list with components including
@@ -2355,7 +2355,7 @@ BoxTidwell.lm <- function(object,transf,epsilon=0.0001,maxiter=30,trace=FALSE,di
 #' @param maxiter an (optional) positive integer value indicating the maximum number of iterations. By default,
 #'                \emph{maxiter} is set to 30.
 #' @param trace an (optional) logical indicating if should the record of iterations be printed. By default,
-#'              \emph{trace} is set to FALSE.
+#'              \emph{trace} is set to \code{FALSE}.
 #' @param digits an (optional) integer value indicating the number of decimal places to be used.
 #' @param ...	further arguments passed to or from other methods.
 #' @return a list list with components including

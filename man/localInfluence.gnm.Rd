@@ -28,7 +28,7 @@ some of the parameters in the 'linear' predictor.}
 
 \item{plot.it}{an (optional) logical indicating if the plot of the measures of local
 influence is required or just the data matrix in which that plot is based. As default,
-\code{plot.it} is set to FALSE.}
+\code{plot.it} is set to \code{FALSE}.}
 
 \item{identify}{an (optional) integer indicating the number of observations to identify
 on the plot of the measures of local influence. This is only appropriate if

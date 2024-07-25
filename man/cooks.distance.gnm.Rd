@@ -10,7 +10,7 @@
 \item{model}{an object of class \emph{gnm}.}
 
 \item{plot.it}{an (optional) logical indicating if the plot is required or just the data matrix in which that
-plot is based. As default, \code{plot.it} is set to FALSE.}
+plot is based. As default, \code{plot.it} is set to \code{FALSE}.}
 
 \item{dispersion}{an (optional) value indicating the estimate of the dispersion parameter. As default, \code{dispersion} is set to \code{summary(object)$dispersion}.}
 

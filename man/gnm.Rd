@@ -132,6 +132,12 @@ data(calls)
 fit6 <- gnm(calls ~ SSlogis(week, Asym, xmid, scal), family=poisson(identity), data=calls)
 summary(fit6)
 
+###### Example 7: Growth of Paramecium aurelium
+data(paramecium)
+fit7 <- gnm(Number ~ exp(alpha - exp(beta - gamma*Days)), family=poisson(log),
+            start=c(alpha=1.85,beta=0.7,gamma=0.35), data=paramecium)
+summary(fit7)
+
 }
 \seealso{
 \link{glm}, \link{glmgee}, \link{gnmgee}

@@ -45,7 +45,7 @@ glmgee(
 
 \item{start}{an (optional) vector of starting values for the parameters in the linear predictor.}
 
-\item{scale.fix}{an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. As default, \code{scale.fix} is set to FALSE.}
+\item{scale.fix}{an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. As default, \code{scale.fix} is set to \code{FALSE}.}
 
 \item{scale.value}{an (optional) numeric value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. As default, \code{scale.value} is set to 1.}
 
@@ -143,7 +143,8 @@ A set of standard extractor functions for fitted model objects is
 available for objects of class \emph{glmgee}, including methods to generic functions such as  \code{print}, \code{summary},	\code{model.matrix}, \code{estequa},
 \code{coef}, \code{vcov}, \code{logLik}, \code{fitted}, \code{confint} and \code{predict}.
 In addition, the model may be assessed using functions such as \link{anova.glmgee},
-\link{residuals.glmgee}, \link{dfbeta.glmgee}, \link{cooks.distance.glmgee} and \link{localInfluence.glmgee}.
+\link{residuals.glmgee}, \link{dfbeta.glmgee}, \link{cooks.distance.glmgee}, \link{localInfluence.glmgee},
+\link{tidy.glmgee} and \link{glance.glmgee}.
 The variable selection may be accomplished using the routine
 \link{stepCriterion.glmgee}.
 }

@@ -20,7 +20,7 @@ the difference between the observed response and the fitted mean ("response"); (
 the observed response and the fitted mean ("standardized"); (3) the randomized quantile residual ("quantile"). By
 default, \code{type} is set to "quantile".}
 
-\item{plot.it}{an (optional) logical switch indicating if the plot of residuals versus the fitted values is required. As default, \code{plot.it} is set to FALSE.}
+\item{plot.it}{an (optional) logical switch indicating if the plot of residuals versus the fitted values is required. As default, \code{plot.it} is set to \code{FALSE}.}
 
 \item{identify}{an (optional) positive integer value indicating the number of individuals to identify on the plot of residuals versus the fitted values. This is only appropriate if \code{plot.it=TRUE}.}
 

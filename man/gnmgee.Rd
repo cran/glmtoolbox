@@ -49,7 +49,7 @@ gnmgee(
 \item{start}{an (optional) vector of starting values for the parameters in the nonlinear predictor. When \code{start} is
 missing (and \code{formula} is not a self-starting model, see \link{nls} and \link{selfStart}), a very cheap guess for \code{start} is tried.}
 
-\item{scale.fix}{an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. As default, \code{scale.fix} is set to FALSE.}
+\item{scale.fix}{an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. As default, \code{scale.fix} is set to \code{FALSE}.}
 
 \item{scale.value}{an (optional) numeric value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. As default, \code{scale.value} is set to 1.}
 
@@ -148,10 +148,10 @@ A set of standard extractor functions for fitted model objects is
 available for objects of class \emph{glmgee}, including methods to generic functions such as   \code{print}, \code{summary},	\code{model.matrix}, \code{estequa},
 \code{coef}, \code{vcov}, \code{logLik}, \code{fitted}, \code{confint} and \code{predict}.
 In addition, the model may be assessed using functions such as \link{anova.glmgee},
-\link{residuals.glmgee}, \link{dfbeta.glmgee} and \link{cooks.distance.glmgee}.
+\link{residuals.glmgee}, \link{dfbeta.glmgee}, \link{cooks.distance.glmgee}, \link{tidy.glmgee} and \link{glance.glmgee}.
 }
 \examples{
-###### Example : Orange trees grown at Riverside, California
+###### Example 1: Orange trees grown at Riverside, California
 data(Oranges)
 mod <- Trunk ~ b1/(1 + exp((b2-Days)/b3))
 start <- c(b1=200,b2=760,b3=375)
@@ -161,6 +161,12 @@ summary(fit1, corr.digits=2)
 
 mod <- Trunk ~ SSlogis(Days,b1,b2,b3)
 fit2 <- gnmgee(mod, id=Tree, family=Gamma(identity), corstr="Exchangeable", data=Oranges)
+summary(fit2, corr.digits=2)
+
+###### Example 2: Growth of Paramecium aurelium
+data(paramecium)
+fit2 <- gnmgee(Number ~ exp(alpha - exp(beta - gamma*Days)), id=Colony, family=poisson(log),
+         start=c(alpha=1.85,beta=0.7,gamma=0.35), corstr="AR-M-dependent(1)", data=paramecium)
 summary(fit2, corr.digits=2)
 
 }

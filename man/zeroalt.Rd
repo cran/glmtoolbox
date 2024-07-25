@@ -21,7 +21,7 @@ zeroalt(
 \arguments{
 \item{formula}{a \code{Formula} expression of the form \code{response ~ x1 + x2 + ...| z1 + z2 + ...},
 which is a symbolic description of the linear predictors of the models to be fitted to
-\eqn{\mu} and \eqn{\pi}, respectively.    See \link{Formula} documentation. If a formula
+\eqn{\mu} and \eqn{\pi}, respectively.    See \link[Formula]{Formula} documentation. If a formula
 of the form \code{response ~ x1 + x2 + ...} is supplied, the same regressors are
 employed in both components. This is equivalent to \code{response ~ x1 + x2 + ...| x1 + x2 + ...}.}
 

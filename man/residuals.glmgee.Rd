@@ -19,7 +19,7 @@
 
 \item{type}{an (optional) character string giving the type of residuals which should be returned. The available options are: (1) "pearson"; (2) "deviance";  (3) the distance between the observed response vector and the fitted mean vector using a metric based on the product between the cluster size and fitted variance-covariance matrix ("mahalanobis"). As default, \code{type} is set to "mahalanobis".}
 
-\item{plot.it}{an (optional) logical switch indicating if a plot of the residuals is required. As default, \code{plot.it} is set to FALSE.}
+\item{plot.it}{an (optional) logical switch indicating if a plot of the residuals is required. As default, \code{plot.it} is set to \code{FALSE}.}
 
 \item{identify}{an (optional) integer value indicating the number of individuals/clusters to identify on the plot of residuals. This is only appropriate when \code{plot.it=TRUE}.}
 }

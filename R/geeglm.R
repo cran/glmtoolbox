@@ -13,7 +13,7 @@
 #' @param maxit an (optional) integer value which represents the maximum number of iterations allowed for the fitting algorithm. As default, \code{maxit} is set to 50.
 #' @param toler an (optional) positive value which represents the \emph{convergence tolerance}. The convergence is reached when the maximum of the absolute relative differences between the values of the parameters in the linear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. As default, \code{toler} is set to 0.00001.
 #' @param trace an (optional) logical variable. If TRUE, output is produced for each iteration of the estimating algorithm.
-#' @param scale.fix an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. As default, \code{scale.fix} is set to FALSE.
+#' @param scale.fix an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. As default, \code{scale.fix} is set to \code{FALSE}.
 #' @param scale.value an (optional) numeric value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. As default, \code{scale.value} is set to 1.
 #' @param waves an (optional) positive integer-valued variable that is used to identify the order and spacing of observations within clusters. This argument is crucial when there are missing values and gaps in the data. As default, \code{waves} is equal to the integers from 1 to the size of each cluster.
 #' @param ...	further arguments passed to or from other methods.
@@ -46,7 +46,8 @@
 #' available for objects of class \emph{glmgee}, including methods to generic functions such as  \code{print}, \code{summary},	\code{model.matrix}, \code{estequa},
 #' \code{coef}, \code{vcov}, \code{logLik}, \code{fitted}, \code{confint} and \code{predict}.
 #' In addition, the model may be assessed using functions such as \link{anova.glmgee},
-#' \link{residuals.glmgee}, \link{dfbeta.glmgee}, \link{cooks.distance.glmgee} and \link{localInfluence.glmgee}.
+#' \link{residuals.glmgee}, \link{dfbeta.glmgee}, \link{cooks.distance.glmgee}, \link{localInfluence.glmgee},
+#' \link{tidy.glmgee} and \link{glance.glmgee}.
 #' The variable selection may be accomplished using the routine
 #' \link{stepCriterion.glmgee}.
 #'
@@ -711,7 +712,7 @@ dfbeta.glmgee <- function(model, level=c("clusters","observations"), method=c("P
 #' @param model an object of class \emph{glmgee}.
 #' @param method an (optional) character string indicating the method of calculation for the \emph{one-step approximation}. The options are: the \emph{one-step approximation} described by Preisser and Qaqish (1996) in which the working-correlation matrix is assumed to be known ("Preisser-Qaqish"); and the "authentic" \emph{one-step approximation} ("full"). As default, \code{method} is set to "Preisser-Qaqish".
 #' @param level an (optional) character string indicating the level for which the Cook's distance is required. The options are: cluster-level ("clusters") and observation-level ("observations"). As default, \code{level} is set to "clusters".
-#' @param plot.it an (optional) logical indicating if the plot of Cook's distance is required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to FALSE.
+#' @param plot.it an (optional) logical indicating if the plot of Cook's distance is required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to \code{FALSE}.
 #' @param coefs	an (optional) character string which (partially) match with the names of some of the parameters in the linear predictor.
 #' @param identify an (optional) integer indicating the number of clusters to identify on the plot of Cook's distance. This is only appropriate if \code{plot.it=TRUE}.
 #' @param varest an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). As default, \code{varest} is set to "robust".
@@ -856,7 +857,7 @@ print.glmgee <- function(x, ...){
 #' @param object an object of the class \emph{glmgee}.
 #' @param newdata	an (optional) \code{data frame} in which to look for variables with which to predict. If omitted, the fitted linear predictors are used.
 #' @param type an (optional) character string giving the type of prediction required. The default, "link", is on the scale of the linear predictors, and the alternative, "response", is on the scale of the response variable.
-#' @param se.fit	an (optional) logical switch indicating if standard errors are required. As default, \code{se.fit} is set to FALSE.
+#' @param se.fit	an (optional) logical switch indicating if standard errors are required. As default, \code{se.fit} is set to \code{FALSE}.
 #' @param varest an (optional) character string indicating the type of estimator which should be used to the variance-covariance matrix of the interest parameters. The available options are: robust sandwich-type estimator ("robust"), degrees-of-freedom-adjusted estimator ("df-adjusted"), bias-corrected estimator ("bias-corrected"), and the model-based or naive estimator ("model"). As default, \code{varest} is set to "robust".
 #' @param ... further arguments passed to or from other methods.
 #' @return A matrix with so many rows as \code{newdata} and one column with the predictions. If \code{se.fit=}TRUE then a second column with estimates standard errors is included.
@@ -923,7 +924,7 @@ predict.glmgee <- function(object, ...,newdata, se.fit=FALSE, type=c("link","res
 #' @description Calculates residuals for a fitted generalized estimating equation.
 #' @param object a object of the class \emph{glmgee}.
 #' @param type an (optional) character string giving the type of residuals which should be returned. The available options are: (1) "pearson"; (2) "deviance";  (3) the distance between the observed response vector and the fitted mean vector using a metric based on the product between the cluster size and fitted variance-covariance matrix ("mahalanobis"). As default, \code{type} is set to "mahalanobis".
-#' @param plot.it an (optional) logical switch indicating if a plot of the residuals is required. As default, \code{plot.it} is set to FALSE.
+#' @param plot.it an (optional) logical switch indicating if a plot of the residuals is required. As default, \code{plot.it} is set to \code{FALSE}.
 #' @param identify an (optional) integer value indicating the number of individuals/clusters to identify on the plot of residuals. This is only appropriate when \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods
 #' @return A vector with the observed residuals type \code{type}.
@@ -1181,7 +1182,7 @@ anova.glmgee <- function(object,...,test=c("wald","score"),verbose=TRUE,varest=c
 #' @description Computes the quasi-likelihood under the independence model criterion (QIC) for one or more objects of the class glmgee.
 #' @param ...	one or several objects of the class \emph{glmgee}.
 #' @param k an (optional) non-negative value giving the magnitude of the penalty. As default, \code{k} is set to 2.
-#' @param u an (optional) logical switch indicating if QIC should be replaced by QICu. As default, \code{u} is set to FALSE.
+#' @param u an (optional) logical switch indicating if QIC should be replaced by QICu. As default, \code{u} is set to \code{FALSE}.
 #' @param verbose an (optional) logical switch indicating if should the report of results be printed. As default, \code{verbose} is set to TRUE.
 #' @param digits an (optional) integer indicating the number of digits to print. As default, \code{digits} is set to \code{max(3, getOption("digits") - 2)}.
 #' @return A \code{data.frame} with the values of -2*quasi-likelihood, the number of parameters in the linear predictor, and the value of QIC (or QICu if \code{u}=TRUE) for each \emph{glmgee} object in the input.
@@ -2289,7 +2290,7 @@ vcov.glmgee <- function(object,...,type=c("robust","df-adjusted","model","bias-c
 #' @description Computes and, optionally, displays a graph of the leverage measures at the cluster- and observation-level.
 #' @param object an object of class \emph{glmgee}.
 #' @param level an (optional) character string indicating the level for which the leverage measures are required. The options are: cluster-level ("clusters") and observation-level ("observations"). As default, \code{level} is set to "clusters".
-#' @param plot.it an (optional) logical indicating if the plot of the measures of leverage are required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to FALSE.
+#' @param plot.it an (optional) logical indicating if the plot of the measures of leverage are required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to \code{FALSE}.
 #' @param identify an (optional) integer indicating the number of (\code{level=``clusters''}) or observations (\code{level=``observations''}) to identify on the plot of the leverage measures. This is only appropriate if \code{plot.it} is specified to be \code{TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it} is specified to be \code{TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example,  \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
 #' @return A vector with the values of the leverage measures with so many rows as clusters (\code{level=``clusters''}) or observations (\code{level=``observations''}) in the sample.
@@ -2370,7 +2371,7 @@ leverage.glmgee <- function(object,level=c("clusters","observations"),plot.it=FA
 #' @param object an object of class \emph{glmgee}.
 #' @param type an (optional) character string indicating the type of approach to study the local influence. The options are: the absolute value of the elements of the eigenvector which corresponds to the maximum absolute eigenvalue ("local"); and the elements of the main diagonal ("total"). As default, \code{type} is set to "total".
 #' @param perturbation an (optional) character string indicating the perturbation scheme to apply. The options are: case weight perturbation of clusters ("cw-clusters"); Case weight perturbation of observations ("cw-observations"); and perturbation of response ("response"). As default, \code{perturbation} is set to "cw-clusters".
-#' @param plot.it an (optional) logical indicating if the plot of the measures of local influence is required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to FALSE.
+#' @param plot.it an (optional) logical indicating if the plot of the measures of local influence is required or just the data matrix in which that plot is based. As default, \code{plot.it} is set to \code{FALSE}.
 #' @param coefs	an (optional) character string which (partially) match with the names of some of the parameters in the linear predictor.
 #' @param identify an (optional) integer indicating the number of clusters/observations to identify on the plot of the measures of local influence. This is only appropriate if \code{plot.it=TRUE}.
 #' @param ... further arguments passed to or from other methods. If \code{plot.it=TRUE} then \code{...} may be used to include graphical parameters to customize the plot. For example, \code{col}, \code{pch}, \code{cex}, \code{main}, \code{sub}, \code{xlab}, \code{ylab}.
@@ -2509,7 +2510,7 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
 #' @param maxit an (optional) integer value which represents the maximum number of iterations allowed for the fitting algorithm. As default, \code{maxit} is set to 50.
 #' @param toler an (optional) positive value which represents the \emph{convergence tolerance}. The convergence is reached when the maximum of the absolute relative differences between the values of the parameters in the nonlinear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. As default, \code{toler} is set to 0.00001.
 #' @param trace an (optional) logical variable. If TRUE, output is produced for each iteration of the estimating algorithm.
-#' @param scale.fix an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. As default, \code{scale.fix} is set to FALSE.
+#' @param scale.fix an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. As default, \code{scale.fix} is set to \code{FALSE}.
 #' @param scale.value an (optional) numeric value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. As default, \code{scale.value} is set to 1.
 #' @param waves an (optional) positive integer-valued variable that is used to identify the order and spacing of observations within clusters. This argument is crucial when there are missing values and gaps in the data. As default, \code{waves} is equal to the integers from 1 to the size of each cluster.
 #' @param ...	further arguments passed to or from other methods.
@@ -2543,7 +2544,7 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
 #' available for objects of class \emph{glmgee}, including methods to generic functions such as   \code{print}, \code{summary},	\code{model.matrix}, \code{estequa},
 #' \code{coef}, \code{vcov}, \code{logLik}, \code{fitted}, \code{confint} and \code{predict}.
 #' In addition, the model may be assessed using functions such as \link{anova.glmgee},
-#' \link{residuals.glmgee}, \link{dfbeta.glmgee} and \link{cooks.distance.glmgee}.
+#' \link{residuals.glmgee}, \link{dfbeta.glmgee}, \link{cooks.distance.glmgee}, \link{tidy.glmgee} and \link{glance.glmgee}.
 #'
 #' @return an object of class \emph{glmgee} in which the main results of the GEE model fitted to the data are stored, i.e., a
 #' list with components including
@@ -2599,7 +2600,7 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
 #' @seealso \link{glmgee}, \link{wglmgee}
 #' @export gnmgee
 #' @examples
-#' ###### Example : Orange trees grown at Riverside, California
+#' ###### Example 1: Orange trees grown at Riverside, California
 #' data(Oranges)
 #' mod <- Trunk ~ b1/(1 + exp((b2-Days)/b3))
 #' start <- c(b1=200,b2=760,b3=375)
@@ -2609,6 +2610,12 @@ localInfluence.glmgee <- function(object,type=c("total","local"),perturbation=c(
 #'
 #' mod <- Trunk ~ SSlogis(Days,b1,b2,b3)
 #' fit2 <- gnmgee(mod, id=Tree, family=Gamma(identity), corstr="Exchangeable", data=Oranges)
+#' summary(fit2, corr.digits=2)
+#'
+#' ###### Example 2: Growth of Paramecium aurelium
+#' data(paramecium)
+#' fit2 <- gnmgee(Number ~ exp(alpha - exp(beta - gamma*Days)), id=Colony, family=poisson(log),
+#'          start=c(alpha=1.85,beta=0.7,gamma=0.35), corstr="AR-M-dependent(1)", data=paramecium)
 #' summary(fit2, corr.digits=2)
 #'
 #' @references Liang K.Y., Zeger S.L. (1986) Longitudinal data analysis using generalized linear models.
@@ -2625,18 +2632,18 @@ gnmgee <- function(formula,family=gaussian(),offset=NULL,weights=NULL,id,waves,d
   if(is.null(start)){
     defaultW <- getOption("warn")
     options(warn = -1)
-    form <- paste0("y2 <- family$linkfun(",formula[[2]],")")
+    form <- paste0("y2 <- family$linkfun(",deparse(formula[[2]]),")")
     if(family$family=="binomial"){
-      form <- paste0("ifelse(",formula[[2]],"*(1-",formula[[2]],")==0,abs(",formula[[2]],"-0.01),",formula[[2]],")")
+      form <- paste0("ifelse(",deparse(formula[[2]]),"*(1-",deparse(formula[[2]]),")==0,abs(",deparse(formula[[2]]),"-0.01),",deparse(formula[[2]]),")")
       form <- paste0("y2 <- family$linkfun(",form,")")
     }
-    if(family$family=="poisson") form <- paste0("y2 <- family$linkfun(ifelse(",formula[[2]],"==0,0.01,",formula[[2]],"))")
+    if(family$family=="poisson") form <- paste0("y2 <- family$linkfun(ifelse(",deparse(formula[[2]]),"==0,0.01,",deparse(formula[[2]]),"))")
     eval(parse(text=paste0("data <- within(data,",form,")")))
     mmf <- match.call(expand.dots = FALSE)
     m <- match(c("subset", "weights", "offset"), names(mmf), 0)
     mmf <- mmf[c(1L,m)]
     if(!is.null(mmf$offset)) eval(parse(text=paste0("data <- within(data,y2 <- y2 - ",deparse(mmf$offset),")") ))
-    conls <- do.call(nls,list(formula=as.formula(paste0("y2 ~ ",as.character(formula[3]))),data=data,subset=mmf$subset,weights=mmf$weights))
+    conls <- try(do.call(nls,list(formula=as.formula(paste0("y2 ~ ",deparse(formula[[3]]))),data=data,subset=mmf$subset,weights=mmf$weights)),silent=TRUE)
     options(warn = defaultW)
     if(is.list(conls)) start <- coef(conls)
   }
@@ -2909,7 +2916,7 @@ gnmgee <- function(formula,family=gaussian(),offset=NULL,weights=NULL,id,waves,d
 #' @param maxit an (optional) integer value which represents the maximum number of iterations allowed for the fitting algorithm. As default, \code{maxit} is set to 50.
 #' @param toler an (optional) positive value which represents the \emph{convergence tolerance}. The convergence is reached when the maximum of the absolute relative differences between the values of the parameters in the linear predictor in consecutive iterations of the fitting algorithm is lower than \code{toler}. As default, \code{toler} is set to 0.00001.
 #' @param trace an (optional) logical variable. If TRUE, output is produced for each iteration of the estimating algorithm.
-#' @param scale.fix an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. As default, \code{scale.fix} is set to FALSE.
+#' @param scale.fix an (optional) logical variable. If TRUE, the scale parameter is fixed at the value of \code{scale.value}. As default, \code{scale.fix} is set to \code{FALSE}.
 #' @param scale.value an (optional) numeric value at which the scale parameter should be fixed. This is only appropriate if \code{scale.fix=TRUE}. As default, \code{scale.value} is set to 1.
 #' @param ...	further arguments passed to or from other methods.
 #' @details The values of the multivariate response variable measured on \eqn{n} subjects or clusters,
